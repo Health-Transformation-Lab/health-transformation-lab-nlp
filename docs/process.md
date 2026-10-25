@@ -5,6 +5,7 @@ to this repo. The diagram is the study design; the table under it says where
 each box lives.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 1000, "nodeSpacing": 30, "rankSpacing": 45}}}%%
 flowchart BT
         N["Chart notes"]
         E["Exam forms"]
@@ -15,13 +16,13 @@ flowchart BT
         PR["Probing chart<br/>• CAL<br/>• RBL<br/>• Tooth loss due to perio"]
 
     subgraph Q["Qualitative"]
-        C["<b>Compare each method against each other</b><br/>Where do they agree and disagree?"]
-        R["<b>Conduct qualitative review</b><br/>Two dental reviewers review charts together<br/>to assess the most accurate methods"]
+        C["<b>Compare each method against each other</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Where do they agree and disagree?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
+        R["<b>Conduct qualitative review</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Two dental reviewers review charts together to assess the most accurate methods&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
     end
 
     subgraph V["Quantitative"]
-        A["<b>Produce rule-based phenotyping algorithm</b><br/>Based on findings from the qualitative review"]
-        QV["<b>Quantitative validation: chart review reliability</b><br/>Many reviewers stage the same set of charts independently,<br/>compared to the rule-based algorithm and the AI model"]
+        A["<b>Produce rule-based phenotyping algorithm</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Based on findings from the qualitative review&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
+        QV["<b>Quantitative validation: chart review reliability assessment</b><br/>Many reviewers stage the same set of charts independently, compared to the rule-based algorithm and AI model"]
     end
 
     N & E & PC & PP & DC & DP & PR --> C
