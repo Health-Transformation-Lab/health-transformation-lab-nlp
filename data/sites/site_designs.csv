@@ -1,0 +1,4 @@
+design,measurement_rows,concept_rows,site_rows,site_event_rows,storage_mb,sql_lines,sql_chars,joins,decode_calls,query_seconds,exams,max_diff_vs_python,cdc_mismatches
+a_post_coordinated,2163414,31,256480.0,2163414.0,529.219584,26,1515,5,1,6.7620613280000725,3437,1.4210854715202004e-14,0
+b_pre_coordinated,2163414,703,,,276.15232,23,1401,2,11,4.215595480000047,3437,1.4210854715202004e-14,0
+c_site_columns,2163414,31,,,308.985856,18,1036,0,0,2.2459562619997087,3437,1.4210854715202004e-14,0

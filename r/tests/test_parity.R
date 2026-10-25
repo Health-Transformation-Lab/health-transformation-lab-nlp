@@ -173,3 +173,22 @@ if (file.exists(vs) && file.exists(pp)) {
   stopifnot(nrow(m) == nrow(py), d < 1e-9)
 } else cat("prevalence: skipped (run 19_prevalence.py)\n")
 cat("parity OK (spec 005)\n")
+
+# 7. Spec 006: derived measures and CDC/AAP from site-level charts.
+if (file.exists("data/sites/parity_sites.csv") && file.exists("data/sites/derived.csv")) {
+  source("r/R/07_sites.R")
+  s <- read.csv("data/sites/parity_sites.csv", stringsAsFactors = FALSE)
+  t <- read.csv("data/sites/parity_teeth.csv", stringsAsFactors = FALSE)
+  t$missing_reason[is.na(t$missing_reason)] <- ""
+  r <- derive_sites(s, t)
+  py <- read.csv("data/sites/derived.csv", stringsAsFactors = FALSE)
+  m <- merge(py, r, by = "visit_id", suffixes = c(".py", ".r"))
+  num <- c("n_teeth_present", "teeth_lost_perio", "max_probing_depth_mm", "max_cal_mm", "bop_pct",
+           "pct_teeth_ip_cal1", "n_teeth_ip_cal3", "n_teeth_ip_cal4", "n_teeth_ip_cal6", "n_teeth_ip_pd4",
+           "n_teeth_ip_pd5", "n_sites_ip_pd5", "max_furcation_class", "max_mobility_degree")
+  d <- max(abs(as.matrix(m[paste0(num, ".py")]) - as.matrix(m[paste0(num, ".r")])))
+  cdc_bad <- sum(cdc_aap(r[match(m$visit_id, r$visit_id), ]) != m$cdc_aap_2012)
+  cat(sprintf("sites:        max |R - Python| = %.2e over %d exams; CDC/AAP mismatches %d\n", d, nrow(m), cdc_bad))
+  stopifnot(nrow(m) == length(unique(s$visit_id)), d < 1e-9, cdc_bad == 0)
+} else cat("sites: skipped (run 22_build_sites.py)\n")
+cat("parity OK (spec 006)\n")

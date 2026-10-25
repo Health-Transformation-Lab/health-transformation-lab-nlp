@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -e "./python[dev,db]"
-      - run: cd python && python scripts/01_build_dataset.py && pytest -q tests/test_db_postgres.py
+      - run: cd python && python scripts/01_build_dataset.py && pytest -q tests/test_db_postgres.py tests/test_site_designs.py
 
   r-parity:
     runs-on: ubuntu-latest

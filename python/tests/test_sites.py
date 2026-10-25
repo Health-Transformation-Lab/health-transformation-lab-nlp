@@ -74,3 +74,10 @@ def test_cdc_aap(cal, pdd, want):
 def test_derived_counts_distinct_teeth():
     d = _one_mouth({(3, "MB"): 6, (3, "DB"): 6, (14, "ML"): 4}, {})
     assert d["n_teeth_ip_cal6"] == 1 and d["n_teeth_ip_cal4"] == 2 and d["n_teeth_ip_cal3"] == 2
+
+
+def test_many_teeth_lost():
+    rng = random.Random(1)
+    c = PerioChart(8, 60, 9, 70, 10)
+    sites, teeth = draw_mouth(c, 80, rng)
+    assert derive(sites, teeth)["teeth_lost_perio"] == 10

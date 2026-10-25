@@ -47,9 +47,10 @@ def draw_mouth(chart: PerioChart, pct_teeth_involved: float, rng: random.Random)
     stage_n = int(stage[-1]) if stage.startswith("periodontitis") else 0
     missing = {t: "other" for t in THIRD_MOLARS if rng.random() < 0.5}
     pool = [t for t in TEETH if t not in missing]
-    lost = rng.sample([t for t in pool if t in MOLARS] or pool, min(chart.teeth_lost_perio, len(pool)))
-    if len(lost) < chart.teeth_lost_perio:
-        lost += rng.sample([t for t in pool if t not in lost], chart.teeth_lost_perio - len(lost))
+    k = min(chart.teeth_lost_perio, len(pool))
+    molars = [t for t in pool if t in MOLARS]                 # periodontitis takes molars first
+    lost = rng.sample(molars, min(k, len(molars)))
+    lost += rng.sample([t for t in pool if t not in lost], k - len(lost))
     for t in lost:
         missing[t] = "perio"
     present = [t for t in TEETH if t not in missing]

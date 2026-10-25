@@ -46,6 +46,17 @@ needs confirming.
 | D2 | Dry run: with the phenotype as outcome, **22.6%** of visit pairs "progress" vs **7.5%** in truth; the model mostly learns phenotype noise (current stage dominates) | Reported for both outcomes | Correct for misclassification, or use outcomes only when the source is stable (B2) | data science | Open |
 | D3 | Even against truth, smoking and diabetes barely register: stage changes are rare over ≤ 3 years | — | Longer follow-up, or model CAL change directly; compare importance with published risk factors | data science | Open |
 
+## Site-level OMOP (spec 006)
+
+| # | Item | Status |
+|---|---|---|
+| F1 | Choose a storage design: A (SITE/SITE_EVENT, base OMOP intact, 5 joins, ~2x storage), B (pre-coordinated concepts), C (site columns, simplest and fastest, changes a CDM table). Dry-run numbers in [site_level_omop.md](site_level_omop.md) | Open |
+| F2 | Confirm LOINC 32910-2 / 32912-8 standard status in Athena; map bleeding, furcation, mobility, tooth status, teeth | Open |
+| F3 | Propose derived measures (counts of teeth over thresholds etc.) as concepts; until then local concepts, written back as MEASUREMENT rows so Atlas can use them | Done, confirm |
+| F4 | ADA 1084 mapping needs access to the standard | Open |
+| F5 | Report prevalence under CDC/AAP 2012 next to NHANES (closes part of B6) | Open |
+| F6 | Primary dentition, surfaces, conditions per tooth, implants not generated | Open |
+
 ## Earlier items
 
 | # | Item | Status |

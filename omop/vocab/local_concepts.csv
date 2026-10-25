@@ -10,3 +10,23 @@ concept_id,concept_name,domain_id,vocabulary_id,concept_class_id,concept_code,st
 2000000013,Periodontal status - periodontitis stage II,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_P2,,2026-01-01,2099-12-31
 2000000014,Periodontal status - periodontitis stage III,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_P3,,2026-01-01,2099-12-31
 2000000015,Periodontal status - periodontitis stage IV,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_P4,,2026-01-01,2099-12-31
+2000000020,Periodontal probing depth at a site,Measurement,DENTAL_LOCAL,Clinical Observation,SITE_PD,,2026-01-01,2099-12-31
+2000000021,Clinical attachment loss at a site,Measurement,DENTAL_LOCAL,Clinical Observation,SITE_CAL,,2026-01-01,2099-12-31
+2000000022,"Bleeding on probing at a site (1 yes, 0 no)",Measurement,DENTAL_LOCAL,Clinical Observation,SITE_BOP,,2026-01-01,2099-12-31
+2000000023,"Tooth status (0 present, 1 missing other cause, 2 missing due to periodontitis)",Measurement,DENTAL_LOCAL,Clinical Observation,TOOTH_STATUS,,2026-01-01,2099-12-31
+2000000024,Furcation involvement class of a tooth,Measurement,DENTAL_LOCAL,Clinical Observation,TOOTH_FURCATION,,2026-01-01,2099-12-31
+2000000025,Mobility degree of a tooth,Measurement,DENTAL_LOCAL,Clinical Observation,TOOTH_MOBILITY,,2026-01-01,2099-12-31
+2000000030,Number of teeth present,Measurement,DENTAL_LOCAL,Clinical Observation,N_TEETH_PRESENT,,2026-01-01,2099-12-31
+2000000031,Percent of teeth with interproximal CAL >= 1 mm,Measurement,DENTAL_LOCAL,Clinical Observation,PCT_TEETH_IP_CAL1,,2026-01-01,2099-12-31
+2000000032,Number of teeth with interproximal CAL >= 3 mm,Measurement,DENTAL_LOCAL,Clinical Observation,N_TEETH_IP_CAL3,,2026-01-01,2099-12-31
+2000000033,Number of teeth with interproximal CAL >= 4 mm,Measurement,DENTAL_LOCAL,Clinical Observation,N_TEETH_IP_CAL4,,2026-01-01,2099-12-31
+2000000034,Number of teeth with interproximal CAL >= 6 mm,Measurement,DENTAL_LOCAL,Clinical Observation,N_TEETH_IP_CAL6,,2026-01-01,2099-12-31
+2000000035,Number of teeth with interproximal PD >= 4 mm,Measurement,DENTAL_LOCAL,Clinical Observation,N_TEETH_IP_PD4,,2026-01-01,2099-12-31
+2000000036,Number of teeth with interproximal PD >= 5 mm,Measurement,DENTAL_LOCAL,Clinical Observation,N_TEETH_IP_PD5,,2026-01-01,2099-12-31
+2000000037,Number of interproximal sites with PD >= 5 mm,Measurement,DENTAL_LOCAL,Clinical Observation,N_SITES_IP_PD5,,2026-01-01,2099-12-31
+2000000038,Maximum furcation class,Measurement,DENTAL_LOCAL,Clinical Observation,MAX_FURCATION,,2026-01-01,2099-12-31
+2000000039,Maximum tooth mobility degree,Measurement,DENTAL_LOCAL,Clinical Observation,MAX_MOBILITY,,2026-01-01,2099-12-31
+2000000040,CDC/AAP 2012 periodontitis - none,Observation,DENTAL_LOCAL,Clinical Finding,CDC_AAP_NONE,,2026-01-01,2099-12-31
+2000000041,CDC/AAP 2012 periodontitis - mild,Observation,DENTAL_LOCAL,Clinical Finding,CDC_AAP_MILD,,2026-01-01,2099-12-31
+2000000042,CDC/AAP 2012 periodontitis - moderate,Observation,DENTAL_LOCAL,Clinical Finding,CDC_AAP_MODERATE,,2026-01-01,2099-12-31
+2000000043,CDC/AAP 2012 periodontitis - severe,Observation,DENTAL_LOCAL,Clinical Finding,CDC_AAP_SEVERE,,2026-01-01,2099-12-31
