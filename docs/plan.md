@@ -18,7 +18,7 @@ in **February 2027**.
       dental allowlist; leak gate; recall measured to the character
 - [x] Readers for every source; pairwise method agreement and coverage
 - [x] Placeholder rule-based algorithm (`RULES_V0`)
-- [x] Datasets: train (~2,400 notes), review (240 charts as Label Studio
+- [x] Datasets: train (~2,400 notes), review (~240 charts as Label Studio
       tasks), answer key
 - [x] Label Studio config, export import, simulated reviewers for dry runs
 - [x] Reliability (Fleiss' kappa, pairwise and weighted kappa, consensus,
@@ -26,6 +26,7 @@ in **February 2027**.
 - [x] AI models: note rules, TF-IDF (run); 12 BERT-family encoders (registry,
       fine-tune code written, not yet run)
 - [x] Design-review page for the Databricks RSA
+- [x] Realistic notes from published examples ([spec 001](../specs/001-realistic-dental-notes/spec.md), [note_realism.md](note_realism.md)); Spec Kit + Superpowers workflow ([CLAUDE.md](../CLAUDE.md))
 - [x] Cost-effectiveness at 1M+ notes: LLM judge (quote gate, OpenAI-compatible
       or `ai_query` backend), judge calibration on the reviewed charts,
       Rogan-Gladen corrected accuracy with bootstrap CI, cost per 1M notes,

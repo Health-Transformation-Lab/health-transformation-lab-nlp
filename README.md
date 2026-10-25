@@ -30,11 +30,26 @@ compared against the algorithm and the AI model. Details:
 
 | File | What it is |
 |------|------------|
-| `train.csv` | ~2,400 de-identified notes from ~970 people, labeled by the generator (chart truth and the clinician's written dx). For training the AI model. |
-| `review_tasks.json` | 240 charts (one visit per person, rare statuses oversampled), every source, de-identified. **Import into Label Studio.** |
-| `answer_key/review_key.csv` | Generator truth and each method's reading for the 240 charts. **Reviewers must not see this.** |
+| `train.csv` | ~2,400 de-identified notes from ~970 people (63% written in the published real-note style; [how](docs/note_realism.md)), labeled by the generator (chart truth and the clinician's written dx). For training the AI model. |
+| `review_tasks.json` | ~240 charts (one visit per person, rare statuses oversampled), every source, de-identified. **Import into Label Studio.** |
+| `answer_key/review_key.csv` | Generator truth and each method's reading for the review charts. **Reviewers must not see this.** |
 | `method_agreement.csv`, `method_coverage.csv` | Pairwise agreement and kappa between the seven sources. Input to the qualitative review. |
 | `deid_report.csv` | Per-note de-identification recall and over-redaction against the injected fake PHI. |
+
+## How we work: Spec Kit + Superpowers
+
+Changes start as a spec and are built test-first.
+
+- **Spec Kit** (spec-driven development): `/speckit-specify` → `/speckit-plan` →
+  `/speckit-tasks` → `/speckit-implement`. Specs live in `specs/NNN-feature/`;
+  project principles in [`.specify/memory/constitution.md`](.specify/memory/constitution.md).
+  First spec: [001 realistic dental notes](specs/001-realistic-dental-notes/spec.md).
+- **Superpowers** (Claude Code skills): brainstorming, writing and executing
+  plans, test-driven development, systematic debugging, verification before
+  completion, code review. Enabled for this repo in `.claude/settings.json`;
+  session plans go in `docs/superpowers/`.
+
+Agent instructions and setup: [CLAUDE.md](CLAUDE.md).
 
 ## Data sources
 
@@ -67,7 +82,7 @@ python scripts/14_benchmark_cost.py && python scripts/15_judge.py --backend open
 | `costs.yaml` | Prices and throughput for costing each method over the full corpus (**illustrative until replaced**) |
 | `omop/` | OMOP CDM 5.4 dental extension (`SITE`, `SITE_EVENT`) from the OHDSI Dentistry Workgroup |
 | `databricks/` | Free Edition notebook; `02_llm_judge.sql` runs the judge with `ai_query` at scale |
-| `docs/` | [process](docs/process.md), [data sources](docs/data_sources.md), [labeling protocol](docs/labeling_protocol.md), [plan and timeline](docs/plan.md), [cost-effectiveness](docs/cost_effectiveness.md), [design review for Databricks](docs/design_review_rsa.md), [ADRs](docs/adr/) |
+| `docs/` | [process](docs/process.md), [data sources](docs/data_sources.md), [note realism](docs/note_realism.md), [labeling protocol](docs/labeling_protocol.md), [plan and timeline](docs/plan.md), [cost-effectiveness](docs/cost_effectiveness.md), [design review for Databricks](docs/design_review_rsa.md), [ADRs](docs/adr/) |
 
 ## Quick start
 

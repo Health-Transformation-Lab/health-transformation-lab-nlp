@@ -30,6 +30,10 @@ DENTAL_ALLOWLIST = {
     "Stage", "Grade", "Generalized", "Localized", "Gen", "Loc", "Perio", "Periodontitis", "Gingivitis",
     "Plaque", "Dental", "Clinical", "Case", "Type", "Prophy", "Recall", "Referred", "Referral", "Next",
     "PERIODONTAL", "CHARTING", "COMPLETED", "Findings", "See", "Adult", "Pt's", "Dr", "Mr", "Mrs", "Ms", "I", "II", "III", "IV", "A", "C", "Gr", "St",
+    # title-case diagnosis wording seen in real notes (spec 001)
+    "Diagnosis", "Gingival", "Inflammation", "Recession", "Health", "Intact", "Periodontium",
+    "Biofilm", "Calculus", "Bone", "Loss", "Chronic", "Severe", "Moderate", "Slight", "Mild",
+    "CC", "MHx", "NV", "BP", "BWX", "PA", "Rx",
 }
 
 _NAME_WORD = r"[A-Z][a-z]+(?:-[A-Z][a-z]+)?"

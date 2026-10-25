@@ -1,19 +1,19 @@
 {
  "visits": 3042,
  "blocked_by_leak_gate": 0,
- "train_visits": 2424,
- "train_people": 960,
- "review_visits": 240,
+ "train_visits": 2426,
+ "train_people": 963,
+ "review_visits": 237,
  "deid_engine": "regex",
  "deid_char_recall": 1.0,
  "deid_non_phi_chars_removed": 0,
  "algorithm": "v0-placeholder",
  "review_status_mix": {
   "gingivitis": 48,
-  "periodontitis_stage_3": 43,
   "periodontitis_stage_2": 43,
+  "periodontitis_stage_3": 43,
   "periodontitis_stage_1": 41,
   "healthy": 36,
-  "periodontitis_stage_4": 29
+  "periodontitis_stage_4": 26
  }
 }

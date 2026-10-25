@@ -159,7 +159,7 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
         .assign(label_source="generator").to_csv(out_dir / "train.csv", index=False)
     (out_dir / "review_tasks.json").write_text(json.dumps(label_studio_tasks(review), indent=1))
     key_cols = ["visit_id", "person_id", "age", "truth_status", "truth_grade", "truth_extent",
-                "style", "numeric", "dx_scheme", "copy_forward", "stated_status", "notes", *READERS, "probing_chart",
+                "style", "numeric", "dx_scheme", "dx_pattern", "copy_forward", "stated_status", "notes", *READERS, "probing_chart",
                 "algorithm_v0", "algorithm_v0_decided_by", "note_text"]
     review[key_cols].to_csv(out_dir / "answer_key" / "review_key.csv", index=False)
     methods = ["notes", *READERS, "probing_chart"]

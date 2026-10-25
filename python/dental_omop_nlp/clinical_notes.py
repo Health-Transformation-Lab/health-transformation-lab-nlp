@@ -29,7 +29,12 @@ import random
 
 from .labels import PerioChart, Status
 from .phi import Builder, Person, Provider, fmt_date
+from .dx_patterns import render_dx
 from .synthetic import RiskFactors
+
+# Share of each note style. "ehr" follows published real-note patterns (spec 001)
+# and is the majority; the older styles stay for variety.
+STYLE_WEIGHTS = {"ehr": 0.6, "soap": 0.15, "narrative": 0.1, "chart_summary": 0.15}
 
 _STAGE_ROMAN = {Status.P1: "I", Status.P2: "II", Status.P3: "III", Status.P4: "IV"}
 _OLD_SEVERITY = {Status.P1: "slight", Status.P2: "moderate", Status.P3: "severe", Status.P4: "severe"}
@@ -121,6 +126,32 @@ def _dx(status: Status, grade: str, extent: str, scheme: str, rng: random.Random
     return rng.choice([f"{ext} {_OLD_SEVERITY[status]} chronic periodontitis.", f"AAP Case Type {_OLD_CASE_TYPE[status]}."])
 
 
+def _ehr_body(b: Builder, chart: PerioChart, status: Status, stated: Status, findings: list[str], dx: str,
+              hx: str, plan: str, numeric: bool, rng: random.Random) -> None:
+    """A dental EHR progress note: terse, lowercase-heavy, section labels, common
+    abbreviations (CC, MHx, BP, OHI, NV, 4BWX, FMX, pt). Body conventions are
+    common charting practice, not from a published corpus; clinician review is
+    specs/001 task T012."""
+    cc = rng.choice(['pt here for perio eval', 'pt presents for recall', 'pt here for comp exam',
+                     '"my gums bleed when i brush"', 'pt reports sensitivity LR', 'no c/o'])
+    b.text(f"CC: {cc}\n")
+    b.text(f"MHx reviewed, no changes. {hx} BP {rng.randint(108, 152)}/{rng.randint(64, 94)}.\n")
+    rads = rng.choice(["4BWX taken", "FMX reviewed", "2BWX + 2PA taken", "PAN reviewed", "no rads today"])
+    perio = [f for f in findings if not f.startswith(("FMX", "BWX", "PAN", "radiographs"))]
+    bone = [f for f in findings if f.startswith(("FMX", "BWX", "PAN", "radiographs"))]
+    b.text("perio charting done: " + ", ".join(perio) + ".\n" if perio else "perio charting done.\n")
+    b.text(f"rads: {rads}" + (f"; {bone[0].split(': ', 1)[-1]}" if bone else "") + ".\n")
+    if dx:
+        b.text(dx.rstrip() + "\n")
+    tx = plan.lower() if rng.random() < 0.5 else plan
+    b.text(f"tx: {tx} OHI given{rng.choice(['', ', pt verbalized understanding', ', reviewed flossing'])}. "
+           f"pt tolerated {rng.choice(['well', 'tx well', 'procedure well'])}.\n")
+    nv = {Status.HEALTHY: ["recall 6 mo", "prophy 6 mo"], Status.GINGIVITIS: ["recall 6 mo", "re-eval gingiva 6 wk"],
+          Status.P1: ["srp ur/lr", "re-eval 6 wk"], Status.P2: ["srp ul/ll", "srp 4 quads"],
+          Status.P3: ["srp ur/lr", "perio consult"], Status.P4: ["perio consult", "ext consult"]}[stated]
+    b.text(f"NV: {rng.choice(nv)}\n")
+
+
 _PLAN = {
     Status.HEALTHY: ["Adult prophy. RTC 6 mo.", "Prophy, OHI. Recall 6 mo."],
     Status.GINGIVITIS: ["Prophy + OHI, re-eval gingiva next recall.", "Prophy, flossing instruction. 6 mo recall."],
@@ -134,7 +165,8 @@ _PLAN = {
 def render_clinical_note(chart: PerioChart, status: Status, grade: str, extent: str, risk: RiskFactors,
                          patient: Person, provider: Provider, visit_date: dt.date,
                          rng: random.Random, prev_date: dt.date | None = None,
-                         stated_status: Status | None = None) -> tuple[str, list[dict], dict]:
+                         stated_status: Status | None = None,
+                         style: str | None = None) -> tuple[str, list[dict], dict]:
     """Returns (text, phi_spans, meta).
 
     `status` is what the chart supports; `stated_status` is what the clinician
@@ -145,7 +177,7 @@ def render_clinical_note(chart: PerioChart, status: Status, grade: str, extent: 
     if stated.is_periodontitis and not status.is_periodontitis:
         grade, extent = "B", "localized"   # clinician staged something the chart doesn't support
     b = Builder()
-    style = rng.choice(["soap", "narrative", "chart_summary"])
+    style = style or rng.choices(list(STYLE_WEIGHTS), weights=list(STYLE_WEIGHTS.values()))[0]
     numeric = rng.random() < 0.55
     scheme = rng.choices(["2017", "short", "old", "none"], weights=[0.35, 0.2, 0.2, 0.25])[0]
 
@@ -161,12 +193,19 @@ def render_clinical_note(chart: PerioChart, status: Status, grade: str, extent: 
     findings = [x for x in (_pd(chart, rng, numeric), _bop(chart, rng, numeric), _cal(chart, rng, numeric),
                             _rbl(chart, rng, numeric), _lost(chart, rng)) if x]
     rng.shuffle(findings)
-    dx = _dx(stated, grade if stated.is_periodontitis else 'NA', extent, scheme, rng)
+    if style == "ehr":   # diagnosis line from the published pattern catalogue (spec 001)
+        dx, dx_pattern = render_dx(stated, grade, extent, rng)
+        scheme = "catalogue"
+    else:
+        dx = _dx(stated, grade if stated.is_periodontitis else 'NA', extent, scheme, rng)
+        dx_pattern = f"legacy_{scheme}" if dx and scheme != "none" else "none"
     hx = _history(risk, rng)
     plan = rng.choice(_PLAN[stated])
 
     # ---- body
-    if style == "soap":
+    if style == "ehr":
+        _ehr_body(b, chart, status, stated, findings, dx, hx, plan, numeric, rng)
+    elif style == "soap":
         b.text(f"S: Pt presents for {rng.choice(['perio eval', 'recall', 'comprehensive exam', 'perio maint'])}. {hx}\n")
         b.text("O: " + "; ".join(findings) + ".\n")
         b.text(f"A: {dx}\n" if dx else "A: \n")
@@ -200,4 +239,4 @@ def render_clinical_note(chart: PerioChart, status: Status, grade: str, extent: 
 
     text, spans = b.build()
     return text, spans, {"style": style, "numeric": numeric, "dx_scheme": scheme, "copy_forward": copy_forward,
-                         "stated_status": stated.value}
+                         "stated_status": stated.value, "dx_pattern": dx_pattern}

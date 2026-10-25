@@ -21,6 +21,13 @@ _OLD = re.compile(r"\b(slight|mild|moderate|severe|advanced)\s+chronic periodont
 _CASE_TYPE = re.compile(r"case type\s*(IV|III|II|I)\b", re.IGNORECASE)
 _OLD_MAP = {"slight": 1, "mild": 1, "moderate": 2, "severe": 3, "advanced": 3}
 _CASE_MAP = {"I": "gingivitis", "II": 1, "III": 2, "IV": 3}
+_GRADE = re.compile(r"\b(?:grade|gr\.?)\s*(iii|ii|i|[abc])\b", re.IGNORECASE)
+_GRADE_MAP = {"a": "A", "b": "B", "c": "C", "i": "A", "ii": "B", "iii": "C"}
+# Extent words, including the typo variants seen in real notes (arXiv 2311.10809).
+_EXTENT = re.compile(r"\b(gen[a-z]*[sz][a-z]*d|loc[a-z]*[sz][a-z]*d)\b", re.IGNORECASE)
+# An extent word followed by one of these describes a different finding (arXiv 2407.21050).
+_NOT_PERIO_EXTENT = re.compile(r"^\s+(recession|gingival|inflammation|plaque|calculus|bop|bleeding|bone)",
+                               re.IGNORECASE)
 
 
 def current_text(text: str) -> str:
@@ -44,13 +51,16 @@ def _stage_status(stage: int, t: str) -> str:
 
 def read_stated_dx(text: str) -> str | None:
     t = current_text(text)
-    if re.search(r"gingival health|perio(?:dontium)? WNL|perio health", t, re.IGNORECASE):
+    if re.search(r"gingival health|periodontal health|perio(?:dontium)? WNL|perio health", t, re.IGNORECASE):
         return Status.HEALTHY.value
     if re.search(r"\bgingivitis\b", t, re.IGNORECASE) and not re.search(r"periodontitis|\bperio\s+(?:st|[1-4IV])", t, re.IGNORECASE):
         return Status.GINGIVITIS.value
     m = _STAGE.search(t)
-    if m and re.search(r"perio|periodontitis", t, re.IGNORECASE):
-        return _stage_status(_ROMAN[m.group(1).upper()], t)
+    # Published notes sometimes give "Generalized Stage 3 Grade B" with no disease word.
+    # An explicit stage is taken as written; only the pre-2017 terms below, which
+    # can't separate stage III from IV, are upgraded on documented tooth loss.
+    if m and (re.search(r"perio|periodontitis", t, re.IGNORECASE) or _GRADE.search(t)):
+        return f"periodontitis_stage_{_ROMAN[m.group(1).upper()]}"
     m = _OLD.search(t)
     if m:
         return _stage_status(_OLD_MAP[m.group(1).lower()], t)
@@ -89,3 +99,34 @@ def read_findings(text: str) -> str:
 
 def read_note(text: str) -> str:
     return read_stated_dx(text) or read_findings(text)
+
+
+def _dx_region(t: str) -> str:
+    """The diagnosis line if one is marked, else the whole current text."""
+    m = re.search(r"(?im)^\s*(?:d|dx|diagnosis|impression|a)\s*[:\-].*$", t)
+    return m.group(0) if m else t
+
+
+def read_grade(text: str) -> str:
+    """A/B/C for periodontitis, 'NA' otherwise, 'unknown' if not written."""
+    t = current_text(text)
+    status = read_stated_dx(text)
+    if not status or not status.startswith("periodontitis"):
+        return "NA"
+    m = _GRADE.search(_dx_region(t)) or _GRADE.search(t)
+    return _GRADE_MAP[m.group(1).lower()] if m else "unknown"
+
+
+def read_extent(text: str) -> str:
+    """localized/generalized for periodontitis, 'NA' otherwise, 'unknown' if not written.
+    Skips extent words that describe another finding ('generalized recession')."""
+    t = current_text(text)
+    status = read_stated_dx(text)
+    if not status or not status.startswith("periodontitis"):
+        return "NA"
+    for region in (_dx_region(t), t):
+        for m in _EXTENT.finditer(region):
+            if _NOT_PERIO_EXTENT.match(region[m.end():]):
+                continue
+            return "generalized" if m.group(1).lower().startswith("gen") else "localized"
+    return "unknown"

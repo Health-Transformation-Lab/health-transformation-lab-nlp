@@ -103,11 +103,11 @@ predictions in calibration (aim for 200+) to pin down specificity.
 
 | method | corrected accuracy (95% CI) | cost / 1M notes | dominated |
 |--------|-----------------------------|----------------:|-----------|
-| note_rules | 0.77 (0.72–0.83) | $0.01 | no |
-| tfidf_logreg | 0.94 (0.89–0.98) | $0.06 | no |
-| sim:distilbert-base | 0.86 (0.81–0.92) | $4.78 | yes |
-| sim:bioclinical-modernbert-base | 0.92 (0.87–0.97) | $13.41 | yes |
-| sim:llm_challenger | 0.90 (0.86–0.95) | $245.83 | yes |
+| note_rules | 0.78 (0.73–0.84) | $0.01 | no |
+| tfidf_logreg | 0.89 (0.84–0.94) | $0.07 | no |
+| sim:distilbert-base | 0.84 (0.79–0.90) | $4.78 | yes |
+| sim:bioclinical-modernbert-base | 0.90 (0.85–0.95) | $13.41 | no |
+| sim:llm_challenger | 0.90 (0.86–0.95) | $257 | yes |
 
 The shape is what to expect on real data: local models cost almost nothing to
 run at this scale, so the frontier is decided by accuracy, and the LLM has to
