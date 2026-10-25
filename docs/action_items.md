@@ -57,6 +57,15 @@ needs confirming.
 | F5 | Report prevalence under CDC/AAP 2012 next to NHANES (closes part of B6) | Open |
 | F6 | Primary dentition, surfaces, conditions per tooth, implants not generated | Open |
 
+## MLOps
+
+| # | Item | Status |
+|---|---|---|
+| G1 | MLflow tracking, UC registry, champion/challenger on the acceptance test, MLflow GenAI judge ([mlops.md](mlops.md)) | Done, confirm on a workspace |
+| G2 | Run the judge with a real endpoint (`--backend mlflow`) and align it to reviewer labels (MLflow ≥ 3.14) | Open |
+| G3 | Monitoring: inference tables on a serving endpoint, data profiling of predictions, alerts | Open |
+| G4 | Retraining: scheduled, then triggered | Open |
+
 ## Earlier items
 
 | # | Item | Status |

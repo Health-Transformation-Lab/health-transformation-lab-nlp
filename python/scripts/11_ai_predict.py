@@ -41,6 +41,8 @@ llm.add_argument("--variant", default="reader-v2", help="prompt variant (reader-
 llm.add_argument("--adapter", default=None, help="LoRA adapter dir from scripts/17_medgemma_lora.py")
 llm.add_argument("--endpoint", default=None, help="openai backend: model / serving endpoint name")
 llm.add_argument("--limit", type=int, default=None, help="only the first N review notes (smoke test)")
+ap.add_argument("--register", default=None, metavar="CATALOG.SCHEMA.MODEL",
+                help="log the fitted rung as an MLflow pyfunc and register a version (alias: challenger)")
 a = ap.parse_args()
 
 train = pd.read_csv(DATASETS_DIR / "train.csv").rename(columns={a.label: "target"})
@@ -86,3 +88,19 @@ if is_llm:
         truth = key.set_index("visit_id")["truth_status"].reindex(out["visit_id"]).to_numpy()
         acc = (out["pred"].to_numpy() == truth).mean()
         print(f"*** SIMULATED READER: dry run, not a MedGemma result (agreement with truth {acc:.1%}) ***")
+
+# ---- MLflow (docs/mlops.md): params, prediction file, optional Unity Catalog registration
+from dental_omop_nlp.tracking import track  # noqa: E402
+
+with track("11_ai_predict", a.rung, simulated=bool(prefix),
+           params={"rung": a.rung, "label": a.label, "n_train": len(train), "n_review": len(review), **{
+               k: v for k, v in kw.items() if k in ("epochs", "max_len", "shots", "variant", "backend_kind")}}) as run:
+    run.log_artifact(path)
+    if is_llm:
+        d = model.details
+        run.log_metrics({"gate_pass": d["gate_ok"].mean(), "fallback": d["fallback"].mean(),
+                         "input_tokens_mean": d["input_tokens"].mean(), "output_tokens_mean": d["output_tokens"].mean()})
+    if a.register:
+        from dental_omop_nlp.model_registry import log_and_register
+        v = log_and_register(model, a.rung, a.register, train.head(3), simulated=bool(prefix))
+        print(f"registered {a.register} version {v} (alias: challenger)")

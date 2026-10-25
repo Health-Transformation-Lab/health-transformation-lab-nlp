@@ -69,3 +69,17 @@ vh5 = agreement_vs_humans(wide5, compare5, n_boot=a.n_boot, margin=a.margin)
 vh5.to_csv(out5 / "agreement_vs_humans.csv", index=False)
 print(f"\nfive categories: Fleiss kappa={rep5['fleiss_kappa']:.3f}")
 print(vh5[vh5["kind"] != "human"].drop(columns=["margin"]).round(3).to_string(index=False))
+
+# ---- MLflow (docs/mlops.md): headline numbers per method and the acceptance verdicts
+from dental_omop_nlp.tracking import track  # noqa: E402
+
+with track("13_reliability", "reliability", simulated=a.simulated,
+           params={"n_boot": a.n_boot, "margin": a.margin, "reviewers": rep["n_reviewers"], "charts": rep["n_visits"]}) as run:
+    run.log_metrics({"fleiss_kappa": rep["fleiss_kappa"], "fleiss_kappa_5cat": rep5["fleiss_kappa"],
+                     "consensus_reached": rep["consensus_reached"]})
+    for r in vh[vh["kind"] == "method"].itertuples():
+        key_ = r.rater.replace(":", "__")
+        run.log_metrics({f"kappa_vs_humans__{key_}": r.mean_kappa_vs_humans, f"diff_vs_human_bar__{key_}": r.diff_vs_human_bar})
+        run.set_tags({f"verdict__{key_}": r.verdict})
+    for f in (out / "methods_vs_reviewers.csv", out / "agreement_vs_humans.csv", out5 / "agreement_vs_humans.csv"):
+        run.log_artifact(f)

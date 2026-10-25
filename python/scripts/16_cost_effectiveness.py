@@ -78,3 +78,12 @@ cols = ["method", "accuracy_est", "ci_low", "ci_high", "cost_usd", "usd_per_1k_c
         "icer_usd_per_extra_correct_note", "compared_to"]
 with pd.option_context("display.float_format", "{:.4g}".format):
     print(t[cols].to_string(index=False))
+
+from dental_omop_nlp.tracking import track  # noqa: E402
+
+with track("16_cost_effectiveness", "cost-effectiveness", simulated=bool(prefix),
+           params={"corpus_notes": costs["corpus_notes"], "prices": "ILLUSTRATIVE"}) as run:
+    for r in t.itertuples():
+        k = str(r.method).replace(":", "__")
+        run.log_metrics({f"accuracy_est__{k}": r.accuracy_est, f"cost_usd__{k}": r.cost_usd})
+    run.log_artifact(CORPUS_DIR / f"{prefix}cost_effectiveness.csv")

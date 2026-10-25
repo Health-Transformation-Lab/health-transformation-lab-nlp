@@ -1,0 +1,21 @@
+# MLflow experiment and Unity Catalog registered model, one per target (docs/mlops.md).
+# Experiments live under the target's root path; the model under <catalog>.<schema>.
+resources:
+  experiments:
+    dental_experiment:
+      name: ${workspace.root_path}/dental-omop-nlp-experiment
+      tags:
+        - key: project
+          value: dental-omop-nlp
+        - key: data
+          value: synthetic
+
+  registered_models:
+    perio_note_classifier:
+      name: perio_note_classifier
+      catalog_name: ${var.catalog}
+      schema_name: ${var.schema}
+      comment: >-
+        Note -> periodontal status (any rung, MLflow pyfunc). Alias challenger = newest
+        version; champion = passed the acceptance test (non-inferior to reviewers).
+        Synthetic data only.

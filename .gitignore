@@ -247,3 +247,6 @@ data/datasets/sft_reader_records.jsonl
 # site-level synthetic charts (spec 006): regenerate with scripts/22_build_sites.py
 data/sites/*.parquet
 data/sites/parity_*.csv
+
+# local MLflow store (tracking.py)
+mlruns/

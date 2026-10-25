@@ -43,3 +43,10 @@ print(t[cols].round(3).to_string(index=False))
 d, s = t[t.is_design_order].iloc[0], t[t.selected].iloc[0]
 print(f"\ndesign order {d['order']}: held-out kappa {d['holdout_kappa']:.3f} ({d['holdout_verdict']})")
 print(f"selected     {s['order']}: held-out kappa {s['holdout_kappa']:.3f} ({s['holdout_verdict']})")
+
+from dental_omop_nlp.tracking import track  # noqa: E402
+
+with track("18_phenotype_order", "phenotype-orders", simulated=a.simulated) as run:
+    run.log_metrics({"design_holdout_kappa": d["holdout_kappa"], "selected_holdout_kappa": s["holdout_kappa"]})
+    run.set_tags({"selected_order": s["order"], "design_verdict": d["holdout_verdict"]})
+    run.log_artifact(out / "phenotype_orders.csv")

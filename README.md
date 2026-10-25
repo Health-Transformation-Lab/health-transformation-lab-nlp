@@ -99,6 +99,7 @@ comparisons, prediction outcome, OMOP storage design).
 | Integrated phenotype (five categories, source order), patients over time, clinic prevalence, data quality, prediction | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
 | Dental vs medical data in OMOP: what claims and EHRs track, tooth/site gaps | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md) |
 | Data: synthetic notes, review set, public datasets | [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
+| MLflow and MLOps: tracking, Unity Catalog models with champion/challenger gated by the acceptance test, MLflow GenAI LLM judge | [mlops.md](docs/mlops.md) |
 | Deploying: Asset Bundle with **dev, UAT, prod** targets and variables; CI | [deployment.md](docs/deployment.md) |
 | Results storage; Lakebase for review queue, live labels, run ledger | [results_storage.md](docs/results_storage.md) |
 | Retrieval, OMOP synonyms/ancestors/relationships, graphs: 8 test cases | [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |

@@ -34,6 +34,7 @@ dbutils.widgets.text("catalog", "workspace")
 dbutils.widgets.text("schema", "dental")
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
+dbutils.widgets.text("experiment", "")   # set per target by the bundle (resources/mlops.yml)
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
@@ -86,7 +87,8 @@ from dental_omop_nlp.registry import load_registry
 from dental_omop_nlp.rungs import make_rung
 
 reg = load_registry()
-mlflow.set_experiment(f"/Users/{spark.sql('select current_user()').first()[0]}/dental-omop-nlp")
+mlflow.set_experiment(dbutils.widgets.get("experiment")
+                      or f"/Users/{spark.sql('select current_user()').first()[0]}/dental-omop-nlp")
 
 def run(rung_id, **kw):
     with mlflow.start_run(run_name=rung_id):

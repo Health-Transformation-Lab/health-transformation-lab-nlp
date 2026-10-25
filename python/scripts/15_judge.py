@@ -27,7 +27,9 @@ from dental_omop_nlp.judge import PROMPT_VERSION, OpenAIJudge, SimulatedJudge
 from dental_omop_nlp.paths import CORPUS_DIR, COSTS_YAML, DATASETS_DIR, REVIEW_DIR
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--backend", choices=["openai", "simulated"], required=True)
+ap.add_argument("--backend", choices=["openai", "mlflow", "simulated"], required=True,
+                help="openai: OpenAI-compatible endpoint; mlflow: MLflow GenAI make_judge, judges given as "
+                     "model URIs (databricks:/<endpoint>, openai:/<model>); simulated: dry run")
 ap.add_argument("--simulated-review", action="store_true",
                 help="calibrate against simulated reviewer consensus (dry run)")
 ap.add_argument("--per-method", type=int, default=None, help="corpus notes judged per method")
@@ -111,6 +113,11 @@ def run(df: pd.DataFrame, judge_truth_col: str, judge_name: str) -> pd.DataFrame
                                specificity=sp, seed=hash(judge_name) % 1000)
         verdicts = [judge(n, p, visit_id=i) for i, (n, p) in enumerate(zip(df["note"], df["pred"]))]
         model_name = judge_name
+    elif a.backend == "mlflow":
+        from dental_omop_nlp.mlflow_judge import MLflowJudgeAdapter
+        judge = MLflowJudgeAdapter(judge_name)
+        verdicts = [judge(n, p) for n, p in zip(df["note"], df["pred"])]
+        model_name = judge_name
     else:
         judge = OpenAIJudge(model=judge_name)
         verdicts = [judge(n, p) for n, p in zip(df["note"], df["pred"])]
@@ -150,3 +157,15 @@ print(f"selected judge: {chosen}")
 print(f"calibration: {len(g)} judged pairs over {g['method'].nunique()} methods on reviewed charts")
 print(f"corpus: {len(c)} judged predictions over {c['method'].nunique()} methods")
 print(f"gate failures: gold {(~g['gate_ok']).mean():.1%}, corpus {(~c['gate_ok']).mean():.1%}")
+
+# ---- MLflow: one run for the bake-off and corpus judging (docs/mlops.md)
+from dental_omop_nlp.tracking import track  # noqa: E402
+
+with track("15_judge", f"judge-bakeoff:{chosen}", simulated=bool(prefix),
+           params={"backend": a.backend, "prompt_version": PROMPT_VERSION, "candidates": ",".join(judges),
+                   "chosen": chosen, "per_method": n_per}) as run:
+    for r in bo.itertuples():
+        run.log_metrics({f"kappa__{r.judge_model}": r.kappa, f"sensitivity__{r.judge_model}": r.sensitivity,
+                         f"specificity__{r.judge_model}": r.specificity})
+    for f in ("judge_bakeoff.csv", "judgments_gold.csv", "judgments_corpus.csv"):
+        run.log_artifact(CORPUS_DIR / f"{prefix}{f}")

@@ -19,6 +19,7 @@ resources:
               schema: ${var.schema}
               n_people: ${var.n_people}
               leak_assessment: "false"
+              experiment: ${resources.experiments.dental_experiment.name}
 
     load_lakebase:
       name: dental-omop-nlp load OMOP into Lakebase (${bundle.target})

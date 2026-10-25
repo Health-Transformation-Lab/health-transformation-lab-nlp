@@ -32,6 +32,7 @@ Every number from these steps is from synthetic patients and simulated reviewers
 | 16 | [LLM judge and cost at 1M notes](#16-llm-judge-and-cost-at-1m-notes) | `14_benchmark_cost.py`, `15_judge.py`, `16_cost_effectiveness.py` | [Drill-downs](../README.md#drill-downs) |
 | 17 | [MedGemma](#17-medgemma) | `11_ai_predict.py --rung medgemma-1.5-4b-it`, `17_medgemma_lora.py` | [Drill-downs](../README.md#drill-downs) |
 | 18 | [Deploy: dev, UAT, prod](#18-deploy-dev-uat-prod) | `databricks bundle deploy -t <target>` | [Drill-downs](../README.md#drill-downs) |
+| 19 | [MLflow: track, register, judge, promote](#19-mlflow-track-register-judge-promote) | `11_ai_predict.py --register`, `24_promote_model.py`, `15_judge.py --backend mlflow` | [Drill-downs](../README.md#drill-downs) |
 | — | [R side and parity](#r-side-and-parity) | `python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R` | [Ground rules](../README.md#ground-rules) |
 
 Commands run from `python/` unless they start with `python/` or `r/`.
@@ -204,6 +205,17 @@ endpoints and GPU settings; GitHub Actions for tests and deploys.
 
 - Code: [`databricks.yml`](../databricks.yml), [`databricks/resources/jobs.yml`](../databricks/resources/jobs.yml),
   [`.github/workflows/`](../.github/workflows/). Docs: [deployment.md](deployment.md).
+
+## 19. MLflow: track, register, judge, promote
+
+Every scoring step logs an MLflow run (step, git commit, dataset fingerprint,
+simulated flag). A rung can be registered in Unity Catalog as a pyfunc (alias
+challenger) and promoted to champion only if it passes the acceptance test and
+matches the current champion. The judge also runs as an MLflow GenAI judge.
+
+- Code: [`tracking.py`](../python/dental_omop_nlp/tracking.py), [`model_registry.py`](../python/dental_omop_nlp/model_registry.py),
+  [`mlflow_judge.py`](../python/dental_omop_nlp/mlflow_judge.py), [`scripts/24_promote_model.py`](../python/scripts/24_promote_model.py);
+  bundle [`databricks/resources/mlops.yml`](../databricks/resources/mlops.yml). Docs: [mlops.md](mlops.md).
 
 ## R side and parity
 

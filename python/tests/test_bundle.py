@@ -16,7 +16,7 @@ def _load():
     jobs = {}
     for inc in root.get("include", []):
         for f in ROOT.glob(inc):
-            for k, j in yaml.safe_load(f.read_text())["resources"]["jobs"].items():
+            for k, j in yaml.safe_load(f.read_text())["resources"].get("jobs", {}).items():
                 jobs[k] = (j, f.parent)
     return root, jobs
 
@@ -78,3 +78,11 @@ def test_medgemma_gpu_job_only_in_uat_and_prod():
     assert "medgemma_reader" not in jobs
     for env in ("uat", "prod"):
         assert "medgemma_reader" in root["targets"][env]["resources"]["jobs"]
+
+
+def test_mlflow_experiment_and_uc_model_per_target():
+    m = yaml.safe_load((ROOT / "databricks/resources/mlops.yml").read_text())["resources"]
+    assert "${bundle.target}" in "".join(m["experiments"]["dental_experiment"]["name"]) or \
+        "${workspace.root_path}" in m["experiments"]["dental_experiment"]["name"]
+    rm = m["registered_models"]["perio_note_classifier"]
+    assert rm["catalog_name"] == "${var.catalog}" and rm["schema_name"] == "${var.schema}"
