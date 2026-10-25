@@ -1,0 +1,177 @@
+# Model registry for the dental-notes periodontal classification benchmark.
+# Source: model evaluation sheet (Oct 2026), 12 candidates.
+# Every model here is run through the same scorer (eval/) on the same
+# patient-level test split, in both the Python and R pipelines.
+#
+# role:
+#   classifier  - fine-tune with a sequence-classification head -> perio status
+#   long_context - classifier that can take a whole chart / multi-visit note set
+#   entity_linking - maps note terms to UMLS/SNOMED concepts (feeds OMOP mapping,
+#                    not a direct classifier)
+#   retrieval   - late-interaction retriever; used for RAG / evidence lookup,
+#                 not fine-tuned as a classifier
+#
+# max_len is the model's native context length in tokens.
+
+models:
+
+  # ---- general-domain baselines -------------------------------------------
+  - id: bert-base
+    hf: google-bert/bert-base-uncased
+    org: Google
+    year: 2018
+    domain: general
+    role: classifier
+    max_len: 512
+    paper: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"
+
+  - id: distilbert-base
+    hf: distilbert/distilbert-base-uncased
+    org: Hugging Face
+    year: 2019
+    domain: general
+    role: classifier
+    max_len: 512
+    paper: "DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter"
+    note: >
+      Sheet links distilbert-base-uncased-finetuned-sst-2-english, which is the
+      SST-2 sentiment fine-tune. Use the base checkpoint above for our own
+      fine-tune; the sentiment head is not a useful starting point.
+
+  - id: modernbert-base
+    hf: answerdotai/ModernBERT-base
+    org: Answer.AI
+    year: 2024
+    domain: general
+    role: long_context
+    max_len: 8192
+    paper: "Smarter, Better, Faster, Longer: A Modern Bidirectional Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference"
+
+  - id: modernbert-large
+    hf: answerdotai/ModernBERT-large
+    org: Answer.AI
+    year: 2024
+    domain: general
+    role: long_context
+    max_len: 8192
+    paper: "Smarter, Better, Faster, Longer (ModernBERT)"
+
+  - id: longformer-base
+    hf: allenai/longformer-base-4096
+    org: Allen Institute for AI
+    year: 2020
+    domain: general
+    role: long_context
+    max_len: 4096
+    paper: "Longformer: The Long-Document Transformer"
+
+  # ---- scientific / biomedical ---------------------------------------------
+  - id: scibert
+    hf: allenai/scibert_scivocab_uncased
+    org: Allen Institute for AI
+    year: 2019
+    domain: scientific
+    role: classifier
+    max_len: 512
+    paper: "SciBERT: A Pretrained Language Model for Scientific Text"
+
+  - id: biomedbert
+    hf: microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext
+    org: Microsoft
+    year: 2020
+    domain: biomedical
+    role: classifier
+    max_len: 512
+    paper: "Domain-Specific Language Model Pretraining for Biomedical Natural Language Processing"
+    note: Formerly PubMedBERT.
+
+  - id: sapbert
+    hf: cambridgeltl/SapBERT-from-PubMedBERT-fulltext
+    org: University of Cambridge
+    year: 2021
+    domain: biomedical
+    role: entity_linking
+    max_len: 512
+    paper: "Self-Alignment Pretraining for Biomedical Entity Representations"
+    note: >
+      Trained for UMLS synonym alignment. Best use here is mapping note terms
+      (e.g. "perio", "BOP", "SRP") to SNOMED/UMLS concepts for the OMOP
+      NOTE_NLP and SITE_EVENT tables. Can also be fine-tuned as a classifier
+      for comparison, but that is not its design.
+
+  # ---- clinical ------------------------------------------------------------
+  - id: bioclinical-modernbert-base
+    hf: thomas-sounack/BioClinical-ModernBERT-base
+    org: Thomas Sounack, Dana-Farber Cancer Institute
+    year: 2025
+    domain: clinical
+    role: long_context
+    max_len: 8192
+    paper: "BioClinical ModernBERT: A State-of-the-Art Long-Context Encoder for Biomedical and Clinical NLP"
+
+  - id: bioclinical-modernbert-large
+    hf: thomas-sounack/BioClinical-ModernBERT-large
+    org: Thomas Sounack, Dana-Farber Cancer Institute
+    year: 2025
+    domain: clinical
+    role: long_context
+    max_len: 8192
+    paper: "BioClinical ModernBERT (large)"
+
+  - id: clinical-longformer
+    hf: yikuan8/Clinical-Longformer
+    org: Northwestern University, Yuan Luo Lab
+    year: 2022
+    domain: clinical
+    role: long_context
+    max_len: 4096
+    paper: "Clinical-Longformer and Clinical-BigBird: Transformers for long clinical sequences"
+
+  # ---- retrieval -----------------------------------------------------------
+  - id: gte-moderncolbert
+    hf: lightonai/GTE-ModernColBERT-v1
+    org: LightOn
+    year: 2025
+    domain: general
+    role: retrieval
+    max_len: 8192
+    paper: "GTE-ModernColBERT (late-interaction retriever built on ModernBERT)"
+    note: >
+      Not a classifier. Keep it for the evidence-retrieval step (find the
+      chart lines that support a status) or for a RAG rung where the LLM is
+      the classifier. Score it on retrieval metrics, not F1 on perio status.
+
+# ---- benchmark groupings ---------------------------------------------------
+ladders:
+  # Rung order for the headline comparison. Same test split for every rung.
+  classification:
+    - rules_baseline            # regex + shorthand expansion, no model
+    - structured_baseline       # logistic regression on chart numerics only
+    - tfidf_logreg              # TF-IDF + logistic regression on the text
+    - distilbert-base
+    - bert-base
+    - scibert
+    - biomedbert
+    - modernbert-base
+    - bioclinical-modernbert-base
+    - modernbert-large
+    - bioclinical-modernbert-large
+    - llm_challenger            # large LLM, zero/few-shot, served on Databricks
+  long_context:
+    # Only matters if the input is a multi-visit chart rather than one note.
+    - longformer-base
+    - clinical-longformer
+    - modernbert-base
+    - bioclinical-modernbert-base
+  concept_mapping:
+    - sapbert
+  retrieval:
+    - gte-moderncolbert
+
+# ---- shared settings ---------------------------------------------------------
+eval:
+  split: by_patient
+  metrics: [macro_f1, per_class_f1, sensitivity, specificity, auroc]
+  primary: sensitivity           # screening use: the miss is the costly error
+  labels: [healthy, gingivitis, periodontitis_stage_1, periodontitis_stage_2, periodontitis_stage_3, periodontitis_stage_4]
+  label_source: synthetic_perio_chart   # replaced by clinician protocol later

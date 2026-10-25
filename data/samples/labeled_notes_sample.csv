@@ -1,0 +1,49 @@
+note_id,person_id,note_text,max_probing_depth_mm,bop_pct,max_cal_mm,rbl_pct,teeth_lost_perio
+9,6,"S: Pt presents for new pt exam. Gums bleed when brushing.
+O: RBL ~9%; attachment loss 1 mm; probing depths up to 2 mm; bleeding at 32% of sites.
+A: Findings as above.
+P: Prophy + OHI. Re-eval gingiva at next recall.",2.1209002378260378,32.32050071162295,0.8405133489882008,9.127514547348332,0
+12,7,"S: Here for periodic oral eval. No pain or concerns.
+O: CAL 1mm; bleeding at 16% of sites; PD max 4mm.
+A: Plaque-induced gingivitis.
+P: Prophy, OHI w/ emphasis on flossing. Recall 6 mo.",3.879423825588425,16.274339435589123,0.8262439600131102,5.243854012258163,0
+1,1,"S: periodic oral eval. Pt reports no complaints.
+O: attachment loss 0 mm; deepest pocket 1mm; no bleeding on probing.
+A: Healthy gingiva.
+P: Prophy. RTC 6 mo.",1.3923835654536676,2.0701676340293726,0.0,0.0,0
+6,5,"S: Pt presents for perio maintenance. Denies sensitivity.
+O: BOP neg; deepest pocket 3mm.
+A: Periodontium WNL.
+P: Prophy. RTC 6 mo.",2.635991821709507,0.4366295477677101,0.0,0.0,0
+2,2,"S: Here for 6 mo recall. No pain or concerns.
+O: CAL 2mm; 5% horizontal bone loss on BWX; deepest pocket 3mm; bleeding at 27% of sites.
+A: Stage I periodontitis.
+P: Localized SRP, perio maint 4 mo.",3.368595024563016,26.51927597551225,1.9434645450476304,4.72589997651111,0
+10,6,"S: Here for periodic oral eval. No pain or concerns.
+O: probing depths up to 3 mm; attachment loss 1 mm; bleeding at 26% of sites.
+A: See perio chart.
+P: SRP 2 quads, re-eval 6 wk.",3.023597650303829,25.966374550382096,1.4113385082174164,0.2341660664368188,0
+3,3,"S: Here for 6 mo recall. Notes bleeding w/ flossing.
+O: bleeding at 40% of sites; probing depths up to 5 mm; attachment loss 4 mm.
+A: Moderate periodontitis.
+P: 4 quad SRP, then perio maint q3-4 mo.",4.732931650800722,40.32452812388021,3.739594090659884,23.29492197206769,0
+4,4,"S: Here for recall exam. No pain or concerns.
+O: RBL ~18%; CAL 4mm; BOP 20%; probing depths up to 5 mm.
+A: Findings as above.
+P: 4 quad SRP, then perio maint q3-4 mo.",4.528264252497991,19.898548500321606,3.5465463287257872,18.312859911502816,0
+48,21,"S: Here for 6 mo recall. Gums bleed when brushing.
+O: BOP 70%; PD max 6mm; attachment loss 6 mm; RBL ~54%.
+A: Discussed w/ pt.
+P: Full mouth SRP, perio consult.",6.399600097421215,69.87692165787003,5.539781637826099,53.95806560145749,0
+49,21,"S: Here for periodic oral eval. Notes bleeding w/ flossing.
+O: 42% horizontal bone loss on BWX; attachment loss 6 mm; BOP 57%; PD max 7mm.
+A: Discussed w/ pt.
+P: SRP 4 quads, refer to periodontist.",6.923244445666297,56.87651730652286,6.315364862926726,41.57461140761768,0
+52,23,"S: Pt presents for 6 mo recall. Notes bleeding w/ flossing.
+O: deepest pocket 8mm; CAL 8mm; bleeding at 50% of sites; 10 teeth previously lost to perio; RBL ~77%.
+A: Findings as above.
+P: Refer to periodontist for comprehensive tx plan.",7.916938799090505,50.040254866468686,7.533063215147545,76.81568737913183,10
+149,63,"S: recall exam. Pt reports gums bleed when brushing.
+O: 7 teeth previously lost to perio; BOP 78%; probing depths up to 8 mm; 46% horizontal bone loss on BWX; CAL 10mm.
+A: Stage IV periodontitis.
+P: Refer to periodontist for comprehensive tx plan.",7.679263368011381,78.05925304438736,9.86279617983696,45.694939408198735,7

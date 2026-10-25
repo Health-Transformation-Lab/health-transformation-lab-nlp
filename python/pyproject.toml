@@ -1,0 +1,36 @@
+[project]
+name = "dental-omop-nlp"
+version = "0.1.0"
+description = "Synthetic dental notes -> OMOP -> periodontal status benchmark (Python side)"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "pandas>=2.0",
+  "pyarrow>=14",
+  "pyyaml>=6",
+  "scikit-learn>=1.3",
+]
+
+[project.optional-dependencies]
+# Encoder rungs. CPU-only torch is enough for the small models on Free Edition.
+models = [
+  "torch>=2.2",
+  "transformers>=4.44",
+  "datasets>=2.19",
+  "evaluate>=0.4",
+  "accelerate>=0.30",
+]
+# Experiment tracking; on Databricks the workspace MLflow is used instead.
+track = ["mlflow>=2.12"]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dental_omop_nlp*"]
+
+[tool.ruff]
+line-length = 100

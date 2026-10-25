@@ -218,3 +218,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---- project ----
+# Synthea output and generated data never go in git (public repo, keep it small)
+synthea/synthea-with-dependencies.jar
+synthea/output/
+data/raw/
+data/omop/
+data/labels/
+data/results/
+mlruns/
+*.parquet
+!data/samples/*.parquet
+.databricks/

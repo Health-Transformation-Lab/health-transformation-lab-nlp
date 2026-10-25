@@ -1,0 +1,12 @@
+concept_id,concept_name,domain_id,vocabulary_id,concept_class_id,concept_code,standard_concept,valid_start_date,valid_end_date
+2000000001,Maximum periodontal probing depth,Measurement,DENTAL_LOCAL,Clinical Observation,PERIO_MAX_PD,,2026-01-01,2099-12-31
+2000000002,Percent of sites bleeding on probing,Measurement,DENTAL_LOCAL,Clinical Observation,PERIO_BOP_PCT,,2026-01-01,2099-12-31
+2000000003,Maximum clinical attachment loss,Measurement,DENTAL_LOCAL,Clinical Observation,PERIO_MAX_CAL,,2026-01-01,2099-12-31
+2000000004,Radiographic bone loss percent of root length,Measurement,DENTAL_LOCAL,Clinical Observation,PERIO_RBL_PCT,,2026-01-01,2099-12-31
+2000000005,Teeth lost due to periodontitis,Measurement,DENTAL_LOCAL,Clinical Observation,PERIO_TEETH_LOST,,2026-01-01,2099-12-31
+2000000010,Periodontal status - healthy,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_HEALTHY,,2026-01-01,2099-12-31
+2000000011,Periodontal status - gingivitis,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_GINGIVITIS,,2026-01-01,2099-12-31
+2000000012,Periodontal status - periodontitis stage I,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_P1,,2026-01-01,2099-12-31
+2000000013,Periodontal status - periodontitis stage II,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_P2,,2026-01-01,2099-12-31
+2000000014,Periodontal status - periodontitis stage III,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_P3,,2026-01-01,2099-12-31
+2000000015,Periodontal status - periodontitis stage IV,Observation,DENTAL_LOCAL,Clinical Finding,PERIO_STATUS_P4,,2026-01-01,2099-12-31
