@@ -5,7 +5,7 @@ to this repo. The diagram is the study design; the table under it says where
 each box lives.
 
 ```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 1000, "nodeSpacing": 30, "rankSpacing": 45}}}%%
+%%{init: {"themeVariables": {"fontSize": "22px"}, "flowchart": {"wrappingWidth": 1400, "nodeSpacing": 30, "rankSpacing": 50, "padding": 18, "subGraphTitleMargin": {"top": 8, "bottom": 14}}}}%%
 flowchart BT
         N["Chart notes"]
         E["Exam forms"]
