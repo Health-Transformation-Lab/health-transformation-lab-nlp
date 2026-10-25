@@ -1,0 +1,9 @@
+method,cost_usd,node_hours,notes_per_sec,throughput_source,has_predictions
+note_rules,0.01114740243795525,0.01114740243795525,24918.61035105234,measured,True
+tfidf_logreg,0.0621532799117195,0.0621532799117195,22856.198474447603,measured,True
+sim:distilbert-base,4.777777777777778,1.1944444444444444,400.0,assumed,True
+bert-base,9.555555555555555,2.388888888888889,200.0,assumed,False
+biomedbert,9.555555555555555,2.388888888888889,200.0,assumed,False
+sim:bioclinical-modernbert-base,13.407407407407408,3.351851851851852,150.0,assumed,True
+bioclinical-modernbert-large,38.22222222222222,9.555555555555555,50.0,assumed,False
+sim:llm_challenger,245.8311957379637,,,tokens,True

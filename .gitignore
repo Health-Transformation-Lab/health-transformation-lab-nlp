@@ -233,3 +233,10 @@ mlruns/
 .databricks/
 data/review/*
 !data/review/simulated_*
+data/corpus/*
+!data/corpus/README.md
+!data/corpus/cost_effectiveness*
+!data/corpus/judge_calibration*
+!data/corpus/simulated_cost_effectiveness*
+!data/corpus/simulated_judge_calibration.json
+!data/corpus/cost_benchmark.csv

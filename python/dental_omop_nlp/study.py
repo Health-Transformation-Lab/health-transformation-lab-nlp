@@ -177,3 +177,18 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
             "deid_non_phi_chars_removed": int(tot.non_phi_chars_removed),
             "algorithm": RULES_V0["version"],
             "review_status_mix": review["truth_status"].value_counts().to_dict()}
+
+
+def build_corpus_sample(n_people: int, seed: int, engine: str = "regex") -> pd.DataFrame:
+    """A de-identified stand-in for the full corpus, for timing and judging.
+
+    Returns visit_id, note_text and (for simulated judging ONLY) truth_status.
+    A real corpus has no truth column; nothing downstream may use it except
+    the simulated judge backend.
+    """
+    df = generate_visits(n_people, seed)
+    for c in READERS:
+        df = df.rename(columns={c: c + "_raw"})
+    df, _ = apply_deid(df, engine)
+    df = df[df["deid_passed"]]
+    return df[["visit_id", "person_id", "note_text", "truth_status"]].reset_index(drop=True)

@@ -1,0 +1,34 @@
+# Cost model for running each method over the full corpus.
+#
+# !!! ILLUSTRATIVE PRICES !!!  Every price below is a placeholder so the
+# pipeline runs. Replace them with your contract rates (DBU price x DBUs/hour
+# for the instance type, and per-token prices for your serving endpoints)
+# before any number from cost_effectiveness.py leaves this repo.
+
+corpus_notes: 1000000          # notes to classify in the full project
+avg_note_tokens: null          # null = measure from the corpus sample (chars / 4)
+
+compute:                       # $/hour for one node, all-in (VM + DBU)
+  cpu_node_usd_per_hour: 1.00  # ILLUSTRATIVE
+  gpu_node_usd_per_hour: 4.00  # ILLUSTRATIVE (single mid-range GPU)
+
+# Per-method run profile. throughput is notes/second on ONE node.
+#   measured: filled in by scripts/14_benchmark_cost.py on the CPU it runs on
+#   assumed:  a planning number until you measure it on the target hardware
+methods:
+  note_rules:          {kind: local, hardware: cpu, throughput_source: measured}
+  tfidf_logreg:        {kind: local, hardware: cpu, throughput_source: measured, train_hours: 0.05}
+  distilbert-base:     {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 400, train_hours: 0.5}
+  bert-base:           {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 200, train_hours: 1.0}
+  biomedbert:          {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 200, train_hours: 1.0}
+  bioclinical-modernbert-base:  {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 150, train_hours: 1.5}
+  bioclinical-modernbert-large: {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 50, train_hours: 4.0}
+  llm_challenger:      {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
+                        prompt_overhead_tokens: 350, output_tokens: 20}       # ILLUSTRATIVE
+
+judge:                         # the LLM judge itself (used on samples, not the whole corpus)
+  usd_per_1m_input_tokens: 3.00   # ILLUSTRATIVE (a stronger model than the classifier)
+  usd_per_1m_output_tokens: 15.00 # ILLUSTRATIVE
+  prompt_overhead_tokens: 450
+  output_tokens: 80
+  sample_per_method: 400       # judged notes per method on the corpus sample

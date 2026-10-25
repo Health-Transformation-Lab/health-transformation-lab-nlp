@@ -20,3 +20,5 @@ MODELS_YAML = REPO_ROOT / "models.yaml"
 DATASETS_DIR = REPO_ROOT / "data" / "datasets"   # committed: synthetic, de-identified
 REVIEW_DIR = DATA_ROOT / "review"                # Label Studio exports + parsed labels
 RAW_DIR = DATA_ROOT / "raw"                      # notes WITH (fake) PHI; never committed
+CORPUS_DIR = DATA_ROOT / "corpus"                # corpus sample, predictions, judgments
+COSTS_YAML = REPO_ROOT / "costs.yaml"

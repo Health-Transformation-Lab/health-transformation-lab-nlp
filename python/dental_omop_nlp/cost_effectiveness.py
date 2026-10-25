@@ -1,0 +1,120 @@
+"""Cost-effectiveness of each method at full-corpus scale.
+
+    1. Calibrate the judge on the human-reviewed charts: for each method's
+       prediction on a reviewed chart we know whether it was truly correct
+       (matches reviewer consensus). The judge's verdicts on the same pairs
+       give its sensitivity (says correct | is correct) and specificity
+       (says incorrect | is incorrect).
+    2. Judge a sample of each method's predictions on the corpus. The raw
+       share judged correct is biased by the judge's errors; correct it with
+       the Rogan-Gladen estimator:
+           accuracy = (p_judged + specificity - 1) / (sensitivity + specificity - 1)
+       Bootstrap the calibration set and the sample together for a 95% CI, so
+       the judge's own uncertainty is in the interval.
+    3. Cost of running each method over the whole corpus (costs.yaml), plus
+       cost per 1,000 correctly classified notes.
+    4. Incremental cost-effectiveness: sort by cost, drop dominated methods
+       (one that costs more and isn't more accurate), and for each remaining
+       step report dollars per additional correctly classified note (ICER).
+
+r/R/05_cost_effectiveness.R computes the same table; the parity test checks.
+"""
+
+from __future__ import annotations
+
+import numpy as np
+import pandas as pd
+
+CORRECT, INCORRECT, ND = "correct", "incorrect", "not_determinable"
+
+
+# ------------------------------------------------------------------ costs
+def method_cost(cfg: dict, n_notes: int, avg_note_tokens: float, compute: dict,
+                measured_tput: float | None = None) -> dict:
+    """Cost to run one method over n_notes. Returns cost and the inputs used."""
+    if cfg["kind"] == "llm":
+        tok_in = n_notes * (avg_note_tokens + cfg["prompt_overhead_tokens"])
+        tok_out = n_notes * cfg["output_tokens"]
+        usd = tok_in / 1e6 * cfg["usd_per_1m_input_tokens"] + tok_out / 1e6 * cfg["usd_per_1m_output_tokens"]
+        return {"cost_usd": usd, "node_hours": None, "notes_per_sec": None, "throughput_source": "tokens"}
+    tput = measured_tput if cfg.get("throughput_source") == "measured" else cfg.get("notes_per_sec")
+    if not tput:
+        raise ValueError("no throughput: run scripts/14_benchmark_cost.py or set notes_per_sec")
+    rate = compute["gpu_node_usd_per_hour" if cfg["hardware"] == "gpu" else "cpu_node_usd_per_hour"]
+    hours = n_notes / tput / 3600 + cfg.get("train_hours", 0.0)
+    return {"cost_usd": hours * rate, "node_hours": hours, "notes_per_sec": tput,
+            "throughput_source": cfg.get("throughput_source", "assumed")}
+
+
+def judge_cost(n_judged: int, avg_note_tokens: float, judge_cfg: dict) -> float:
+    tok_in = n_judged * (avg_note_tokens + judge_cfg["prompt_overhead_tokens"])
+    tok_out = n_judged * judge_cfg["output_tokens"]
+    return tok_in / 1e6 * judge_cfg["usd_per_1m_input_tokens"] + tok_out / 1e6 * judge_cfg["usd_per_1m_output_tokens"]
+
+
+# ------------------------------------------------------------------ judge calibration
+def calibrate_judge(gold: pd.DataFrame) -> dict:
+    """gold: rows with columns truly_correct (bool) and verdict. Not-determinable excluded."""
+    g = gold[gold["verdict"].isin([CORRECT, INCORRECT]) & gold["gate_ok"]]
+    pos, neg = g[g["truly_correct"]], g[~g["truly_correct"]]
+    sens = float((pos["verdict"] == CORRECT).mean()) if len(pos) else float("nan")
+    spec = float((neg["verdict"] == INCORRECT).mean()) if len(neg) else float("nan")
+    return {"sensitivity": sens, "specificity": spec, "n_pos": len(pos), "n_neg": len(neg),
+            "nd_rate": float((gold["verdict"] == ND).mean()),
+            "gate_fail_rate": float((~gold["gate_ok"]).mean())}
+
+
+def rogan_gladen(p: float, sens: float, spec: float) -> float:
+    denom = sens + spec - 1
+    if not np.isfinite(denom) or denom <= 0:
+        return float("nan")   # judge no better than chance: estimate undefined
+    return float(min(max((p + spec - 1) / denom, 0.0), 1.0))
+
+
+def _p_judged_correct(s: pd.DataFrame) -> float:
+    d = s[s["verdict"].isin([CORRECT, INCORRECT]) & s["gate_ok"]]
+    return float((d["verdict"] == CORRECT).mean()) if len(d) else float("nan")
+
+
+def corrected_accuracy(sample: pd.DataFrame, gold: pd.DataFrame, n_boot: int = 1000,
+                       seed: int = 0) -> dict:
+    """sample: judged corpus predictions for ONE method. gold: judged calibration rows (all methods)."""
+    cal = calibrate_judge(gold)
+    p = _p_judged_correct(sample)
+    est = rogan_gladen(p, cal["sensitivity"], cal["specificity"])
+    rng = np.random.default_rng(seed)
+    boots = []
+    for _ in range(n_boot):
+        s = sample.iloc[rng.integers(0, len(sample), len(sample))]
+        g = gold.iloc[rng.integers(0, len(gold), len(gold))]
+        c = calibrate_judge(g)
+        boots.append(rogan_gladen(_p_judged_correct(s), c["sensitivity"], c["specificity"]))
+    lo, hi = np.nanpercentile(boots, [2.5, 97.5]) if np.isfinite(boots).any() else (np.nan, np.nan)
+    return {"p_judged_correct": p, "accuracy_est": est, "ci_low": float(lo), "ci_high": float(hi),
+            "n_judged": int(sample["verdict"].isin([CORRECT, INCORRECT]).sum()),
+            "nd_rate": float((sample["verdict"] == ND).mean())}
+
+
+# ------------------------------------------------------------------ frontier
+def frontier(table: pd.DataFrame, n_notes: int) -> pd.DataFrame:
+    """Adds dominated flag and ICER (USD per additional correct note) along the frontier."""
+    t = table.sort_values(["cost_usd", "accuracy_est"], ascending=[True, False]).reset_index(drop=True)
+    t["dominated"] = False
+    best = -1.0
+    for i, r in t.iterrows():
+        if r["accuracy_est"] <= best:
+            t.loc[i, "dominated"] = True
+        else:
+            best = r["accuracy_est"]
+    t["icer_usd_per_extra_correct_note"] = np.nan
+    t["compared_to"] = ""
+    prev = None
+    for i, r in t[~t["dominated"]].iterrows():
+        if prev is not None:
+            d_correct = (r["accuracy_est"] - prev["accuracy_est"]) * n_notes
+            t.loc[i, "icer_usd_per_extra_correct_note"] = (r["cost_usd"] - prev["cost_usd"]) / d_correct
+            t.loc[i, "compared_to"] = prev["method"]
+        prev = r
+    t["expected_correct_notes"] = t["accuracy_est"] * n_notes
+    t["usd_per_1k_correct"] = t["cost_usd"] / (t["expected_correct_notes"] / 1000)
+    return t

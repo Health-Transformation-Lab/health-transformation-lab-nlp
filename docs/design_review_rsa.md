@@ -78,7 +78,14 @@ flowchart LR
 8. **Model output into OMOP.** Writing NLP flags to `NOTE_NLP` from a batch
    job: any guidance on lineage so every flag traces back to model version
    and note hash?
-9. **Timeline fit.** Given a January analysis deadline, which of the above
+9. **LLM judge at scale.** We'll judge a stratified sample (~1,500 notes per
+   method, ~10k calls) with `ai_query`, and need batch inference for a
+   classifier rung over 1M+ notes. Provisioned throughput or pay-per-token?
+   Typical throughput and cost for ~500-token notes? How do we pin the
+   model version so judge calibration stays valid?
+10. **Cost reporting.** Can we tag jobs and endpoints so system tables give
+    us actual cost per method, to replace the planning prices in `costs.yaml`?
+11. **Timeline fit.** Given a January analysis deadline, which of the above
    can we decide in one session, and what needs an account-team follow-up?
 
 ## Decisions already made

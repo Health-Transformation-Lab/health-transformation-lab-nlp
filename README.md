@@ -36,17 +36,30 @@ compared against the algorithm and the AI model. Details:
 | `method_agreement.csv`, `method_coverage.csv` | Pairwise agreement and kappa between the seven sources. Input to the qualitative review. |
 | `deid_report.csv` | Per-note de-identification recall and over-redaction against the injected fake PHI. |
 
+## Cost-effectiveness at 1M+ notes
+
+Reviewers can stage hundreds of charts, not a million. An LLM judge, calibrated
+against the reviewers, estimates each method's accuracy on a sample of the full
+corpus; a cost model prices running each method over every note. Result: a
+frontier of accuracy vs cost with incremental cost per extra correct note.
+[docs/cost_effectiveness.md](docs/cost_effectiveness.md)
+
+```bash
+python scripts/14_benchmark_cost.py && python scripts/15_judge.py --backend openai && python scripts/16_cost_effectiveness.py
+```
+
 ## What's in here
 
 | Path | What it is |
 |------|------------|
-| `python/dental_omop_nlp/` | `study.py` builds everything; `clinical_notes.py`, `sources.py`, `phi.py` generate; `deid.py` de-identifies; `note_reader.py` + `sources.READERS` read each source; `phenotype.py` compares methods and holds the rule-based algorithm; `rungs.py` the AI models; `labelstudio.py`, `reliability.py` the validation |
+| `python/dental_omop_nlp/` | `study.py` builds everything; `clinical_notes.py`, `sources.py`, `phi.py` generate; `deid.py` de-identifies; `note_reader.py` + `sources.READERS` read each source; `phenotype.py` compares methods and holds the rule-based algorithm; `rungs.py` the AI models; `labelstudio.py`, `reliability.py` the validation; `judge.py`, `cost_effectiveness.py` the LLM judge and cost analysis |
 | `labelstudio/` | Labeling config and setup steps |
 | `r/` | R twin: labels, scorer, reliability (`04_reliability.R`), tidymodels/`text` models, OHDSI ETL-Synthea. Local run and GPU guidance in `r/README.md` |
 | `models.yaml` | 12 candidate encoders from the evaluation sheet, with roles and ladders |
+| `costs.yaml` | Prices and throughput for costing each method over the full corpus (**illustrative until replaced**) |
 | `omop/` | OMOP CDM 5.4 dental extension (`SITE`, `SITE_EVENT`) from the OHDSI Dentistry Workgroup |
-| `databricks/` | Free Edition notebook |
-| `docs/` | [process](docs/process.md), [labeling protocol](docs/labeling_protocol.md), [plan and timeline](docs/plan.md), [design review for Databricks](docs/design_review_rsa.md), [ADRs](docs/adr/) |
+| `databricks/` | Free Edition notebook; `02_llm_judge.sql` runs the judge with `ai_query` at scale |
+| `docs/` | [process](docs/process.md), [labeling protocol](docs/labeling_protocol.md), [plan and timeline](docs/plan.md), [cost-effectiveness](docs/cost_effectiveness.md), [design review for Databricks](docs/design_review_rsa.md), [ADRs](docs/adr/) |
 
 ## Quick start
 

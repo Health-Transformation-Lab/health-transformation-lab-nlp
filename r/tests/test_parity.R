@@ -58,3 +58,21 @@ if (file.exists(py_rel) && file.exists("data/review/simulated_reviewer_labels.cs
   stopifnot(d < 1e-9)
 } else cat("reliability: skipped (run python scripts 12 --simulate and 13 --simulated first)\n")
 cat("parity OK (all sections)\n")
+
+# 5. Cost-effectiveness: point estimates, costs, dominance and ICER match Python.
+py_ce <- "data/corpus/simulated_cost_effectiveness.csv"
+if (file.exists(py_ce)) {
+  source("r/R/05_cost_effectiveness.R")
+  gold <- read.csv("data/corpus/simulated_judgments_gold.csv", stringsAsFactors = FALSE)
+  corp <- read.csv("data/corpus/simulated_judgments_corpus.csv", stringsAsFactors = FALSE)
+  bench <- read.csv("data/corpus/cost_benchmark.csv", stringsAsFactors = FALSE)
+  py <- read.csv(py_ce, stringsAsFactors = FALSE)
+  r <- cost_effectiveness(gold, corp, bench, 1e6)
+  r <- r[match(py$method, r$method), ]
+  num <- c("accuracy_est", "cost_usd", "usd_per_1k_correct", "icer_usd_per_extra_correct_note")
+  d <- max(abs(as.matrix(r[num]) - as.matrix(py[num])), na.rm = TRUE)
+  stopifnot(all(r$dominated == as.logical(py$dominated)))
+  cat(sprintf("cost-effectiveness: max |R - Python| = %.2e over %d methods; frontier identical\n", d, nrow(py)))
+  stopifnot(d < 1e-9)
+} else cat("cost-effectiveness: skipped (run python scripts 14-16 first)\n")
+cat("parity OK (incl. cost-effectiveness)\n")
