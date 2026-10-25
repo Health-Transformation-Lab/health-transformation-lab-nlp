@@ -22,6 +22,18 @@ def load_registry(path: Path | str = MODELS_YAML) -> dict:
     return reg
 
 
+def families_of(reg: dict, methods) -> set[str]:
+    """Model families of the evaluated methods (ids may carry sim:/ai: prefixes).
+    Used so an LLM judge never grades its own family."""
+    by_id = {m["id"]: m.get("family") for m in reg["models"]}
+    out = set()
+    for meth in methods:
+        mid = meth.split(":", 1)[-1]
+        if by_id.get(mid):
+            out.add(by_id[mid])
+    return out
+
+
 def model(reg: dict, model_id: str) -> dict:
     for m in reg["models"]:
         if m["id"] == model_id:

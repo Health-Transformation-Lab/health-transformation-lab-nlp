@@ -24,7 +24,8 @@ from dental_omop_nlp.registry import load_registry
 from dental_omop_nlp.rungs import make_rung
 from dental_omop_nlp.study import build_corpus_sample
 
-SIM_ACCURACY = {"distilbert-base": 0.86, "bioclinical-modernbert-base": 0.90, "llm_challenger": 0.88}
+SIM_ACCURACY = {"distilbert-base": 0.86, "bioclinical-modernbert-base": 0.90, "llm_challenger": 0.88,
+                "medgemma-1.5-4b-it": 0.87, "medgemma-27b-text-it": 0.90}   # placeholders for dry runs only
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--n-people", type=int, default=1500)

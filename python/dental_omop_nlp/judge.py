@@ -40,10 +40,8 @@ from .labels import LABELS
 
 PROMPT_VERSION = "judge-v1"
 
-SYSTEM = """You are a periodontist auditing an automated classifier. You judge whether a dental \
-chart note supports a predicted periodontal status under the 2017 AAP/EFP classification.
-
-Status definitions:
+# Status definitions and rules, shared with the note reader (llm_reader.py).
+CRITERIA = """Status definitions:
 - healthy: no attachment loss, bleeding on probing (BOP) < 10% of sites
 - gingivitis: no attachment loss, BOP >= 10%
 - periodontitis_stage_1: interdental CAL 1-2 mm, radiographic bone loss (RBL) < 15%, no tooth loss due to perio
@@ -52,13 +50,19 @@ Status definitions:
 - periodontitis_stage_4: as stage 3 with >= 5 teeth lost due to perio
 Rules: measured findings outrank a written diagnosis; the worst site decides; ignore text \
 copied forward from previous visits; pre-2017 terms map slight=stage 1, moderate=stage 2, \
-severe=stage 3 (4 if >= 5 teeth lost to perio).
+severe=stage 3 (4 if >= 5 teeth lost to perio)."""
+
+SYSTEM = ("You are a periodontist auditing an automated classifier. You judge whether a dental "
+          "chart note supports a predicted periodontal status under the 2017 AAP/EFP classification.\n\n"
+          + CRITERIA + """
 
 Answer with JSON only:
 {"verdict": "correct" | "incorrect" | "not_determinable",
  "supported_status": one of the six statuses or null,
  "quote": "the exact sentence or phrase from the note that decides it, copied verbatim",
  "rationale": "one sentence"}"""
+
+)
 
 USER = """Note:
 <<<

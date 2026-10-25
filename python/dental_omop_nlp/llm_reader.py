@@ -1,0 +1,295 @@
+"""An LLM (MedGemma by default) as a note reader: note in, status/grade/extent out.
+
+Exploratory (spec 004, docs/medgemma.md). The reader is a rung like any other:
+fit(train) picks optional few-shot examples, predict(test) returns (labels, None).
+Per-note details (raw output, quote, gate, tokens, latency, fallback) are kept in
+`.details` and written next to the predictions.
+
+Safeguards
+  - Residual PHI scan before anything is sent; a flagged note is never sent.
+  - Quote gate (shared with the judge): the answer must quote the note verbatim.
+  - Any failure (bad JSON, unknown status, failed gate, backend error) falls back
+    to the note_rules prediction and is flagged, so scores stay comparable and the
+    failure rate is visible.
+
+Backends
+  hf         local transformers. Multimodal MedGemma 4B via AutoModelForImageTextToText,
+             text-only 27B via AutoModelForCausalLM; optional LoRA adapter. Needs
+             `pip install -e ".[llm]"`, a Hugging Face login that has accepted the
+             HAI-DEF terms, and ideally a GPU.
+  openai     any OpenAI-compatible chat endpoint: Databricks Model Serving, vLLM,
+             Ollama (http://localhost:11434/v1). READER_BASE_URL, READER_API_KEY,
+             READER_MODEL.
+  simulated  no model; errs at set rates by difficulty level. Dry runs only;
+             output files are prefixed simulated_.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import random
+import time
+import urllib.request
+from typing import ClassVar
+
+import pandas as pd
+
+from .deid import residual_scan
+from .judge import CRITERIA
+from .labels import LABELS
+
+GRADES = {"A", "B", "C"}
+EXTENTS = {"localized", "generalized"}
+
+_ANSWER = """Answer with JSON only:
+{"status": one of healthy, gingivitis, periodontitis_stage_1, periodontitis_stage_2, \
+periodontitis_stage_3, periodontitis_stage_4,
+ "grade": "A" | "B" | "C" | null (null unless periodontitis),
+ "extent": "localized" | "generalized" | null (null unless periodontitis),
+ "quote": "the exact sentence or phrase from the note that decides the status, copied verbatim",
+ "rationale": "one sentence"}"""
+
+PROMPTS = {
+    "reader-v1": ("You are a periodontist reading a de-identified dental chart note. Classify the "
+                  "patient's periodontal status at this visit under the 2017 AAP/EFP classification.\n\n"
+                  + CRITERIA + "\n\n" + _ANSWER),
+    "reader-v1-terse": ("Classify periodontal status from this dental note (2017 AAP/EFP).\n\n"
+                        + CRITERIA + "\n\n" + _ANSWER),
+}
+DEFAULT_VARIANT = "reader-v1"
+USER = "Note:\n<<<\n{note}\n>>>"
+
+_FINDING_WORDS = ("CAL", "attachment", "bone loss", "RBL", "PD ", "probing", "BOP", "pocket")
+
+
+# ---------------------------------------------------------------- prompt
+def build_messages(note: str, examples: list[tuple[str, str]] | None = None,
+                   variant: str = DEFAULT_VARIANT) -> list[dict]:
+    msgs = [{"role": "system", "content": PROMPTS[variant]}]
+    for ex_note, ex_answer in examples or []:
+        msgs += [{"role": "user", "content": USER.format(note=ex_note)},
+                 {"role": "assistant", "content": ex_answer}]
+    return msgs + [{"role": "user", "content": USER.format(note=note)}]
+
+
+def _decisive_line(note: str) -> str:
+    """A verbatim line to quote in example answers: measured findings first
+    (they outrank a written diagnosis), then a diagnosis line, then the first line."""
+    lines = [ln.strip() for ln in note.splitlines() if ln.strip()]
+    for ln in lines:
+        if any(w.lower() in ln.lower() for w in _FINDING_WORDS):
+            return ln
+    for ln in lines:
+        if "diagnos" in ln.lower() or ln.lower().startswith("dx"):
+            return ln
+    return lines[0] if lines else ""
+
+
+def target_answer(note: str, status: str, grade: str = "NA", extent: str = "NA") -> str:
+    perio = status.startswith("periodontitis")
+    g = grade if perio and grade in GRADES else None
+    e = extent if perio and extent in EXTENTS else None
+    return json.dumps({"status": status, "grade": g, "extent": e, "quote": _decisive_line(note),
+                       "rationale": "From the charted findings and diagnosis in the note."})
+
+
+def pick_examples(train: pd.DataFrame, k: int, seed: int = 0) -> list[tuple[str, str]]:
+    """k synthetic training notes per status, chosen by seed."""
+    rng = random.Random(seed)
+    out = []
+    for lab in LABELS:
+        pool = train.index[train["label"] == lab].tolist()
+        for i in rng.sample(pool, min(k, len(pool))):
+            r = train.loc[i]
+            out.append((r["note_text"], target_answer(r["note_text"], lab, str(r.get("grade", "NA")),
+                                                       str(r.get("extent", "NA")))))
+    return out
+
+
+def sft_records(train: pd.DataFrame, variant: str = DEFAULT_VARIANT) -> list[dict]:
+    """Chat-format fine-tuning records in exactly the reader's prompt/answer format."""
+    recs = []
+    for _, r in train.iterrows():
+        msgs = build_messages(r["note_text"], variant=variant)
+        msgs.append({"role": "assistant", "content": target_answer(
+            r["note_text"], r["label"], str(r.get("grade", "NA")), str(r.get("extent", "NA")))})
+        recs.append({"messages": msgs})
+    return recs
+
+
+# ---------------------------------------------------------------- parse + gate
+def parse_answer(raw: str, note: str) -> dict:
+    out = {"status": None, "grade": "NA", "extent": "NA", "quote": "", "gate_ok": False, "error": ""}
+    try:
+        s = raw[raw.index("{"): raw.rindex("}") + 1]
+        d = json.loads(s)
+    except (ValueError, json.JSONDecodeError) as e:
+        out["error"] = f"parse: {type(e).__name__}"
+        return out
+    status, quote = d.get("status"), (d.get("quote") or "").strip()
+    out["quote"] = quote
+    if status not in LABELS:
+        out["error"] = f"bad status {status!r}"
+        return out
+    out["status"] = status
+    if status.startswith("periodontitis"):
+        out["grade"] = d.get("grade") if d.get("grade") in GRADES else "NA"
+        out["extent"] = d.get("extent") if d.get("extent") in EXTENTS else "NA"
+    if not quote or quote not in note:
+        out["error"] = "quote not in note"
+        return out
+    out["gate_ok"] = True
+    return out
+
+
+# ---------------------------------------------------------------- backends
+class OpenAIChat:
+    name, simulated = "openai", False
+
+    def __init__(self, model: str | None = None, base_url: str | None = None, api_key: str | None = None,
+                 max_tokens: int = 300, max_retries: int = 3, timeout: int = 120):
+        self.model = model or os.environ["READER_MODEL"]
+        self.base_url = (base_url or os.environ["READER_BASE_URL"]).rstrip("/")
+        self.api_key = api_key or os.environ.get("READER_API_KEY", "none")
+        self.max_tokens, self.max_retries, self.timeout = max_tokens, max_retries, timeout
+
+    def __call__(self, messages: list[dict], visit_id=None) -> dict:
+        body = json.dumps({"model": self.model, "temperature": 0, "max_tokens": self.max_tokens,
+                           "messages": messages}).encode()
+        req = urllib.request.Request(f"{self.base_url}/chat/completions", data=body, method="POST",
+                                     headers={"Authorization": f"Bearer {self.api_key}",
+                                              "Content-Type": "application/json"})
+        err = ""
+        for attempt in range(self.max_retries):
+            t0 = time.time()
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout) as r:
+                    resp = json.loads(r.read())
+                u = resp.get("usage", {})
+                return {"raw": resp["choices"][0]["message"]["content"], "input_tokens": u.get("prompt_tokens", 0),
+                        "output_tokens": u.get("completion_tokens", 0), "latency_s": time.time() - t0}
+            except Exception as e:  # noqa: BLE001 - network, rate limit: retry, then report
+                err = f"{type(e).__name__}: {e}"
+                time.sleep(2 ** attempt)
+        return {"raw": "", "input_tokens": 0, "output_tokens": 0, "latency_s": 0.0, "error": err}
+
+
+class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
+    """Local transformers generation, greedy. Loads lazily on first call."""
+
+    name, simulated = "hf", False
+
+    def __init__(self, hf_id: str, modality: str = "multimodal", adapter: str | None = None,
+                 max_new_tokens: int = 300, dtype: str = "bfloat16", device_map: str = "auto"):
+        self.hf_id, self.modality, self.adapter = hf_id, modality, adapter
+        self.max_new_tokens, self.dtype, self.device_map = max_new_tokens, dtype, device_map
+        self.model = None
+
+    def _load(self):
+        import torch
+        from transformers import (
+            AutoModelForCausalLM,
+            AutoModelForImageTextToText,
+            AutoProcessor,
+            AutoTokenizer,
+        )
+        kw = {"torch_dtype": getattr(torch, self.dtype), "device_map": self.device_map}
+        if self.modality == "multimodal":
+            self.proc = AutoProcessor.from_pretrained(self.hf_id)
+            self.model = AutoModelForImageTextToText.from_pretrained(self.hf_id, **kw)
+        else:
+            self.proc = AutoTokenizer.from_pretrained(self.hf_id)
+            self.model = AutoModelForCausalLM.from_pretrained(self.hf_id, **kw)
+        if self.adapter:
+            from peft import PeftModel
+            self.model = PeftModel.from_pretrained(self.model, self.adapter)
+        self.model.eval()
+
+    def __call__(self, messages: list[dict], visit_id=None) -> dict:
+        import torch
+        if self.model is None:
+            self._load()
+        msgs = messages if self.modality != "multimodal" else [
+            {"role": m["role"], "content": [{"type": "text", "text": m["content"]}]} for m in messages]
+        t0 = time.time()
+        inputs = self.proc.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True,
+                                               return_dict=True, return_tensors="pt").to(self.model.device)
+        n = inputs["input_ids"].shape[-1]
+        with torch.inference_mode():
+            out = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens, do_sample=False)
+        gen = out[0][n:]
+        return {"raw": self.proc.decode(gen, skip_special_tokens=True), "input_tokens": int(n),
+                "output_tokens": len(gen), "latency_s": time.time() - t0}
+
+
+class SimulatedReader:
+    """Dry-run reader. Knows the generator truth; errs more on harder notes.
+    Error rates are placeholders, not estimates of MedGemma."""
+
+    name, simulated = "simulated", True
+    ERROR_BY_LEVEL: ClassVar[dict[str, float]] = {"L1": 0.05, "L2": 0.12, "L3": 0.30}
+
+    def __init__(self, truth: dict, level: dict | None = None, seed: int = 0):
+        self.truth, self.level, self.rng = truth, level or {}, random.Random(seed)
+
+    def __call__(self, messages: list[dict], visit_id=None) -> dict:
+        note = messages[-1]["content"].removeprefix("Note:\n<<<\n").removesuffix("\n>>>")
+        t = self.truth[visit_id]
+        status = t
+        if self.rng.random() < self.ERROR_BY_LEVEL.get(self.level.get(visit_id, "L2"), 0.12):
+            i = LABELS.index(t)
+            near = [LABELS[j] for j in (i - 1, i + 1) if 0 <= j < len(LABELS)]
+            status = self.rng.choice(near if self.rng.random() < 0.8 else [x for x in LABELS if x != t])
+        return {"raw": target_answer(note, status), "input_tokens": (len(PROMPTS[DEFAULT_VARIANT]) + len(note)) // 4,
+                "output_tokens": 60, "latency_s": 0.0}
+
+
+def make_backend(entry: dict, kind: str, **kw):
+    if kind == "hf":
+        return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"))
+    if kind == "openai":
+        return OpenAIChat(model=kw.get("endpoint"))
+    raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
+
+
+# ---------------------------------------------------------------- rung
+class LLMReader:
+    def __init__(self, model_id: str, backend=None, shots: int = 0, variant: str = DEFAULT_VARIANT,
+                 seed: int = 0, entry: dict | None = None, backend_kind: str | None = None, **backend_kw):
+        self.model_id, self.shots, self.variant, self.seed = model_id, shots, variant, seed
+        self.backend = backend or make_backend(entry or {"hf": model_id},
+                                               backend_kind or os.environ.get("READER_BACKEND", "hf"), **backend_kw)
+        self.examples: list[tuple[str, str]] = []
+        self.details = pd.DataFrame()
+
+    def fit(self, train: pd.DataFrame):
+        self.examples = pick_examples(train, self.shots, self.seed) if self.shots and len(train) else []
+        return self
+
+    def predict(self, test: pd.DataFrame):
+        from .note_reader import read_note
+        preds, rows = [], []
+        for _, r in test.iterrows():
+            note, vid = r["note_text"], r.get("visit_id")
+            row = {"visit_id": vid, "model": self.model_id, "backend": self.backend.name,
+                   "prompt_version": self.variant, "shots": self.shots, "input_tokens": 0, "output_tokens": 0,
+                   "latency_s": 0.0, "raw": "", "status": None, "grade": "NA", "extent": "NA", "quote": "",
+                   "gate_ok": False, "error": ""}
+            if residual_scan(note):
+                row["error"] = "residual PHI pattern: not sent"
+            else:
+                res = self.backend(build_messages(note, self.examples, self.variant), visit_id=vid)
+                row.update({k: res.get(k, row[k]) for k in ("input_tokens", "output_tokens", "latency_s")})
+                row["raw"] = (res.get("raw") or "")[:2000]
+                if res.get("error"):
+                    row["error"] = "backend: " + res["error"]
+                else:
+                    row.update(parse_answer(row["raw"], note))
+            row["fallback"] = not row["gate_ok"]
+            pred = row["status"] if row["gate_ok"] else read_note(note)
+            row["pred"] = pred
+            preds.append(pred)
+            rows.append(row)
+        self.details = pd.DataFrame(rows)
+        return preds, None

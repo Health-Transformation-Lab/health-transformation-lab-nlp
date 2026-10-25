@@ -1,0 +1,78 @@
+# Feature Specification: MedGemma as a note reader, judge candidate and fine-tune target
+
+**Feature Branch**: `004-medgemma-reader`
+
+**Created**: 2026-10-25
+
+**Status**: v1 implemented (reader, judge family rule, LoRA script); not yet run on real MedGemma weights
+
+**Input**: "Use MedGemma and possibly extend it." See [docs/medgemma.md](../../docs/medgemma.md).
+
+> **Exploratory, for learning and training.** Personal learning project; public
+> information only; not affiliated with Google. Synthetic notes only.
+
+## Context
+
+MedGemma (Google HAI-DEF) is an open medical LLM family: 4B multimodal and 27B
+text, with MedGemma 1.5 4B released January 2026. It has not been reported on
+dental notes. The repo's ladder has encoders and rules but no generative reader
+that can run inside our own environment.
+
+## User Scenarios & Testing
+
+### User Story 1 - Zero-/few-shot MedGemma note reader (P1)
+
+As the data scientist, I want MedGemma to read each de-identified note and
+return status, grade and extent as JSON, scored like every other rung.
+
+**Independent Test**: `11_ai_predict.py --rung medgemma-4b-it --backend simulated`
+writes predictions; the reader's parsing, gate and fallback are unit-tested.
+
+1. **Given** a valid JSON answer whose quote is in the note, **Then** the status is used and `gate_ok` is true.
+2. **Given** invalid JSON, an unknown status, or a quote not in the note, **Then** the prediction falls back to `note_rules` and the row is flagged (`fallback`, `error`).
+3. **Given** a note where the residual PHI scan finds anything, **Then** it is not sent to the model (fallback, flagged).
+4. **Given** `--shots k`, **Then** k synthetic training notes per status are included as examples, chosen by seed.
+
+### User Story 2 - Several ways to run it (P1)
+
+`hf` (local transformers, GPU or CPU), `openai` (any OpenAI-compatible endpoint:
+Databricks Model Serving, vLLM, Ollama), `simulated` (dry run, no model, files
+prefixed `simulated_`).
+
+### User Story 3 - Judge family rule (P2)
+
+When a MedGemma rung's predictions are being judged, a Gemma-family judge is
+not selected. Families come from `models.yaml`.
+
+### User Story 4 - Fine-tune ("extend") (P2)
+
+A LoRA script trains MedGemma on `train.csv` in the reader's prompt/answer
+format, saving an adapter that the `hf` backend can load.
+
+### Edge Cases
+
+- Model wraps JSON in prose or code fences: parse the first `{...}`.
+- Prompt sensitivity: two prompt variants, selectable.
+- Long notes: truncated only by the model context (128K), so no truncation needed here.
+
+## Requirements
+
+- **FR-001**: `llm_reader.py`: prompt (shared status criteria with the judge), parser, gate, fallback, PHI pre-check.
+- **FR-002**: Backends hf / openai / simulated behind one interface; per-note details (raw output, quote, tokens, latency, fallback, error) written alongside predictions.
+- **FR-003**: `make_rung` builds an `LLMReader` for any `role: llm` model in `models.yaml`.
+- **FR-004**: Costs: MedGemma entries in `costs.yaml` (assumed GPU throughput, ILLUSTRATIVE) and simulated predictions in `14_benchmark_cost.py --simulate-missing`.
+- **FR-005**: `15_judge.py` adds families of evaluated LLM rungs to the excluded judge families automatically.
+- **FR-006**: `17_medgemma_lora.py` + `llm_reader.sft_records`.
+- **FR-007**: Databricks notebook running the reader on Free Edition serverless GPU.
+- **FR-008**: R parity unaffected: predictions are CSV in the existing format.
+
+## Success Criteria
+
+- **SC-001**: Unit tests cover parse, gate, fallback, PHI check, few-shot selection, OpenAI request/response, simulated backend, SFT records, family rule.
+- **SC-002**: Simulated dry run produces predictions and appears in the cost frontier as `sim:medgemma-*`.
+- **SC-003**: Real-weights run (later, on GPU) reports agreement, kappa, unsafe rate and by-level results, plus gate-fail and fallback rates.
+
+## Assumptions
+
+- Simulated error rates by difficulty (L1 5%, L2 12%, L3 30%) are placeholders for the dry run only.
+- MedGemma weights need a Hugging Face account that has accepted the HAI-DEF terms.

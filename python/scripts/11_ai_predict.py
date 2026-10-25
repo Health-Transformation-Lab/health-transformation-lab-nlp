@@ -6,7 +6,17 @@ The AI model reads ONLY the de-identified note. Reviewers see every source.
     python scripts/11_ai_predict.py --rung distilbert-base --epochs 2 --max-len 256
     python scripts/11_ai_predict.py --rung bioclinical-modernbert-base --label stated_status
 
-Writes data/datasets/ai_predictions_<rung>.csv (visit_id, pred, p_<status>...).
+LLM note readers (MedGemma, spec 004):
+
+    python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf          # local GPU/CPU
+    python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf --adapter runs/medgemma-lora
+    READER_BASE_URL=... READER_API_KEY=... python scripts/11_ai_predict.py \
+        --rung medgemma-27b-text-it --backend openai --endpoint <serving endpoint name>
+    python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend simulated   # dry run, no model
+
+Writes data/datasets/ai_predictions_<rung>.csv (visit_id, pred, p_<status>...), plus
+llm_details_<rung>.csv for LLM rungs. The simulated backend writes simulated_* files,
+which the reliability and judge scripts do not pick up.
 """
 
 import argparse
@@ -15,6 +25,7 @@ import pandas as pd
 
 from dental_omop_nlp.labels import LABELS
 from dental_omop_nlp.paths import DATASETS_DIR
+from dental_omop_nlp.radiograph import FEATURES as RAD_FEATURES
 from dental_omop_nlp.registry import load_registry
 from dental_omop_nlp.rungs import make_rung
 
@@ -23,20 +34,55 @@ ap.add_argument("--rung", required=True)
 ap.add_argument("--label", default="label", help="train target: label (chart) or stated_status (clinician)")
 ap.add_argument("--epochs", type=int, default=3)
 ap.add_argument("--max-len", type=int, default=256)
+llm = ap.add_argument_group("LLM readers")
+llm.add_argument("--backend", choices=["hf", "openai", "simulated"], default="hf")
+llm.add_argument("--shots", type=int, default=0, help="few-shot examples per status from train.csv")
+llm.add_argument("--variant", default="reader-v1", help="prompt variant (reader-v1, reader-v1-terse)")
+llm.add_argument("--adapter", default=None, help="LoRA adapter dir from scripts/17_medgemma_lora.py")
+llm.add_argument("--endpoint", default=None, help="openai backend: model / serving endpoint name")
+llm.add_argument("--limit", type=int, default=None, help="only the first N review notes (smoke test)")
 a = ap.parse_args()
 
 train = pd.read_csv(DATASETS_DIR / "train.csv").rename(columns={a.label: "target"})
 train = train.drop(columns=[c for c in ("label",) if c in train]).rename(columns={"target": "label"})
-from dental_omop_nlp.radiograph import FEATURES as RAD_FEATURES  # noqa: E402
+key = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv")
+review = key[["visit_id", "note_text", *RAD_FEATURES]]
+if a.limit:
+    review = review.head(a.limit)
 
-review = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv")[["visit_id", "note_text", *RAD_FEATURES]]
-kw = {} if a.rung in ("rules_baseline", "note_rules", "tfidf_logreg", "fusion_tfidf_rad") else {"epochs": a.epochs, "max_len": a.max_len}
-model = make_rung(a.rung, load_registry(), **kw).fit(train)
+reg = load_registry()
+entry = next((m for m in reg["models"] if m["id"] == a.rung), {})
+is_llm = entry.get("role") == "llm"
+prefix = ""
+if is_llm:
+    kw = {"shots": a.shots, "variant": a.variant}
+    if a.backend == "simulated":
+        from dental_omop_nlp.llm_reader import SimulatedReader
+        kw["backend"] = SimulatedReader(dict(zip(key.visit_id, key.truth_status)),
+                                        dict(zip(key.visit_id, key.difficulty)), seed=4)
+        prefix = "simulated_"
+    else:
+        kw.update(backend_kind=a.backend, adapter=a.adapter, endpoint=a.endpoint)
+elif a.rung in ("rules_baseline", "note_rules", "tfidf_logreg", "fusion_tfidf_rad"):
+    kw = {}
+else:
+    kw = {"epochs": a.epochs, "max_len": a.max_len}
+
+model = make_rung(a.rung, reg, **kw).fit(train)
 pred, proba = model.predict(review)
 out = review[["visit_id"]].assign(pred=pred)
 if proba is not None:
     for i, lab in enumerate(LABELS):
         out[f"p_{lab}"] = proba[:, i]
-path = DATASETS_DIR / f"ai_predictions_{a.rung}.csv"
+path = DATASETS_DIR / f"{prefix}ai_predictions_{a.rung}.csv"
 out.to_csv(path, index=False)
 print(f"wrote {path} ({len(out)} visits)")
+if is_llm:
+    d = model.details
+    d.to_csv(DATASETS_DIR / f"{prefix}llm_details_{a.rung}.csv", index=False)
+    print(f"gate pass {d['gate_ok'].mean():.1%}, fallback {d['fallback'].mean():.1%}, "
+          f"tokens in/out {d['input_tokens'].mean():.0f}/{d['output_tokens'].mean():.0f} per note")
+    if prefix:
+        truth = key.set_index("visit_id")["truth_status"].reindex(out["visit_id"]).to_numpy()
+        acc = (out["pred"].to_numpy() == truth).mean()
+        print(f"*** SIMULATED READER: dry run, not a MedGemma result (agreement with truth {acc:.1%}) ***")

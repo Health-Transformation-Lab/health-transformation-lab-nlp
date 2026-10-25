@@ -10,6 +10,8 @@ structured_baseline  logistic regression on the chart numerics (not the text). U
 tfidf_logreg         TF-IDF + logistic regression on the text. Cheapest text model.
 <hf id>              any `classifier` / `long_context` model in models.yaml, fine-tuned
                      with a sequence-classification head via transformers.Trainer.
+<llm id>             any `role: llm` model (MedGemma): zero-/few-shot note reader,
+                     llm_reader.py (spec 004).
 """
 
 from __future__ import annotations
@@ -172,6 +174,10 @@ def make_rung(rung_id: str, registry: dict, **hf_kwargs):
     m = next((m for m in registry["models"] if m["id"] == rung_id), None)
     if m is None:
         raise KeyError(f"unknown rung {rung_id!r}")
+    if m["role"] == "llm":
+        from .llm_reader import LLMReader
+        allowed = {"backend", "backend_kind", "shots", "variant", "seed", "adapter", "endpoint"}
+        return LLMReader(rung_id, entry=m, **{k: v for k, v in hf_kwargs.items() if k in allowed})
     if m["role"] not in ("classifier", "long_context"):
         raise ValueError(f"{rung_id} has role {m['role']!r}; it is not a classifier rung")
     hf_kwargs.setdefault("max_len", min(m["max_len"], 256))

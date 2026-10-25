@@ -20,6 +20,10 @@ models = [
   "evaluate>=0.4",
   "accelerate>=0.30",
 ]
+# LLM note readers (MedGemma, spec 004). Gemma 3 support needs transformers >= 4.50.
+llm = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30"]
+# LoRA fine-tuning of an LLM reader (scripts/17_medgemma_lora.py). GPU strongly advised.
+lora = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30", "peft>=0.11", "trl>=0.12", "datasets>=2.19"]
 # Experiment tracking; on Databricks the workspace MLflow is used instead.
 track = ["mlflow>=2.12"]
 dev = ["pytest>=8", "ruff>=0.5"]

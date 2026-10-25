@@ -96,6 +96,12 @@ else:
     import os
     judges = {os.environ["JUDGE_MODEL"]: ""}
 classifier_families = set(filter(None, a.classifier_families.split(","))) or ({"fam-llm"} if sim else set())
+# Families of evaluated LLM rungs (e.g. MedGemma -> gemma) come from models.yaml automatically (spec 004).
+from dental_omop_nlp.registry import families_of, load_registry
+
+classifier_families |= families_of(load_registry(), {r["method"] for r in gold_rows})
+if classifier_families:
+    print(f"judges of these families are not eligible: {sorted(classifier_families)}")
 
 
 def run(df: pd.DataFrame, judge_truth_col: str, judge_name: str) -> pd.DataFrame:

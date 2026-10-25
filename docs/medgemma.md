@@ -35,6 +35,25 @@
 | 5 | **Radiograph extension ("extend", images)** | MedGemma wasn't trained on dental images. Options: (a) MedSigLIP image embeddings + a small classifier for bone loss; (b) fine-tune the 4B multimodal model on a public, licensed dental radiograph dataset. Output feeds the same structured radiograph schema as spec 003 | High; images and licences | Radiograph exploration |
 | 6 | **Grade from history** | Use the long context to read several visits at once and estimate progression (grade is about rate of change) | Medium | Grade reader |
 
+## Implemented (spec 004)
+
+Uses 1 (reader), 2 (LoRA fine-tune) and 3 (judge family rule) are in the code;
+none has been run on real MedGemma weights yet (needs a GPU and accepted HAI-DEF terms).
+
+| Piece | Where |
+|---|---|
+| Note reader rung: prompt shares the judge's AAP/EFP criteria; JSON status/grade/extent + verbatim quote; falls back to `note_rules` and flags the row on any failure; never sends a note the residual PHI scan flags | `python/dental_omop_nlp/llm_reader.py` |
+| Backends: `hf` (local transformers, optional LoRA adapter), `openai` (Databricks serving, vLLM, Ollama), `simulated` (dry run) | same |
+| Run it | `python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf [--shots 1] [--limit 40]` |
+| Fine-tune | `python scripts/17_medgemma_lora.py` then `--adapter runs/medgemma-lora` |
+| Judge rule | `15_judge.py` excludes judges of any evaluated LLM's family (`family: gemma` in `models.yaml`) |
+| Databricks | `databricks/notebooks/03_medgemma_reader.py` (Free Edition serverless GPU) |
+| Costs | `costs.yaml`: assumed GPU throughput, ILLUSTRATIVE; measure and replace |
+
+Per-note details (gate pass, fallback, tokens, latency) go to
+`data/datasets/llm_details_<rung>.csv`. The simulated dry run's numbers come from
+placeholder error rates and say nothing about MedGemma.
+
 ## Suggested order
 
 1. **Rung 1 first.** Cheap, and it answers the basic question: how does an

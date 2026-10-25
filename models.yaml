@@ -142,14 +142,30 @@ models:
       the classifier. Score it on retrieval metrics, not F1 on perio status.
 
   # ---- medical LLMs (exploratory; see docs/medgemma.md) ---------------------
-  # Not runnable as classifier rungs yet. Check Hugging Face for the current
-  # MedGemma 1.5 ids and accept the HAI-DEF terms before downloading.
+  # Run as note-reader rungs by llm_reader.py (spec 004):
+  #   python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf
+  # Accept the HAI-DEF terms on Hugging Face before downloading. `family` is used
+  # by the judge bake-off: a judge of the same family is not selected.
+  - id: medgemma-1.5-4b-it
+    hf: google/medgemma-1.5-4b-it
+    org: Google (Health AI Developer Foundations)
+    year: 2026
+    domain: medical
+    role: llm
+    family: gemma
+    modality: multimodal
+    max_len: 128000
+    paper: "MedGemma Technical Report (arXiv 2507.05201); MedGemma 1.5 release, Jan 2026"
+    note: Newer 4B; better document/EHR extraction reported. Default reader to try first.
+
   - id: medgemma-4b-it
     hf: google/medgemma-4b-it
     org: Google (Health AI Developer Foundations)
     year: 2025
     domain: medical
     role: llm
+    family: gemma
+    modality: multimodal
     max_len: 128000
     paper: "MedGemma Technical Report (arXiv 2507.05201)"
     note: Multimodal (text + image). Candidate zero-shot reader, LoRA fine-tune, judge, paraphraser.
@@ -160,6 +176,8 @@ models:
     year: 2025
     domain: medical
     role: llm
+    family: gemma
+    modality: text
     max_len: 128000
     paper: "MedGemma Technical Report (arXiv 2507.05201)"
     note: Text only. Candidate zero-shot reader and judge.
@@ -193,7 +211,8 @@ ladders:
   retrieval:
     - gte-moderncolbert
   llm_challengers:
-    # exploratory; served on GPU or via ai_query, not by rungs.py yet
+    # exploratory note readers (llm_reader.py, spec 004)
+    - medgemma-1.5-4b-it
     - medgemma-4b-it
     - medgemma-27b-text-it
 
