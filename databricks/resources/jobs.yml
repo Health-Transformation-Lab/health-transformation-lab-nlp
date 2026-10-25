@@ -20,6 +20,21 @@ resources:
               n_people: ${var.n_people}
               leak_assessment: "false"
 
+    load_lakebase:
+      name: dental-omop-nlp load OMOP into Lakebase (${bundle.target})
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: load
+          notebook_task:
+            notebook_path: ../notebooks/04_load_lakebase.py
+            base_parameters:
+              lakebase_instance: ${var.lakebase_instance}
+              lakebase_database: ${var.lakebase_database}
+              lakebase_schema: ${var.lakebase_schema}
+              secret_scope: ${var.hf_secret_scope}
+
     llm_judge:
       name: dental-omop-nlp LLM judge via ai_query (${bundle.target})
       tags:

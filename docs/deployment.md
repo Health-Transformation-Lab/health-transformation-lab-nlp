@@ -34,6 +34,7 @@ catalogs your workspaces actually have.
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
 | `hf_secret_scope` | `dental` | secret scope with `hf_token` |
 | `gpu_node_type`, `gpu_spark_version` | `g5.2xlarge`, `16.4.x-gpu-ml-scala2.12` | GPU job cluster (uat/prod; AWS node type, change on Azure/GCP) |
+| `lakebase_instance`, `lakebase_database`, `lakebase_schema` | `dental-dev` / `-uat` / `-prod`, `databricks_postgres`, `cdm_dev` / `cdm` | where the OMOP CDM goes in Lakebase |
 | `service_principal` | placeholder id | who runs uat/prod jobs |
 | `users_group` | `users` | group given CAN_VIEW on uat/prod jobs |
 
@@ -46,6 +47,7 @@ Override any variable with `--var name=value`, or the environment variable
 |---|---|---|
 | `study_benchmark` | `01_run_benchmark.py`: build synthetic study, baselines, Delta tables | serverless |
 | `llm_judge` | `02_llm_judge.sql`: judge with `ai_query` | SQL warehouse |
+| `load_lakebase` | `04_load_lakebase.py`: OMOP CDM 5.4 + dental extension into Lakebase (Postgres) | serverless |
 | `medgemma_reader` (uat/prod) | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | single-node GPU |
 
 ## Deploy from your laptop (dev)

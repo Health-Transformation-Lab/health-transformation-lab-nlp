@@ -8,8 +8,8 @@
 -- that proposal. It is additive: no base CDM table changes.
 --
 -- Base CDM DDL: https://github.com/OHDSI/CommonDataModel (v5.4, Apache-2.0)
--- Dialect: ANSI-ish; works on Databricks SQL, DuckDB and Postgres with at most
--- the type names changing.
+-- Dialect: ANSI SQL. Tested on Postgres 16 (Lakebase) in CI; also runs on
+-- Databricks SQL.
 
 -- One row per anatomic site per person. For dentistry a site is a tooth
 -- (universal numbering 1-32, primary A-T) or a tooth surface.

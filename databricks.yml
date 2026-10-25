@@ -46,6 +46,15 @@ variables:
   hf_secret_scope:
     description: Secret scope holding hf_token (Hugging Face read token; HAI-DEF terms accepted)
     default: dental
+  lakebase_instance:
+    description: Lakebase (managed Postgres) instance or project for this environment
+    default: dental-dev
+  lakebase_database:
+    description: Postgres database inside the Lakebase instance
+    default: databricks_postgres
+  lakebase_schema:
+    description: Schema for the OMOP CDM + dental extension in Lakebase
+    default: cdm_dev
   gpu_node_type:
     description: GPU node type for the MedGemma job (uat/prod only)
     default: g5.2xlarge
@@ -79,6 +88,8 @@ targets:
       catalog: dental_uat
       schema: dental
       n_people: "1500"
+      lakebase_instance: dental-uat
+      lakebase_schema: cdm
     permissions:
       - group_name: ${var.users_group}
         level: CAN_VIEW
@@ -121,6 +132,8 @@ targets:
     variables:
       catalog: dental_prod
       schema: dental
+      lakebase_instance: dental-prod
+      lakebase_schema: cdm
       n_people: "1500"
       reader_limit: "0"
     permissions:

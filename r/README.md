@@ -12,7 +12,7 @@ Python side. A result from here and a result from `python/` land in the same
 | `../eval/score.R` | Shared scorer (R twin of `score.py`) | base R |
 | `tests/test_parity.R` | Proves R and Python agree on labels, rules predictions and metrics | base R |
 | `run_ladder.R` | Runs rungs and writes results | base R for rules; tidymodels for the rest |
-| `R/01_etl_synthea.R` | Full Synthea → OMOP CDM 5.4 load with OHDSI `ETLSyntheaBuilder`, plus the dental extension | ETL-Synthea, DuckDB, Athena vocab |
+| `R/01_etl_synthea.R` | Full Synthea → OMOP CDM 5.4 load with OHDSI `ETLSyntheaBuilder`, plus the dental extension | ETL-Synthea, Postgres / Lakebase (or Databricks SQL), Athena vocab |
 | `R/02_baselines.R` | Structured and TF-IDF baselines | tidymodels, textrecipes, glmnet |
 | `R/03_encoders.R` | Encoder rungs: frozen embeddings (`text` pkg) or fine-tune via reticulate | `text` + Python env |
 | `install.R` | Installs all of the above | — |

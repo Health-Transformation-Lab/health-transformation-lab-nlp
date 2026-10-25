@@ -62,6 +62,16 @@ Keep in Delta: anything analytical or large (OMOP, a million notes,
 predictions). Keep in MLflow: model runs. Lakebase is for the working state
 in between.
 
+## Implemented
+
+- `dental_omop_nlp/db.py` + `scripts/05_load_omop_db.py`: OMOP CDM 5.4 (OHDSI Postgres DDL)
+  + dental extension + synthetic data into any Postgres, including Lakebase. Tested
+  on Postgres 16 in CI; the `perio_chart` view reproduces every label.
+- `databricks/notebooks/04_load_lakebase.py` and the `load_lakebase` bundle job, with
+  `lakebase_instance` / `lakebase_schema` set per environment (dev, uat, prod).
+- R: `r/R/01_etl_synthea.R` defaults to Postgres / Lakebase (`DENTAL_DBMS=postgresql`);
+  Databricks SQL (`spark`) is the other option. DuckDB has been removed.
+
 ## Cautions
 
 - Only de-identified data in Label Studio and any review app; the same leak gate applies.
