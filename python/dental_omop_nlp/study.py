@@ -68,7 +68,7 @@ RECORD_ERROR_RATE = 0.02     # charted follow-up visits with a charting error (s
 STRUCTURED_COLS = ["visit_id", "person_id", "clinic_id", "visit_seq", "visit_date", "age", "charted",
                    "treated_before", "cigarettes_per_day", "diabetes", "hba1c",
                    "rec_max_probing_depth_mm", "rec_bop_pct", "rec_max_cal_mm", "rec_rbl_pct",
-                   "rec_teeth_lost_perio", "notes", *READERS, "probing_chart", "radiograph_ai",
+                   "rec_teeth_lost_perio", "rec_pct_teeth_involved", "notes", *READERS, "probing_chart", "radiograph_ai",
                    "algorithm_v0", "algorithm_design", "in_review"]
 
 
@@ -143,6 +143,7 @@ def generate_visits(n_people: int, seed: int) -> pd.DataFrame:
                          diabetes=diabetic, hba1c=risk.hba1c,
                          **{k: getattr(chart, k) for k in ("max_probing_depth_mm", "bop_pct", "max_cal_mm",
                                                            "rbl_pct", "teeth_lost_perio")},
+                         rec_pct_teeth_involved=pct_involved if charted else None,
                          **{f"rec_{k}": getattr(recorded, k) if charted else None
                             for k in ("max_probing_depth_mm", "bop_pct", "max_cal_mm", "rbl_pct", "teeth_lost_perio")},
                          radiograph_json=to_json(rad), radiograph_summary=rad_summary(rad),
