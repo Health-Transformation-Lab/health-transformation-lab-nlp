@@ -17,25 +17,25 @@ for the secure zone. Only de-identified text that passes the leak gate leaves.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import random
 from pathlib import Path
 
 import pandas as pd
 
-from .build import _visits_generated
 from .clinical_notes import render_clinical_note
 from .deid import deidentify, leak_check, residual_scan, score_deid
 from .labels import PerioChart, Status, extent_of, grade_of, label_chart
 from .note_reader import read_note
-from .phenotype import RULES_V0, agreement_matrix, coverage, phenotype_v0
+from .phenotype import RULES_DESIGN, RULES_V0, agreement_matrix, coverage, phenotype, phenotype_v0
 from .phi import fake_person, fake_provider
 from .radiograph import FEATURES as RAD_FEATURES
 from .radiograph import features as rad_features
 from .radiograph import read_radiograph, simulate_radiograph, to_json
 from .radiograph import summary as rad_summary
 from .sources import READERS, UNKNOWN, generate_sources
-from .synthetic import draw_chart, draw_pct_teeth_involved, draw_risk
+from .synthetic import draw_chart, draw_history, draw_pct_teeth_involved, draw_risk
 
 REVIEW_STRATA = {  # target share of the review set; rare classes oversampled
     "healthy": 0.15, "gingivitis": 0.20, "periodontitis_stage_1": 0.17,
@@ -61,17 +61,63 @@ def _clinician_call(status: Status, rng: random.Random) -> Status:
     return order[min(max(i + rng.choice([-1, 1]), 0), len(order) - 1)]
 
 
+N_CLINICS = 8
+RECORD_ERROR_RATE = 0.02     # charted follow-up visits with a charting error (spec 005)
+
+
+STRUCTURED_COLS = ["visit_id", "person_id", "clinic_id", "visit_seq", "visit_date", "age", "charted",
+                   "treated_before", "cigarettes_per_day", "diabetes", "hba1c",
+                   "rec_max_probing_depth_mm", "rec_bop_pct", "rec_max_cal_mm", "rec_rbl_pct",
+                   "rec_teeth_lost_perio", "notes", *READERS, "probing_chart", "radiograph_ai",
+                   "algorithm_v0", "algorithm_design", "in_review"]
+
+
+def clinic_profiles(seed: int) -> pd.DataFrame:
+    """Synthetic clinics: case mix (sicker or healthier patients) and charting habits."""
+    rng = random.Random(seed * 31 + 7)
+    return pd.DataFrame([{"clinic_id": c, "case_mix": round(rng.uniform(-0.08, 0.10), 3),
+                          "charted_share": round(rng.uniform(0.6, 0.95), 2),
+                          "patient_weight": rng.uniform(0.5, 1.5)} for c in range(1, N_CLINICS + 1)])
+
+
+def _study_visits(n_people: int, rng: random.Random, clinics: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for pid in range(1, n_people + 1):
+        birth = dt.date(1940, 1, 1) + dt.timedelta(days=rng.randint(0, 365 * 63))
+        first = dt.date(2021, 1, 1) + dt.timedelta(days=rng.randint(0, 180))
+        clinic = rng.choices(list(clinics.clinic_id), weights=list(clinics.patient_weight))[0]
+        for k in range(rng.randint(1, 6)):   # 1-6 recall visits about 6 months apart
+            d = first + dt.timedelta(days=182 * k + rng.randint(-20, 20))
+            rows.append(dict(person_id=pid, clinic_id=clinic, visit_seq=k, birth_date=birth, visit_date=d,
+                             age=(d - birth).days // 365))
+    return pd.DataFrame(rows)
+
+
+def _record_error(chart: PerioChart, age: int, rng: random.Random) -> tuple[PerioChart, str]:
+    """A charting error in the record (truth unchanged): another patient's chart, or a decimal slip."""
+    if rng.random() < 0.5:
+        return draw_chart(age, rng), "wrong_patient_chart"
+    return PerioChart(chart.max_probing_depth_mm, chart.bop_pct, round(chart.max_cal_mm / 10, 2),
+                      round(chart.rbl_pct / 10, 1), chart.teeth_lost_perio), "decimal_slip"
+
+
 def generate_visits(n_people: int, seed: int) -> pd.DataFrame:
     rng = random.Random(seed)
-    visits = _visits_generated(n_people, rng).sort_values(["person_id", "visit_date"]).reset_index(drop=True)
+    clinics = clinic_profiles(seed).set_index("clinic_id")
+    visits = _study_visits(n_people, rng, clinics.reset_index()).sort_values(
+        ["person_id", "visit_date"]).reset_index(drop=True)
     people = {pid: (fake_person(rng, g.iloc[0]["birth_date"]), draw_risk(rng))
               for pid, g in visits.groupby("person_id")}
+    histories = {pid: draw_history(int(g.iloc[0]["age"]), len(g), people[pid][1], rng,
+                                   case_mix=float(clinics.loc[g.iloc[0]["clinic_id"], "case_mix"]))
+                 for pid, g in visits.groupby("person_id")}
     rows, prev = [], {}
     for i, v in enumerate(visits.itertuples(), start=1):
         person, risk = people[v.person_id]
-        chart = draw_chart(int(v.age), rng)
-        status = label_chart(chart)
-        grade = grade_of(status, chart.rbl_pct, int(v.age), risk.cigarettes_per_day, risk.hba1c)
+        hv = histories[v.person_id][v.visit_seq]
+        chart, status = hv.chart, hv.status
+        diabetic = risk.hba1c is not None and risk.hba1c >= 6.5   # notes call 5.8-6.4 pre-diabetic
+        grade = grade_of(status, chart.rbl_pct, int(v.age), risk.cigarettes_per_day, risk.hba1c, diabetes=diabetic)
         pct_involved = draw_pct_teeth_involved(chart, rng)
         extent = extent_of(status, pct_involved)
         # Radiograph AI output (spec 003) on its own random stream, so adding it
@@ -82,13 +128,23 @@ def generate_visits(n_people: int, seed: int) -> pd.DataFrame:
                                                fake_provider(rng), v.visit_date, rng, prev.get(v.person_id),
                                                stated_status=stated)
         prev[v.person_id] = v.visit_date
-        rows.append(dict(visit_id=i, person_id=v.person_id, visit_date=v.visit_date, age=int(v.age),
+        charted = rng.random() < float(clinics.loc[v.clinic_id, "charted_share"])
+        recorded, error = chart, ""
+        if charted and v.visit_seq > 0 and rng.random() < RECORD_ERROR_RATE:
+            recorded, error = _record_error(chart, int(v.age), rng)
+        rows.append(dict(visit_id=i, person_id=v.person_id, clinic_id=int(v.clinic_id), visit_seq=int(v.visit_seq),
+                         visit_date=v.visit_date, age=int(v.age),
                          note_raw=text, phi_spans=json.dumps(phi), **meta,
-                         charted=(charted := rng.random() < CHARTED_SHARE),
-                         probing_chart_text=probing_chart_text(chart) if charted else "(not charted at this visit)",
+                         charted=charted, treated_before=hv.treated_before, record_error=error,
+                         probing_chart_text=probing_chart_text(recorded) if charted else "(not charted at this visit)",
+                         probing_chart_status=label_chart(recorded).value if charted else UNKNOWN,
                          truth_status=status.value, truth_grade=grade, truth_extent=extent,
+                         cigarettes_per_day=risk.cigarettes_per_day,
+                         diabetes=diabetic, hba1c=risk.hba1c,
                          **{k: getattr(chart, k) for k in ("max_probing_depth_mm", "bop_pct", "max_cal_mm",
                                                            "rbl_pct", "teeth_lost_perio")},
+                         **{f"rec_{k}": getattr(recorded, k) if charted else None
+                            for k in ("max_probing_depth_mm", "bop_pct", "max_cal_mm", "rbl_pct", "teeth_lost_perio")},
                          radiograph_json=to_json(rad), radiograph_summary=rad_summary(rad),
                          radiograph_ai=read_radiograph(rad), **rad_features(rad),
                          **generate_sources(status, extent, rng)))
@@ -113,14 +169,18 @@ def read_methods(df: pd.DataFrame) -> pd.DataFrame:
     df["notes"] = [read_note(t) for t in df["note_text"]]
     for col, reader in READERS.items():
         df[col] = [reader(v) for v in df[col + "_raw"]]
-    # The chart IS the measured evidence, when it was done. Patel (2020) found
-    # charting findings present for ~80% of patients in a real EDR.
-    df["probing_chart"] = [ts if charted else UNKNOWN for ts, charted in zip(df["truth_status"], df["charted"])]
+    # The chart is the measured evidence, when it was done (Patel 2020: ~80% charted;
+    # here it varies by clinic). Read from the RECORDED chart, which carries the
+    # injected charting errors, and staged from that visit's chart alone.
+    df["probing_chart"] = df["probing_chart_status"]
     df["difficulty"] = [difficulty(d, s, c, cf) for d, s, c, cf in
                         zip(df["dx_pattern"], df["stated_status"], df["truth_status"], df["copy_forward"])]
     pa = [phenotype_v0(r) for _, r in df.iterrows()]
     df["algorithm_v0"] = [p[0] for p in pa]
     df["algorithm_v0_decided_by"] = [p[1] for p in pa]
+    pd_ = [phenotype(r, RULES_DESIGN) for _, r in df.iterrows()]   # spec 005: study-design order
+    df["algorithm_design"] = [p[0] for p in pd_]
+    df["algorithm_design_decided_by"] = [p[1] for p in pd_]
     return df
 
 
@@ -164,6 +224,7 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
 
     review = pick_review(df, review_n, seed)
     train = df[~df["person_id"].isin(review["person_id"])]
+    df["in_review"] = df["visit_id"].isin(review["visit_id"])
 
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "answer_key").mkdir(exist_ok=True)
@@ -175,8 +236,15 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
     key_cols = ["visit_id", "person_id", "age", "truth_status", "truth_grade", "truth_extent",
                 "style", "numeric", "dx_scheme", "dx_pattern", "difficulty", "copy_forward", "stated_status", "notes", *READERS, "probing_chart", "radiograph_ai", "radiograph_summary",
                 *RAD_FEATURES,
-                "algorithm_v0", "algorithm_v0_decided_by", "note_text"]
+                "algorithm_v0", "algorithm_v0_decided_by", "algorithm_design", "algorithm_design_decided_by",
+                "clinic_id", "note_text"]
     review[key_cols].to_csv(out_dir / "answer_key" / "review_key.csv", index=False)
+    # Spec 005: every visit's structured data and source readings (no note text, no truth),
+    # for longitudinal checks, clinic prevalence and prediction; truth kept in the answer key.
+    df[STRUCTURED_COLS].to_csv(out_dir / "visits_structured.csv", index=False)
+    df[["visit_id", "person_id", "truth_status", "truth_grade", "truth_extent", "record_error",
+        "max_cal_mm", "rbl_pct", "teeth_lost_perio"]].to_csv(out_dir / "answer_key" / "visits_truth.csv", index=False)
+    clinic_profiles(seed).to_csv(out_dir / "answer_key" / "clinic_profiles.csv", index=False)
     methods = ["notes", *READERS, "probing_chart", "radiograph_ai"]
     agree = pd.concat([agreement_matrix(df, methods, "status").assign(level="status"),
                        agreement_matrix(df, methods, "perio").assign(level="perio")])
@@ -190,7 +258,8 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
             "review_visits": len(review), "deid_engine": engine,
             "deid_char_recall": round(tot.phi_chars_removed / tot.phi_chars, 4),
             "deid_non_phi_chars_removed": int(tot.non_phi_chars_removed),
-            "algorithm": RULES_V0["version"],
+            "algorithm": RULES_V0["version"], "algorithm_design": RULES_DESIGN["version"],
+            "record_errors_injected": int((df["record_error"] != "").sum()),
             "review_status_mix": review["truth_status"].value_counts().to_dict()}
 
 

@@ -33,6 +33,13 @@ from .labels import Status
 from .phenotype import cohen_kappa
 
 ORDER = [s.value for s in Status]
+# Five-category reports (spec 005) collapse healthy + gingivitis into one label.
+FIVE = ["healthy_gingivitis", *ORDER[2:]]
+VALID = [*ORDER, "healthy_gingivitis"]   # any value outside this is "no answer"
+
+
+def _ordinal_for(*series: pd.Series) -> list[str]:
+    return FIVE if any((s == "healthy_gingivitis").any() for s in series) else ORDER
 
 
 def fleiss_kappa(wide: pd.DataFrame) -> float:
@@ -47,8 +54,10 @@ def fleiss_kappa(wide: pd.DataFrame) -> float:
     return float((P_bar - P_e) / (1 - P_e))
 
 
-def weighted_kappa(a: pd.Series, b: pd.Series, order: list[str] = ORDER) -> float:
-    """Quadratic-weighted Cohen's kappa over ordinal statuses; other values dropped."""
+def weighted_kappa(a: pd.Series, b: pd.Series, order: list[str] | None = None) -> float:
+    """Quadratic-weighted Cohen's kappa over ordinal statuses; other values dropped.
+    Uses the five-level order when the collapsed label is present."""
+    order = order or _ordinal_for(a, b)
     keep = a.isin(order) & b.isin(order)
     x = a[keep].map(order.index).to_numpy()
     y = b[keep].map(order.index).to_numpy()
@@ -73,7 +82,7 @@ def consensus(wide: pd.DataFrame) -> pd.Series:
 
 
 def _kappa_where_both(a: pd.Series, b: pd.Series) -> float:
-    ok = a.isin(ORDER) & b.isin(ORDER)
+    ok = a.isin(VALID) & b.isin(VALID)
     return cohen_kappa(a[ok], b[ok])
 
 
@@ -88,8 +97,8 @@ def reliability_report(labels: pd.DataFrame, key: pd.DataFrame, compare: dict[st
     rows = []
     for name, s in {"generator_chart_truth": key["truth_status"], **compare}.items():
         s = s.reindex(cons.index)
-        has = s.isin(ORDER)                  # the method said something about status
-        ok = cons.isin(ORDER) & has
+        has = s.isin(VALID)                  # the method said something about status
+        ok = cons.isin(VALID) & has
         rows.append({"method": name, "coverage": float(has.mean()), "n": int(ok.sum()),
                      "pct_agree_consensus": float((s[ok] == cons[ok]).mean()),
                      "kappa_vs_consensus": cohen_kappa(s[ok], cons[ok]),
@@ -100,7 +109,7 @@ def reliability_report(labels: pd.DataFrame, key: pd.DataFrame, compare: dict[st
                      **{k: v for k, v in unsafe_rates(cons[ok], s[ok]).items() if k != "n"}})
     return {"n_visits": int(wide.shape[0]), "n_reviewers": int(wide.shape[1]),
             "fleiss_kappa": fleiss_kappa(wide),
-            "consensus_reached": float(cons.isin(ORDER).mean()),
+            "consensus_reached": float(cons.isin(VALID).mean()),
             "pairwise": pd.DataFrame(pair), "methods": pd.DataFrame(rows), "consensus": cons}
 
 
@@ -113,7 +122,7 @@ def by_level(key: pd.DataFrame, cons: pd.Series, compare: dict[str, pd.Series]) 
         s = s.reindex(cons.index)
         per = {}
         for level in ("L1", "L2", "L3"):
-            ok = (lev == level) & cons.isin(ORDER) & s.isin(ORDER)
+            ok = (lev == level) & cons.isin(VALID) & s.isin(VALID)
             per[level] = float((s[ok] == cons[ok]).mean()) if ok.any() else float("nan")
             rows.append({"method": name, "level": level, "n": int(ok.sum()), "pct_agree_consensus": per[level]})
         rows.append({"method": name, "level": "macro", "n": int(sum(r["n"] for r in rows[-3:])),

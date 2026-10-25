@@ -1,0 +1,45 @@
+"""Score every ordering of the four source groups for the integrated phenotype (spec 005).
+
+    python scripts/18_phenotype_order.py --simulated     # against simulated reviewers (dry run)
+    python scripts/18_phenotype_order.py                 # against real reviewer labels
+
+Groups: exam_form, dx_code (diagnosis codes on completed, then planned procedures),
+notes (chart-note NLP), probing_chart (periodontal-chart algorithm). The study
+design's starting order is exam_form > dx_code > notes > probing_chart; the
+order is chosen on half of the review charts and reported on the other half,
+in five categories, with the AI-vs-human acceptance test.
+
+Writes data/review/[simulated_]reliability_5cat/phenotype_orders.csv.
+"""
+
+import argparse
+
+import pandas as pd
+
+from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
+from dental_omop_nlp.phenotype import score_orders
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--simulated", action="store_true")
+ap.add_argument("--n-boot", type=int, default=200)
+ap.add_argument("--seed", type=int, default=11)
+ap.add_argument("--six", action="store_true", help="score on six categories instead of five")
+a = ap.parse_args()
+prefix = "simulated_" if a.simulated else ""
+
+labels = pd.read_csv(REVIEW_DIR / f"{prefix}reviewer_labels.csv")
+key = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id")
+wide = labels.pivot_table(index="visit_id", columns="reviewer", values="status", aggfunc="first")
+t = score_orders(key, wide, n_boot=a.n_boot, seed=a.seed, five=not a.six)
+out = REVIEW_DIR / f"{prefix}reliability_5cat"
+out.mkdir(parents=True, exist_ok=True)
+t.to_csv(out / "phenotype_orders.csv", index=False)
+
+if a.simulated:
+    print("*** SIMULATED REVIEWERS: pipeline dry run, not a result ***")
+cols = ["order", "is_design_order", "select_kappa", "holdout_kappa", "holdout_coverage",
+        "holdout_diff_vs_human_bar", "holdout_verdict", "selected"]
+print(t[cols].round(3).to_string(index=False))
+d, s = t[t.is_design_order].iloc[0], t[t.selected].iloc[0]
+print(f"\ndesign order {d['order']}: held-out kappa {d['holdout_kappa']:.3f} ({d['holdout_verdict']})")
+print(f"selected     {s['order']}: held-out kappa {s['holdout_kappa']:.3f} ({s['holdout_verdict']})")

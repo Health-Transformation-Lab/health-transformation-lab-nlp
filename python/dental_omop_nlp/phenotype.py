@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import itertools
 
+import numpy as np
 import pandas as pd
 
 from .sources import UNKNOWN
@@ -36,8 +37,40 @@ RULES_V0 = {
                  "exam_form", "proc_codes_completed", "proc_codes_planned"],
     "radiograph_lower_bound": True,
 }
+# Spec 005: the study design's starting order for the integrated phenotype. Not
+# assumed final: scripts/18_phenotype_order.py scores every ordering of the four
+# groups so the order can change if another source proves more accurate.
+DESIGN_GROUPS = {
+    "exam_form": ["exam_form"],
+    "dx_code": ["proc_dx_completed", "proc_dx_planned"],
+    "notes": ["notes"],
+    "probing_chart": ["probing_chart"],
+}
+DESIGN_ORDER = ["exam_form", "dx_code", "notes", "probing_chart"]
+
+
+def rules_for_order(order: list[str], version: str | None = None, radiograph_lower_bound: bool = False) -> dict:
+    return {"version": version or "order:" + ">".join(order),
+            "priority": [m for g in order for m in DESIGN_GROUPS[g]],
+            "radiograph_lower_bound": radiograph_lower_bound}
+
+
+RULES_DESIGN = rules_for_order(DESIGN_ORDER, version="design-v1")
+
 _ORDER = ["healthy", "gingivitis", "periodontitis_stage_1", "periodontitis_stage_2",
           "periodontitis_stage_3", "periodontitis_stage_4"]
+# Five categories: healthy and gingivitis combined, then stage I-IV.
+FIVE = ["healthy_gingivitis", *_ORDER[2:]]
+
+
+def collapse5(s: pd.Series) -> pd.Series:
+    """Map six statuses to five (healthy + gingivitis -> healthy_gingivitis); other values unchanged."""
+    return s.replace({"healthy": "healthy_gingivitis", "gingivitis": "healthy_gingivitis"})
+
+
+def phenotype(row: pd.Series, rules: dict) -> tuple[str, str]:
+    """Integrated phenotype: (status, method that decided) under the given rules."""
+    return phenotype_v0(row, rules)
 
 
 def phenotype_v0(row: pd.Series, rules: dict = RULES_V0) -> tuple[str, str]:
@@ -86,3 +119,45 @@ def agreement_matrix(df: pd.DataFrame, methods: list[str] = METHODS, level: str 
 def coverage(df: pd.DataFrame, methods: list[str] = METHODS) -> pd.Series:
     """Share of visits where each method says anything at all."""
     return pd.Series({m: float((df[m] != UNKNOWN).mean()) for m in methods})
+
+
+def score_orders(key: pd.DataFrame, reviewer_wide: pd.DataFrame, n_boot: int = 200, seed: int = 0,
+                 five: bool = True, margin: float = 0.05) -> pd.DataFrame:
+    """Score every ordering of the four source groups (spec 005).
+
+    The review charts are split in half by seed. The order is chosen on the
+    'select' half (highest kappa vs reviewer consensus) and reported on the
+    held-out half, with the acceptance test, so the chosen order isn't graded on
+    the charts that chose it. key: review_key indexed by visit_id;
+    reviewer_wide: visits x reviewers."""
+    from .reliability import agreement_vs_humans, consensus  # local: avoid import cycle
+    rng = np.random.default_rng(seed)
+    ids = np.array(sorted(set(key.index) & set(reviewer_wide.index)))
+    rng.shuffle(ids)
+    sel, hold = set(ids[: len(ids) // 2]), set(ids[len(ids) // 2:])
+    f = collapse5 if five else (lambda s: s)
+    wide = reviewer_wide.apply(f)
+    cons = f(consensus(reviewer_wide))
+    cats = FIVE if five else _ORDER
+    rows = []
+    for order in itertools.permutations(DESIGN_GROUPS):
+        rules = rules_for_order(list(order))
+        pred = f(pd.Series({vid: phenotype(key.loc[vid], rules)[0] for vid in ids}))
+        out = {"order": ">".join(order), "is_design_order": list(order) == DESIGN_ORDER}
+        for name, part in (("select", sel), ("holdout", hold)):
+            p = pred.reindex(sorted(part))
+            c = cons.reindex(p.index)
+            ok = c.isin(cats) & p.isin(cats)
+            out[f"{name}_n"] = int(ok.sum())
+            out[f"{name}_coverage"] = float(p.isin(cats).mean())
+            out[f"{name}_pct_agree"] = float((p[ok] == c[ok]).mean()) if ok.any() else float("nan")
+            out[f"{name}_kappa"] = cohen_kappa(p[ok], c[ok])
+        vh = agreement_vs_humans(wide.reindex(sorted(hold)), {"m": pred.reindex(sorted(hold))},
+                                 n_boot=n_boot, seed=seed, margin=margin)
+        m = vh[vh["kind"] == "method"].iloc[0]
+        out.update({"holdout_diff_vs_human_bar": m["diff_vs_human_bar"], "holdout_ci_low": m["ci_low"],
+                    "holdout_ci_high": m["ci_high"], "holdout_verdict": m["verdict"] if n_boot else ""})
+        rows.append(out)
+    t = pd.DataFrame(rows).sort_values("select_kappa", ascending=False).reset_index(drop=True)
+    t["selected"] = t.index == 0
+    return t

@@ -12,6 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
+from dental_omop_nlp.phenotype import collapse5
 from dental_omop_nlp.reliability import agreement_vs_humans, by_level, reliability_report
 
 ap = argparse.ArgumentParser()
@@ -26,7 +27,7 @@ labels = pd.read_csv(REVIEW_DIR / f"{prefix}reviewer_labels.csv")
 key = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id")
 compare = {m: key[m] for m in ["notes", "exam_form", "proc_codes_completed", "proc_codes_planned",
                                "proc_dx_completed", "proc_dx_planned", "probing_chart", "radiograph_ai",
-                               "algorithm_v0"]}
+                               "algorithm_v0", "algorithm_design"]}
 for f in sorted(glob.glob(str(DATASETS_DIR / "ai_predictions_*.csv"))):
     p = pd.read_csv(f).set_index("visit_id")["pred"]
     compare["ai:" + Path(f).stem.removeprefix("ai_predictions_")] = p
@@ -54,3 +55,17 @@ vh.to_csv(out / "agreement_vs_humans.csv", index=False)
 print(f"\nacceptance test: agree with reviewers at least as much as they agree with each other "
       f"(non-inferiority margin {a.margin} kappa, 95% bootstrap CI over charts):")
 print(vh.drop(columns=["margin"]).round(3).to_string(index=False))
+
+# Spec 005: the same report on five categories (healthy and gingivitis combined)
+out5 = REVIEW_DIR / f"{prefix}reliability_5cat"
+out5.mkdir(parents=True, exist_ok=True)
+labels5 = labels.assign(status=collapse5(labels["status"]))
+key5 = key.assign(truth_status=collapse5(key["truth_status"]))
+compare5 = {k: collapse5(v) for k, v in compare.items()}
+rep5 = reliability_report(labels5, key5, compare5)
+rep5["methods"].to_csv(out5 / "methods_vs_reviewers.csv", index=False)
+wide5 = labels5.pivot_table(index="visit_id", columns="reviewer", values="status", aggfunc="first")
+vh5 = agreement_vs_humans(wide5, compare5, n_boot=a.n_boot, margin=a.margin)
+vh5.to_csv(out5 / "agreement_vs_humans.csv", index=False)
+print(f"\nfive categories: Fleiss kappa={rep5['fleiss_kappa']:.3f}")
+print(vh5[vh5["kind"] != "human"].drop(columns=["margin"]).round(3).to_string(index=False))

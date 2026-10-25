@@ -34,6 +34,8 @@ ORDER = LABELS  # healthy, gingivitis, stage 1..4
 
 
 def severity(truth: str, pred: str) -> str:
+    # five-category reports: the collapsed label grades like "healthy"
+    truth, pred = ("healthy" if x == "healthy_gingivitis" else x for x in (truth, pred))
     t, p = ORDER.index(truth), ORDER.index(pred)
     if t == p:
         return "S0"
@@ -50,7 +52,7 @@ def severity(truth: str, pred: str) -> str:
 
 
 def unsafe_rates(truth: pd.Series, pred: pd.Series) -> dict:
-    ok = truth.isin(ORDER) & pred.isin(ORDER)
+    ok = truth.isin([*ORDER, "healthy_gingivitis"]) & pred.isin([*ORDER, "healthy_gingivitis"])
     if not ok.any():
         return {"n": 0, "unsafe_rate": float("nan"), "s2_rate": float("nan")}
     sev = [severity(t, p) for t, p in zip(truth[ok], pred[ok])]

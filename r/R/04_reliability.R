@@ -9,6 +9,10 @@
 
 STATUS_ORDER <- c("healthy", "gingivitis", "periodontitis_stage_1",
                   "periodontitis_stage_2", "periodontitis_stage_3", "periodontitis_stage_4")
+# Five-category reports (spec 005): healthy + gingivitis collapsed into one label.
+FIVE_ORDER <- c("healthy_gingivitis", STATUS_ORDER[3:6])
+VALID_STATUS <- c(STATUS_ORDER, "healthy_gingivitis")
+collapse5 <- function(s) { s[s %in% c("healthy", "gingivitis")] <- "healthy_gingivitis"; s }
 
 cohen_kappa <- function(a, b) {
   n <- length(a); if (!n) return(NA_real_)
@@ -18,7 +22,8 @@ cohen_kappa <- function(a, b) {
   if (pe == 1) NA_real_ else (po - pe) / (1 - pe)
 }
 
-weighted_kappa <- function(a, b, order = STATUS_ORDER) {
+weighted_kappa <- function(a, b, order = NULL) {
+  if (is.null(order)) order <- if (any(c(a, b) == "healthy_gingivitis", na.rm = TRUE)) FIVE_ORDER else STATUS_ORDER
   keep <- a %in% order & b %in% order
   x <- match(a[keep], order); y <- match(b[keep], order); k <- length(order)
   if (!length(x)) return(NA_real_)
@@ -50,6 +55,7 @@ consensus <- function(wide) {
 
 # ---- spec 002: clinical severity of errors (DRAFT matrix; see python/dental_omop_nlp/harm.py)
 severity <- function(truth, pred) {
+  truth[truth == "healthy_gingivitis"] <- "healthy"; pred[pred == "healthy_gingivitis"] <- "healthy"
   t <- match(truth, STATUS_ORDER) - 1; p <- match(pred, STATUS_ORDER) - 1
   ifelse(t == p, "S0",
   ifelse(t < 2 & p < 2, "S0",
@@ -60,7 +66,7 @@ severity <- function(truth, pred) {
 }
 
 unsafe_rates <- function(truth, pred) {
-  ok <- truth %in% STATUS_ORDER & pred %in% STATUS_ORDER
+  ok <- truth %in% VALID_STATUS & pred %in% VALID_STATUS
   if (!any(ok)) return(c(unsafe_rate = NA_real_, s2_rate = NA_real_))
   s <- severity(truth[ok], pred[ok])
   c(unsafe_rate = mean(s != "S0"), s2_rate = mean(s == "S2"))
@@ -72,7 +78,7 @@ by_level <- function(key, cons_df, compare) {
   do.call(rbind, lapply(names(compare), function(nm) {
     s <- unname(compare[[nm]][as.character(cons_df$visit_id)])
     per <- sapply(c("L1", "L2", "L3"), function(l) {
-      ok <- lev == l & cons %in% STATUS_ORDER & s %in% STATUS_ORDER
+      ok <- lev == l & cons %in% VALID_STATUS & s %in% VALID_STATUS
       if (any(ok, na.rm = TRUE)) mean(s[ok %in% TRUE] == cons[ok %in% TRUE]) else NA_real_
     })
     data.frame(method = nm, level = c("L1", "L2", "L3", "macro"),
@@ -88,12 +94,12 @@ reliability_report <- function(labels, key, compare) {
   wide <- wide[order(as.numeric(rownames(wide))), , drop = FALSE]
   ids <- rownames(wide)
   cons <- consensus(wide)
-  both_k <- function(a, b) { ok <- a %in% STATUS_ORDER & b %in% STATUS_ORDER; cohen_kappa(a[ok], b[ok]) }
+  both_k <- function(a, b) { ok <- a %in% VALID_STATUS & b %in% VALID_STATUS; cohen_kappa(a[ok], b[ok]) }
 
   methods <- c(list(generator_chart_truth = setNames(key$truth_status, key$visit_id)), compare)
   rows <- lapply(names(methods), function(nm) {
-    s <- unname(methods[[nm]][ids]); has <- s %in% STATUS_ORDER
-    ok <- cons %in% STATUS_ORDER & has
+    s <- unname(methods[[nm]][ids]); has <- s %in% VALID_STATUS
+    ok <- cons %in% VALID_STATUS & has
     data.frame(method = nm, coverage = mean(has), n = sum(ok),
                pct_agree_consensus = mean(s[ok] == cons[ok]),
                kappa_vs_consensus = cohen_kappa(s[ok], cons[ok]),
@@ -103,7 +109,7 @@ reliability_report <- function(labels, key, compare) {
                s2_rate = unsafe_rates(cons[ok], s[ok])[["s2_rate"]])
   })
   list(n_visits = nrow(wide), n_reviewers = ncol(wide), fleiss_kappa = fleiss_kappa(wide),
-       consensus_reached = mean(cons %in% STATUS_ORDER), methods = do.call(rbind, rows),
+       consensus_reached = mean(cons %in% VALID_STATUS), methods = do.call(rbind, rows),
        consensus = data.frame(visit_id = as.integer(ids), consensus = cons))
 }
 
@@ -112,7 +118,7 @@ reliability_report <- function(labels, key, compare) {
 # only approximately.
 agreement_vs_humans <- function(wide, compare, n_boot = 500, seed = 0, margin = 0.05) {
   revs <- names(wide); pairs <- combn(revs, 2, simplify = FALSE)
-  both_k <- function(a, b) { ok <- a %in% STATUS_ORDER & b %in% STATUS_ORDER; cohen_kappa(a[ok], b[ok]) }
+  both_k <- function(a, b) { ok <- a %in% VALID_STATUS & b %in% VALID_STATUS; cohen_kappa(a[ok], b[ok]) }
   bar <- function(w) mean(sapply(pairs, function(p) both_k(w[[p[1]]], w[[p[2]]])), na.rm = TRUE)
   vs_h <- function(s, w) mean(sapply(revs, function(r) both_k(s, w[[r]])), na.rm = TRUE)
   ids <- rownames(wide)
@@ -149,7 +155,7 @@ if (sys.nframe() == 0) {
   labels <- read.csv(file.path("data/review", paste0(prefix, "reviewer_labels.csv")), stringsAsFactors = FALSE)
   key <- read.csv("data/datasets/answer_key/review_key.csv", stringsAsFactors = FALSE)
   m <- c("notes", "exam_form", "proc_codes_completed", "proc_codes_planned",
-         "proc_dx_completed", "proc_dx_planned", "probing_chart", "radiograph_ai", "algorithm_v0")
+         "proc_dx_completed", "proc_dx_planned", "probing_chart", "radiograph_ai", "algorithm_v0", "algorithm_design")
   compare <- setNames(lapply(m, function(x) setNames(key[[x]], key$visit_id)), m)
   for (f in sort(Sys.glob("data/datasets/ai_predictions_*.csv"))) {
     p <- read.csv(f, stringsAsFactors = FALSE)
