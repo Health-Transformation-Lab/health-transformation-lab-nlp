@@ -11,12 +11,22 @@ data, to learn the pipeline, the reviewer workflow and the analysis.
 
 <img src="docs/img/process.png" alt="Study process" width="520">
 
-**Seven sources per visit:**
+**What a phenotype is:** a computable definition of a condition, meaning a rule or model that reads a
+patient's record and assigns a label the same way every time. Here the label is periodontal status:
+healthy, gingivitis or periodontitis stage I–IV (with grade and extent). Dental records rarely hold a
+reliable assigned diagnosis, so the phenotype has to be derived from the evidence below.
 
-- Chart notes · Exam forms
-- Procedure codes, completed · planned
-- Procedure diagnoses, completed · planned
-- Probing chart (CAL, radiographic bone loss, tooth loss from perio)
+**Sources read for each visit:**
+
+- **Chart notes** (free text)
+- **Exam forms** (structured fields, e.g. PSR score, perio status)
+- **Procedure codes**, completed and planned (CDT, e.g. D4341 scaling and root planing)
+- **Procedure diagnosis codes**, completed and planned (ICD-10-CM, e.g. K05.3x)
+- **Probing chart** (attachment loss, bone loss, teeth lost to periodontitis)
+
+**Free text:** in this repo the chart notes are the only free text, and the only input the AI models
+read. Real records have more (exam-form and perio-chart comments, radiograph interpretations,
+treatment-plan notes, referral letters, medical-history text): see [action items](docs/action_items.md).
 
 Details: [docs/process.md](docs/process.md).
 
@@ -34,7 +44,7 @@ step, with links to the code; the Databricks notebook
 
 | # | Step | Walkthrough |
 |---|---|---|
-| 1 | Generate synthetic patients over time (8 clinics), all seven sources, notes with fake PHI | [1](docs/code_walkthrough.md#1-generate-the-synthetic-study) |
+| 1 | Generate synthetic patients over time (8 clinics): notes, exam forms, procedure codes and diagnoses, probing chart; fake PHI in notes | [1](docs/code_walkthrough.md#1-generate-the-synthetic-study) |
 | 2 | De-identify; a leak gate blocks any note with PHI left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
 | 3 | Read each source; compare them; build the rule-based phenotype (study-design order) | [3–5](docs/code_walkthrough.md#3-read-each-source) |
 | 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
@@ -66,20 +76,14 @@ Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[de
 
 The 12 models from the evaluation sheet (also in `models.yaml`):
 
-| Model | Paper | Domain | Role |
-|---|---|---|---|
-| [BERT base](https://huggingface.co/google-bert/bert-base-uncased) | [arXiv 1810.04805](https://arxiv.org/abs/1810.04805) | general | classifier |
-| [DistilBERT](https://huggingface.co/distilbert/distilbert-base-uncased) | [arXiv 1910.01108](https://arxiv.org/abs/1910.01108) | general | classifier |
-| [ModernBERT base](https://huggingface.co/answerdotai/ModernBERT-base) | [arXiv 2412.13663](https://arxiv.org/abs/2412.13663) | general | classifier, long context |
-| [ModernBERT large](https://huggingface.co/answerdotai/ModernBERT-large) | [arXiv 2412.13663](https://arxiv.org/abs/2412.13663) | general | classifier, long context |
-| [Longformer](https://huggingface.co/allenai/longformer-base-4096) | [arXiv 2004.05150](https://arxiv.org/abs/2004.05150) | general | long context |
-| [SciBERT](https://huggingface.co/allenai/scibert_scivocab_uncased) | [arXiv 1903.10676](https://arxiv.org/abs/1903.10676) | scientific | classifier |
-| [BiomedBERT](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) | [arXiv 2007.15779](https://arxiv.org/abs/2007.15779) | biomedical | classifier |
-| [BioClinical ModernBERT base](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-base) | [arXiv 2506.10896](https://arxiv.org/abs/2506.10896) | clinical | classifier, long context |
-| [BioClinical ModernBERT large](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-large) | [arXiv 2506.10896](https://arxiv.org/abs/2506.10896) | clinical | classifier, long context |
-| [Clinical-Longformer](https://huggingface.co/yikuan8/Clinical-Longformer) | [arXiv 2201.11838](https://arxiv.org/abs/2201.11838) | clinical | long context |
-| [SapBERT](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) | [arXiv 2010.11784](https://arxiv.org/abs/2010.11784) | biomedical | concept mapping |
-| [GTE-ModernColBERT](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) | model card | general | retrieval |
+| Model · paper · domain, role | Model · paper · domain, role |
+|---|---|
+| [BERT base](https://huggingface.co/google-bert/bert-base-uncased) · [1810.04805](https://arxiv.org/abs/1810.04805) · general, classifier | [BiomedBERT](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) · [2007.15779](https://arxiv.org/abs/2007.15779) · biomedical, classifier |
+| [DistilBERT](https://huggingface.co/distilbert/distilbert-base-uncased) · [1910.01108](https://arxiv.org/abs/1910.01108) · general, classifier | [BioClinical ModernBERT base](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-base) · [2506.10896](https://arxiv.org/abs/2506.10896) · clinical, classifier, long context |
+| [ModernBERT base](https://huggingface.co/answerdotai/ModernBERT-base) · [2412.13663](https://arxiv.org/abs/2412.13663) · general, classifier, long context | [BioClinical ModernBERT large](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-large) · [2506.10896](https://arxiv.org/abs/2506.10896) · clinical, classifier, long context |
+| [ModernBERT large](https://huggingface.co/answerdotai/ModernBERT-large) · [2412.13663](https://arxiv.org/abs/2412.13663) · general, classifier, long context | [Clinical-Longformer](https://huggingface.co/yikuan8/Clinical-Longformer) · [2201.11838](https://arxiv.org/abs/2201.11838) · clinical, long context |
+| [Longformer](https://huggingface.co/allenai/longformer-base-4096) · [2004.05150](https://arxiv.org/abs/2004.05150) · general, long context | [SapBERT](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) · [2010.11784](https://arxiv.org/abs/2010.11784) · biomedical, concept mapping |
+| [SciBERT](https://huggingface.co/allenai/scibert_scivocab_uncased) · [1903.10676](https://arxiv.org/abs/1903.10676) · scientific, classifier | [GTE-ModernColBERT](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) · card · general, retrieval |
 
 Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it),
 [27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
@@ -87,14 +91,14 @@ Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5
 
 ## Action items
 
-Differences from the study design and open decisions: **[docs/action_items.md](docs/action_items.md)**
-(source order and five categories, plausibility tolerances, clinic definition, published
-comparisons, prediction outcome, OMOP storage design).
+Differences from the study design and open decisions: **[docs/action_items.md](docs/action_items.md)**.
+Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol](docs/labeling_protocol.md) · [plan](docs/plan.md) · owner John Bowyer · MIT.
 
 ## Drill-downs
 
 | Topic | |
 |---|---|
+| **Diagrams**: study process, platform (dev/UAT/prod), OMOP + dental ERD, site storage designs, MLOps; process flows (draw.io + PNG, Mermaid) | [diagrams/](diagrams/README.md) |
 | Site-level data in OMOP: 32 teeth × 6 sites, derived measures, 2017 AAP/EFP **and 2012 CDC/AAP**, three storage designs on Postgres/Lakebase, concept mapping, Atlas feasibility | [site_level_omop.md](docs/site_level_omop.md) |
 | Integrated phenotype (five categories, source order), patients over time, clinic prevalence, data quality, prediction | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
 | Dental vs medical data in OMOP: what claims and EHRs track, tooth/site gaps | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md) |
@@ -105,4 +109,3 @@ comparisons, prediction outcome, OMOP storage design).
 | Retrieval, OMOP synonyms/ancestors/relationships, graphs: 8 test cases | [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
 | Financial trade-offs: inference vs review hours vs accuracy | [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md) |
 | Exploratory: radiograph findings; MedGemma | [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
-| How we work, references, protocol, plan | [CLAUDE.md](CLAUDE.md), [references](docs/references.md), [protocol](docs/labeling_protocol.md), [plan](docs/plan.md). Owner: John Bowyer. MIT |

@@ -66,6 +66,12 @@ needs confirming.
 | G3 | Monitoring: inference tables on a serving endpoint, data profiling of predictions, alerts | Open |
 | G4 | Retraining: scheduled, then triggered | Open |
 
+## Free text
+
+| # | Item | Status |
+|---|---|---|
+| H1 | Chart notes are the only free text here and the only AI input. Inventory the real EHR's other free text (exam-form and perio-chart comments, radiograph interpretations, treatment-plan and procedure notes, referral/specialist letters, medical-history text, scanned documents) and decide which to de-identify and read | Open |
+
 ## Earlier items
 
 | # | Item | Status |

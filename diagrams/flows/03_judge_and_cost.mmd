@@ -1,0 +1,9 @@
+%%{init: {"themeVariables": {"fontSize": "18px"}}}%%
+flowchart LR
+    G["Reviewed charts<br/>consensus"] --> B["Judge bake-off<br/>kappa vs reviewers,<br/>no same-family judge"]
+    B --> CAL["Calibrate chosen judge<br/>sensitivity, specificity"]
+    C["1M+ notes"] --> S["Stratified sample<br/>per method"] --> J["LLM judge<br/>MLflow make_judge / ai_query<br/>verbatim quote gate"]
+    J --> RG["Corrected accuracy<br/>Rogan-Gladen + bootstrap CI"]
+    CAL --> RG
+    K["costs.yaml<br/>(illustrative) +<br/>measured throughput"] --> F["Frontier<br/>dominance, ICER"]
+    RG --> F

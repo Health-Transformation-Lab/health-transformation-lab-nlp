@@ -1,7 +1,8 @@
 """The seven evidence sources per visit, and a rule that reads each one.
 
 The study compares methods for phenotyping periodontal status from a dental
-EHR. Each visit has up to seven sources of evidence, and they disagree:
+EHR. Each visit has up to seven sources of evidence (chart note, exam form, procedure codes completed
+and planned, procedure diagnosis codes completed and planned, probing chart), and they disagree:
 
     1 chart notes                 free text (clinical_notes.py)
     2 exam forms                  structured screening fields (PSR codes, checkboxes)

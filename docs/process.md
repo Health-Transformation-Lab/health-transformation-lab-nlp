@@ -1,6 +1,8 @@
 # Study process
 
-How periodontal status is phenotyped from a dental EHR, and how each step maps
+A **phenotype** is a computable definition of a condition: a rule or model that reads a
+patient's record and assigns a label (here periodontal status, stage, grade, extent)
+the same way for every patient. This page shows how periodontal status is phenotyped from a dental EHR, and how each step maps
 to this repo. The diagram is the study design; the table under it says where
 each box lives.
 
@@ -46,7 +48,7 @@ flowchart BT
 
 | Step | Repo | Output |
 |------|------|--------|
-| Seven sources per visit | `python/dental_omop_nlp/study.py` (generate), `sources.py` (codes, forms), `clinical_notes.py` (notes), `labels.py` (probing chart) | `data/datasets/answer_key/review_key.csv` |
+| Sources per visit: chart notes, exam forms, procedure codes (completed, planned), procedure diagnosis codes (completed, planned), probing chart | `python/dental_omop_nlp/study.py` (generate), `sources.py` (codes, forms), `clinical_notes.py` (notes), `labels.py` (probing chart) | `data/datasets/answer_key/review_key.csv` |
 | Read each source | `note_reader.py` (notes), `sources.READERS` (forms, codes, diagnoses), chart staging rules in `labels.py` | one status per source per visit |
 | Compare each method against each other | `phenotype.agreement_matrix`, `phenotype.coverage` | `data/datasets/method_agreement.csv`, `method_coverage.csv` |
 | Qualitative review | People. Reviewers work from `method_agreement.csv` and the disagreeing charts; their findings go into `docs/labeling_protocol.md` and `RULES_V0` | rules, written down |

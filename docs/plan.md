@@ -4,7 +4,7 @@
 > research plan. The timeline below is a practice exercise in planning a study
 > like this, not a commitment or deliverable. See [DISCLAIMER](../DISCLAIMER.md).
 
-Goal: phenotype periodontal status from a dental EHR, compare seven sources,
+Goal: phenotype periodontal status from a dental EHR, compare the sources (notes, exam forms, procedure codes and diagnoses, probing chart),
 derive a rule-based algorithm, and test whether a BERT-family model reading
 the notes performs like clinicians reviewing the full chart. Built in public on
 synthetic data until approved for internal use. Databricks is the eventual home.

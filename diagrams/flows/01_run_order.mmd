@@ -1,0 +1,19 @@
+%%{init: {"themeVariables": {"fontSize": "18px"}, "flowchart": {"nodeSpacing": 30, "rankSpacing": 45}}}%%
+flowchart LR
+    A["10_build_study<br/>synthetic patients over time,<br/>8 clinics, all sources,<br/>de-identify + leak gate"] --> B["11_ai_predict<br/>baselines · BERT · MedGemma<br/>(note only)"]
+    A --> C["Label Studio<br/>reviewers stage charts<br/>12_import_review"]
+    B --> D["13_reliability<br/>acceptance test<br/>6 and 5 categories"]
+    C --> D
+    D --> E["18_phenotype_order<br/>24 orders, held-out"]
+    A --> F["19_prevalence · 20_data_quality<br/>21_predict_progression"]
+    A --> G["22_build_sites<br/>32 teeth × 6 sites<br/>2017 AAP/EFP + 2012 CDC/AAP"]
+    G --> H["23_site_designs<br/>3 OMOP designs on Postgres"]
+    A --> I["01 + 05_load_omop_db<br/>OMOP into Lakebase"]
+    D --> J["14–16 judge + cost<br/>at 1M notes<br/>(calibrated on reviewers)"]
+    D --> K["24_promote_model<br/>champion if non-inferior"]
+    classDef s fill:#dbeafe,stroke:#1e3a5f,color:#0f172a
+    classDef r fill:#ffedd5,stroke:#c2410c,color:#0f172a
+    classDef m fill:#fde7f1,stroke:#e7157b,color:#0f172a
+    class A,G,H,I s
+    class C,D,E r
+    class B,F,J,K m

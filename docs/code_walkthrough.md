@@ -10,13 +10,17 @@ has one section per step below, with a cell that shows that step's output.
 
 Every number from these steps is from synthetic patients and simulated reviewers.
 
+Pictures of the same: [study process](../diagrams/d1_study_process.png), [platform](../diagrams/d2_platform_architecture.png),
+[ERD](../diagrams/d3_erd_omop_dental.png), [site storage designs](../diagrams/d4_site_storage_designs.png),
+[MLOps](../diagrams/d5_mlops_lifecycle.png), [run order](../diagrams/flows/01_run_order.png) ([all diagrams](../diagrams/README.md)).
+
 ## The steps in run order
 
 | # | Step | Command | README section |
 |---|---|---|---|
-| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Seven sources](../README.md#dental-omop-nlp) |
+| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Sources](../README.md#dental-omop-nlp) |
 | 2 | [De-identify and gate](#2-de-identify-and-gate) | (inside step 1) | [Ground rules](../README.md#ground-rules) |
-| 3 | [Read each source](#3-read-each-source) | (inside step 1) | [Seven sources](../README.md#dental-omop-nlp) |
+| 3 | [Read each source](#3-read-each-source) | (inside step 1) | [Sources](../README.md#dental-omop-nlp) |
 | 4 | [Compare the sources](#4-compare-the-sources) | (inside step 1) | [Study process](process.md) |
 | 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#dental-omop-nlp) |
 | 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated) |
@@ -42,8 +46,9 @@ Commands run from `python/` unless they start with `python/` or `r/`.
 Synthetic people with **histories**: 1–6 recall visits about six months apart,
 in one of 8 clinics. Attachment and bone loss never recover; smoking and diabetes
 speed progression; therapy lowers pockets and bleeding; 2% of charted follow-up
-visits get a charting error (answer key only). Each visit gets all seven sources
-plus a structured radiograph AI read.
+visits get a charting error (answer key only). Each visit gets a chart note, an
+exam form, procedure codes and diagnosis codes (completed and planned), a probing
+chart, and a structured radiograph AI read.
 
 - Code: [`study.py`](../python/dental_omop_nlp/study.py) `generate_visits`, `build_study`;
   [`synthetic.py`](../python/dental_omop_nlp/synthetic.py) `draw_history`, `draw_chart`, `draw_risk`;
