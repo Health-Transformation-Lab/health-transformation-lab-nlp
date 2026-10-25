@@ -1,9 +1,14 @@
 # dental-omop-nlp
 
+> **Personal learning project.** Built on my own time while waiting for internal
+> approvals. Not affiliated with or endorsed by any employer, institution or
+> vendor, and nothing here reflects official business or research of any
+> organization, including CareQuest. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
+
 How well can periodontal status be phenotyped from a dental EHR, and can a
 BERT-family model reading the chart notes match clinicians? This repo runs that
-study end to end on **synthetic** data so the pipeline, the reviewer workflow
-and the analysis are ready before real data is approved.
+kind of study end to end on **synthetic** data, as a way to learn the pipeline,
+the reviewer workflow and the analysis.
 
 ![Study process](docs/img/process.png)
 
@@ -91,7 +96,7 @@ python scripts/14_benchmark_cost.py && python scripts/15_judge.py --backend open
 | `costs.yaml` | Prices and throughput for costing each method over the full corpus (**illustrative until replaced**) |
 | `omop/` | OMOP CDM 5.4 dental extension (`SITE`, `SITE_EVENT`) from the OHDSI Dentistry Workgroup |
 | `databricks/` | Free Edition notebook; `02_llm_judge.sql` runs the judge with `ai_query` at scale |
-| `docs/` | [process](docs/process.md), [data sources](docs/data_sources.md), [note realism](docs/note_realism.md), [GlobalDentBench methods](docs/dentbench_methods.md), [references](docs/references.md), [labeling protocol](docs/labeling_protocol.md), [plan and timeline](docs/plan.md), [cost-effectiveness](docs/cost_effectiveness.md), [design review for Databricks](docs/design_review_rsa.md), [ADRs](docs/adr/) |
+| `docs/` | [process](docs/process.md), [data sources](docs/data_sources.md), [note realism](docs/note_realism.md), [GlobalDentBench methods](docs/dentbench_methods.md), [references](docs/references.md), [labeling protocol](docs/labeling_protocol.md), [learning plan](docs/plan.md), [cost-effectiveness](docs/cost_effectiveness.md), [architecture review questions](docs/design_review_rsa.md), [ADRs](docs/adr/) |
 
 ## Quick start
 

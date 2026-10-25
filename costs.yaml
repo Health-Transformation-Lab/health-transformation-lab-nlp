@@ -5,7 +5,7 @@
 # for the instance type, and per-token prices for your serving endpoints)
 # before any number from cost_effectiveness.py leaves this repo.
 
-corpus_notes: 1000000          # notes to classify in the full project
+corpus_notes: 1000000          # hypothetical corpus size for the exercise
 avg_note_tokens: null          # null = measure from the corpus sample (chars / 4)
 
 compute:                       # $/hour for one node, all-in (VM + DBU)
