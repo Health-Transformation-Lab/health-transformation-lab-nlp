@@ -9,7 +9,7 @@ Can periodontal status be phenotyped from a dental EHR, and can AI reading the
 chart notes match clinicians? This repo runs that study end to end on **synthetic**
 data, to learn the pipeline, the reviewer workflow and the analysis.
 
-![Study process](docs/img/process.png)
+<img src="docs/img/process.png" alt="Study process" width="520">
 
 **Seven sources per visit:**
 
@@ -104,10 +104,4 @@ comparisons, prediction outcome, OMOP storage design).
 | Retrieval, OMOP synonyms/ancestors/relationships, graphs: 8 test cases | [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
 | Financial trade-offs: inference vs review hours vs accuracy | [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md) |
 | Exploratory: radiograph findings; MedGemma | [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
-
-## More
-
-[How we work](CLAUDE.md) (Spec Kit specs, Superpowers, test-first) · [references](docs/references.md) ·
-[labeling protocol](docs/labeling_protocol.md) · [learning plan](docs/plan.md) ·
-[architecture review questions](docs/design_review_rsa.md) · Owners: Python / data engineering / OMOP:
-John Bowyer; R / data science: _TBD_ · MIT license (OMOP CDM and OHDSI tools Apache-2.0; model licenses in `models.yaml`)
+| How we work, references, protocol, plan | [CLAUDE.md](CLAUDE.md), [references](docs/references.md), [protocol](docs/labeling_protocol.md), [plan](docs/plan.md). Owner: John Bowyer. MIT |
