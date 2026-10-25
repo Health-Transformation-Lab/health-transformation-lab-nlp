@@ -5,6 +5,13 @@ Principles every spec, plan and change in this repo must satisfy. The Spec Kit
 
 ## Core Principles
 
+### 0. Personal Learning Project, Not Affiliated (NON-NEGOTIABLE)
+This repo is a personal learning project, built while waiting for internal
+approvals. It is not affiliated with or endorsed by any employer, institution or
+vendor and reflects no organization's business or research. Docs never present
+work here as an organization's plan, study, finding or partnership; companies are
+mentioned only as their own public sources describe them. See `DISCLAIMER.md`.
+
 ### I. Synthetic Only, No PHI (NON-NEGOTIABLE)
 Every record in this repo is generated. Real patient data, real notes, and
 employer or partner data never enter the repo, a branch, a test fixture, a
@@ -66,4 +73,4 @@ This constitution overrides other practice in the repo. Amend it by PR that
 states the change and why, bumps the version, and updates any affected spec.
 Reviewers check principle I and II on every PR.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-25
+**Version**: 1.1.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-25

@@ -1,12 +1,15 @@
-# Plan
+# Learning plan
+
+> Personal learning project; not affiliated with any organization and not a
+> research plan. The timeline below is a practice exercise in planning a study
+> like this, not a commitment or deliverable. See [DISCLAIMER](../DISCLAIMER.md).
 
 Goal: phenotype periodontal status from a dental EHR, compare seven sources,
 derive a rule-based algorithm, and test whether a BERT-family model reading
 the notes performs like clinicians reviewing the full chart. Built in public on
 synthetic data until approved for internal use. Databricks is the eventual home.
 
-**Target dates:** notes analysed by **January 7, 2027**; manuscript submitted
-in **February 2027**.
+**Practice timeline:** illustrative only; no publication or official deliverable is planned from this repo.
 
 ## Built
 
@@ -25,7 +28,7 @@ in **February 2027**.
       each method vs reviewers) in Python and R, parity-tested
 - [x] AI models: note rules, TF-IDF (run); 12 BERT-family encoders (registry,
       fine-tune code written, not yet run)
-- [x] Design-review page for the Databricks RSA
+- [x] Practice architecture-review questions for Databricks
 - [x] GlobalDentBench methods: severity-graded errors, difficulty levels, judge bake-off ([spec 002](../specs/002-dentbench-methods/spec.md))
 - [x] Realistic notes from published examples ([spec 001](../specs/001-realistic-dental-notes/spec.md), [note_realism.md](note_realism.md)); Spec Kit + Superpowers workflow ([CLAUDE.md](../CLAUDE.md))
 - [x] Cost-effectiveness at 1M+ notes: LLM judge (quote gate, OpenAI-compatible
@@ -43,24 +46,24 @@ in **February 2027**.
 - Note rules and TF-IDF are equal at κ ~0.82 against consensus. On synthetic
   notes there's little room for BERT to win; real notes are the test.
 
-## Timeline (working back from January 7)
+## Practice timeline (illustrative)
 
 | Weeks | Dates | Work | Done when |
 |------:|-------|------|-----------|
-| 1–2 | Oct 26 – Nov 6 | RSA design review; submit data-access / IRB determination; finalize protocol draft with the qualitative reviewers | approval request filed; RSA answers to questions 1–5 |
+| 1–2 | Oct 26 – Nov 6 | Architecture review questions; learn what data-access / IRB steps a study like this needs; draft a protocol | questions answered from public docs |
 | 3–4 | Nov 9 – Nov 20 | Real extract into the restricted zone; run de-id on a 100-note sample; human check of the sample; fix allowlist | zero PHI found in the sample review |
 | 4–6 | Nov 16 – Dec 4 | Qualitative review: two reviewers go through disagreeing charts (from `method_agreement.csv`); write `RULES_V1` and protocol v1 | rules and protocol versioned |
 | 6–8 | Dec 7 – Dec 23 | Reliability round: N reviewers stage the same 240 charts in Label Studio. In parallel: fine-tune the encoder ladder on de-identified training notes; measure throughput on target hardware; set real prices in `costs.yaml` | all reviewers finished; AI predictions written |
 | 8–9 | Dec 21 – Jan 1 | Run every method over the 1M+ notes; judge a stratified sample per method (~1,500 each); calibrate the judge on the reviewed charts | judgments and calibration written |
 | 9–10 | Dec 28 – Jan 7 | Analysis: reliability, methods vs reviewers, AI vs reviewers, cost-effectiveness frontier, error review; tables and figures in R | **notes analysed** |
-| 11–15 | Jan 8 – Feb | Write-up, co-author review, submit | **submitted** |
+| 11–15 | Jan 8 – Feb | Write up what I learned | notes in `docs/` |
 
 ## Risks to the dates
 
 1. **Data approval** is the critical path. If real notes aren't in the
    restricted zone by about Nov 20, the reliability round slips past the holidays.
 2. **Reviewer time in December.** 240 charts at 1–3 minutes each is 4–12 hours
-   per reviewer. Book it now.
+   per reviewer; a real study would need to plan for it.
 3. **De-identification on real notes.** The regex engine is tuned to synthetic
    formats. Real notes need Presidio or a de-id model plus a human sample
    check. Budget a fix-and-rerun cycle.
@@ -76,6 +79,6 @@ in **February 2027**.
 - Whether cost-effectiveness reports compute only or includes labeling and engineering time (recommend both)
 - Number of reviewers for the reliability round (3–5), and who they are
 - Whether the AI model trains on chart truth or on the clinician's written diagnosis (both columns are in `train.csv`)
-- Label Studio hosting inside the boundary vs a Databricks-native labeling option (RSA question 3)
+- Label Studio hosting inside the boundary vs a Databricks-native labeling option (architecture question 3)
 - R owner (README names them)
 - A 13th candidate model was added after the sheet; name to be confirmed

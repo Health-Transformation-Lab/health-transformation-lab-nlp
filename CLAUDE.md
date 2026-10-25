@@ -4,7 +4,11 @@ Instructions for Claude Code (and other agents) working in this repo.
 
 ## Ground rules
 
-Read `.specify/memory/constitution.md` first. The short version:
+Read `DISCLAIMER.md` and `.specify/memory/constitution.md` first. The short version:
+
+- **Personal learning project, not affiliated.** Don't describe anything here as
+  an organization's plan, study, finding or partnership. Mention companies only
+  as their public sources describe them, with a citation.
 
 - **Synthetic only. No PHI, ever.** Don't add real notes, real names, or
   employer data anywhere, including tests and prompt examples.

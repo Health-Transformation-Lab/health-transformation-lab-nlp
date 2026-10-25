@@ -1,6 +1,7 @@
 # Cost-effectiveness with an LLM judge
 
-The full project has more than a million notes. Reviewers can stage a few
+A real project of this kind could have a million or more notes (this exercise
+assumes 1,000,000). Reviewers can stage a few
 hundred charts. For everything else, the question "which method should we run
 over all of them?" is answered with an LLM judge plus a cost model.
 

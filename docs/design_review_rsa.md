@@ -1,9 +1,13 @@
 # Design review: periodontal phenotyping and NLP on Databricks
 
-Prepared for a Databricks Resident Solutions Architect (RSA) design review.
+> Personal learning project; not affiliated with any organization. These are
+> practice questions, not an official design review. See [DISCLAIMER](../DISCLAIMER.md).
+
+Practice architecture-review questions for running a project like this on Databricks,
+the kind to bring to a Databricks solutions architect.
 The repo runs end to end on synthetic data today (local and Free Edition). This
 page sets out how it would run on real, governed data, and the questions we want
-the RSA's view on. Context: [process.md](process.md), [plan.md](plan.md).
+an architect's view on. Context: [process.md](process.md), [plan.md](plan.md).
 
 ## What the system does
 
@@ -50,7 +54,7 @@ flowchart LR
 | Analysis | Python and R produce identical reliability numbers | `reliability.py`, `r/R/04_reliability.R`, parity test |
 | Deployment | Declarative Automation Bundles, dev/prod targets, CI from GitHub | not yet |
 
-## Questions for the RSA
+## Questions for an architecture review
 
 1. **PHI isolation.** Is a separate catalog with a single service principal for
    the de-id job enough, or should raw notes sit in a separate workspace?
@@ -58,7 +62,7 @@ flowchart LR
 2. **De-identification on Databricks.** For clinical/dental notes, what are
    customers using: Presidio in a job, John Snow Labs Healthcare NLP from
    the Marketplace, a Hugging Face model on Model Serving, or an LLM via
-   `ai_query`? Which of these is covered under our compliance setup for PHI?
+   `ai_query`? Which of these is covered under a typical healthcare compliance setup for PHI?
 3. **Labeling inside the boundary.** Can Label Studio run as a Databricks App
    (Django + Postgres, with Lakebase as the database)? Or is an MLflow
    labeling session / Review App with custom categorical schemas a better
@@ -67,7 +71,7 @@ flowchart LR
    serverless GPU available to us, or should we plan a small classic GPU
    cluster? What does a run cost?
 5. **Foundation models and PHI.** Can de-identified notes go to a
-   pay-per-token Foundation Model endpoint under our agreement and compliance
+   pay-per-token Foundation Model endpoint under a typical agreement and compliance
    security profile? Can identified notes ever go, or only to a provisioned
    endpoint inside the workspace?
 6. **R users.** The data science lead works in R. Best path: an R notebook on
@@ -85,8 +89,7 @@ flowchart LR
    model version so judge calibration stays valid?
 10. **Cost reporting.** Can we tag jobs and endpoints so system tables give
     us actual cost per method, to replace the planning prices in `costs.yaml`?
-11. **Timeline fit.** Given a January analysis deadline, which of the above
-   can we decide in one session, and what needs an account-team follow-up?
+11. **Sequencing.** Which of the above can be decided in one working session, and which need follow-up?
 
 ## Decisions already made
 
