@@ -1,0 +1,2 @@
+n_pairs_train,n_pairs_test,progress_rate,auroc,auroc_ci_low,auroc_ci_high,outcome
+2189,954,0.07540566337893732,0.7350452079566004,0.682265520833808,0.7891903044967951,truth_status

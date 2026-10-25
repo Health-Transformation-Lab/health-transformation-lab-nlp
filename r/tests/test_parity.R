@@ -120,3 +120,56 @@ if (file.exists(py_bo) && file.exists("data/corpus/simulated_judgments_gold_all_
   stopifnot(d < 1e-9)
 }
 cat("parity OK (incl. cost-effectiveness and judge bake-off)\n")
+
+# 6. Spec 005: five categories, temporal plausibility, clinic prevalence.
+source("r/R/06_validation.R")
+py5 <- "data/review/simulated_reliability_5cat/methods_vs_reviewers.csv"
+if (file.exists(py5) && file.exists("data/review/simulated_reviewer_labels.csv")) {
+  source("r/R/04_reliability.R")
+  labels <- read.csv("data/review/simulated_reviewer_labels.csv", stringsAsFactors = FALSE)
+  key <- read.csv("data/datasets/answer_key/review_key.csv", stringsAsFactors = FALSE)
+  py <- read.csv(py5, stringsAsFactors = FALSE)
+  ms <- setdiff(py$method, "generator_chart_truth")
+  compare <- setNames(lapply(ms, function(m) {
+    if (startsWith(m, "ai:")) { p <- read.csv(sprintf("data/datasets/ai_predictions_%s.csv", sub("^ai:", "", m)))
+      setNames(collapse5(p$pred), p$visit_id) } else setNames(collapse5(key[[m]]), key$visit_id)
+  }), ms)
+  labels$status <- collapse5(labels$status); key$truth_status <- collapse5(key$truth_status)
+  r <- reliability_report(labels, key, compare)$methods
+  r <- r[match(py$method, r$method), ]
+  num <- c("coverage", "pct_agree_consensus", "kappa_vs_consensus", "weighted_kappa_vs_consensus",
+           "mean_kappa_vs_each_reviewer", "unsafe_rate", "s2_rate")
+  d <- max(abs(as.matrix(r[num]) - as.matrix(py[num])), na.rm = TRUE)
+  cat(sprintf("five categories: max |R - Python| = %.2e over %d methods\n", d, nrow(py)))
+  stopifnot(d < 1e-9)
+} else cat("five categories: skipped (run 13_reliability.py --simulated)\n")
+
+vs <- "data/datasets/visits_structured.csv"
+pf <- "data/datasets/data_quality/flags_probing_chart.csv"
+if (file.exists(vs) && file.exists(pf)) {
+  v <- read.csv(vs, stringsAsFactors = FALSE)
+  h <- data.frame(visit_id = v$visit_id, person_id = v$person_id, visit_date = v$visit_date,
+                  charted = v$charted == "True" | v$charted == TRUE, max_cal_mm = v$rec_max_cal_mm,
+                  rbl_pct = v$rec_rbl_pct, teeth_lost_perio = v$rec_teeth_lost_perio, status = v$probing_chart)
+  r <- check_history(h, "status")
+  py <- read.csv(pf, stringsAsFactors = FALSE)
+  m <- merge(py, r, by = "visit_id", suffixes = c(".py", ".r"))
+  bad <- sum(sapply(c(PLAUS_FLAGS, "any_flag"), function(f) sum(as.logical(m[[paste0(f, ".py")]]) != m[[paste0(f, ".r")]])))
+  cat(sprintf("plausibility: %d visits, %d flag mismatches\n", nrow(m), bad))
+  stopifnot(nrow(m) == nrow(py), bad == 0)
+} else cat("plausibility: skipped (run 20_data_quality.py)\n")
+
+pp <- "data/datasets/prevalence/prevalence_by_clinic.csv"
+if (file.exists(vs) && file.exists(pp)) {
+  v <- read.csv(vs, stringsAsFactors = FALSE)
+  py <- read.csv(pp, stringsAsFactors = FALSE)
+  py <- py[py$method == "algorithm_design", ]
+  r <- prevalence_by(v, "algorithm_design", by = "clinic_id")
+  m <- merge(py, r, by = "clinic_id", suffixes = c(".py", ".r"))
+  num <- c("n_people", "n_unknown", "periodontitis", "periodontitis_ci_low", "periodontitis_ci_high",
+           "stage3_4", "stage3_4_ci_low", "stage3_4_ci_high")
+  d <- max(abs(as.matrix(m[paste0(num, ".py")]) - as.matrix(m[paste0(num, ".r")])), na.rm = TRUE)
+  cat(sprintf("prevalence:   max |R - Python| = %.2e over %d clinics\n", d, nrow(m)))
+  stopifnot(nrow(m) == nrow(py), d < 1e-9)
+} else cat("prevalence: skipped (run 19_prevalence.py)\n")
+cat("parity OK (spec 005)\n")

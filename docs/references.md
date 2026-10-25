@@ -85,6 +85,16 @@ Everything this repo relies on, and what it's used for.
 33. **Databricks.** *Lakebase release notes.* [docs](https://docs.databricks.com/aws/en/release-notes/lakebase/)
 34. **Databricks.** *Free Edition limitations.* [docs](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations)
 
+## Epidemiology and data quality
+
+35. **Eke PI, Thornton-Evans GO, Wei L, Borgnakke WS, Dye BA, Genco RJ.** *Periodontitis in US adults:
+    National Health and Nutrition Examination Survey 2009-2014.* J Am Dent Assoc 2018;149(7):576-588.
+    [doi:10.1016/j.adaj.2018.04.023](https://doi.org/10.1016/j.adaj.2018.04.023); figures via
+    [NIDCR](https://nidcr.nih.gov/research/data-statistics/periodontal-disease/adults)
+36. **Kahn MG, Callahan TJ, Barnard J, et al.** *A harmonized data quality assessment terminology and framework
+    for the secondary use of electronic health record data.* eGEMs 2016;4(1):1244.
+    [doi:10.13063/2327-9214.1244](https://doi.org/10.13063/2327-9214.1244)
+
 ## Classification rules
 
 26. **American Academy of Periodontology.** *Staging and Grading Periodontitis* (worksheet).

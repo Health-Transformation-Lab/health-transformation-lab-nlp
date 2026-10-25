@@ -82,6 +82,20 @@ Comparing a method with the reviewer **consensus** instead would be unfair to th
 humans, because each reviewer helped make the consensus. Output:
 `data/review/[simulated_]reliability/agreement_vs_humans.csv`.
 
+## Integrated phenotype and validation (spec 005)
+
+| Step | Repo | Output |
+|---|---|---|
+| Integrated phenotype, five categories, study-design source order | `phenotype.RULES_DESIGN`, `collapse5`; `algorithm_design` column | `review_key.csv`, `visits_structured.csv` |
+| Can the order change? Score all 24 orders, chosen on half the charts, reported on the other half | `scripts/18_phenotype_order.py` | `reliability_5cat/phenotype_orders.csv` |
+| Reliability and acceptance test on five categories | `scripts/13_reliability.py` (Py + R) | `reliability_5cat/` |
+| Patients over time; temporal plausibility | `synthetic.draw_history`, `plausibility.py` (Py + R) | `data_quality/` |
+| Clinic-level prevalence, published comparison | `prevalence.py` (Py + R), `scripts/19_prevalence.py` | `prevalence/` |
+| Data quality: conformance, completeness, plausibility | `dq.py`, `scripts/20_data_quality.py` | `data_quality/` |
+| Prediction of progression, feature importance | `prediction.py`, `scripts/21_predict_progression.py` | `prediction/` |
+
+Differences from the study design and open decisions: [action_items.md](action_items.md).
+
 ## What's real and what's simulated today
 
 Everything runs end to end on synthetic data. Two pieces are stand-ins:

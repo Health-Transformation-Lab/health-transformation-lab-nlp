@@ -81,10 +81,21 @@ Plus baselines (`note_rules`, `tfidf_logreg`, `structured_baseline`,
 `scripts/11_ai_predict.py --rung <id>` but haven't been run yet (they need the
 Hugging Face downloads). Results so far are baselines on simulated reviewers.
 
+## Action items
+
+Where the repo differs from the study design, and the decisions still open, are tracked in
+**[docs/action_items.md](docs/action_items.md)**. The biggest open ones:
+- confirm the source order and the five categories;
+- tolerances for over-time plausibility;
+- what "clinic" means in real data;
+- comparable published studies;
+- the outcome and horizon for the prediction model.
+
 ## Drill-downs
 
 | Topic | |
 |---|---|
+| Integrated phenotype (five categories, source order), patients over time, clinic prevalence, data quality, prediction | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
 | Dental vs medical data in OMOP: what claims and EHRs track, tooth/site gaps | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md) |
 | Data: synthetic notes, review set, public datasets | [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
 | Deploying: Asset Bundle with **dev, UAT, prod** targets and variables; CI | [deployment.md](docs/deployment.md) |
