@@ -67,9 +67,9 @@ grading its own model family. [docs/dentbench_methods.md](docs/dentbench_methods
 
 ## Exploratory: structured radiograph findings
 
-An exploration, for learning and training, of how structured radiograph AI
-output (bone level per tooth) could be added as an eighth source and as model
-input. Simulated data and public information only.
+A personal exploration, for learning and training, of how structured radiograph
+AI output (bone level per tooth) could be added as an eighth source and as model
+input. Simulated data and public information only; not affiliated with any vendor.
 [docs/radiograph.md](docs/radiograph.md)
 
 ## Data sources
