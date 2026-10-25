@@ -5,32 +5,46 @@
 > vendor, and nothing here reflects official business or research of any
 > organization, including CareQuest. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
 
-How well can periodontal status be phenotyped from a dental EHR, and can a
-BERT-family model reading the chart notes match clinicians? This repo runs that
-kind of study end to end on **synthetic** data, as a way to learn the pipeline,
-the reviewer workflow and the analysis.
+Can periodontal status be phenotyped from a dental EHR, and can AI reading the
+chart notes match clinicians? This repo runs that study end to end on **synthetic**
+data, to learn the pipeline, the reviewer workflow and the analysis.
 
 ![Study process](docs/img/process.png)
 
 **Seven sources per visit:**
 
-- Chart notes
-- Exam forms
-- Procedure codes, completed
-- Procedure codes, planned
-- Procedure diagnoses, completed
-- Procedure diagnoses, planned
+- Chart notes · Exam forms
+- Procedure codes, completed · planned
+- Procedure diagnoses, completed · planned
 - Probing chart (CAL, radiographic bone loss, tooth loss from perio)
 
-Compare methods → qualitative review → rule-based phenotyping algorithm →
-several reviewers stage the same charts in Label Studio, compared against the
-algorithm and the AI model. [docs/process.md](docs/process.md)
+Details: [docs/process.md](docs/process.md).
 
-**Staging and grading** follow the AAP worksheet
-([PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf)):
-stage from interdental CAL (RBL only if CAL is missing), raised by tooth loss
-and complexity; grade starts at B. Same rules for the synthetic truth,
-reviewers and LLMs. [docs/staging_grading.md](docs/staging_grading.md)
+**Two classification systems:** the 2017 AAP/EFP staging and grading, following the AAP worksheet
+([PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf)),
+for the truth, reviewers and LLMs ([staging_grading.md](docs/staging_grading.md)); and the 2012 CDC/AAP
+surveillance definitions behind national prevalence, computed from tooth- and site-level charts
+([site_level_omop.md](docs/site_level_omop.md)).
+
+## What it does, step by step
+
+Summary here; **[code walkthrough](docs/code_walkthrough.md)** for how the code does each
+step, with links to the code; the Databricks notebook
+[`00_walkthrough.py`](databricks/notebooks/00_walkthrough.py) runs one section per step.
+
+| # | Step | Walkthrough |
+|---|---|---|
+| 1 | Generate synthetic patients over time (8 clinics), all seven sources, notes with fake PHI | [1](docs/code_walkthrough.md#1-generate-the-synthetic-study) |
+| 2 | De-identify; a leak gate blocks any note with PHI left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
+| 3 | Read each source; compare them; build the rule-based phenotype (study-design order) | [3–5](docs/code_walkthrough.md#3-read-each-source) |
+| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
+| 5 | Reviewers stage the same charts in Label Studio | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
+| 6 | Reliability and the acceptance test, on six and five categories; every source order scored | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
+| 7 | Over time and at scale: plausibility, data quality, clinic prevalence, progression | [10–12](docs/code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
+| 8 | Site-level charts, both classifications, three OMOP storage designs, Lakebase | [13–15](docs/code_walkthrough.md#13-site-level-charts-both-classifications) |
+| 9 | 1M+ notes: LLM judge and cost; deploy to dev, UAT, prod | [16–18](docs/code_walkthrough.md#16-llm-judge-and-cost-at-1m-notes) |
+
+Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[dev]" && cd .. && python/scripts/make_parity_inputs.sh`; tests: `pytest -q python/tests`, `Rscript r/tests/test_parity.R`.
 
 ## Ground rules
 
@@ -40,19 +54,13 @@ reviewers and LLMs. [docs/staging_grading.md](docs/staging_grading.md)
 
 ## How results are measured
 
-- **Acceptance test:** an AI passes if it agrees with the reviewers at least as
-  much as they agree with each other: mean kappa vs each reviewer against the
-  mean reviewer-pair kappa, with a bootstrap CI and a margin fixed in advance.
-  After OHDSI's case-validation work ([video](https://www.youtube.com/watch?v=scUssf863TI),
-  from ~49 min; [paper](https://doi.org/10.1038/s41746-025-01433-4)).
-- **Kappa** is agreement beyond chance. **95% confidence intervals** give the
-  range the true value plausibly falls in, since ~240 charts are a sample;
-  overlapping intervals mean two methods can't be called different. Computed by
-  bootstrap (resample charts 1,000 times, keep the middle 95%).
-- **Unsafe rate** (errors by clinical severity) and **results by difficulty**, after GlobalDentBench.
-
-Details: [process](docs/process.md#validation-criterion-as-reliable-as-a-human-reviewer),
-[statistics](docs/statistics.md), [GlobalDentBench methods](docs/dentbench_methods.md).
+- **Acceptance test:** an AI passes if it agrees with the reviewers at least as much as
+  they agree with each other (OHDSI case validation: [video](https://www.youtube.com/watch?v=scUssf863TI)
+  from ~49 min, [paper](https://doi.org/10.1038/s41746-025-01433-4)).
+- **Kappa** is agreement beyond chance. **95% confidence intervals** (bootstrap over
+  charts) give the range the true value plausibly falls in; overlapping intervals mean two
+  methods can't be called different. [statistics](docs/statistics.md)
+- **Unsafe rate** and **results by difficulty**, after [GlobalDentBench](docs/dentbench_methods.md).
 
 ## Models evaluated
 
@@ -73,23 +81,15 @@ The 12 models from the evaluation sheet (also in `models.yaml`):
 | [SapBERT](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) | [arXiv 2010.11784](https://arxiv.org/abs/2010.11784) | biomedical | concept mapping |
 | [GTE-ModernColBERT](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) | model card | general | retrieval |
 
-Plus baselines (`note_rules`, `tfidf_logreg`, `structured_baseline`,
-`fusion_tfidf_rad`) and exploratory MedGemma readers
-([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it), [4B](https://huggingface.co/google/medgemma-4b-it),
+Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it),
 [27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
-**Status:** the 10 classifier and long-context models train and predict with
-`scripts/11_ai_predict.py --rung <id>` but haven't been run yet (they need the
-Hugging Face downloads). Results so far are baselines on simulated reviewers.
+**Status:** all train and predict, but none has been run yet (needs the Hugging Face downloads).
 
 ## Action items
 
-Where the repo differs from the study design, and the decisions still open, are tracked in
-**[docs/action_items.md](docs/action_items.md)**. The biggest open ones:
-- confirm the source order and the five categories;
-- tolerances for over-time plausibility;
-- what "clinic" means in real data;
-- comparable published studies;
-- the outcome and horizon for the prediction model.
+Differences from the study design and open decisions: **[docs/action_items.md](docs/action_items.md)**
+(source order and five categories, plausibility tolerances, clinic definition, published
+comparisons, prediction outcome, OMOP storage design).
 
 ## Drill-downs
 
@@ -105,22 +105,9 @@ Where the repo differs from the study design, and the decisions still open, are 
 | Financial trade-offs: inference vs review hours vs accuracy | [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md) |
 | Exploratory: radiograph findings; MedGemma | [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
 
-## Quick start
-
-```bash
-cd python && pip install -e .
-python scripts/10_build_study.py && python scripts/11_ai_predict.py --rung tfidf_logreg
-python scripts/12_import_review.py --simulate 4 && python scripts/13_reliability.py --simulated  # dry run
-pytest -q tests && cd .. && Rscript r/tests/test_parity.R
-```
-
 ## More
 
-| | |
-|---|---|
-| How we work | Spec Kit specs in `specs/`, Superpowers skills, test-first. [CLAUDE.md](CLAUDE.md), [constitution](.specify/memory/constitution.md) |
-| Code | `python/dental_omop_nlp/`, `r/`, `models.yaml` (12 encoders), `costs.yaml` (illustrative prices), `omop/` (dental extension) |
-| Docs | [labeling protocol](docs/labeling_protocol.md), [learning plan](docs/plan.md), [architecture review questions](docs/design_review_rsa.md), [ADRs](docs/adr/), [statistics](docs/statistics.md), [dental vs medical OMOP](docs/omop_dental_vs_medical.md) |
-| Background | Key papers (UTHealth/UCSF NLP, IUPUI phenotyping, OHDSI dental): [docs/references.md](docs/references.md) |
-| Owners | Python / data engineering / OMOP: John Bowyer. R / data science: _TBD_ |
-| License | MIT. OMOP CDM and OHDSI tools Apache-2.0; model licenses per model in `models.yaml` |
+[How we work](CLAUDE.md) (Spec Kit specs, Superpowers, test-first) · [references](docs/references.md) ·
+[labeling protocol](docs/labeling_protocol.md) · [learning plan](docs/plan.md) ·
+[architecture review questions](docs/design_review_rsa.md) · Owners: Python / data engineering / OMOP:
+John Bowyer; R / data science: _TBD_ · MIT license (OMOP CDM and OHDSI tools Apache-2.0; model licenses in `models.yaml`)
