@@ -37,7 +37,7 @@ Anything that changes a dataset, a metric, a label rule or the review workflow d
 ```bash
 cd python && pip install -e ".[dev]"
 pytest -q tests                                   # Python tests
-cd .. && Rscript r/tests/test_parity.R            # R vs Python parity
+cd .. && python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R   # R vs Python parity
 cd python && python scripts/10_build_study.py     # rebuild study datasets (seeded)
 ```
 
