@@ -4,13 +4,84 @@ Run:    python3 build_drawio.py          -> ../<name>.drawio
 Render: see render.md (draw.io's own export engine, headless) -> ../<name>.png
 Synthetic data only; personal learning project.
 """
-from _helpers import DBX, STORAGE, SECURITY, MGMT, box, dbx_icon, edge, entity, group, lane, note, rel, reset, save, title
+from _helpers import DB, DBX, STORAGE, SECURITY, MGMT, box, dbx_icon, edge, entity, group, icon, lane, note, rel, reset, save, title
 
 GREEN, GREEN_F = "#15803D", "#DCFCE7"
 ORANGE, ORANGE_F = "#C2410C", "#FFEDD5"
 BLUE, BLUE_F = "#1E3A5F", "#DBEAFE"
 PURPLE, PURPLE_F = "#7C3AED", "#F3E8FF"
 GREY, GREY_F = "#7D8998", "#F5F5F5"
+
+# ====================================================================== d0: medallion architecture
+reset()
+title("Architecture: dental sources → bronze (PHI zone) → silver (de-identified) → gold (OMOP + dental) on Databricks")
+for label, x, w in [("Source", 40, 230), ("Ingest", 290, 280), ("Bronze · Silver · Gold", 590, 560),
+                    ("Query and process", 1170, 300), ("Serve", 1490, 170), ("Consumer", 1680, 150)]:
+    lane(label, x, 70, w)
+# sources
+icon("s_ehr", "Dental EHR (future)\nchart notes · exam forms\nprobing chart", "traditional_server", "#232F3E", 120, 140, 48)
+icon("s_pm", "Practice management / claims\nCDT procedure codes\nICD-10 diagnosis codes", "database", DB, 120, 300, 48)
+icon("s_rad", "Radiograph AI (exploratory)\nbone level per tooth", "client", "#232F3E", 120, 460, 48)
+box("s_syn", "Today: synthetic generator\n10_build_study (seeded)\nfake PHI on purpose", 50, 590, 210, 60, color=GREY, fill=GREY_F)
+# ingest
+dbx_icon("al", "Auto Loader\nfiles → volume (future)", "auto-loader", 330, 140, 48)
+dbx_icon("lc", "Lakeflow Connect / JDBC\nEHR database (future)", "lakeflow-connect", 330, 300, 48)
+box("in_api", "Job task: vendor API pull\n(future)", 310, 465, 220, 45, color=GREY, fill=GREY_F)
+box("in_syn", "Job task: write synthetic\nsources to bronze", 310, 600, 220, 45, color=GREY, fill=GREY_F)
+# lakehouse
+group("g_lake", "Databricks lakehouse · one catalog per environment (dev · UAT · prod)", "dbxlake", 580, 110, 900, 600)
+dbx_icon("dbxlogo", "", "databricks", 1430, 116, 32)
+dbx_icon("uc", "Unity Catalog", "unity-catalog", 610, 150, 44)
+box("gov", "Governance: bronze is the PHI zone (restricted grants); silver and gold de-identified only · lineage · tags · masks · audit",
+    680, 150, 770, 44, color=SECURITY, fill="#FBE9EB")
+dbx_icon("jobs", "Lakeflow Jobs", "lakeflow-jobs", 610, 225, 44)
+box("cicd", "Asset Bundle: dev · UAT · prod targets · GitHub Actions CI/CD · jobs run as a service principal in UAT/prod",
+    680, 225, 770, 44, color=GREY, fill=GREY_F)
+box("bronze", "BRONZE · PHI zone\nraw notes (with PHI)\nforms · CDT · ICD-10\ncharts · radiograph JSON",
+    600, 320, 165, 100, color="#A0522D", fill="#F6E7DA")
+box("silver", "SILVER · de-identified\nnotes (passed leak gate)\none status per source\nsites: PD · CAL · BOP",
+    810, 320, 165, 100, color="#6B7280", fill="#EEF0F2")
+box("gold", "GOLD · OMOP + dental\nNOTE · NOTE_NLP\nMEASUREMENT (+ site)\nphenotype · results",
+    1020, 320, 165, 100, color="#B8860B", fill="#FFF6D6")
+note("bronze → silver: de-identify, leak gate · silver → gold: source readers, derived site measures, OMOP load, "
+     "phenotype, reliability, prevalence", 600, 428, 420, 50)
+dbx_icon("sdp", "Pipelines: de-id, readers,\nderived measures, DQ checks", "spark-declarative-pipelines", 640, 495, 48)
+dbx_icon("dl", "Delta Lake\nbronze → silver → gold", "delta-lake", 860, 495, 48)
+box("lb", "Lakebase (Postgres): OMOP + perio_chart (dev/test) · Label Studio DB · review queue · run ledger",
+    600, 600, 575, 44, color=SECURITY, fill="#FBE9EB")
+dbx_icon("wh", "SQL warehouse\nderived site measures\nai_query judge", "sql-warehouse", 1220, 320, 48)
+dbx_icon("ms", "Model Serving\nLLM judge (MLflow make_judge)\nMedGemma", "model-serving", 1220, 450, 48)
+dbx_icon("ml", "MLflow + UC models\nchallenger → champion\non the acceptance test", "notebooks", 1380, 450, 48)
+dbx_icon("mon", "Data quality · plausibility\nalerts (future)", "lakeflow", 1380, 320, 48)
+# serve
+dbx_icon("bi", "AI/BI dashboards\nacceptance test · prevalence\nby clinic · data quality", "ai-bi-dashboards", 1550, 140, 48)
+box("ls", "Label Studio\nde-identified tasks", 1505, 480, 150, 50, color=ORANGE, fill=ORANGE_F)
+icon("atlas", "OHDSI tools\nAtlas · R (Postgres CDM)", "client", "#232F3E", 1556, 330, 48)
+# consumers
+icon("c1", "Study lead,\ndata science (R)", "users", "#232F3E", 1730, 140, 48)
+icon("c2", "Periodontist\nreviewers", "users", "#232F3E", 1730, 481, 48)
+icon("c3", "Researchers\n(cohorts)", "users", "#232F3E", 1730, 330, 48)
+# edges
+edge("s_ehr", "al", ""); edge("s_pm", "lc", ""); edge("s_rad", "in_api", "")
+edge("s_syn", "in_syn", "")
+edge("al", "bronze", "", exit=(1, 0.5), entry=(0, 0.2), via=[(570, 164), (570, 342)])
+edge("lc", "bronze", "", exit=(1, 0.5), entry=(0, 0.45), via=[(560, 324), (560, 369)])
+edge("in_api", "bronze", "", exit=(1, 0.5), entry=(0, 0.7), via=[(560, 487), (560, 397)])
+edge("in_syn", "bronze", "", exit=(1, 0.5), entry=(0, 0.95), via=[(570, 622), (570, 424)])
+edge("bronze", "silver", "")
+edge("silver", "gold", "")
+edge("gold", "wh", "")
+edge("gold", "ms", "", exit=(1, 0.8), entry=(0, 0.5), via=[(1195, 408), (1195, 474)])
+edge("ms", "ml", "")
+edge("gold", "lb", "load", dashed=True, exit=(0.5, 1), entry=(0.85, 0))
+edge("wh", "bi", "", exit=(1, 0.3), entry=(0, 0.5), via=[(1470, 334), (1470, 164)])
+edge("lb", "ls", "tasks · labels", dashed=True, exit=(1, 0.5), entry=(0.5, 1), via=[(1580, 622)])
+edge("lb", "atlas", "", exit=(1, 0.2), entry=(0, 0.5), via=[(1495, 609), (1495, 354)])
+edge("bi", "c1", ""); edge("ls", "c2", "", exit=(1, 0.5), entry=(0, 0.5)); edge("atlas", "c3", "")
+note("Today everything is synthetic: the generator writes fake-PHI notes to bronze so the de-identification and leak gate are exercised end to end. "
+     "Only de-identified data leaves bronze (Label Studio, models, LLM endpoints). Same layout in every environment; code deployed, not data or models.",
+     40, 730, 1790, 45)
+save("d0_medallion_architecture", page_w=1860, page_h=790)
 
 # ====================================================================== d1: study process
 reset()

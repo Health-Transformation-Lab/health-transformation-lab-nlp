@@ -4,6 +4,7 @@ draw.io sources with rendered PNGs, and Mermaid process flows. How they're built
 
 | Diagram | What it shows |
 |---|---|
+| [**d0 medallion architecture**](d0_medallion_architecture.png) ([.drawio](d0_medallion_architecture.drawio)) | Source → ingest → bronze (PHI zone) → silver (de-identified) → gold (OMOP + dental) → query and process → serve → consumers, on Databricks; same style as the Milliman diagrams |
 | [d1 study process](d1_study_process.png) ([.drawio](d1_study_process.drawio)) | Chart notes, exam forms, procedure codes and diagnoses (completed and planned) and the probing chart → comparison, qualitative review, rule-based phenotype, AI, reviewers, acceptance test |
 | [d2 platform architecture](d2_platform_architecture.png) ([.drawio](d2_platform_architecture.drawio)) | GitHub CI/CD → one bundle, three environments: jobs, Delta, Lakebase, MLflow, UC model, serving, Label Studio |
 | [d3 ERD](d3_erd_omop_dental.png) ([.drawio](d3_erd_omop_dental.drawio)) | OMOP CDM 5.4 tables used, dental extension (SITE, SITE_EVENT), local concepts, perio_chart view |
