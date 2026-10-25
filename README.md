@@ -12,9 +12,20 @@ the reviewer workflow and the analysis.
 
 ![Study process](docs/img/process.png)
 
-Seven sources per visit → compare methods → qualitative review → rule-based
-phenotyping algorithm → several reviewers stage the same charts in Label Studio,
-compared against the algorithm and the AI model. Details:
+**Seven sources per visit:**
+
+- Chart notes
+- Exam forms
+- Procedure codes, completed
+- Procedure codes, planned
+- Procedure diagnoses, completed
+- Procedure diagnoses, planned
+- Probing chart (CAL, radiographic bone loss, tooth loss from perio)
+
+Compare methods → qualitative review → rule-based phenotyping algorithm →
+several reviewers stage the same charts in Label Studio, compared against the
+algorithm and the AI model. Structured radiograph AI output is an exploratory
+eighth source ([docs/radiograph.md](docs/radiograph.md)). Details:
 [docs/process.md](docs/process.md).
 
 **Ground rules**
