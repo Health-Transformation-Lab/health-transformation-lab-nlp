@@ -80,6 +80,33 @@ def label_chart(chart: PerioChart) -> Status:
     return {1: Status.P1, 2: Status.P2, 3: Status.P3, 4: Status.P4}[stage]
 
 
+def grade_of(status: Status, rbl_pct: float, age: int, cigarettes_per_day: int = 0,
+             hba1c: float | None = None) -> str:
+    """2017 grade from indirect evidence (% bone loss / age) with risk-factor
+    modifiers. 'NA' when not periodontitis.
+
+        A  %RBL/age < 0.25, non-smoker, no diabetes
+        B  0.25-1.0, or smoker < 10 cig/day, or HbA1c < 7.0 with diabetes
+        C  > 1.0, or smoker >= 10 cig/day, or HbA1c >= 7.0
+    """
+    if not status.is_periodontitis:
+        return "NA"
+    ratio = rbl_pct / max(age, 1)
+    grade = "A" if ratio < 0.25 else "B" if ratio <= 1.0 else "C"
+    if cigarettes_per_day >= 10 or (hba1c is not None and hba1c >= 7.0):
+        return "C"
+    if (cigarettes_per_day > 0 or hba1c is not None) and grade == "A":
+        return "B"
+    return grade
+
+
+def extent_of(status: Status, pct_teeth_involved: float) -> str:
+    """Localized < 30% of teeth involved, generalized >= 30%. 'NA' when not periodontitis."""
+    if not status.is_periodontitis:
+        return "NA"
+    return "generalized" if pct_teeth_involved >= 30 else "localized"
+
+
 def label_row(row) -> str:
     """pandas apply helper: row with the perio_chart view's column names."""
     chart = PerioChart(

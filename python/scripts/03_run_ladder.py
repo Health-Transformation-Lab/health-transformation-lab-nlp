@@ -17,7 +17,7 @@ from dental_omop_nlp.registry import load_registry
 from dental_omop_nlp.rungs import make_rung
 
 sys.path.insert(0, str(REPO_ROOT / "eval"))
-from score import score, write  # noqa: E402
+from score import score, write
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--rungs", help="comma-separated rung ids")

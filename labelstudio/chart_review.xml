@@ -1,0 +1,84 @@
+<!--
+  Label Studio labeling config: periodontal chart review.
+
+  One task = one visit. The reviewer sees every source for that visit
+  (de-identified) and stages it, the way they would review a chart. The
+  free-text note is also span-annotatable so evidence can train/score NER.
+
+  Fields map 1:1 to labelstudio/import_review.py and docs/labeling_protocol.md.
+  Change a value here and you must change it there too.
+-->
+<View style="display: flex; gap: 1em">
+  <View style="flex: 60%">
+    <Header value="Chart note (de-identified)"/>
+    <Text name="note" value="$note" granularity="word"/>
+    <Labels name="evidence" toName="note" showInline="true">
+      <Label value="DIAGNOSIS" background="#7c3aed"/>
+      <Label value="PROBING_DEPTH" background="#2563eb"/>
+      <Label value="BOP" background="#0891b2"/>
+      <Label value="CAL" background="#059669"/>
+      <Label value="BONE_LOSS" background="#ca8a04"/>
+      <Label value="TOOTH_LOSS_PERIO" background="#dc2626"/>
+      <Label value="RISK_FACTOR" background="#9333ea"/>
+      <Label value="EXTENT" background="#64748b"/>
+      <Label value="NEGATION" background="#475569"/>
+      <Label value="COPIED_FORWARD" background="#a8a29e"/>
+    </Labels>
+
+    <Header value="Other sources"/>
+    <Text name="exam_form" value="Exam form: $exam_form"/>
+    <Text name="proc_codes_completed" value="Procedures completed (CDT): $proc_codes_completed"/>
+    <Text name="proc_codes_planned" value="Procedures planned (CDT): $proc_codes_planned"/>
+    <Text name="proc_dx_completed" value="Procedure diagnosis completed (ICD-10): $proc_dx_completed"/>
+    <Text name="proc_dx_planned" value="Procedure diagnosis planned (ICD-10): $proc_dx_planned"/>
+    <Text name="probing_chart" value="Probing chart: $probing_chart"/>
+    <Text name="age" value="Age at visit: $age"/>
+  </View>
+
+  <View style="flex: 40%">
+    <Header value="Periodontal status (2017 AAP/EFP)"/>
+    <Choices name="status" toName="note" choice="single" required="true">
+      <Choice value="healthy"/>
+      <Choice value="gingivitis"/>
+      <Choice value="periodontitis_stage_1"/>
+      <Choice value="periodontitis_stage_2"/>
+      <Choice value="periodontitis_stage_3"/>
+      <Choice value="periodontitis_stage_4"/>
+      <Choice value="cannot_determine"/>
+    </Choices>
+
+    <Header value="Grade (periodontitis only)"/>
+    <Choices name="grade" toName="note" choice="single">
+      <Choice value="A"/><Choice value="B"/><Choice value="C"/>
+      <Choice value="NA"/><Choice value="cannot_determine"/>
+    </Choices>
+
+    <Header value="Extent (periodontitis only)"/>
+    <Choices name="extent" toName="note" choice="single">
+      <Choice value="localized"/><Choice value="generalized"/>
+      <Choice value="NA"/><Choice value="cannot_determine"/>
+    </Choices>
+
+    <Header value="Which sources decided it? (all that apply)"/>
+    <Choices name="decided_by" toName="note" choice="multiple">
+      <Choice value="notes"/>
+      <Choice value="exam_form"/>
+      <Choice value="proc_codes_completed"/>
+      <Choice value="proc_codes_planned"/>
+      <Choice value="proc_dx_completed"/>
+      <Choice value="proc_dx_planned"/>
+      <Choice value="probing_chart"/>
+    </Choices>
+
+    <Header value="Sources conflict?"/>
+    <Choices name="conflict" toName="note" choice="single">
+      <Choice value="no"/><Choice value="yes"/>
+    </Choices>
+
+    <Header value="Confidence"/>
+    <Rating name="confidence" toName="note" maxRating="5"/>
+
+    <Header value="Comment (why, if conflicting or uncertain)"/>
+    <TextArea name="comment" toName="note" rows="3" editable="true"/>
+  </View>
+</View>

@@ -13,7 +13,7 @@ def load_registry(path: Path | str = MODELS_YAML) -> dict:
     with open(path) as f:
         reg = yaml.safe_load(f)
     ids = {m["id"] for m in reg["models"]}
-    builtins = {"rules_baseline", "structured_baseline", "tfidf_logreg", "llm_challenger"}
+    builtins = {"rules_baseline", "note_rules", "structured_baseline", "tfidf_logreg", "llm_challenger"}
     for ladder, rungs in reg["ladders"].items():
         unknown = [r for r in rungs if r not in ids | builtins]
         if unknown:

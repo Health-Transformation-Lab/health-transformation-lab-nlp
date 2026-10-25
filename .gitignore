@@ -231,3 +231,5 @@ mlruns/
 *.parquet
 !data/samples/*.parquet
 .databricks/
+data/review/*
+!data/review/simulated_*

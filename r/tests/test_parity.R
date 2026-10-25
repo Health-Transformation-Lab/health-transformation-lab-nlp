@@ -5,6 +5,7 @@
 source("r/R/labels.R")
 source("eval/score.R")
 
+if (file.exists("data/labels/labeled_notes.csv")) {
 notes <- read.csv("data/labels/labeled_notes.csv", stringsAsFactors = FALSE)
 split <- read.csv("data/labels/split.csv")
 
@@ -36,4 +37,24 @@ if (file.exists(py_res_file)) {
   stopifnot(max(diff) < 1e-9)
 } else cat("scorer:  skipped (python score file not found)\n")
 
-cat("parity OK\n")
+} else cat("labels/rules/scorer: skipped (run python scripts 01 + 02 + export_rules_predictions first)\n")
+
+# 4. Reliability: R 04_reliability.R == Python reliability.py (needs a simulated or real review run).
+py_rel <- "data/review/simulated_reliability/methods_vs_reviewers.csv"
+if (file.exists(py_rel) && file.exists("data/review/simulated_reviewer_labels.csv")) {
+  source("r/R/04_reliability.R")
+  labels <- read.csv("data/review/simulated_reviewer_labels.csv", stringsAsFactors = FALSE)
+  key <- read.csv("data/datasets/answer_key/review_key.csv", stringsAsFactors = FALSE)
+  py <- read.csv(py_rel, stringsAsFactors = FALSE)
+  compare <- setNames(lapply(setdiff(py$method, "generator_chart_truth"), function(m) {
+    if (startsWith(m, "ai:")) { p <- read.csv(sprintf("data/datasets/ai_predictions_%s.csv", sub("^ai:", "", m)))
+      setNames(p$pred, p$visit_id) } else setNames(key[[m]], key$visit_id)
+  }), setdiff(py$method, "generator_chart_truth"))
+  r <- reliability_report(labels, key, compare)$methods
+  r <- r[match(py$method, r$method), ]
+  num <- c("coverage", "pct_agree_consensus", "kappa_vs_consensus", "weighted_kappa_vs_consensus", "mean_kappa_vs_each_reviewer")
+  d <- max(abs(as.matrix(r[num]) - as.matrix(py[num])), na.rm = TRUE)
+  cat(sprintf("reliability: max |R - Python| = %.2e over %d methods\n", d, nrow(py)))
+  stopifnot(d < 1e-9)
+} else cat("reliability: skipped (run python scripts 12 --simulate and 13 --simulated first)\n")
+cat("parity OK (all sections)\n")

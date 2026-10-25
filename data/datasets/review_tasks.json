@@ -1,0 +1,3122 @@
+[
+ {
+  "data": {
+   "visit_id": 1408,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: PAN: crestal bone WNL, no attachment loss, no pocketing, no bleeding on probing. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 5% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 36
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2320,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BWX: crestal bone WNL\n- no bleeding on probing\n- PD 1-3mm WNL\nDx: Periodontium WNL.\nMed hx: no sig med hx; non-smoker.\nTx plan: Adult prophy. RTC 6 mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 1 mm | BOP 4% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 69
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1306,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; smoker ~3 cig/day. Exam: mild pocketing, localized BOP, radiographs: mild horizontal bone loss, slight attachment loss. Impression: Localized periodontitis Stage I Grade B. Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 19% | Max interproximal CAL 2 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 69
+  }
+ },
+ {
+  "data": {
+   "visit_id": 359,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; never smoker.\nO: max CAL 1mm interproximal; recession 1mm #22; PAN: bone loss to coronal third (~8%); BOP 31%; PD up to 4mm (#12 L 3mm, #30 M 3mm).\nA: \nP: 4 quad SRP then perio maint q3mo.\n\n-- copied from visit [DATE] --\nDx at that visit: gingivitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 31% | Max interproximal CAL 1 mm | RBL 8% | Teeth lost to perio: 0",
+   "age": 47
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1944,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; non-smoker. Exam: localized BOP, mild pocketing, slight attachment loss. Impression: Dental biofilm-induced gingivitis, localized. Prophy + OHI, re-eval gingiva next recall.\n\n-- copied from visit [DATE] --\nDx at that visit: gingivitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 15% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 31
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1138,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: HTN controlled; non-smoker.\nO: BOP 28%; attachment loss 4-5 mm; generalized 4-5mm pockets, localized #7 B 5mm, #9 D 6mm; PAN: bone loss to apical third (~47%).\nA: See perio chart.\nP: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 6 mm | BOP 28% | Max interproximal CAL 5 mm | RBL 47% | Teeth lost to perio: 0",
+   "age": 52
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1468,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- bleeding on probing 33% of sites\n- CAL up to 9mm; recession 3mm #6\n- max PD 9 mm\n- FMX: bone loss to apical third (~74%)\n- missing #2, #3, #9, #15, #30 (hx perio ext)\nDx: Stage IV/Grade C perio.\nMed hx: T2DM, last A1c 9.2; non-smoker.\nTx plan: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4910 D7140",
+   "proc_codes_planned": "D0180 D4341 D4910 D7140",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 9 mm | BOP 33% | Max interproximal CAL 9 mm | RBL 74% | Teeth lost to perio: 5",
+   "age": 59
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2400,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; former smoker, quit 2015. Exam: FMX: mild horizontal bone loss, mild pocketing, slight attachment loss; recession 3mm #22, BOP generalized. Impression: Perio IA, gen. Localized SRP, perio maint q4mo. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "Max PD 4 mm | BOP 21% | Max interproximal CAL 2 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 71,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: no sig med hx; former smoker, quit 2015. Exam: probing depths within normal limits, no BOP, recession 3mm #6. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 2% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 51
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2642,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: max PD 4 mm, PAN: moderate horizontal bone loss ~32%, max CAL 4mm interproximal, bleeding on probing 44% of sites. Impression: Localized slight chronic periodontitis. Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 44% | Max interproximal CAL 4 mm | RBL 32% | Teeth lost to perio: 0",
+   "age": 51
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2382,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: HTN controlled; never smoker.\nO: generalized 3-3mm pockets, localized #7 L 3mm, #9 DB 4mm, #19 DB 4mm, #29 DB 4mm; bleeding on probing 11% of sites; CAL 0; recession 2mm #22.\nA: \nP: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 11% | Max interproximal CAL 0 mm | RBL 4% | Teeth lost to perio: 0",
+   "age": 81
+  }
+ },
+ {
+  "data": {
+   "visit_id": 888,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; non-smoker. Exam: PAN: severe horizontal bone loss ~47%, bleeding on probing 39% of sites, max CAL 6mm interproximal; recession 2mm #22, generalized 4-5mm pockets, localized #7 DL 5mm, #30 ML 5mm, missing #2, #19 (hx perio ext). Impression: AAP Case Type IV. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 6 mm | BOP 39% | Max interproximal CAL 6 mm | RBL 47% | Teeth lost to perio: 2",
+   "age": 69
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2297,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; never smoker.\nO: generalized 3-3mm pockets, localized #6 DB 4mm, #24 D 4mm; CAL up to 1mm; BOP 16%; PAN: crestal bone WNL.\nA: Findings reviewed with pt.\nP: Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 20
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2229,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- radiographs: severe horizontal bone loss, vertical defect #3\n- hx extraction of 3 teeth d/t perio\n- severe attachment loss\n- deep pockets posterior sextants\n- heavy BOP\nDx: Generalized periodontitis Stage II Grade C.\nMed hx: no sig med hx; non-smoker.\nTx plan: SRP 4 quads, re-eval 4-6 wk. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 8 mm | BOP 49% | Max interproximal CAL 8 mm | RBL 45% | Teeth lost to perio: 3",
+   "age": 34
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1207,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; never smoker. Exam: probing depths within normal limits, BOP generalized, slight attachment loss. Impression: Perio IA, loc. Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 71
+  }
+ },
+ {
+  "data": {
+   "visit_id": 879,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PAN: bone loss to apical third (~61%)\n- max PD 6 mm\n- bleeding on probing 73% of sites\n- hx extraction of 5 teeth d/t perio\n- CAL up to 6mm\nDx: Findings reviewed with pt.\nMed hx: no sig med hx; non-smoker.\nTx plan: Referral to periodontist for comprehensive tx plan. Next appt [DATE].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 6 mm | BOP 73% | Max interproximal CAL 6 mm | RBL 61% | Teeth lost to perio: 5",
+   "age": 51
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2818,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: no sig med hx; smoker ~27 cig/day. Exam: radiographs: severe horizontal bone loss, BOP generalized, severe attachment loss; recession 1mm #6, deep pockets posterior sextants. Impression: Stage III/Grade C perio. SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 34% | Max interproximal CAL 7 mm | RBL 46% | Teeth lost to perio: 0",
+   "age": 66
+  }
+ },
+ {
+  "data": {
+   "visit_id": 151,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: NKDA; former smoker, quit 2015.\nO: recession 1mm #22; no BOP; PAN: crestal bone WNL; shallow sulci throughout.\nA: Findings reviewed with pt.\nP: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 79
+  }
+ },
+ {
+  "data": {
+   "visit_id": 64,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: T2DM, last A1c 8.2; smoker ~24 cig/day.\nO: FMX: moderate horizontal bone loss; heavy BOP; moderate pocketing posterior; moderate attachment loss.\nA: AAP Case Type III.\nP: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 5 mm | BOP 42% | Max interproximal CAL 4 mm | RBL 27% | Teeth lost to perio: 0",
+   "age": 36
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1833,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; smoker ~3 cig/day.\nO: heavy BOP; radiographs: moderate horizontal bone loss; moderate pocketing posterior; moderate attachment loss; recession 1mm #27.\nA: Stage II/Grade B perio.\nP: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 5 mm | BOP 41% | Max interproximal CAL 3 mm | RBL 20% | Teeth lost to perio: 0",
+   "age": 39
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1177,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: BOP 49%, PAN: moderate horizontal bone loss ~19%, generalized 3-4mm pockets, localized #5 MB 5mm, #20 MB 5mm, attachment loss 3-4 mm; recession 2mm #11. 4 quad SRP then perio maint q3mo. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "(not charted at this visit)",
+   "age": 68
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2467,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: no sig med hx; former smoker, quit 2015. Exam: radiographs: crestal bone WNL, PD 1-3mm WNL, no bleeding on probing. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 1 mm | BOP 1% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 56
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1937,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: no sig med hx; never smoker.\nO: max PD 8 mm; max CAL 8mm interproximal; recession 2mm #22; radiographs: bone loss to apical third (~53%); bleeding on probing 53% of sites; missing #3, #9, #14, #15, #18, #19, #24, #30, #31 (hx perio ext).\nA: Localized periodontitis Stage IV Grade B.\nP: Perio referral; prosthetic consult for edentulous areas.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341 D4910",
+   "proc_codes_planned": "D0180 D4341 D4910",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 8 mm | BOP 53% | Max interproximal CAL 8 mm | RBL 53% | Teeth lost to perio: 9",
+   "age": 59
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2987,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP <10%\n- probing depths within normal limits\nDx: Perio health.\nMed hx: pre-diabetic A1c 6.2; former smoker, quit 2015.\nTx plan: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 53
+  }
+ },
+ {
+  "data": {
+   "visit_id": 292,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: heavy BOP, deep pockets posterior sextants, severe attachment loss, missing #3, #9, #24, #31 (hx perio ext), PAN: severe horizontal bone loss, vertical defect #19. Impression: Gen. perio St IV Gr C. Perio referral; prosthetic consult for edentulous areas.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 7 mm | BOP 56% | Max interproximal CAL 8 mm | RBL 52% | Teeth lost to perio: 4",
+   "age": 35
+  }
+ },
+ {
+  "data": {
+   "visit_id": 336,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; former smoker, quit 2015. Exam: BOP 29%, max PD 5 mm, PAN: moderate horizontal bone loss ~26%, attachment loss 3-4 mm; recession 1mm #6. Impression: Perio IB, loc. SRP UR/LR, re-eval 6 wk. Next appt [DATE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage I periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 2; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 29% | Max interproximal CAL 4 mm | RBL 26% | Teeth lost to perio: 0",
+   "age": 28
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2620,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: NKDA; former smoker, quit 2015.\nO: BWX: crestal bone WNL; no pocketing; no bleeding on probing.\nA: Perio health.\nP: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1888,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP generalized\n- hx extraction of 2 teeth d/t perio\n- severe attachment loss; recession 1mm #6\n- deep pockets posterior sextants\n- FMX: severe horizontal bone loss, vertical defect #3\nDx: Localized severe chronic periodontitis.\nMed hx: NKDA; non-smoker.\nTx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 25% | Max interproximal CAL 6 mm | RBL 52% | Teeth lost to perio: 2",
+   "age": 37
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1103,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: NKDA; former smoker, quit 2015.\nO: heavy BOP; severe attachment loss; missing #3, #8, #9, #14, #15, #18, #19, #30 (hx perio ext); radiographs: severe horizontal bone loss; deep pockets posterior sextants.\nA: Gen. perio St IV Gr B.\nP: Perio referral; prosthetic consult for edentulous areas.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4910 D4260",
+   "proc_codes_planned": "D0180 D4341 D4910 D4260",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "(not charted at this visit)",
+   "age": 68
+  }
+ },
+ {
+  "data": {
+   "visit_id": 225,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: pre-diabetic A1c 5.8; never smoker.\nO: BOP generalized; moderate attachment loss; recession 2mm #6; moderate pocketing posterior; BWX: moderate horizontal bone loss.\nA: Findings reviewed with pt.\nP: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 36% | Max interproximal CAL 3 mm | RBL 21% | Teeth lost to perio: 0",
+   "age": 58
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1911,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: max PD 4 mm, attachment loss 1-2 mm, bleeding on probing 15% of sites. Impression: Generalized periodontitis Stage I Grade A. Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "Max PD 4 mm | BOP 15% | Max interproximal CAL 2 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 27
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2948,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; non-smoker.\nO: BOP 30%; radiographs: bone loss to apical third (~54%); CAL up to 10mm; recession 1mm #22; 6 teeth lost to periodontal disease; max PD 6 mm.\nA: Loc. perio St IV Gr B.\nP: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4910 D4260",
+   "proc_codes_planned": "D0180 D4341 D4910 D4260",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 6 mm | BOP 30% | Max interproximal CAL 10 mm | RBL 54% | Teeth lost to perio: 6",
+   "age": 61
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1322,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: no sig med hx; smoker ~1 cig/day.\nO: no pocketing; no bleeding on probing; no attachment loss; PAN: crestal bone WNL.\nA: Clinical gingival health on an intact periodontium.\nP: Adult prophy. RTC 6 mo. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 1 mm | BOP 3% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 24
+  }
+ },
+ {
+  "data": {
+   "visit_id": 489,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: no sig med hx; former smoker, quit 2015.\nO: radiographs: severe horizontal bone loss, vertical defect #19; severe attachment loss; recession 1mm #6; heavy BOP; 1 teeth lost to periodontal disease; deep pockets posterior sextants.\nA: Generalized periodontitis Stage III Grade C.\nP: FM SRP, refer to periodontist.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 8 mm | BOP 60% | Max interproximal CAL 8 mm | RBL 59% | Teeth lost to perio: 1",
+   "age": 43
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2790,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; non-smoker.\nO: recession 1mm #11; BWX: crestal bone WNL; no pocketing; no bleeding on probing.\nA: Perio health.\nP: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "(not charted at this visit)",
+   "age": 64
+  }
+ },
+ {
+  "data": {
+   "visit_id": 544,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; never smoker.\nO: probing depths within normal limits; BOP 20%.\nA: Dental biofilm-induced gingivitis, generalized.\nP: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 20% | Max interproximal CAL 0 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 75
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1801,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PD up to 7mm (#23 DB 6mm, #31 B 6mm)\n- max CAL 7mm interproximal\n- FMX: severe horizontal bone loss ~60%\n- 1 teeth lost to periodontal disease\n- bleeding on probing 45% of sites\nDx: Generalized periodontitis Stage III Grade C.\nMed hx: NKDA; non-smoker.\nTx plan: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 7 mm | BOP 45% | Max interproximal CAL 7 mm | RBL 60% | Teeth lost to perio: 1",
+   "age": 26
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1815,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: BOP 43%, no attachment loss, probing depths within normal limits. Impression: See perio chart. Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 71
+  }
+ },
+ {
+  "data": {
+   "visit_id": 908,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- localized BOP\n- CAL 0\n- BWX: crestal bone WNL\n- shallow sulci throughout\nDx: See perio chart.\nMed hx: pre-diabetic A1c 6.4; non-smoker.\nTx plan: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 16% | Max interproximal CAL 0 mm | RBL 5% | Teeth lost to perio: 0",
+   "age": 35
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1036,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: missing #8, #9, #14, #31 (hx perio ext), PD up to 7mm (#2 DB 7mm, #19 B 7mm), PAN: severe horizontal bone loss ~45%, max CAL 6mm interproximal, BOP 50%. Impression: See perio chart. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 50% | Max interproximal CAL 6 mm | RBL 45% | Teeth lost to perio: 4",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1220,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: pre-diabetic A1c 5.9; former smoker, quit 2015. Exam: heavy BOP, hx extraction of 8 teeth d/t perio, deep pockets posterior sextants, severe attachment loss, radiographs: severe horizontal bone loss. Impression: Localized periodontitis Stage IV Grade B. Referral to periodontist for comprehensive tx plan. Next appt [DATE].",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 6 mm | BOP 53% | Max interproximal CAL 6 mm | RBL 55% | Teeth lost to perio: 8",
+   "age": 69
+  }
+ },
+ {
+  "data": {
+   "visit_id": 277,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: slight attachment loss, BOP generalized, FMX: mild horizontal bone loss, shallow sulci throughout. Impression: Loc. perio St I Gr A. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 36% | Max interproximal CAL 2 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2765,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.\nO: 6 teeth lost to periodontal disease; BOP 36%; PAN: bone loss to apical third (~46%); CAL up to 5mm; recession 1mm #27; PD up to 7mm (#7 B 7mm, #10 ML 7mm).\nA: Generalized periodontitis Stage IV Grade C.\nP: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].",
+   "exam_form": "PSR max 3*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341 D7140 D4260",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 36% | Max interproximal CAL 5 mm | RBL 46% | Teeth lost to perio: 6",
+   "age": 27
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2077,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; smoker ~7 cig/day.\nO: no pocketing; PAN: crestal bone WNL; no bleeding on probing; recession 2mm #6.\nA: Periodontium WNL.\nP: Adult prophy. RTC 6 mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 3% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 28
+  }
+ },
+ {
+  "data": {
+   "visit_id": 723,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; smoker ~13 cig/day.\nO: BOP 48%; FMX: moderate horizontal bone loss ~23%; CAL up to 3mm; recession 3mm #22; PD up to 4mm (#15 M 4mm, #21 M 4mm).\nA: Loc. perio St III Gr C.\nP: SRP 4 quads; perio consult for surgical eval.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 48% | Max interproximal CAL 3 mm | RBL 23% | Teeth lost to perio: 0",
+   "age": 36
+  }
+ },
+ {
+  "data": {
+   "visit_id": 738,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: NKDA; non-smoker.\nO: CAL up to 1mm; BOP 24%; PD 1-3mm WNL; PAN: mild horizontal bone loss ~6%.\nA: \nP: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 24% | Max interproximal CAL 1 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 40
+  }
+ },
+ {
+  "data": {
+   "visit_id": 247,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PAN: bone loss to middle third (~30%)\n- BOP 22%\n- attachment loss 3-4 mm\n- max PD 4 mm\nDx: Stage II/Grade B perio.\nMed hx: no sig med hx; never smoker.\nTx plan: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 56
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2730,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; smoker ~1 cig/day. Exam: no attachment loss; recession 2mm #27, shallow sulci throughout, radiographs: mild horizontal bone loss ~9%, bleeding on probing 30% of sites. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 3 mm | BOP 30% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2518,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- mild pocketing\n- BWX: moderate horizontal bone loss\n- moderate attachment loss\n- BOP generalized\nDx: Localized periodontitis Stage II Grade B.\nMed hx: pre-diabetic A1c 6.4; non-smoker.\nTx plan: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 4 mm | BOP 26% | Max interproximal CAL 4 mm | RBL 29% | Teeth lost to perio: 0",
+   "age": 40
+  }
+ },
+ {
+  "data": {
+   "visit_id": 563,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; smoker ~1 cig/day. Exam: probing depths within normal limits, BOP 35%, attachment loss 1-1 mm, FMX: mild horizontal bone loss ~7%. Impression: See perio chart. Prophy + OHI, re-eval gingiva next recall. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 35% | Max interproximal CAL 1 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 42
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1460,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PD up to 8mm (#4 L 8mm, #5 B 7mm)\n- BWX: severe horizontal bone loss ~56%\n- max CAL 6mm interproximal; recession 1mm #11\n- bleeding on probing 37% of sites\nDx: Gen. perio St III Gr B.\nMed hx: NKDA; former smoker, quit 2015.\nTx plan: FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "(not charted at this visit)",
+   "age": 57
+  }
+ },
+ {
+  "data": {
+   "visit_id": 836,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; smoker ~3 cig/day.\nO: severe attachment loss; deep pockets posterior sextants; 4 teeth lost to periodontal disease; heavy BOP; FMX: severe horizontal bone loss.\nA: Generalized periodontitis Stage III Grade C.\nP: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 6 mm | BOP 57% | Max interproximal CAL 7 mm | RBL 55% | Teeth lost to perio: 4",
+   "age": 41
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1931,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: BOP generalized, deep pockets posterior sextants, radiographs: severe horizontal bone loss, vertical defect #3, 4 teeth lost to periodontal disease, severe attachment loss. Impression: AAP Case Type IV. SRP 4 quads; perio consult for surgical eval.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 8 mm | BOP 28% | Max interproximal CAL 7 mm | RBL 36% | Teeth lost to perio: 4",
+   "age": 30
+  }
+ },
+ {
+  "data": {
+   "visit_id": 650,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: no sig med hx; never smoker.\nO: BOP 59%; generalized 5-6mm pockets, localized #7 L 6mm, #13 D 7mm, #15 L 6mm, #29 DB 6mm; FMX: bone loss to apical third (~47%); attachment loss 5-6 mm.\nA: Localized periodontitis Stage III Grade B.\nP: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 59% | Max interproximal CAL 6 mm | RBL 47% | Teeth lost to perio: 0",
+   "age": 56
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1861,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: deep pockets posterior sextants, severe attachment loss, hx extraction of 5 teeth d/t perio, FMX: severe horizontal bone loss, heavy BOP. Impression: Stage IV/Grade C perio. Perio referral; prosthetic consult for edentulous areas. Next appt [DATE].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341 D4910 D4260",
+   "proc_codes_planned": "D0180 D4341 D4910 D4260",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 9 mm | BOP 57% | Max interproximal CAL 9 mm | RBL 70% | Teeth lost to perio: 5",
+   "age": 67
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2267,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- 1 teeth lost to periodontal disease\n- generalized 5-6mm pockets, localized #6 L 7mm, #22 L 7mm, #29 ML 6mm\n- FMX: severe horizontal bone loss ~39%\n- max CAL 7mm interproximal\n- bleeding on probing 39% of sites\nDx: Findings reviewed with pt.\nMed hx: T2DM, last A1c 10.0; non-smoker.\nTx plan: FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 39% | Max interproximal CAL 7 mm | RBL 39% | Teeth lost to perio: 1",
+   "age": 32
+  }
+ },
+ {
+  "data": {
+   "visit_id": 22,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: NKDA; smoker ~17 cig/day. Exam: attachment loss 1-2 mm, bleeding on probing 36% of sites, generalized 3-3mm pockets, localized #7 MB 4mm, #10 DL 4mm. Impression: Localized periodontitis Stage I Grade C. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 20
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1363,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: pre-diabetic A1c 6.4; smoker ~17 cig/day.\nO: radiographs: severe horizontal bone loss, vertical defect #14; missing #2, #9, #15, #25, #30 (hx perio ext); heavy BOP; deep pockets posterior sextants; severe attachment loss.\nA: Localized severe chronic periodontitis.\nP: Referral to periodontist for comprehensive tx plan.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage III periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 10 mm | BOP 74% | Max interproximal CAL 6 mm | RBL 66% | Teeth lost to perio: 5",
+   "age": 26
+  }
+ },
+ {
+  "data": {
+   "visit_id": 612,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: attachment loss 1-1 mm, radiographs: mild horizontal bone loss ~7%, bleeding on probing 26% of sites, probing depths within normal limits. Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 2 mm | BOP 26% | Max interproximal CAL 1 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1970,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: NKDA; former smoker, quit 2015.\nO: PAN: moderate horizontal bone loss; moderate attachment loss; recession 1mm #22; moderate pocketing posterior; localized BOP.\nA: See perio chart.\nP: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 19% | Max interproximal CAL 3 mm | RBL 26% | Teeth lost to perio: 0",
+   "age": 69
+  }
+ },
+ {
+  "data": {
+   "visit_id": 284,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PD 1-3mm WNL\n- max CAL 1mm interproximal\n- BWX: mild horizontal bone loss ~9%\n- BOP 10%\nDx: Loc. perio St I Gr B.\nMed hx: no sig med hx; smoker ~2 cig/day.\nTx plan: Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 3 mm | BOP 10% | Max interproximal CAL 1 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 67
+  }
+ },
+ {
+  "data": {
+   "visit_id": 194,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP 27%\n- FMX: bone loss to middle third (~33%)\n- max PD 4 mm\n- attachment loss 2-3 mm\nDx: Perio IIC, gen.\nMed hx: NKDA; former smoker, quit 2015.\nTx plan: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 27% | Max interproximal CAL 3 mm | RBL 33% | Teeth lost to perio: 0",
+   "age": 32
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2694,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: no sig med hx; never smoker.\nO: mild pocketing; BOP generalized; slight attachment loss; PAN: mild horizontal bone loss.\nA: Loc. perio St I Gr B.\nP: Localized SRP, perio maint q4mo. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 38% | Max interproximal CAL 1 mm | RBL 11% | Teeth lost to perio: 0",
+   "age": 28
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1526,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: no sig med hx; non-smoker.\nO: probing depths within normal limits; PAN: crestal bone WNL; slight attachment loss; localized BOP.\nA: Dental biofilm-induced gingivitis, localized.\nP: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 47
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2288,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; non-smoker.\nO: BWX: mild horizontal bone loss ~12%; max CAL 1mm interproximal; PD up to 4mm (#22 B 4mm, #23 ML 4mm); BOP 10%.\nA: Stage II/Grade B perio.\nP: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 10% | Max interproximal CAL 1 mm | RBL 12% | Teeth lost to perio: 0",
+   "age": 23
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2793,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BWX: crestal bone WNL\n- BOP 26%\n- shallow sulci throughout\nDx: AAP Case Type I.\nMed hx: no sig med hx; never smoker.\nTx plan: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 26% | Max interproximal CAL 0 mm | RBL 2% | Teeth lost to perio: 0",
+   "age": 44
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1890,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; non-smoker. Exam: BOP 32%, attachment loss 1-1 mm; recession 3mm #11, shallow sulci throughout, radiographs: bone loss to coronal third (~6%). Impression: Gingivitis. Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 32% | Max interproximal CAL 1 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 60
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2451,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: T2DM, last A1c 6.7; smoker ~24 cig/day.\nO: mild pocketing; localized BOP; radiographs: crestal bone WNL; slight attachment loss.\nA: Localized periodontitis Stage I Grade C.\nP: SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 15% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 43
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1737,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; former smoker, quit 2015.\nO: bleeding on probing 22% of sites; probing depths within normal limits; PAN: crestal bone WNL; CAL up to 1mm; recession 1mm #11.\nA: AAP Case Type II.\nP: SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 22% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 52
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2717,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: T2DM, last A1c 6.7; former smoker, quit 2015. Exam: BOP 70%, missing #2, #3 (hx perio ext), attachment loss 6-7 mm, generalized 6-7mm pockets, localized #8 L 7mm, #14 ML 7mm, #22 M 7mm, PAN: severe horizontal bone loss ~59%. Impression: AAP Case Type IV. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 8 mm | BOP 70% | Max interproximal CAL 7 mm | RBL 59% | Teeth lost to perio: 2",
+   "age": 74
+  }
+ },
+ {
+  "data": {
+   "visit_id": 847,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- generalized 4-5mm pockets, localized #10 L 5mm, #12 M 5mm, #20 B 5mm, #21 D 6mm\n- BOP 32%\n- FMX: severe horizontal bone loss ~56%\n- max CAL 7mm interproximal\nDx: Localized severe chronic periodontitis.\nMed hx: NKDA; never smoker.\nTx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 6 mm | BOP 32% | Max interproximal CAL 7 mm | RBL 56% | Teeth lost to perio: 0",
+   "age": 71
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2810,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: mild pocketing, BOP generalized, PAN: mild horizontal bone loss, slight attachment loss. Impression: Localized periodontitis Stage I Grade B. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 22
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1072,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.\nO: no BOP; PD 1-3mm WNL; no attachment loss.\nA: Periodontium WNL.\nP: Adult prophy. RTC 6 mo.",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 1 mm | BOP 1% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 25
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2160,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: bleeding on probing 17% of sites, radiographs: crestal bone WNL, CAL up to 1mm, shallow sulci throughout. Impression: Generalized periodontitis Stage I Grade A. Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 3 mm | BOP 17% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2348,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PAN: crestal bone WNL\n- CAL 0; recession 1mm #11\n- BOP generalized\n- shallow sulci throughout\nMed hx: NKDA; non-smoker.\nTx plan: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 30% | Max interproximal CAL 0 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 49
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2136,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; never smoker.\nO: radiographs: crestal bone WNL; PD 1-3mm WNL; slight attachment loss; localized BOP.\nA: Findings reviewed with pt.\nP: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 13% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1628,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: T2DM, last A1c 6.9; smoker ~7 cig/day.\nO: BOP <10%; probing depths within normal limits.\nA: Clinical gingival health on an intact periodontium.\nP: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 9% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 725,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; non-smoker. Exam: BWX: mild horizontal bone loss ~6%, BOP 37%, PD 1-3mm WNL, CAL up to 1mm. Impression: Gingivitis. Prophy, flossing instruction. 6 mo recall. Next appt [DATE].",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 60
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2471,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PD up to 5mm (#13 D 5mm, #23 L 4mm)\n- PAN: moderate horizontal bone loss ~16%\n- attachment loss 2-3 mm\n- BOP 25%\nDx: Stage II/Grade B perio.\nMed hx: T2DM, last A1c 6.8; never smoker.\nTx plan: 4 quad SRP then perio maint q3mo. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 5 mm | BOP 25% | Max interproximal CAL 3 mm | RBL 16% | Teeth lost to perio: 0",
+   "age": 22
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1824,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP 36%\n- max PD 5 mm\n- PAN: bone loss to middle third (~30%)\n- max CAL 4mm interproximal; recession 1mm #11\nDx: See perio chart.\nMed hx: no sig med hx; former smoker, quit 2015.\nTx plan: 4 quad SRP then perio maint q3mo. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 5 mm | BOP 36% | Max interproximal CAL 4 mm | RBL 30% | Teeth lost to perio: 0",
+   "age": 44
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1231,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- max PD 4 mm\n- BWX: mild horizontal bone loss ~14%\n- CAL up to 2mm; recession 3mm #27\n- BOP 20%\nDx: Loc. perio St I Gr B.\nMed hx: HTN controlled; former smoker, quit 2015.\nTx plan: Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 20% | Max interproximal CAL 2 mm | RBL 14% | Teeth lost to perio: 0",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1894,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- no attachment loss\n- BOP 11%\n- probing depths within normal limits\n- FMX: bone loss to coronal third (~6%)\nMed hx: NKDA; smoker ~1 cig/day.\nTx plan: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 11% | Max interproximal CAL 0 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 33
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2762,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: severe attachment loss, 5 teeth lost to periodontal disease, deep pockets posterior sextants, BOP generalized, FMX: severe horizontal bone loss. Impression: AAP Case Type IV. Referral to periodontist for comprehensive tx plan. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 32% | Max interproximal CAL 9 mm | RBL 47% | Teeth lost to perio: 5",
+   "age": 33
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1097,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BWX: severe horizontal bone loss\n- 1 teeth lost to periodontal disease\n- deep pockets posterior sextants\n- severe attachment loss\n- heavy BOP\nDx: Perio IIIB, gen.\nMed hx: NKDA; non-smoker.\nTx plan: FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 7 mm | BOP 55% | Max interproximal CAL 7 mm | RBL 50% | Teeth lost to perio: 1",
+   "age": 72
+  }
+ },
+ {
+  "data": {
+   "visit_id": 511,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP generalized\n- moderate pocketing posterior\n- moderate attachment loss; recession 1mm #6\n- PAN: moderate horizontal bone loss\nDx: Localized periodontitis Stage II Grade C.\nMed hx: NKDA; smoker ~18 cig/day.\nTx plan: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 5 mm | BOP 32% | Max interproximal CAL 3 mm | RBL 16% | Teeth lost to perio: 0",
+   "age": 59
+  }
+ },
+ {
+  "data": {
+   "visit_id": 546,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: no bleeding on probing, no attachment loss, no pocketing, FMX: crestal bone WNL. Impression: Clinical gingival health on an intact periodontium. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 56
+  }
+ },
+ {
+  "data": {
+   "visit_id": 992,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: recession 2mm #22, no BOP, PD 1-3mm WNL. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo. Next appt [DATE].",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 1 mm | BOP 6% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 30
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2176,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: NKDA; smoker ~24 cig/day.\nO: minimal BOP; CAL 0; recession 1mm #22; probing depths within normal limits.\nA: Perio health.\nP: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "(not charted at this visit)",
+   "age": 69
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1522,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- CAL 0\n- PAN: crestal bone WNL\n- no bleeding on probing\n- shallow sulci throughout\nDx: See perio chart.\nMed hx: HTN controlled; non-smoker.\nTx plan: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 2 mm | BOP 6% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 38
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2843,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: no sig med hx; non-smoker.\nO: FMX: crestal bone WNL; bleeding on probing 42% of sites; PD up to 4mm (#20 MB 4mm, #25 D 3mm); attachment loss 1-1 mm.\nA: AAP Case Type I.\nP: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 4 mm | BOP 42% | Max interproximal CAL 1 mm | RBL 4% | Teeth lost to perio: 0",
+   "age": 80
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1057,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: hx extraction of 7 teeth d/t perio, PAN: bone loss to apical third (~66%), attachment loss 5-6 mm; recession 2mm #27, max PD 8 mm, BOP 37%. Impression: Generalized periodontitis Stage IV Grade B. Referral to periodontist for comprehensive tx plan.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 8 mm | BOP 37% | Max interproximal CAL 6 mm | RBL 66% | Teeth lost to perio: 7",
+   "age": 66
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1572,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: no sig med hx; non-smoker.\nO: BWX: moderate horizontal bone loss ~28%; PD up to 5mm (#20 B 4mm, #24 B 4mm); CAL up to 4mm; bleeding on probing 16% of sites.\nA: \nP: 4 quad SRP then perio maint q3mo. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 79
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1398,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PD up to 5mm (#23 D 5mm, #28 B 4mm)\n- FMX: moderate horizontal bone loss ~32%\n- bleeding on probing 29% of sites\n- attachment loss 2-3 mm\nDx: See perio chart.\nMed hx: NKDA; never smoker.\nTx plan: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 29% | Max interproximal CAL 3 mm | RBL 32% | Teeth lost to perio: 0",
+   "age": 50
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1149,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- localized BOP\n- slight attachment loss; recession 3mm #27\n- mild pocketing\n- PAN: crestal bone WNL\nDx: See perio chart.\nMed hx: T2DM, last A1c 9.2; smoker ~26 cig/day.\nTx plan: Prophy, flossing instruction. 6 mo recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 4 mm | BOP 19% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "age": 69
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2709,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: HTN controlled; former smoker, quit 2015.\nO: radiographs: moderate horizontal bone loss; moderate attachment loss; localized BOP; moderate pocketing posterior.\nA: Localized periodontitis Stage II Grade C.\nP: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 5 mm | BOP 16% | Max interproximal CAL 3 mm | RBL 30% | Teeth lost to perio: 0",
+   "age": 20
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1151,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: no sig med hx; former smoker, quit 2015.\nO: PAN: severe horizontal bone loss ~55%; generalized 4-5mm pockets, localized #6 B 6mm, #11 L 5mm, #25 M 6mm; hx extraction of 4 teeth d/t perio; bleeding on probing 34% of sites; max CAL 8mm interproximal.\nA: Localized severe chronic periodontitis.\nP: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 6 mm | BOP 34% | Max interproximal CAL 8 mm | RBL 55% | Teeth lost to perio: 4",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1391,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- no pocketing\n- BOP generalized\n- radiographs: mild horizontal bone loss\n- slight attachment loss\nMed hx: HTN controlled; non-smoker.\nTx plan: Prophy, flossing instruction. 6 mo recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 2 mm | BOP 34% | Max interproximal CAL 1 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 53
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2610,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: HTN controlled; former smoker, quit 2015.\nO: BWX: bone loss to coronal third (~5%); no attachment loss; recession 2mm #22; probing depths within normal limits; bleeding on probing 22% of sites.\nA: Gingivitis.\nP: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 2 mm | BOP 22% | Max interproximal CAL 0 mm | RBL 5% | Teeth lost to perio: 0",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1125,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; never smoker.\nO: FMX: bone loss to middle third (~27%); CAL up to 3mm; BOP 41%; max PD 5 mm.\nA: Loc. perio St II Gr B.\nP: SRP 4 quads, re-eval 4-6 wk.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage I periodontitis. Pt declined SRP at that time.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 41% | Max interproximal CAL 3 mm | RBL 27% | Teeth lost to perio: 0",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 118,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.0; smoker ~4 cig/day. Exam: BWX: moderate horizontal bone loss ~16%, max CAL 3mm interproximal, max PD 5 mm, BOP 30%. Impression: Generalized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk. Next appt [DATE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage I periodontitis. Pt declined SRP at that time.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 25
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1293,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- no pocketing\n- no attachment loss; recession 1mm #22\n- PAN: mild horizontal bone loss\n- BOP generalized\nDx: Gingivitis.\nMed hx: NKDA; never smoker.\nTx plan: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 33% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 41
+  }
+ },
+ {
+  "data": {
+   "visit_id": 3007,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: pre-diabetic A1c 5.8; former smoker, quit 2015.\nO: CAL up to 4mm; BOP 44%; PAN: moderate horizontal bone loss ~24%; max PD 4 mm.\nA: Generalized periodontitis Stage II Grade C.\nP: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 44% | Max interproximal CAL 4 mm | RBL 24% | Teeth lost to perio: 0",
+   "age": 21
+  }
+ },
+ {
+  "data": {
+   "visit_id": 130,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: HTN controlled; smoker ~18 cig/day. Exam: no BOP, radiographs: crestal bone WNL, CAL 0; recession 3mm #22, probing depths within normal limits. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 25
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2193,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: T2DM, last A1c 6.5; former smoker, quit 2015.\nO: radiographs: severe horizontal bone loss, vertical defect #19; BOP generalized; deep pockets posterior sextants; severe attachment loss; missing #3, #9, #14, #15, #18, #19, #25 (hx perio ext).\nA: See perio chart.\nP: Referral to periodontist for comprehensive tx plan.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 9 mm | BOP 37% | Max interproximal CAL 9 mm | RBL 56% | Teeth lost to perio: 7",
+   "age": 30
+  }
+ },
+ {
+  "data": {
+   "visit_id": 469,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: bleeding on probing 31% of sites, hx extraction of 6 teeth d/t perio, max PD 7 mm, radiographs: bone loss to apical third (~48%), max CAL 5mm interproximal. Impression: Generalized periodontitis Stage III Grade C. FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 31% | Max interproximal CAL 5 mm | RBL 48% | Teeth lost to perio: 6",
+   "age": 20
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2102,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: radiographs: severe horizontal bone loss, vertical defect #30, hx extraction of 5 teeth d/t perio, deep pockets posterior sextants, severe attachment loss; recession 2mm #11, heavy BOP. Impression: Perio IIIB, loc. SRP 4 quads; perio consult for surgical eval.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4260 D7140",
+   "proc_codes_planned": "D0180 D4341 D4260 D7140",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 8 mm | BOP 59% | Max interproximal CAL 6 mm | RBL 60% | Teeth lost to perio: 5",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 122,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.2; smoker ~8 cig/day. Exam: mild pocketing, heavy BOP, moderate attachment loss; recession 3mm #27, FMX: moderate horizontal bone loss. Impression: AAP Case Type III. SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "Max PD 4 mm | BOP 45% | Max interproximal CAL 3 mm | RBL 22% | Teeth lost to perio: 0",
+   "age": 66
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1538,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: probing depths within normal limits, no BOP. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo. Next appt [DATE].",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 47
+  }
+ },
+ {
+  "data": {
+   "visit_id": 483,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; former smoker, quit 2015. Exam: BOP <10%, shallow sulci throughout, CAL 0, PAN: crestal bone WNL. Impression: Periodontium WNL. Adult prophy. RTC 6 mo. Next appt [DATE].",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 2 mm | BOP 8% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 72
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1001,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: BOP generalized, probing depths within normal limits, slight attachment loss; recession 3mm #11, PAN: mild horizontal bone loss. Impression: Findings reviewed with pt. Prophy, flossing instruction. 6 mo recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 64
+  }
+ },
+ {
+  "data": {
+   "visit_id": 209,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; non-smoker.\nO: BWX: mild horizontal bone loss; no attachment loss; recession 2mm #6; shallow sulci throughout; localized BOP.\nA: Clinical gingival health on an intact periodontium.\nP: Prophy, OHI. Recall 6 mo. Pt moved; new address [LOCATION].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "(not charted at this visit)",
+   "age": 27
+  }
+ },
+ {
+  "data": {
+   "visit_id": 573,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP generalized\n- slight attachment loss\n- BWX: mild horizontal bone loss\n- mild pocketing\nDx: Perio IA, gen.\nMed hx: NKDA; former smoker, quit 2015.\nTx plan: Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.321",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 4 mm | BOP 28% | Max interproximal CAL 1 mm | RBL 11% | Teeth lost to perio: 0",
+   "age": 76
+  }
+ },
+ {
+  "data": {
+   "visit_id": 640,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- FMX: mild horizontal bone loss\n- localized BOP\n- slight attachment loss; recession 3mm #6\n- mild pocketing\nDx: Findings reviewed with pt.\nMed hx: T2DM, last A1c 6.5; non-smoker.\nTx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.321",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "Max PD 4 mm | BOP 11% | Max interproximal CAL 2 mm | RBL 5% | Teeth lost to perio: 0",
+   "age": 35
+  }
+ },
+ {
+  "data": {
+   "visit_id": 976,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: NKDA; smoker ~8 cig/day.\nO: max CAL 4mm interproximal; recession 3mm #27; BOP 47%; PAN: moderate horizontal bone loss ~33%; max PD 5 mm.\nA: Generalized periodontitis Stage II Grade B.\nP: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 5 mm | BOP 47% | Max interproximal CAL 4 mm | RBL 33% | Teeth lost to perio: 0",
+   "age": 54
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1279,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: no sig med hx; smoker ~19 cig/day.\nO: severe attachment loss; deep pockets posterior sextants; heavy BOP; missing #2, #8, #15, #30 (hx perio ext); radiographs: severe horizontal bone loss.\nA: Findings reviewed with pt.\nP: Perio referral; prosthetic consult for edentulous areas.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 8 mm | BOP 60% | Max interproximal CAL 6 mm | RBL 58% | Teeth lost to perio: 4",
+   "age": 73
+  }
+ },
+ {
+  "data": {
+   "visit_id": 476,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- bleeding on probing 22% of sites\n- shallow sulci throughout\n- CAL up to 2mm\n- FMX: bone loss to coronal third (~7%)\nMed hx: HTN controlled; non-smoker.\nTx plan: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 22% | Max interproximal CAL 2 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 51
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1877,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; former smoker, quit 2015. Exam: slight attachment loss, BOP generalized, probing depths within normal limits. Impression: See perio chart. SRP UR/LR, re-eval 6 wk. Pt moved; new address [LOCATION].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 3 mm | BOP 37% | Max interproximal CAL 2 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 74
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2653,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: T2DM, last A1c 7.8; non-smoker. Exam: FMX: moderate horizontal bone loss, moderate attachment loss, mild pocketing, BOP generalized. Impression: AAP Case Type III. 4 quad SRP then perio maint q3mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "(not charted at this visit)",
+   "age": 57
+  }
+ },
+ {
+  "data": {
+   "visit_id": 144,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP 48%\n- CAL up to 3mm\n- radiographs: bone loss to middle third (~17%)\n- generalized 3-4mm pockets, localized #12 M 5mm, #22 B 4mm, #31 DL 4mm\nDx: Findings reviewed with pt.\nMed hx: T2DM, last A1c 6.5; non-smoker.\nTx plan: FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 5 mm | BOP 48% | Max interproximal CAL 3 mm | RBL 17% | Teeth lost to perio: 0",
+   "age": 54
+  }
+ },
+ {
+  "data": {
+   "visit_id": 482,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; non-smoker. Exam: bleeding on probing 33% of sites, BWX: bone loss to coronal third (~8%), attachment loss 1-1 mm, max PD 4 mm. SRP UR/LR, re-eval 6 wk. Pt moved; new address [LOCATION].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 33% | Max interproximal CAL 1 mm | RBL 8% | Teeth lost to perio: 0",
+   "age": 37
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1006,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: NKDA; never smoker. Exam: shallow sulci throughout, BOP 17%, CAL up to 1mm; recession 1mm #27. Impression: See perio chart. Prophy, flossing instruction. 6 mo recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 72
+  }
+ },
+ {
+  "data": {
+   "visit_id": 42,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: pre-diabetic A1c 5.8; non-smoker. Exam: BOP generalized, moderate pocketing posterior, FMX: moderate horizontal bone loss, moderate attachment loss. Impression: Localized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 20% | Max interproximal CAL 3 mm | RBL 27% | Teeth lost to perio: 0",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 296,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: T2DM, last A1c 8.2; non-smoker. Exam: PAN: mild horizontal bone loss, no pocketing, heavy BOP, slight attachment loss. Impression: Plaque-induced gingivitis. Prophy + OHI, re-eval gingiva next recall. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 30
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2698,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: no sig med hx; non-smoker.\nO: radiographs: crestal bone WNL; no pocketing; CAL 0; no bleeding on probing.\nA: Periodontium WNL.\nP: Adult prophy. RTC 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 1 mm | BOP 6% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 39
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1711,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: T2DM, last A1c 6.8; former smoker, quit 2015.\nO: BOP 14%; max PD 4 mm; CAL up to 1mm; radiographs: bone loss to coronal third (~6%).\nA: Localized periodontitis Stage I Grade B.\nP: SRP UR/LR, re-eval 6 wk.\n\n-- copied from visit [DATE] --\nDx at that visit: gingivitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 14% | Max interproximal CAL 1 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 50
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2593,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.3; non-smoker. Exam: BOP generalized, BWX: moderate horizontal bone loss, moderate attachment loss, moderate pocketing posterior. Impression: Localized moderate chronic periodontitis. 4 quad SRP then perio maint q3mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 39% | Max interproximal CAL 4 mm | RBL 28% | Teeth lost to perio: 0",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1187,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: FMX: severe horizontal bone loss, vertical defect #3, missing #2, #25, #30 (hx perio ext), severe attachment loss, heavy BOP, deep pockets posterior sextants. Impression: See perio chart. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 56% | Max interproximal CAL 7 mm | RBL 34% | Teeth lost to perio: 3",
+   "age": 58
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2507,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; never smoker.\nO: no bleeding on probing; probing depths within normal limits; no attachment loss.\nA: Perio health.\nP: Prophy, OHI. Recall 6 mo. Next appt [DATE].",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 1% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 21
+  }
+ },
+ {
+  "data": {
+   "visit_id": 865,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; former smoker, quit 2015. Exam: no bleeding on probing, FMX: crestal bone WNL, no pocketing. Impression: Clinical gingival health on an intact periodontium. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 3% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 53
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1619,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- FMX: severe horizontal bone loss\n- BOP generalized\n- severe attachment loss\n- missing #2, #3, #8, #14, #15, #18, #19, #30 (hx perio ext)\n- deep pockets posterior sextants\nDx: See perio chart.\nMed hx: NKDA; former smoker, quit 2015.\nTx plan: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 38% | Max interproximal CAL 8 mm | RBL 75% | Teeth lost to perio: 8",
+   "age": 25
+  }
+ },
+ {
+  "data": {
+   "visit_id": 472,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: no sig med hx; smoker ~5 cig/day. Exam: minimal BOP, shallow sulci throughout, BWX: crestal bone WNL, CAL 0; recession 3mm #6. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 1 mm | BOP 2% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 56
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1082,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: no sig med hx; former smoker, quit 2015.\nO: attachment loss 3-4 mm; PAN: bone loss to middle third (~33%); max PD 4 mm; BOP 49%.\nA: Generalized periodontitis Stage II Grade C.\nP: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "Max PD 4 mm | BOP 49% | Max interproximal CAL 4 mm | RBL 33% | Teeth lost to perio: 0",
+   "age": 22
+  }
+ },
+ {
+  "data": {
+   "visit_id": 828,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- FMX: crestal bone WNL\n- no attachment loss\n- no bleeding on probing\n- no pocketing\nDx: Perio health.\nMed hx: HTN controlled; non-smoker.\nTx plan: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 8% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 23
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2876,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- slight attachment loss\n- shallow sulci throughout\n- localized BOP\n- FMX: mild horizontal bone loss\nDx: Generalized periodontitis Stage I Grade A.\nMed hx: no sig med hx; former smoker, quit 2015.\nTx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "Max PD 3 mm | BOP 20% | Max interproximal CAL 1 mm | RBL 10% | Teeth lost to perio: 0",
+   "age": 52
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2867,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: BWX: crestal bone WNL, minimal BOP, probing depths within normal limits, CAL 0. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 2% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 28
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2743,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; non-smoker. Exam: BWX: bone loss to middle third (~23%), bleeding on probing 27% of sites, CAL up to 3mm, PD up to 4mm (#2 DL 3mm, #10 B 3mm). Impression: See perio chart. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 4 mm | BOP 27% | Max interproximal CAL 3 mm | RBL 23% | Teeth lost to perio: 0",
+   "age": 66
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1060,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.3; former smoker, quit 2015. Exam: FMX: severe horizontal bone loss ~57%, generalized 6-7mm pockets, localized #14 ML 7mm, #19 MB 7mm, bleeding on probing 50% of sites, CAL up to 5mm. Impression: Localized periodontitis Stage II Grade C. SRP 4 quads, re-eval 4-6 wk. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 38
+  }
+ },
+ {
+  "data": {
+   "visit_id": 37,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: no sig med hx; never smoker. Exam: no pocketing, recession 3mm #27, localized BOP, BWX: crestal bone WNL. Impression: AAP Case Type I. Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 12% | Max interproximal CAL 0 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 71
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1708,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- mild pocketing\n- FMX: moderate horizontal bone loss\n- BOP generalized\n- moderate attachment loss; recession 1mm #22\nDx: Loc. perio St II Gr B.\nMed hx: HTN controlled; smoker ~3 cig/day.\nTx plan: 4 quad SRP then perio maint q3mo.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage I periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 4 mm | BOP 27% | Max interproximal CAL 4 mm | RBL 27% | Teeth lost to perio: 0",
+   "age": 58
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2094,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- mild pocketing\n- moderate attachment loss; recession 3mm #22\n- PAN: moderate horizontal bone loss\n- heavy BOP\nDx: Localized periodontitis Stage III Grade B.\nMed hx: NKDA; never smoker.\nTx plan: FM SRP, refer to periodontist. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 42% | Max interproximal CAL 3 mm | RBL 24% | Teeth lost to perio: 0",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2732,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: generalized 8-9mm pockets, localized #2 DB 9mm, #5 ML 10mm, #12 MB 9mm, #15 M 9mm, PAN: severe horizontal bone loss ~56%, bleeding on probing 31% of sites, 10 teeth lost to periodontal disease, max CAL 8mm interproximal; recession 1mm #11. Perio referral; prosthetic consult for edentulous areas.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage III periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 10 mm | BOP 31% | Max interproximal CAL 8 mm | RBL 56% | Teeth lost to perio: 10",
+   "age": 68
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2124,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: severe attachment loss, deep pockets posterior sextants, BWX: severe horizontal bone loss, vertical defect #14, BOP generalized, hx extraction of 4 teeth d/t perio. FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 6 mm | BOP 39% | Max interproximal CAL 6 mm | RBL 38% | Teeth lost to perio: 4",
+   "age": 51
+  }
+ },
+ {
+  "data": {
+   "visit_id": 710,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: pre-diabetic A1c 6.2; non-smoker.\nO: slight attachment loss; heavy BOP; no pocketing.\nA: Localized periodontitis Stage I Grade B.\nP: SRP UR/LR, re-eval 6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 2 mm | BOP 41% | Max interproximal CAL 1 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 22
+  }
+ },
+ {
+  "data": {
+   "visit_id": 818,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; non-smoker.\nO: generalized 5-6mm pockets, localized #2 MB 6mm, #21 DL 6mm; PAN: severe horizontal bone loss ~59%; bleeding on probing 52% of sites; CAL up to 5mm; missing #30 (hx perio ext).\nA: Generalized periodontitis Stage IV Grade C.\nP: Perio referral; prosthetic consult for edentulous areas. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 7 mm | BOP 52% | Max interproximal CAL 5 mm | RBL 59% | Teeth lost to perio: 1",
+   "age": 36
+  }
+ },
+ {
+  "data": {
+   "visit_id": 515,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- radiographs: bone loss to coronal third (~6%)\n- bleeding on probing 41% of sites\n- probing depths within normal limits\nDx: See perio chart.\nMed hx: NKDA; never smoker.\nTx plan: Prophy, flossing instruction. 6 mo recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 41% | Max interproximal CAL 0 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 94,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; former smoker, quit 2015. Exam: bleeding on probing 20% of sites, PD up to 4mm (#13 B 4mm, #23 L 4mm), CAL 0; recession 2mm #22. Impression: Localized periodontitis Stage I Grade B. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 2; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 20% | Max interproximal CAL 0 mm | RBL 2% | Teeth lost to perio: 0",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 589,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: HTN controlled; former smoker, quit 2015.\nO: CAL up to 4mm; PD up to 4mm (#23 ML 4mm, #26 ML 3mm); BWX: bone loss to middle third (~21%); bleeding on probing 34% of sites.\nA: Localized periodontitis Stage III Grade B.\nP: FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 4 mm | BOP 34% | Max interproximal CAL 4 mm | RBL 21% | Teeth lost to perio: 0",
+   "age": 24
+  }
+ },
+ {
+  "data": {
+   "visit_id": 311,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: HTN controlled; never smoker.\nO: recession 3mm #11; BOP generalized; no pocketing; radiographs: mild horizontal bone loss.\nA: Localized periodontitis Stage I Grade B.\nP: Localized SRP, perio maint q4mo. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 3 mm | BOP 37% | Max interproximal CAL 0 mm | RBL 5% | Teeth lost to perio: 0",
+   "age": 22
+  }
+ },
+ {
+  "data": {
+   "visit_id": 3029,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; smoker ~5 cig/day.\nO: mild pocketing; slight attachment loss; BOP generalized; radiographs: mild horizontal bone loss.\nA: Generalized periodontitis Stage II Grade B.\nP: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.321",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "(not charted at this visit)",
+   "age": 65
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2616,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: minimal BOP, CAL 0, probing depths within normal limits. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 1 mm | BOP 2% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 77
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2199,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- max CAL 6mm interproximal; recession 1mm #6\n- PAN: severe horizontal bone loss ~50%\n- hx extraction of 1 teeth d/t perio\n- generalized 4-5mm pockets, localized #8 B 5mm, #25 ML 5mm, #27 D 6mm\n- bleeding on probing 39% of sites\nDx: Localized periodontitis Stage IV Grade B.\nMed hx: HTN controlled; never smoker.\nTx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 6 mm | BOP 39% | Max interproximal CAL 6 mm | RBL 50% | Teeth lost to perio: 1",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 792,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; non-smoker.\nO: FMX: severe horizontal bone loss ~40%; bleeding on probing 64% of sites; PD up to 6mm (#7 B 6mm, #29 DL 6mm); CAL up to 8mm; 4 teeth lost to periodontal disease.\nA: Localized periodontitis Stage III Grade B.\nP: SRP 4 quads; perio consult for surgical eval. Next appt [DATE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 6 mm | BOP 64% | Max interproximal CAL 8 mm | RBL 40% | Teeth lost to perio: 4",
+   "age": 46
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1136,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- slight attachment loss; recession 2mm #27\n- BOP generalized\n- probing depths within normal limits\n- PAN: mild horizontal bone loss\nDx: Gingivitis.\nMed hx: HTN controlled; non-smoker.\nTx plan: Prophy + OHI, re-eval gingiva next recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 27% | Max interproximal CAL 1 mm | RBL 5% | Teeth lost to perio: 0",
+   "age": 78
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1990,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: BOP 13%, generalized 3-3mm pockets, localized #3 MB 3mm, #9 M 3mm, #14 D 3mm, PAN: mild horizontal bone loss ~9%. Impression: Localized slight chronic periodontitis. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 4 mm | BOP 13% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 24
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2006,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: NKDA; never smoker.\nO: 2 teeth lost to periodontal disease; max PD 8 mm; BOP 31%; BWX: severe horizontal bone loss ~38%; CAL up to 7mm; recession 2mm #22.\nA: Localized severe chronic periodontitis.\nP: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "(not charted at this visit)",
+   "age": 79
+  }
+ },
+ {
+  "data": {
+   "visit_id": 875,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: NKDA; non-smoker. Exam: BWX: mild horizontal bone loss, no attachment loss; recession 2mm #27, BOP generalized, probing depths within normal limits. Impression: Findings reviewed with pt. Prophy + OHI, re-eval gingiva next recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 72
+  }
+ },
+ {
+  "data": {
+   "visit_id": 504,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- mild pocketing\n- FMX: mild horizontal bone loss\n- slight attachment loss\n- BOP generalized\nMed hx: HTN controlled; never smoker.\nTx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 39% | Max interproximal CAL 1 mm | RBL 11% | Teeth lost to perio: 0",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 968,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- attachment loss 6-7 mm\n- max PD 7 mm\n- bleeding on probing 61% of sites\n- missing #3, #18 (hx perio ext)\n- PAN: bone loss to apical third (~43%)\nDx: Loc. perio St III Gr C.\nMed hx: HTN controlled; never smoker.\nTx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 26
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2144,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP generalized\n- slight attachment loss\n- mild pocketing\n- PAN: crestal bone WNL\nDx: Gingivitis.\nMed hx: NKDA; former smoker, quit 2015.\nTx plan: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 4 mm | BOP 31% | Max interproximal CAL 1 mm | RBL 2% | Teeth lost to perio: 0",
+   "age": 65
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2130,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BWX: bone loss to middle third (~17%)\n- bleeding on probing 43% of sites\n- max PD 4 mm\n- max CAL 3mm interproximal\nDx: AAP Case Type III.\nMed hx: HTN controlled; never smoker.\nTx plan: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 4 mm | BOP 43% | Max interproximal CAL 3 mm | RBL 17% | Teeth lost to perio: 0",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 348,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: no sig med hx; former smoker, quit 2015.\nO: FMX: severe horizontal bone loss ~57%; bleeding on probing 67% of sites; 5 teeth lost to periodontal disease; max CAL 9mm interproximal; recession 2mm #27; generalized 7-8mm pockets, localized #22 ML 9mm, #29 ML 8mm.\nA: Localized severe chronic periodontitis.\nP: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 9 mm | BOP 67% | Max interproximal CAL 9 mm | RBL 57% | Teeth lost to perio: 5",
+   "age": 73
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2882,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: no sig med hx; never smoker. Exam: BOP <10%, shallow sulci throughout, no attachment loss. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 2 mm | BOP 4% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 27
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2692,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- bleeding on probing 31% of sites\n- BWX: mild horizontal bone loss ~13%\n- attachment loss 1-2 mm\n- probing depths within normal limits\nDx: Findings reviewed with pt.\nMed hx: HTN controlled; never smoker.\nTx plan: SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 31% | Max interproximal CAL 2 mm | RBL 13% | Teeth lost to perio: 0",
+   "age": 41
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2631,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: no sig med hx; former smoker, quit 2015.\nO: radiographs: crestal bone WNL; BOP 22%; shallow sulci throughout; CAL up to 1mm.\nA: Plaque-induced gingivitis.\nP: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 22% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "age": 77
+  }
+ },
+ {
+  "data": {
+   "visit_id": 549,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: HTN controlled; non-smoker.\nO: BOP generalized; moderate pocketing posterior; BWX: moderate horizontal bone loss; moderate attachment loss.\nA: Stage I/Grade A perio.\nP: Localized SRP, perio maint q4mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "(not charted at this visit)",
+   "age": 78
+  }
+ },
+ {
+  "data": {
+   "visit_id": 709,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- 9 teeth lost to periodontal disease\n- severe attachment loss\n- deep pockets posterior sextants\n- heavy BOP\n- FMX: severe horizontal bone loss, vertical defect #19\nDx: Localized severe chronic periodontitis.\nMed hx: NKDA; non-smoker.\nTx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage III periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4260 D4910",
+   "proc_codes_planned": "D0180 D4341 D4260 D4910",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 9 mm | BOP 60% | Max interproximal CAL 6 mm | RBL 64% | Teeth lost to perio: 9",
+   "age": 66
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1849,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- PAN: severe horizontal bone loss\n- deep pockets posterior sextants\n- BOP generalized\n- severe attachment loss\nDx: AAP Case Type IV.\nMed hx: no sig med hx; never smoker.\nTx plan: SRP 4 quads; perio consult for surgical eval.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 7 mm | BOP 35% | Max interproximal CAL 5 mm | RBL 39% | Teeth lost to perio: 0",
+   "age": 64
+  }
+ },
+ {
+  "data": {
+   "visit_id": 221,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; non-smoker.\nO: PD up to 8mm (#2 M 7mm, #31 D 7mm); BOP 38%; BWX: bone loss to apical third (~76%); hx extraction of 8 teeth d/t perio; max CAL 9mm interproximal.\nA: AAP Case Type IV.\nP: Referral to periodontist for comprehensive tx plan. Next appt [DATE].",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D4910",
+   "proc_codes_planned": "D0180 D4341 D4910",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "(not charted at this visit)",
+   "age": 73
+  }
+ },
+ {
+  "data": {
+   "visit_id": 777,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: no sig med hx; former smoker, quit 2015.\nO: PD up to 4mm (#22 B 4mm, #28 D 3mm); max CAL 1mm interproximal; bleeding on probing 33% of sites.\nA: Findings reviewed with pt.\nP: Prophy + OHI, re-eval gingiva next recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 33% | Max interproximal CAL 1 mm | RBL 4% | Teeth lost to perio: 0",
+   "age": 50
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1638,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: moderate attachment loss, radiographs: moderate horizontal bone loss, moderate pocketing posterior, heavy BOP. Impression: Stage II/Grade B perio. SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 5 mm | BOP 47% | Max interproximal CAL 3 mm | RBL 31% | Teeth lost to perio: 0",
+   "age": 75
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2049,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; never smoker. Exam: BOP generalized, shallow sulci throughout, no attachment loss, BWX: mild horizontal bone loss. Impression: Dental biofilm-induced gingivitis, localized. Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 26% | Max interproximal CAL 0 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 37
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2208,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- probing depths within normal limits\n- minimal BOP\n- BWX: crestal bone WNL\nDx: Clinical gingival health on an intact periodontium.\nMed hx: no sig med hx; non-smoker.\nTx plan: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 1 mm | BOP 5% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 64
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1661,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; never smoker. Exam: no BOP, probing depths within normal limits, no attachment loss; recession 1mm #22. Impression: AAP Case Type I. Prophy + OHI, re-eval gingiva next recall. Next appt [DATE].",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 5% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 34
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2524,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: no sig med hx; former smoker, quit 2015.\nO: heavy BOP; missing #9, #19, #25 (hx perio ext); deep pockets posterior sextants; severe attachment loss; recession 2mm #27; FMX: severe horizontal bone loss.\nA: Gen. perio St IV Gr B.\nP: Perio referral; prosthetic consult for edentulous areas.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 8 mm | BOP 49% | Max interproximal CAL 6 mm | RBL 44% | Teeth lost to perio: 3",
+   "age": 73
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1586,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- CAL up to 1mm\n- PAN: crestal bone WNL\n- max PD 4 mm\n- BOP 22%\nDx: Localized periodontitis Stage I Grade A.\nMed hx: no sig med hx; never smoker.\nTx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 22% | Max interproximal CAL 1 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 756,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; smoker ~28 cig/day.\nO: probing depths within normal limits; radiographs: mild horizontal bone loss ~6%; attachment loss 1-1 mm; bleeding on probing 31% of sites.\nA: Generalized periodontitis Stage I Grade C.\nP: SRP UR/LR, re-eval 6 wk.\n\n-- copied from visit [DATE] --\nDx at that visit: gingivitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 3 mm | BOP 31% | Max interproximal CAL 1 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 616,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: shallow sulci throughout, bleeding on probing 21% of sites, no attachment loss, radiographs: crestal bone WNL. Impression: Perio health. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "(not charted at this visit)",
+   "age": 25
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1095,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: HTN controlled; smoker ~6 cig/day.\nO: severe attachment loss; deep pockets posterior sextants; BWX: severe horizontal bone loss, vertical defect #19; heavy BOP; hx extraction of 5 teeth d/t perio.\nA: Generalized periodontitis Stage IV Grade B.\nP: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage III periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D7140 D4260",
+   "proc_codes_planned": "D0180 D4341 D7140 D4260",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 10 mm | BOP 56% | Max interproximal CAL 6 mm | RBL 53% | Teeth lost to perio: 5",
+   "age": 79
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1364,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: HTN controlled; never smoker.\nO: deep pockets posterior sextants; BOP generalized; severe attachment loss; radiographs: severe horizontal bone loss, vertical defect #14; 7 teeth lost to periodontal disease.\nA: AAP Case Type IV.\nP: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D7140",
+   "proc_codes_planned": "D0180 D4341 D7140",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 6 mm | BOP 35% | Max interproximal CAL 8 mm | RBL 69% | Teeth lost to perio: 7",
+   "age": 28
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1385,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; former smoker, quit 2015.\nO: BOP 23%; CAL up to 2mm; max PD 4 mm.\nA: Localized periodontitis Stage I Grade A.\nP: Localized SRP, perio maint q4mo. Next appt [DATE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "(not charted at this visit)",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2884,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: probing depths within normal limits, BOP <10%. Impression: Perio health. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 1; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "Max PD 2 mm | BOP 9% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 62
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1693,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: no attachment loss, no BOP, probing depths within normal limits, FMX: crestal bone WNL. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo.",
+   "exam_form": "PSR max 0; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "(not charted at this visit)",
+   "age": 26
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2065,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: HTN controlled; former smoker, quit 2015.\nO: probing depths within normal limits; attachment loss 1-1 mm; BOP 23%; PAN: mild horizontal bone loss ~8%.\nA: Plaque-induced gingivitis.\nP: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 23% | Max interproximal CAL 1 mm | RBL 8% | Teeth lost to perio: 0",
+   "age": 20
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2068,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: pre-diabetic A1c 6.1; non-smoker. Exam: BOP 41%, PD up to 7mm (#5 ML 7mm, #15 L 7mm), radiographs: bone loss to apical third (~42%), hx extraction of 3 teeth d/t perio, max CAL 6mm interproximal; recession 1mm #6. Impression: Localized periodontitis Stage III Grade B. FM SRP, refer to periodontist. Pt moved; new address [LOCATION].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 41% | Max interproximal CAL 6 mm | RBL 42% | Teeth lost to perio: 3",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 190,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: T2DM, last A1c 6.6; smoker ~29 cig/day.\nO: PD up to 5mm (#9 M 5mm, #20 DL 5mm); BOP 40%; BWX: moderate horizontal bone loss ~16%; CAL up to 4mm.\nA: AAP Case Type III.\nP: 4 quad SRP then perio maint q3mo.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage I periodontitis. Pt declined SRP at that time.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1447,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: BOP <10%, no attachment loss; recession 2mm #6, PD 1-3mm WNL, FMX: crestal bone WNL. Impression: Perio health. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 7% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 46
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1623,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: NKDA; non-smoker.\nO: BOP 18%; PD up to 5mm (#4 MB 4mm, #18 D 5mm); radiographs: bone loss to middle third (~24%); CAL up to 3mm.\nA: Perio IIB, gen.\nP: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 5 mm | BOP 18% | Max interproximal CAL 3 mm | RBL 24% | Teeth lost to perio: 0",
+   "age": 81
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1181,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: mild pocketing, localized BOP, no attachment loss, BWX: mild horizontal bone loss. Impression: Findings reviewed with pt. Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 14% | Max interproximal CAL 0 mm | RBL 8% | Teeth lost to perio: 0",
+   "age": 80
+  }
+ },
+ {
+  "data": {
+   "visit_id": 893,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- FMX: severe horizontal bone loss\n- deep pockets posterior sextants\n- heavy BOP\n- severe attachment loss; recession 1mm #27\n- missing #3, #14, #18, #19, #24, #25, #31 (hx perio ext)\nDx: See perio chart.\nMed hx: HTN controlled; former smoker, quit 2015.\nTx plan: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4910",
+   "proc_codes_planned": "D0180 D4341 D4910",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 9 mm | BOP 53% | Max interproximal CAL 7 mm | RBL 61% | Teeth lost to perio: 7",
+   "age": 61
+  }
+ },
+ {
+  "data": {
+   "visit_id": 678,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: HTN controlled; former smoker, quit 2015.\nO: moderate attachment loss; PAN: moderate horizontal bone loss; BOP generalized; moderate pocketing posterior.\nA: Loc. perio St II Gr B.\nP: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 33% | Max interproximal CAL 4 mm | RBL 24% | Teeth lost to perio: 0",
+   "age": 67
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1459,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.\nO: PAN: severe horizontal bone loss ~59%; missing #14, #24, #30 (hx perio ext); BOP 68%; max CAL 5mm interproximal; max PD 7 mm.\nA: Gen. perio St III Gr B.\nP: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 7 mm | BOP 68% | Max interproximal CAL 5 mm | RBL 59% | Teeth lost to perio: 3",
+   "age": 59
+  }
+ },
+ {
+  "data": {
+   "visit_id": 400,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: CAL up to 9mm; recession 1mm #11, PAN: bone loss to apical third (~54%), max PD 9 mm, BOP 42%, missing #2, #3, #8, #9, #14, #15, #18, #19, #24, #30 (hx perio ext). Impression: Generalized periodontitis Stage IV Grade C. Perio referral; prosthetic consult for edentulous areas.",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "(not charted at this visit)",
+   "age": 32
+  }
+ },
+ {
+  "data": {
+   "visit_id": 3018,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: FMX: crestal bone WNL, localized BOP, CAL 0, probing depths within normal limits. Impression: Gingivitis. Prophy, flossing instruction. 6 mo recall. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 12% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 58
+  }
+ },
+ {
+  "data": {
+   "visit_id": 198,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: NKDA; never smoker. Exam: BOP generalized, slight attachment loss, probing depths within normal limits. Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "(not charted at this visit)",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 943,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: T2DM, last A1c 6.8; former smoker, quit 2015. Exam: slight attachment loss, BWX: mild horizontal bone loss, BOP generalized, mild pocketing. Impression: Generalized slight chronic periodontitis. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.321",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "(not charted at this visit)",
+   "age": 60
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1667,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- max PD 4 mm\n- CAL 0\n- BOP 31%\nDx: See perio chart.\nMed hx: HTN controlled; former smoker, quit 2015.\nTx plan: Prophy + OHI, re-eval gingiva next recall. Next appt [DATE].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 4 mm | BOP 31% | Max interproximal CAL 0 mm | RBL 4% | Teeth lost to perio: 0",
+   "age": 36
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1129,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- max PD 7 mm\n- FMX: severe horizontal bone loss ~57%\n- attachment loss 4-5 mm\n- missing #2 (hx perio ext)\n- BOP 53%\nDx: Generalized periodontitis Stage IV Grade B.\nMed hx: no sig med hx; never smoker.\nTx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 53% | Max interproximal CAL 5 mm | RBL 57% | Teeth lost to perio: 1",
+   "age": 74
+  }
+ },
+ {
+  "data": {
+   "visit_id": 974,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.\nO: BOP 66%; hx extraction of 2 teeth d/t perio; FMX: severe horizontal bone loss ~58%; attachment loss 5-6 mm; max PD 7 mm.\nA: Localized periodontitis Stage III Grade C.\nP: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 7 mm | BOP 66% | Max interproximal CAL 6 mm | RBL 58% | Teeth lost to perio: 2",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2429,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; former smoker, quit 2015. Exam: heavy BOP, deep pockets posterior sextants, radiographs: severe horizontal bone loss, severe attachment loss, hx extraction of 1 teeth d/t perio. Impression: AAP Case Type IV. Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 7 mm | BOP 50% | Max interproximal CAL 7 mm | RBL 51% | Teeth lost to perio: 1",
+   "age": 24
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2967,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- hx extraction of 1 teeth d/t perio\n- heavy BOP\n- deep pockets posterior sextants\n- severe attachment loss\n- radiographs: severe horizontal bone loss, vertical defect #14\nDx: Localized periodontitis Stage III Grade B.\nMed hx: HTN controlled; former smoker, quit 2015.\nTx plan: SRP 4 quads; perio consult for surgical eval.\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 56% | Max interproximal CAL 7 mm | RBL 49% | Teeth lost to perio: 1",
+   "age": 79
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1324,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- severe attachment loss\n- 6 teeth lost to periodontal disease\n- heavy BOP\n- deep pockets posterior sextants\n- FMX: severe horizontal bone loss, vertical defect #19\nDx: Localized periodontitis Stage IV Grade C.\nMed hx: T2DM, last A1c 10.5; non-smoker.\nTx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D4341 D7140",
+   "proc_codes_planned": "D0180 D4341 D7140",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "(not charted at this visit)",
+   "age": 80
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1049,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: T2DM, last A1c 8.5; never smoker. Exam: PD up to 7mm (#6 DB 6mm, #12 M 6mm), BOP 61%, attachment loss 4-5 mm, FMX: severe horizontal bone loss ~63%, hx extraction of 10 teeth d/t perio. Impression: Loc. perio St IV Gr C. Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D7140",
+   "proc_codes_planned": "D0180 D4341 D7140",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 61% | Max interproximal CAL 5 mm | RBL 63% | Teeth lost to perio: 10",
+   "age": 39
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1288,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- generalized 6-7mm pockets, localized #8 DB 8mm, #10 DL 7mm, #27 ML 7mm\n- bleeding on probing 30% of sites\n- CAL up to 7mm\n- PAN: bone loss to apical third (~35%)\nDx: Generalized periodontitis Stage III Grade C.\nMed hx: NKDA; former smoker, quit 2015.\nTx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage II periodontitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 8 mm | BOP 30% | Max interproximal CAL 7 mm | RBL 35% | Teeth lost to perio: 0",
+   "age": 33
+  }
+ },
+ {
+  "data": {
+   "visit_id": 3014,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- no pocketing\n- slight attachment loss\n- BOP generalized\nDx: Periodontium WNL.\nMed hx: HTN controlled; non-smoker.\nTx plan: Prophy, OHI. Recall 6 mo. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 38% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "age": 72
+  }
+ },
+ {
+  "data": {
+   "visit_id": 958,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: no attachment loss, radiographs: bone loss to coronal third (~9%), BOP 16%, probing depths within normal limits. Impression: Findings reviewed with pt. Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 16% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 36
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2716,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; never smoker. Exam: BOP generalized, PAN: mild horizontal bone loss, slight attachment loss, no pocketing. Impression: Localized periodontitis Stage I Grade A. SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2971,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: no sig med hx; smoker ~9 cig/day. Exam: no pocketing, radiographs: crestal bone WNL, no bleeding on probing. Impression: Perio health. Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "(not charted at this visit)",
+   "age": 22
+  }
+ },
+ {
+  "data": {
+   "visit_id": 656,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: no sig med hx; non-smoker.\nO: PD up to 4mm (#14 DB 4mm, #28 DL 3mm); BOP 43%; BWX: crestal bone WNL; max CAL 1mm interproximal.\nA: Gingivitis.\nP: Prophy + OHI, re-eval gingiva next recall. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D4346",
+   "proc_codes_planned": "D0120 D4346",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 4 mm | BOP 43% | Max interproximal CAL 1 mm | RBL 2% | Teeth lost to perio: 0",
+   "age": 23
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2740,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: severe attachment loss, BOP generalized, missing #2, #14, #18, #25 (hx perio ext), FMX: severe horizontal bone loss, vertical defect #3, deep pockets posterior sextants. SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "(not charted at this visit)",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1144,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- moderate attachment loss; recession 1mm #27\n- radiographs: moderate horizontal bone loss\n- moderate pocketing posterior\n- BOP generalized\nDx: Findings reviewed with pt.\nMed hx: pre-diabetic A1c 6.4; former smoker, quit 2015.\nTx plan: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 5 mm | BOP 32% | Max interproximal CAL 3 mm | RBL 28% | Teeth lost to perio: 0",
+   "age": 55
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2925,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: BWX: severe horizontal bone loss, deep pockets posterior sextants, missing #3, #14, #18, #19, #24, #25, #30 (hx perio ext), heavy BOP, severe attachment loss. Impression: Generalized periodontitis Stage IV Grade C. Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].",
+   "exam_form": "PSR max 4*; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 10 mm | BOP 58% | Max interproximal CAL 9 mm | RBL 67% | Teeth lost to perio: 7",
+   "age": 63
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2225,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: NKDA; non-smoker. Exam: severe attachment loss, BWX: severe horizontal bone loss, deep pockets posterior sextants, hx extraction of 1 teeth d/t perio, heavy BOP. Impression: Localized severe chronic periodontitis. SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 49% | Max interproximal CAL 6 mm | RBL 44% | Teeth lost to perio: 1",
+   "age": 79
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1715,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- generalized 6-7mm pockets, localized #12 DL 7mm, #20 B 7mm, #31 DB 8mm\n- BWX: severe horizontal bone loss ~41%\n- attachment loss 4-5 mm\n- 1 teeth lost to periodontal disease\n- BOP 38%\nDx: Perio IIIC, gen.\nMed hx: HTN controlled; never smoker.\nTx plan: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 8 mm | BOP 38% | Max interproximal CAL 5 mm | RBL 41% | Teeth lost to perio: 1",
+   "age": 26
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2378,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; smoker ~7 cig/day. Exam: max CAL 3mm interproximal; recession 1mm #22, BOP 34%, radiographs: moderate horizontal bone loss ~31%, PD up to 5mm (#23 DB 4mm, #29 M 4mm). Impression: Localized periodontitis Stage II Grade C. 4 quad SRP then perio maint q3mo. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 34% | Max interproximal CAL 3 mm | RBL 31% | Teeth lost to perio: 0",
+   "age": 27
+  }
+ },
+ {
+  "data": {
+   "visit_id": 631,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: recession 3mm #27, bleeding on probing 20% of sites, shallow sulci throughout, radiographs: bone loss to coronal third (~6%). Impression: See perio chart. Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 3 mm | BOP 20% | Max interproximal CAL 0 mm | RBL 6% | Teeth lost to perio: 0",
+   "age": 58
+  }
+ },
+ {
+  "data": {
+   "visit_id": 771,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for periodontal evaluation. Med hx: no sig med hx; smoker ~1 cig/day. Exam: PAN: moderate horizontal bone loss ~31%, max CAL 3mm interproximal, max PD 4 mm, bleeding on probing 46% of sites. Impression: Generalized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 46% | Max interproximal CAL 3 mm | RBL 31% | Teeth lost to perio: 0",
+   "age": 80
+  }
+ },
+ {
+  "data": {
+   "visit_id": 629,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: heavy BOP, deep pockets posterior sextants, 6 teeth lost to periodontal disease, PAN: severe horizontal bone loss, severe attachment loss. Impression: Localized periodontitis Stage IV Grade C. Referral to periodontist for comprehensive tx plan.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341 D7140 D4260",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 7 mm | BOP 51% | Max interproximal CAL 9 mm | RBL 70% | Teeth lost to perio: 6",
+   "age": 28
+  }
+ },
+ {
+  "data": {
+   "visit_id": 453,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP <10%\n- radiographs: crestal bone WNL\n- CAL 0\n- PD 1-3mm WNL\nDx: See perio chart.\nMed hx: HTN controlled; smoker ~15 cig/day.\nTx plan: Adult prophy. RTC 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 2 mm | BOP 1% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 26
+  }
+ },
+ {
+  "data": {
+   "visit_id": 3031,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; smoker ~4 cig/day.\nO: attachment loss 1-1 mm; PD 1-3mm WNL; radiographs: mild horizontal bone loss ~7%; BOP 10%.\nA: Plaque-induced gingivitis.\nP: Prophy + OHI, re-eval gingiva next recall.",
+   "exam_form": "PSR max 2; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 2 mm | BOP 10% | Max interproximal CAL 1 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 78
+  }
+ },
+ {
+  "data": {
+   "visit_id": 815,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: NKDA; never smoker. Exam: max CAL 3mm interproximal, max PD 5 mm, PAN: bone loss to middle third (~28%), bleeding on probing 46% of sites. Impression: Localized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 5 mm | BOP 46% | Max interproximal CAL 3 mm | RBL 28% | Teeth lost to perio: 0",
+   "age": 47
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1952,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: pre-diabetic A1c 6.4; non-smoker. Exam: FMX: moderate horizontal bone loss, mild pocketing, BOP generalized, moderate attachment loss. Impression: Generalized periodontitis Stage III Grade B. FM SRP, refer to periodontist. Next appt [DATE]. Pt moved; new address [LOCATION].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 4 mm | BOP 27% | Max interproximal CAL 3 mm | RBL 17% | Teeth lost to perio: 0",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 379,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: T2DM, last A1c 9.8; never smoker.\nO: moderate attachment loss; recession 1mm #22; moderate pocketing posterior; BOP generalized; PAN: moderate horizontal bone loss.\nA: Findings reviewed with pt.\nP: SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.312",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 5 mm | BOP 25% | Max interproximal CAL 3 mm | RBL 21% | Teeth lost to perio: 0",
+   "age": 41
+  }
+ },
+ {
+  "data": {
+   "visit_id": 279,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: NKDA; non-smoker.\nO: generalized 3-3mm pockets, localized #25 L 3mm, #29 D 3mm; bleeding on probing 34% of sites; attachment loss 1-2 mm.\nA: Localized slight chronic periodontitis.\nP: Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 4 mm | BOP 34% | Max interproximal CAL 2 mm | RBL 3% | Teeth lost to perio: 0",
+   "age": 44
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1011,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: HTN controlled; never smoker.\nO: PD up to 4mm (#6 B 3mm, #15 MB 3mm); BWX: bone loss to coronal third (~11%); bleeding on probing 11% of sites; CAL up to 2mm.\nA: AAP Case Type III.\nP: 4 quad SRP then perio maint q3mo.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4342",
+   "proc_codes_planned": "D0180 D4342",
+   "proc_dx_completed": "K05.321",
+   "proc_dx_planned": "K05.322",
+   "probing_chart": "Max PD 4 mm | BOP 11% | Max interproximal CAL 2 mm | RBL 11% | Teeth lost to perio: 0",
+   "age": 19
+  }
+ },
+ {
+  "data": {
+   "visit_id": 934,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for periodontal evaluation. Med hx: no sig med hx; smoker ~11 cig/day. Exam: slight attachment loss, FMX: mild horizontal bone loss, localized BOP, no pocketing. Impression: Localized periodontitis Stage I Grade C. Localized SRP, perio maint q4mo.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.311",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "Max PD 3 mm | BOP 17% | Max interproximal CAL 1 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 48
+  }
+ },
+ {
+  "data": {
+   "visit_id": 569,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP generalized\n- mild pocketing\n- slight attachment loss\n- FMX: mild horizontal bone loss\nDx: AAP Case Type II.\nMed hx: no sig med hx; former smoker, quit 2015.\nTx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.321",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "(not charted at this visit)",
+   "age": 70
+  }
+ },
+ {
+  "data": {
+   "visit_id": 411,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio eval. Med hx: NKDA; non-smoker.\nO: max CAL 6mm interproximal; recession 1mm #27; hx extraction of 2 teeth d/t perio; BWX: severe horizontal bone loss ~59%; BOP 33%; max PD 7 mm.\nA: AAP Case Type IV.\nP: FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341 D4260",
+   "proc_codes_planned": "D0180 D4341 D4260",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 7 mm | BOP 33% | Max interproximal CAL 6 mm | RBL 59% | Teeth lost to perio: 2",
+   "age": 81
+  }
+ },
+ {
+  "data": {
+   "visit_id": 187,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- bleeding on probing 22% of sites\n- CAL up to 1mm\n- generalized 3-3mm pockets, localized #2 DL 4mm, #14 DB 3mm\n- FMX: crestal bone WNL\nDx: Dental biofilm-induced gingivitis, localized.\nMed hx: HTN controlled; smoker ~6 cig/day.\nTx plan: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.311",
+   "probing_chart": "(not charted at this visit)",
+   "age": 38
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2659,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: heavy BOP, severe attachment loss, deep pockets posterior sextants, FMX: severe horizontal bone loss, vertical defect #14, hx extraction of 6 teeth d/t perio. Impression: See perio chart. Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].\n\n-- copied from visit [DATE] --\nDx at that visit: Stage III periodontitis. Pt declined SRP at that time.",
+   "exam_form": "(none)",
+   "proc_codes_completed": "D0180 D4341 D4910",
+   "proc_codes_planned": "D0180 D4341 D4910",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "(not charted at this visit)",
+   "age": 72
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2173,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: no sig med hx; former smoker, quit 2015.\nO: radiographs: severe horizontal bone loss, vertical defect #3; severe attachment loss; BOP generalized; hx extraction of 4 teeth d/t perio; deep pockets posterior sextants.\nA: AAP Case Type III.\nP: 4 quad SRP then perio maint q3mo. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 8 mm | BOP 26% | Max interproximal CAL 7 mm | RBL 35% | Teeth lost to perio: 4",
+   "age": 45
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2334,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: HTN controlled; never smoker.\nO: attachment loss 1-1 mm; BOP 18%; radiographs: bone loss to coronal third (~10%); PD 1-3mm WNL.\nA: \nP: SRP UR/LR, re-eval 6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 3 mm | BOP 18% | Max interproximal CAL 1 mm | RBL 10% | Teeth lost to perio: 0",
+   "age": 74
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1478,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPt seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: 10 teeth lost to periodontal disease, radiographs: severe horizontal bone loss, deep pockets posterior sextants, severe attachment loss, BOP generalized. Impression: Localized periodontitis Stage III Grade C. FM SRP, refer to periodontist.",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 4",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D4341 D4910 D7140",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.313",
+   "probing_chart": "Max PD 8 mm | BOP 30% | Max interproximal CAL 8 mm | RBL 68% | Teeth lost to perio: 10",
+   "age": 61
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2235,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: no sig med hx; former smoker, quit 2015.\nO: CAL 0; no bleeding on probing; no pocketing; FMX: crestal bone WNL.\nA: Perio health.\nP: Prophy, OHI. Recall 6 mo. Next appt [DATE].",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 2 mm | BOP 9% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "age": 62
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1773,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPatient seen for recall exam. Med hx: NKDA; non-smoker. Exam: missing #2, #9, #15, #18 (hx perio ext), BOP 48%, FMX: bone loss to apical third (~60%), CAL up to 6mm, PD up to 7mm (#11 ML 6mm, #13 B 6mm). Impression: Perio IIIB, gen. FM SRP, refer to periodontist. Next appt [DATE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 3",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.323",
+   "proc_dx_planned": "K05.323",
+   "probing_chart": "Max PD 7 mm | BOP 48% | Max interproximal CAL 6 mm | RBL 60% | Teeth lost to perio: 4",
+   "age": 79
+  }
+ },
+ {
+  "data": {
+   "visit_id": 988,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for perio maint. Med hx: T2DM, last A1c 8.4; former smoker, quit 2015.\nO: FMX: mild horizontal bone loss ~9%; shallow sulci throughout; bleeding on probing 38% of sites.\nA: See perio chart.\nP: Prophy, flossing instruction. 6 mo recall.",
+   "exam_form": "PSR max 1; perio status: gingivitis",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "K05.10",
+   "proc_dx_planned": "K05.10",
+   "probing_chart": "Max PD 2 mm | BOP 38% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "age": 77
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1598,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BOP generalized\n- slight attachment loss\n- BWX: mild horizontal bone loss\n- mild pocketing\nDx: See perio chart.\nMed hx: NKDA; former smoker, quit 2015.\nTx plan: Localized SRP, perio maint q4mo. Next appt [DATE].",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "Max PD 4 mm | BOP 40% | Max interproximal CAL 1 mm | RBL 7% | Teeth lost to perio: 0",
+   "age": 56
+  }
+ },
+ {
+  "data": {
+   "visit_id": 1115,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- BWX: crestal bone WNL\n- no BOP\n- CAL 0; recession 1mm #6\n- PD 1-3mm WNL\nDx: Clinical gingival health on an intact periodontium.\nMed hx: no sig med hx; non-smoker.\nTx plan: Prophy, OHI. Recall 6 mo.",
+   "exam_form": "PSR max 0; perio status: WNL",
+   "proc_codes_completed": "D0120 D1110",
+   "proc_codes_planned": "D0120 D1110",
+   "proc_dx_completed": "Z01.20",
+   "proc_dx_planned": "Z01.20",
+   "probing_chart": "(not charted at this visit)",
+   "age": 74
+  }
+ },
+ {
+  "data": {
+   "visit_id": 162,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for recall. Med hx: HTN controlled; former smoker, quit 2015.\nO: PD up to 4mm (#6 ML 3mm, #8 B 4mm); BWX: bone loss to coronal third (~11%); BOP 39%; CAL up to 1mm; recession 3mm #22.\nA: Generalized periodontitis Stage I Grade A.\nP: SRP UR/LR, re-eval 6 wk. Next appt [DATE].\n\n-- copied from visit [DATE] --\nDx at that visit: gingivitis. Pt declined SRP at that time.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 1",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "K05.322",
+   "proc_dx_planned": "K05.321",
+   "probing_chart": "(not charted at this visit)",
+   "age": 43
+  }
+ },
+ {
+  "data": {
+   "visit_id": 76,
+   "note": "Pt [NAME] ([ID])\nDOS: [DATE]  Provider: Dr. [NAME]\n\nPERIODONTAL CHARTING COMPLETED\n- max CAL 7mm interproximal\n- FMX: severe horizontal bone loss ~52%\n- missing #2, #14 (hx perio ext)\n- max PD 7 mm\n- BOP 47%\nDx: Findings reviewed with pt.\nMed hx: HTN controlled; smoker ~30 cig/day.\nTx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].",
+   "exam_form": "PSR max 4; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D4341",
+   "proc_codes_planned": "D0180 D4341",
+   "proc_dx_completed": "K05.313",
+   "proc_dx_planned": "K05.312",
+   "probing_chart": "Max PD 7 mm | BOP 47% | Max interproximal CAL 7 mm | RBL 52% | Teeth lost to perio: 2",
+   "age": 73
+  }
+ },
+ {
+  "data": {
+   "visit_id": 2491,
+   "note": "Patient: [NAME]   DOB: [DATE]   MRN: [ID]\nDOS: [DATE]  Provider: Dr. [NAME]\n\nS: Pt presents for comprehensive exam. Med hx: HTN controlled; never smoker.\nO: max PD 4 mm; BOP 38%; radiographs: crestal bone WNL; CAL up to 2mm; recession 2mm #11.\nA: Localized periodontitis Stage II Grade A.\nP: SRP 4 quads, re-eval 4-6 wk.",
+   "exam_form": "PSR max 3; perio status: periodontitis stage 2",
+   "proc_codes_completed": "D0180 D1110",
+   "proc_codes_planned": "D0180 D1110",
+   "proc_dx_completed": "(none)",
+   "proc_dx_planned": "(none)",
+   "probing_chart": "(not charted at this visit)",
+   "age": 30
+  }
+ }
+]

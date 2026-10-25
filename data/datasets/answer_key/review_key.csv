@@ -1,0 +1,1734 @@
+visit_id,person_id,age,truth_status,truth_grade,truth_extent,style,numeric,dx_scheme,copy_forward,stated_status,notes,exam_form,proc_codes_completed,proc_codes_planned,proc_dx_completed,proc_dx_planned,probing_chart,algorithm_v0,algorithm_v0_decided_by,note_text
+1408,565,36,healthy,NA,NA,narrative,False,old,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: PAN: crestal bone WNL, no attachment loss, no pocketing, no bleeding on probing. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo."
+2320,917,69,healthy,NA,NA,chart_summary,False,old,False,healthy,healthy,unknown,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BWX: crestal bone WNL
+- no bleeding on probing
+- PD 1-3mm WNL
+Dx: Periodontium WNL.
+Med hx: no sig med hx; non-smoker.
+Tx plan: Adult prophy. RTC 6 mo."
+1306,521,69,periodontitis_stage_1,B,localized,narrative,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,unknown,unknown,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; smoker ~3 cig/day. Exam: mild pocketing, localized BOP, radiographs: mild horizontal bone loss, slight attachment loss. Impression: Localized periodontitis Stage I Grade B. Localized SRP, perio maint q4mo."
+359,145,47,periodontitis_stage_1,A,localized,soap,True,none,True,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; never smoker.
+O: max CAL 1mm interproximal; recession 1mm #22; PAN: bone loss to coronal third (~8%); BOP 31%; PD up to 4mm (#12 L 3mm, #30 M 3mm).
+A: 
+P: 4 quad SRP then perio maint q3mo.
+
+-- copied from visit [DATE] --
+Dx at that visit: gingivitis. Pt declined SRP at that time."
+1944,772,31,periodontitis_stage_1,A,localized,narrative,False,2017,True,gingivitis,gingivitis,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; non-smoker. Exam: localized BOP, mild pocketing, slight attachment loss. Impression: Dental biofilm-induced gingivitis, localized. Prophy + OHI, re-eval gingiva next recall.
+
+-- copied from visit [DATE] --
+Dx at that visit: gingivitis. Pt declined SRP at that time."
+1138,459,52,periodontitis_stage_3,B,localized,soap,True,none,True,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,unknown,periodontitis_stage_3,gingivitis,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: HTN controlled; non-smoker.
+O: BOP 28%; attachment loss 4-5 mm; generalized 4-5mm pockets, localized #7 B 5mm, #9 D 6mm; PAN: bone loss to apical third (~47%).
+A: See perio chart.
+P: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+1468,585,59,periodontitis_stage_4,C,generalized,chart_summary,True,short,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- bleeding on probing 33% of sites
+- CAL up to 9mm; recession 3mm #6
+- max PD 9 mm
+- FMX: bone loss to apical third (~74%)
+- missing #2, #3, #9, #15, #30 (hx perio ext)
+Dx: Stage IV/Grade C perio.
+Med hx: T2DM, last A1c 9.2; non-smoker.
+Tx plan: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+2400,948,55,periodontitis_stage_1,A,generalized,narrative,False,short,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; former smoker, quit 2015. Exam: FMX: mild horizontal bone loss, mild pocketing, slight attachment loss; recession 3mm #22, BOP generalized. Impression: Perio IA, gen. Localized SRP, perio maint q4mo. Next appt [DATE]."
+71,30,51,healthy,NA,NA,narrative,True,old,False,healthy,healthy,healthy,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: no sig med hx; former smoker, quit 2015. Exam: probing depths within normal limits, no BOP, recession 3mm #6. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo."
+2642,1043,51,periodontitis_stage_2,B,localized,narrative,True,old,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: max PD 4 mm, PAN: moderate horizontal bone loss ~32%, max CAL 4mm interproximal, bleeding on probing 44% of sites. Impression: Localized slight chronic periodontitis. Localized SRP, perio maint q4mo."
+2382,941,81,gingivitis,NA,NA,soap,True,none,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,unknown,unknown,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: HTN controlled; never smoker.
+O: generalized 3-3mm pockets, localized #7 L 3mm, #9 DB 4mm, #19 DB 4mm, #29 DB 4mm; bleeding on probing 11% of sites; CAL 0; recession 2mm #22.
+A: 
+P: Prophy, flossing instruction. 6 mo recall."
+888,350,69,periodontitis_stage_3,B,generalized,narrative,True,old,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; non-smoker. Exam: PAN: severe horizontal bone loss ~47%, bleeding on probing 39% of sites, max CAL 6mm interproximal; recession 2mm #22, generalized 4-5mm pockets, localized #7 DL 5mm, #30 ML 5mm, missing #2, #19 (hx perio ext). Impression: AAP Case Type IV. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+2297,910,20,periodontitis_stage_1,A,localized,soap,True,none,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,unknown,unknown,unknown,periodontitis_stage_1,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; never smoker.
+O: generalized 3-3mm pockets, localized #6 DB 4mm, #24 D 4mm; CAL up to 1mm; BOP 16%; PAN: crestal bone WNL.
+A: Findings reviewed with pt.
+P: Localized SRP, perio maint q4mo."
+2229,885,34,periodontitis_stage_3,C,generalized,chart_summary,False,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- radiographs: severe horizontal bone loss, vertical defect #3
+- hx extraction of 3 teeth d/t perio
+- severe attachment loss
+- deep pockets posterior sextants
+- heavy BOP
+Dx: Generalized periodontitis Stage II Grade C.
+Med hx: no sig med hx; non-smoker.
+Tx plan: SRP 4 quads, re-eval 4-6 wk. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+1207,483,71,periodontitis_stage_1,A,localized,narrative,False,short,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,unknown,unknown,unknown,periodontitis_stage_1,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; never smoker. Exam: probing depths within normal limits, BOP generalized, slight attachment loss. Impression: Perio IA, loc. Localized SRP, perio maint q4mo."
+879,346,51,periodontitis_stage_4,C,localized,chart_summary,True,none,False,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PAN: bone loss to apical third (~61%)
+- max PD 6 mm
+- bleeding on probing 73% of sites
+- hx extraction of 5 teeth d/t perio
+- CAL up to 6mm
+Dx: Findings reviewed with pt.
+Med hx: no sig med hx; non-smoker.
+Tx plan: Referral to periodontist for comprehensive tx plan. Next appt [DATE]."
+2818,1116,66,periodontitis_stage_3,C,generalized,narrative,False,short,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: no sig med hx; smoker ~27 cig/day. Exam: radiographs: severe horizontal bone loss, BOP generalized, severe attachment loss; recession 1mm #6, deep pockets posterior sextants. Impression: Stage III/Grade C perio. SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]."
+151,64,79,healthy,NA,NA,soap,True,none,False,gingivitis,healthy,healthy,healthy,healthy,unknown,unknown,unknown,healthy,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: NKDA; former smoker, quit 2015.
+O: recession 1mm #22; no BOP; PAN: crestal bone WNL; shallow sulci throughout.
+A: Findings reviewed with pt.
+P: Prophy, flossing instruction. 6 mo recall."
+64,27,36,periodontitis_stage_2,C,generalized,soap,False,old,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: T2DM, last A1c 8.2; smoker ~24 cig/day.
+O: FMX: moderate horizontal bone loss; heavy BOP; moderate pocketing posterior; moderate attachment loss.
+A: AAP Case Type III.
+P: SRP 4 quads, re-eval 4-6 wk."
+1833,732,39,periodontitis_stage_2,B,localized,soap,False,short,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; smoker ~3 cig/day.
+O: heavy BOP; radiographs: moderate horizontal bone loss; moderate pocketing posterior; moderate attachment loss; recession 1mm #27.
+A: Stage II/Grade B perio.
+P: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE]."
+1177,473,68,periodontitis_stage_2,B,localized,narrative,True,none,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: BOP 49%, PAN: moderate horizontal bone loss ~19%, generalized 3-4mm pockets, localized #5 MB 5mm, #20 MB 5mm, attachment loss 3-4 mm; recession 2mm #11. 4 quad SRP then perio maint q3mo. Pt moved; new address [LOCATION]."
+2467,974,56,healthy,NA,NA,narrative,False,old,False,healthy,healthy,healthy,healthy,healthy,healthy,gingivitis,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: no sig med hx; former smoker, quit 2015. Exam: radiographs: crestal bone WNL, PD 1-3mm WNL, no bleeding on probing. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo."
+1937,770,59,periodontitis_stage_4,B,localized,soap,True,2017,False,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: no sig med hx; never smoker.
+O: max PD 8 mm; max CAL 8mm interproximal; recession 2mm #22; radiographs: bone loss to apical third (~53%); bleeding on probing 53% of sites; missing #3, #9, #14, #15, #18, #19, #24, #30, #31 (hx perio ext).
+A: Localized periodontitis Stage IV Grade B.
+P: Perio referral; prosthetic consult for edentulous areas."
+2987,1179,53,healthy,NA,NA,chart_summary,True,short,False,healthy,healthy,gingivitis,healthy,healthy,healthy,gingivitis,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP <10%
+- probing depths within normal limits
+Dx: Perio health.
+Med hx: pre-diabetic A1c 6.2; former smoker, quit 2015.
+Tx plan: Prophy, OHI. Recall 6 mo."
+292,119,35,periodontitis_stage_3,C,generalized,narrative,False,short,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: heavy BOP, deep pockets posterior sextants, severe attachment loss, missing #3, #9, #24, #31 (hx perio ext), PAN: severe horizontal bone loss, vertical defect #19. Impression: Gen. perio St IV Gr C. Perio referral; prosthetic consult for edentulous areas."
+336,134,28,periodontitis_stage_2,B,localized,narrative,True,short,True,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; former smoker, quit 2015. Exam: BOP 29%, max PD 5 mm, PAN: moderate horizontal bone loss ~26%, attachment loss 3-4 mm; recession 1mm #6. Impression: Perio IB, loc. SRP UR/LR, re-eval 6 wk. Next appt [DATE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage I periodontitis. Pt declined SRP at that time."
+2620,1035,45,healthy,NA,NA,soap,False,short,False,healthy,healthy,gingivitis,healthy,healthy,unknown,unknown,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: NKDA; former smoker, quit 2015.
+O: BWX: crestal bone WNL; no pocketing; no bleeding on probing.
+A: Perio health.
+P: Prophy, OHI. Recall 6 mo."
+1888,752,37,periodontitis_stage_3,C,localized,chart_summary,False,old,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP generalized
+- hx extraction of 2 teeth d/t perio
+- severe attachment loss; recession 1mm #6
+- deep pockets posterior sextants
+- FMX: severe horizontal bone loss, vertical defect #3
+Dx: Localized severe chronic periodontitis.
+Med hx: NKDA; non-smoker.
+Tx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]. Pt moved; new address [LOCATION]."
+1103,444,68,periodontitis_stage_4,B,generalized,soap,False,short,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_4,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: NKDA; former smoker, quit 2015.
+O: heavy BOP; severe attachment loss; missing #3, #8, #9, #14, #15, #18, #19, #30 (hx perio ext); radiographs: severe horizontal bone loss; deep pockets posterior sextants.
+A: Gen. perio St IV Gr B.
+P: Perio referral; prosthetic consult for edentulous areas."
+225,92,58,periodontitis_stage_2,B,localized,soap,False,none,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: pre-diabetic A1c 5.8; never smoker.
+O: BOP generalized; moderate attachment loss; recession 2mm #6; moderate pocketing posterior; BWX: moderate horizontal bone loss.
+A: Findings reviewed with pt.
+P: 4 quad SRP then perio maint q3mo."
+1911,760,27,periodontitis_stage_1,A,generalized,narrative,True,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: max PD 4 mm, attachment loss 1-2 mm, bleeding on probing 15% of sites. Impression: Generalized periodontitis Stage I Grade A. Localized SRP, perio maint q4mo."
+2948,1163,61,periodontitis_stage_4,B,localized,soap,True,short,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; non-smoker.
+O: BOP 30%; radiographs: bone loss to apical third (~54%); CAL up to 10mm; recession 1mm #22; 6 teeth lost to periodontal disease; max PD 6 mm.
+A: Loc. perio St IV Gr B.
+P: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION]."
+1322,527,24,healthy,NA,NA,soap,False,2017,False,healthy,healthy,gingivitis,healthy,healthy,gingivitis,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: no sig med hx; smoker ~1 cig/day.
+O: no pocketing; no bleeding on probing; no attachment loss; PAN: crestal bone WNL.
+A: Clinical gingival health on an intact periodontium.
+P: Adult prophy. RTC 6 mo. Next appt [DATE]. Pt moved; new address [LOCATION]."
+489,195,43,periodontitis_stage_3,C,generalized,soap,False,2017,True,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: no sig med hx; former smoker, quit 2015.
+O: radiographs: severe horizontal bone loss, vertical defect #19; severe attachment loss; recession 1mm #6; heavy BOP; 1 teeth lost to periodontal disease; deep pockets posterior sextants.
+A: Generalized periodontitis Stage III Grade C.
+P: FM SRP, refer to periodontist.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+2790,1106,64,healthy,NA,NA,soap,False,short,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,unknown,healthy,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; non-smoker.
+O: recession 1mm #11; BWX: crestal bone WNL; no pocketing; no bleeding on probing.
+A: Perio health.
+P: Prophy, OHI. Recall 6 mo."
+544,216,75,gingivitis,NA,NA,soap,True,2017,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; never smoker.
+O: probing depths within normal limits; BOP 20%.
+A: Dental biofilm-induced gingivitis, generalized.
+P: Prophy + OHI, re-eval gingiva next recall."
+1801,718,26,periodontitis_stage_3,C,generalized,chart_summary,True,2017,True,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PD up to 7mm (#23 DB 6mm, #31 B 6mm)
+- max CAL 7mm interproximal
+- FMX: severe horizontal bone loss ~60%
+- 1 teeth lost to periodontal disease
+- bleeding on probing 45% of sites
+Dx: Generalized periodontitis Stage III Grade C.
+Med hx: NKDA; non-smoker.
+Tx plan: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+1815,724,71,gingivitis,NA,NA,narrative,True,none,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,unknown,gingivitis,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: BOP 43%, no attachment loss, probing depths within normal limits. Impression: See perio chart. Prophy + OHI, re-eval gingiva next recall."
+908,359,35,gingivitis,NA,NA,chart_summary,False,none,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- localized BOP
+- CAL 0
+- BWX: crestal bone WNL
+- shallow sulci throughout
+Dx: See perio chart.
+Med hx: pre-diabetic A1c 6.4; non-smoker.
+Tx plan: Prophy + OHI, re-eval gingiva next recall."
+1036,414,70,periodontitis_stage_3,B,localized,narrative,True,none,True,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: missing #8, #9, #14, #31 (hx perio ext), PD up to 7mm (#2 DB 7mm, #19 B 7mm), PAN: severe horizontal bone loss ~45%, max CAL 6mm interproximal, BOP 50%. Impression: See perio chart. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+1220,489,69,periodontitis_stage_4,B,localized,narrative,False,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_3,gingivitis,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: pre-diabetic A1c 5.9; former smoker, quit 2015. Exam: heavy BOP, hx extraction of 8 teeth d/t perio, deep pockets posterior sextants, severe attachment loss, radiographs: severe horizontal bone loss. Impression: Localized periodontitis Stage IV Grade B. Referral to periodontist for comprehensive tx plan. Next appt [DATE]."
+277,111,45,periodontitis_stage_1,A,localized,narrative,False,short,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: slight attachment loss, BOP generalized, FMX: mild horizontal bone loss, shallow sulci throughout. Impression: Loc. perio St I Gr A. SRP UR/LR, re-eval 6 wk."
+2765,1095,27,periodontitis_stage_4,C,generalized,soap,True,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_3,unknown,unknown,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.
+O: 6 teeth lost to periodontal disease; BOP 36%; PAN: bone loss to apical third (~46%); CAL up to 5mm; recession 1mm #27; PD up to 7mm (#7 B 7mm, #10 ML 7mm).
+A: Generalized periodontitis Stage IV Grade C.
+P: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]."
+2077,820,28,healthy,NA,NA,soap,False,old,False,healthy,healthy,unknown,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; smoker ~7 cig/day.
+O: no pocketing; PAN: crestal bone WNL; no bleeding on probing; recession 2mm #6.
+A: Periodontium WNL.
+P: Adult prophy. RTC 6 mo."
+723,288,36,periodontitis_stage_2,C,localized,soap,True,short,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_1,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; smoker ~13 cig/day.
+O: BOP 48%; FMX: moderate horizontal bone loss ~23%; CAL up to 3mm; recession 3mm #22; PD up to 4mm (#15 M 4mm, #21 M 4mm).
+A: Loc. perio St III Gr C.
+P: SRP 4 quads; perio consult for surgical eval."
+738,294,40,gingivitis,NA,NA,soap,True,none,False,healthy,periodontitis_stage_1,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: NKDA; non-smoker.
+O: CAL up to 1mm; BOP 24%; PD 1-3mm WNL; PAN: mild horizontal bone loss ~6%.
+A: 
+P: Prophy, OHI. Recall 6 mo."
+247,101,56,periodontitis_stage_2,B,generalized,chart_summary,True,short,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,unknown,periodontitis_stage_2,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PAN: bone loss to middle third (~30%)
+- BOP 22%
+- attachment loss 3-4 mm
+- max PD 4 mm
+Dx: Stage II/Grade B perio.
+Med hx: no sig med hx; never smoker.
+Tx plan: 4 quad SRP then perio maint q3mo."
+2730,1080,63,gingivitis,NA,NA,narrative,True,2017,False,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; smoker ~1 cig/day. Exam: no attachment loss; recession 2mm #27, shallow sulci throughout, radiographs: mild horizontal bone loss ~9%, bleeding on probing 30% of sites. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo."
+2518,994,40,periodontitis_stage_2,B,localized,chart_summary,False,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- mild pocketing
+- BWX: moderate horizontal bone loss
+- moderate attachment loss
+- BOP generalized
+Dx: Localized periodontitis Stage II Grade B.
+Med hx: pre-diabetic A1c 6.4; non-smoker.
+Tx plan: 4 quad SRP then perio maint q3mo."
+563,226,42,gingivitis,NA,NA,narrative,True,none,False,gingivitis,periodontitis_stage_1,periodontitis_stage_1,gingivitis,gingivitis,unknown,unknown,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; smoker ~1 cig/day. Exam: probing depths within normal limits, BOP 35%, attachment loss 1-1 mm, FMX: mild horizontal bone loss ~7%. Impression: See perio chart. Prophy + OHI, re-eval gingiva next recall. Next appt [DATE]. Pt moved; new address [LOCATION]."
+1460,583,57,periodontitis_stage_3,B,generalized,chart_summary,True,short,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_2,unknown,periodontitis_stage_3,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PD up to 8mm (#4 L 8mm, #5 B 7mm)
+- BWX: severe horizontal bone loss ~56%
+- max CAL 6mm interproximal; recession 1mm #11
+- bleeding on probing 37% of sites
+Dx: Gen. perio St III Gr B.
+Med hx: NKDA; former smoker, quit 2015.
+Tx plan: FM SRP, refer to periodontist."
+836,331,41,periodontitis_stage_3,C,generalized,soap,False,2017,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; smoker ~3 cig/day.
+O: severe attachment loss; deep pockets posterior sextants; 4 teeth lost to periodontal disease; heavy BOP; FMX: severe horizontal bone loss.
+A: Generalized periodontitis Stage III Grade C.
+P: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+1931,767,30,periodontitis_stage_3,C,generalized,narrative,False,old,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: BOP generalized, deep pockets posterior sextants, radiographs: severe horizontal bone loss, vertical defect #3, 4 teeth lost to periodontal disease, severe attachment loss. Impression: AAP Case Type IV. SRP 4 quads; perio consult for surgical eval."
+650,258,56,periodontitis_stage_3,B,localized,soap,True,2017,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: no sig med hx; never smoker.
+O: BOP 59%; generalized 5-6mm pockets, localized #7 L 6mm, #13 D 7mm, #15 L 6mm, #29 DB 6mm; FMX: bone loss to apical third (~47%); attachment loss 5-6 mm.
+A: Localized periodontitis Stage III Grade B.
+P: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+1861,743,67,periodontitis_stage_4,C,localized,narrative,False,short,False,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: deep pockets posterior sextants, severe attachment loss, hx extraction of 5 teeth d/t perio, FMX: severe horizontal bone loss, heavy BOP. Impression: Stage IV/Grade C perio. Perio referral; prosthetic consult for edentulous areas. Next appt [DATE]."
+2267,899,32,periodontitis_stage_3,C,localized,chart_summary,True,none,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- 1 teeth lost to periodontal disease
+- generalized 5-6mm pockets, localized #6 L 7mm, #22 L 7mm, #29 ML 6mm
+- FMX: severe horizontal bone loss ~39%
+- max CAL 7mm interproximal
+- bleeding on probing 39% of sites
+Dx: Findings reviewed with pt.
+Med hx: T2DM, last A1c 10.0; non-smoker.
+Tx plan: FM SRP, refer to periodontist."
+22,11,20,periodontitis_stage_1,C,localized,narrative,True,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,unknown,unknown,unknown,periodontitis_stage_1,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: NKDA; smoker ~17 cig/day. Exam: attachment loss 1-2 mm, bleeding on probing 36% of sites, generalized 3-3mm pockets, localized #7 MB 4mm, #10 DL 4mm. Impression: Localized periodontitis Stage I Grade C. SRP UR/LR, re-eval 6 wk."
+1363,545,26,periodontitis_stage_4,C,localized,soap,False,old,True,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: pre-diabetic A1c 6.4; smoker ~17 cig/day.
+O: radiographs: severe horizontal bone loss, vertical defect #14; missing #2, #9, #15, #25, #30 (hx perio ext); heavy BOP; deep pockets posterior sextants; severe attachment loss.
+A: Localized severe chronic periodontitis.
+P: Referral to periodontist for comprehensive tx plan.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage III periodontitis. Pt declined SRP at that time."
+612,244,70,gingivitis,NA,NA,narrative,True,none,False,gingivitis,periodontitis_stage_1,periodontitis_stage_1,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: attachment loss 1-1 mm, radiographs: mild horizontal bone loss ~7%, bleeding on probing 26% of sites, probing depths within normal limits. Prophy + OHI, re-eval gingiva next recall."
+1970,780,69,periodontitis_stage_2,B,localized,soap,False,none,False,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: NKDA; former smoker, quit 2015.
+O: PAN: moderate horizontal bone loss; moderate attachment loss; recession 1mm #22; moderate pocketing posterior; localized BOP.
+A: See perio chart.
+P: SRP 4 quads, re-eval 4-6 wk."
+284,115,67,periodontitis_stage_1,B,localized,chart_summary,True,short,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PD 1-3mm WNL
+- max CAL 1mm interproximal
+- BWX: mild horizontal bone loss ~9%
+- BOP 10%
+Dx: Loc. perio St I Gr B.
+Med hx: no sig med hx; smoker ~2 cig/day.
+Tx plan: Localized SRP, perio maint q4mo."
+194,81,32,periodontitis_stage_2,C,generalized,chart_summary,True,short,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP 27%
+- FMX: bone loss to middle third (~33%)
+- max PD 4 mm
+- attachment loss 2-3 mm
+Dx: Perio IIC, gen.
+Med hx: NKDA; former smoker, quit 2015.
+Tx plan: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE]. Pt moved; new address [LOCATION]."
+2694,1066,28,periodontitis_stage_1,B,localized,soap,False,short,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: no sig med hx; never smoker.
+O: mild pocketing; BOP generalized; slight attachment loss; PAN: mild horizontal bone loss.
+A: Loc. perio St I Gr B.
+P: Localized SRP, perio maint q4mo. Next appt [DATE]. Pt moved; new address [LOCATION]."
+1526,612,47,gingivitis,NA,NA,soap,False,2017,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,unknown,gingivitis,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: no sig med hx; non-smoker.
+O: probing depths within normal limits; PAN: crestal bone WNL; slight attachment loss; localized BOP.
+A: Dental biofilm-induced gingivitis, localized.
+P: Prophy + OHI, re-eval gingiva next recall."
+2288,906,23,periodontitis_stage_1,B,localized,soap,True,short,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; non-smoker.
+O: BWX: mild horizontal bone loss ~12%; max CAL 1mm interproximal; PD up to 4mm (#22 B 4mm, #23 ML 4mm); BOP 10%.
+A: Stage II/Grade B perio.
+P: SRP 4 quads, re-eval 4-6 wk."
+2793,1108,44,gingivitis,NA,NA,chart_summary,True,old,False,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BWX: crestal bone WNL
+- BOP 26%
+- shallow sulci throughout
+Dx: AAP Case Type I.
+Med hx: no sig med hx; never smoker.
+Tx plan: Prophy + OHI, re-eval gingiva next recall."
+1890,753,60,periodontitis_stage_1,A,generalized,narrative,True,short,False,gingivitis,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; non-smoker. Exam: BOP 32%, attachment loss 1-1 mm; recession 3mm #11, shallow sulci throughout, radiographs: bone loss to coronal third (~6%). Impression: Gingivitis. Prophy, flossing instruction. 6 mo recall."
+2451,967,43,periodontitis_stage_1,C,localized,soap,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: T2DM, last A1c 6.7; smoker ~24 cig/day.
+O: mild pocketing; localized BOP; radiographs: crestal bone WNL; slight attachment loss.
+A: Localized periodontitis Stage I Grade C.
+P: SRP UR/LR, re-eval 6 wk."
+1737,692,52,periodontitis_stage_1,A,localized,soap,True,old,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; former smoker, quit 2015.
+O: bleeding on probing 22% of sites; probing depths within normal limits; PAN: crestal bone WNL; CAL up to 1mm; recession 1mm #11.
+A: AAP Case Type II.
+P: SRP UR/LR, re-eval 6 wk."
+2717,1076,74,periodontitis_stage_3,B,generalized,narrative,True,old,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: T2DM, last A1c 6.7; former smoker, quit 2015. Exam: BOP 70%, missing #2, #3 (hx perio ext), attachment loss 6-7 mm, generalized 6-7mm pockets, localized #8 L 7mm, #14 ML 7mm, #22 M 7mm, PAN: severe horizontal bone loss ~59%. Impression: AAP Case Type IV. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+847,335,71,periodontitis_stage_3,B,localized,chart_summary,True,old,False,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- generalized 4-5mm pockets, localized #10 L 5mm, #12 M 5mm, #20 B 5mm, #21 D 6mm
+- BOP 32%
+- FMX: severe horizontal bone loss ~56%
+- max CAL 7mm interproximal
+Dx: Localized severe chronic periodontitis.
+Med hx: NKDA; never smoker.
+Tx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]."
+2810,1113,22,periodontitis_stage_1,B,localized,narrative,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,unknown,periodontitis_stage_1,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: mild pocketing, BOP generalized, PAN: mild horizontal bone loss, slight attachment loss. Impression: Localized periodontitis Stage I Grade B. SRP UR/LR, re-eval 6 wk."
+1072,430,25,healthy,NA,NA,soap,True,old,False,healthy,healthy,gingivitis,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.
+O: no BOP; PD 1-3mm WNL; no attachment loss.
+A: Periodontium WNL.
+P: Adult prophy. RTC 6 mo."
+2160,855,45,periodontitis_stage_1,A,generalized,narrative,True,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: bleeding on probing 17% of sites, radiographs: crestal bone WNL, CAL up to 1mm, shallow sulci throughout. Impression: Generalized periodontitis Stage I Grade A. Localized SRP, perio maint q4mo."
+2348,928,49,gingivitis,NA,NA,chart_summary,False,none,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PAN: crestal bone WNL
+- CAL 0; recession 1mm #11
+- BOP generalized
+- shallow sulci throughout
+Med hx: NKDA; non-smoker.
+Tx plan: Prophy + OHI, re-eval gingiva next recall."
+2136,845,45,gingivitis,NA,NA,soap,False,none,False,gingivitis,periodontitis_stage_1,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; never smoker.
+O: radiographs: crestal bone WNL; PD 1-3mm WNL; slight attachment loss; localized BOP.
+A: Findings reviewed with pt.
+P: Prophy, flossing instruction. 6 mo recall."
+1628,652,70,healthy,NA,NA,soap,True,2017,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: T2DM, last A1c 6.9; smoker ~7 cig/day.
+O: BOP <10%; probing depths within normal limits.
+A: Clinical gingival health on an intact periodontium.
+P: Prophy, OHI. Recall 6 mo."
+725,289,60,gingivitis,NA,NA,narrative,True,short,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,unknown,gingivitis,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; non-smoker. Exam: BWX: mild horizontal bone loss ~6%, BOP 37%, PD 1-3mm WNL, CAL up to 1mm. Impression: Gingivitis. Prophy, flossing instruction. 6 mo recall. Next appt [DATE]."
+2471,975,22,periodontitis_stage_2,B,localized,chart_summary,True,short,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PD up to 5mm (#13 D 5mm, #23 L 4mm)
+- PAN: moderate horizontal bone loss ~16%
+- attachment loss 2-3 mm
+- BOP 25%
+Dx: Stage II/Grade B perio.
+Med hx: T2DM, last A1c 6.8; never smoker.
+Tx plan: 4 quad SRP then perio maint q3mo. Next appt [DATE]."
+1824,728,44,periodontitis_stage_2,B,localized,chart_summary,True,none,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP 36%
+- max PD 5 mm
+- PAN: bone loss to middle third (~30%)
+- max CAL 4mm interproximal; recession 1mm #11
+Dx: See perio chart.
+Med hx: no sig med hx; former smoker, quit 2015.
+Tx plan: 4 quad SRP then perio maint q3mo. Pt moved; new address [LOCATION]."
+1231,495,55,periodontitis_stage_1,B,localized,chart_summary,True,short,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- max PD 4 mm
+- BWX: mild horizontal bone loss ~14%
+- CAL up to 2mm; recession 3mm #27
+- BOP 20%
+Dx: Loc. perio St I Gr B.
+Med hx: HTN controlled; former smoker, quit 2015.
+Tx plan: Localized SRP, perio maint q4mo."
+1894,755,33,gingivitis,NA,NA,chart_summary,True,none,False,gingivitis,gingivitis,gingivitis,healthy,healthy,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- no attachment loss
+- BOP 11%
+- probing depths within normal limits
+- FMX: bone loss to coronal third (~6%)
+Med hx: NKDA; smoker ~1 cig/day.
+Tx plan: Prophy, flossing instruction. 6 mo recall."
+2762,1094,33,periodontitis_stage_4,C,localized,narrative,False,old,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: severe attachment loss, 5 teeth lost to periodontal disease, deep pockets posterior sextants, BOP generalized, FMX: severe horizontal bone loss. Impression: AAP Case Type IV. Referral to periodontist for comprehensive tx plan. Pt moved; new address [LOCATION]."
+1097,442,72,periodontitis_stage_3,B,generalized,chart_summary,False,short,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BWX: severe horizontal bone loss
+- 1 teeth lost to periodontal disease
+- deep pockets posterior sextants
+- severe attachment loss
+- heavy BOP
+Dx: Perio IIIB, gen.
+Med hx: NKDA; non-smoker.
+Tx plan: FM SRP, refer to periodontist."
+511,204,59,periodontitis_stage_2,C,localized,chart_summary,False,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP generalized
+- moderate pocketing posterior
+- moderate attachment loss; recession 1mm #6
+- PAN: moderate horizontal bone loss
+Dx: Localized periodontitis Stage II Grade C.
+Med hx: NKDA; smoker ~18 cig/day.
+Tx plan: SRP 4 quads, re-eval 4-6 wk."
+546,218,56,healthy,NA,NA,narrative,False,2017,False,healthy,healthy,gingivitis,healthy,healthy,unknown,unknown,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: no bleeding on probing, no attachment loss, no pocketing, FMX: crestal bone WNL. Impression: Clinical gingival health on an intact periodontium. Prophy, OHI. Recall 6 mo."
+992,393,30,healthy,NA,NA,narrative,True,2017,False,healthy,healthy,healthy,healthy,healthy,gingivitis,gingivitis,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: recession 2mm #22, no BOP, PD 1-3mm WNL. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo. Next appt [DATE]."
+2176,861,69,healthy,NA,NA,soap,True,short,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: NKDA; smoker ~24 cig/day.
+O: minimal BOP; CAL 0; recession 1mm #22; probing depths within normal limits.
+A: Perio health.
+P: Prophy, OHI. Recall 6 mo."
+1522,609,38,healthy,NA,NA,chart_summary,False,none,False,gingivitis,healthy,healthy,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- CAL 0
+- PAN: crestal bone WNL
+- no bleeding on probing
+- shallow sulci throughout
+Dx: See perio chart.
+Med hx: HTN controlled; non-smoker.
+Tx plan: Prophy + OHI, re-eval gingiva next recall."
+2843,1124,80,gingivitis,NA,NA,soap,True,old,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: no sig med hx; non-smoker.
+O: FMX: crestal bone WNL; bleeding on probing 42% of sites; PD up to 4mm (#20 MB 4mm, #25 D 3mm); attachment loss 1-1 mm.
+A: AAP Case Type I.
+P: Prophy + OHI, re-eval gingiva next recall."
+1057,424,66,periodontitis_stage_4,B,generalized,narrative,True,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: hx extraction of 7 teeth d/t perio, PAN: bone loss to apical third (~66%), attachment loss 5-6 mm; recession 2mm #27, max PD 8 mm, BOP 37%. Impression: Generalized periodontitis Stage IV Grade B. Referral to periodontist for comprehensive tx plan."
+1572,631,79,periodontitis_stage_2,B,generalized,soap,True,none,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,unknown,periodontitis_stage_2,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: no sig med hx; non-smoker.
+O: BWX: moderate horizontal bone loss ~28%; PD up to 5mm (#20 B 4mm, #24 B 4mm); CAL up to 4mm; bleeding on probing 16% of sites.
+A: 
+P: 4 quad SRP then perio maint q3mo. Next appt [DATE]. Pt moved; new address [LOCATION]."
+1398,559,50,periodontitis_stage_2,B,localized,chart_summary,True,none,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PD up to 5mm (#23 D 5mm, #28 B 4mm)
+- FMX: moderate horizontal bone loss ~32%
+- bleeding on probing 29% of sites
+- attachment loss 2-3 mm
+Dx: See perio chart.
+Med hx: NKDA; never smoker.
+Tx plan: 4 quad SRP then perio maint q3mo."
+1149,463,69,gingivitis,NA,NA,chart_summary,False,none,False,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- localized BOP
+- slight attachment loss; recession 3mm #27
+- mild pocketing
+- PAN: crestal bone WNL
+Dx: See perio chart.
+Med hx: T2DM, last A1c 9.2; smoker ~26 cig/day.
+Tx plan: Prophy, flossing instruction. 6 mo recall. Next appt [DATE]."
+2709,1072,20,periodontitis_stage_2,C,localized,soap,False,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: HTN controlled; former smoker, quit 2015.
+O: radiographs: moderate horizontal bone loss; moderate attachment loss; localized BOP; moderate pocketing posterior.
+A: Localized periodontitis Stage II Grade C.
+P: 4 quad SRP then perio maint q3mo."
+1151,464,63,periodontitis_stage_3,B,localized,soap,True,old,False,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: no sig med hx; former smoker, quit 2015.
+O: PAN: severe horizontal bone loss ~55%; generalized 4-5mm pockets, localized #6 B 6mm, #11 L 5mm, #25 M 6mm; hx extraction of 4 teeth d/t perio; bleeding on probing 34% of sites; max CAL 8mm interproximal.
+A: Localized severe chronic periodontitis.
+P: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION]."
+1391,557,53,gingivitis,NA,NA,chart_summary,False,none,False,gingivitis,periodontitis_stage_1,gingivitis,healthy,healthy,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- no pocketing
+- BOP generalized
+- radiographs: mild horizontal bone loss
+- slight attachment loss
+Med hx: HTN controlled; non-smoker.
+Tx plan: Prophy, flossing instruction. 6 mo recall. Next appt [DATE]."
+2610,1030,45,gingivitis,NA,NA,soap,True,short,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: HTN controlled; former smoker, quit 2015.
+O: BWX: bone loss to coronal third (~5%); no attachment loss; recession 2mm #22; probing depths within normal limits; bleeding on probing 22% of sites.
+A: Gingivitis.
+P: Prophy + OHI, re-eval gingiva next recall."
+1125,454,63,periodontitis_stage_2,B,localized,soap,True,short,True,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; never smoker.
+O: FMX: bone loss to middle third (~27%); CAL up to 3mm; BOP 41%; max PD 5 mm.
+A: Loc. perio St II Gr B.
+P: SRP 4 quads, re-eval 4-6 wk.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage I periodontitis. Pt declined SRP at that time."
+118,51,25,periodontitis_stage_2,B,generalized,narrative,True,2017,True,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,unknown,periodontitis_stage_2,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.0; smoker ~4 cig/day. Exam: BWX: moderate horizontal bone loss ~16%, max CAL 3mm interproximal, max PD 5 mm, BOP 30%. Impression: Generalized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk. Next appt [DATE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage I periodontitis. Pt declined SRP at that time."
+1293,517,41,gingivitis,NA,NA,chart_summary,False,short,False,gingivitis,gingivitis,unknown,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- no pocketing
+- no attachment loss; recession 1mm #22
+- PAN: mild horizontal bone loss
+- BOP generalized
+Dx: Gingivitis.
+Med hx: NKDA; never smoker.
+Tx plan: Prophy, flossing instruction. 6 mo recall."
+3007,1187,21,periodontitis_stage_2,C,generalized,soap,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: pre-diabetic A1c 5.8; former smoker, quit 2015.
+O: CAL up to 4mm; BOP 44%; PAN: moderate horizontal bone loss ~24%; max PD 4 mm.
+A: Generalized periodontitis Stage II Grade C.
+P: SRP 4 quads, re-eval 4-6 wk."
+130,55,25,healthy,NA,NA,narrative,True,old,False,healthy,healthy,unknown,healthy,healthy,unknown,unknown,unknown,healthy,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: HTN controlled; smoker ~18 cig/day. Exam: no BOP, radiographs: crestal bone WNL, CAL 0; recession 3mm #22, probing depths within normal limits. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo."
+2193,867,30,periodontitis_stage_4,C,generalized,soap,False,none,False,periodontitis_stage_4,periodontitis_stage_4,unknown,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: T2DM, last A1c 6.5; former smoker, quit 2015.
+O: radiographs: severe horizontal bone loss, vertical defect #19; BOP generalized; deep pockets posterior sextants; severe attachment loss; missing #3, #9, #14, #15, #18, #19, #25 (hx perio ext).
+A: See perio chart.
+P: Referral to periodontist for comprehensive tx plan."
+469,187,20,periodontitis_stage_4,C,generalized,narrative,True,2017,False,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,unknown,unknown,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: no sig med hx; non-smoker. Exam: bleeding on probing 31% of sites, hx extraction of 6 teeth d/t perio, max PD 7 mm, radiographs: bone loss to apical third (~48%), max CAL 5mm interproximal. Impression: Generalized periodontitis Stage III Grade C. FM SRP, refer to periodontist."
+2102,830,70,periodontitis_stage_4,B,localized,narrative,False,short,False,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: radiographs: severe horizontal bone loss, vertical defect #30, hx extraction of 5 teeth d/t perio, deep pockets posterior sextants, severe attachment loss; recession 2mm #11, heavy BOP. Impression: Perio IIIB, loc. SRP 4 quads; perio consult for surgical eval."
+122,52,66,periodontitis_stage_2,B,generalized,narrative,False,old,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.2; smoker ~8 cig/day. Exam: mild pocketing, heavy BOP, moderate attachment loss; recession 3mm #27, FMX: moderate horizontal bone loss. Impression: AAP Case Type III. SRP 4 quads, re-eval 4-6 wk."
+1538,617,47,healthy,NA,NA,narrative,True,2017,False,healthy,healthy,gingivitis,healthy,healthy,healthy,gingivitis,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: probing depths within normal limits, no BOP. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo. Next appt [DATE]."
+483,193,72,healthy,NA,NA,narrative,True,old,False,healthy,healthy,gingivitis,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; former smoker, quit 2015. Exam: BOP <10%, shallow sulci throughout, CAL 0, PAN: crestal bone WNL. Impression: Periodontium WNL. Adult prophy. RTC 6 mo. Next appt [DATE]."
+1001,397,64,gingivitis,NA,NA,narrative,False,none,False,gingivitis,periodontitis_stage_1,gingivitis,healthy,healthy,gingivitis,gingivitis,unknown,periodontitis_stage_1,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: BOP generalized, probing depths within normal limits, slight attachment loss; recession 3mm #11, PAN: mild horizontal bone loss. Impression: Findings reviewed with pt. Prophy, flossing instruction. 6 mo recall. Next appt [DATE]."
+209,85,27,gingivitis,NA,NA,soap,False,2017,False,healthy,healthy,unknown,gingivitis,gingivitis,gingivitis,periodontitis_stage_1,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; non-smoker.
+O: BWX: mild horizontal bone loss; no attachment loss; recession 2mm #6; shallow sulci throughout; localized BOP.
+A: Clinical gingival health on an intact periodontium.
+P: Prophy, OHI. Recall 6 mo. Pt moved; new address [LOCATION]."
+573,229,76,periodontitis_stage_1,A,generalized,chart_summary,False,short,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP generalized
+- slight attachment loss
+- BWX: mild horizontal bone loss
+- mild pocketing
+Dx: Perio IA, gen.
+Med hx: NKDA; former smoker, quit 2015.
+Tx plan: Localized SRP, perio maint q4mo."
+640,255,35,periodontitis_stage_1,B,generalized,chart_summary,False,none,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- FMX: mild horizontal bone loss
+- localized BOP
+- slight attachment loss; recession 3mm #6
+- mild pocketing
+Dx: Findings reviewed with pt.
+Med hx: T2DM, last A1c 6.5; non-smoker.
+Tx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE]."
+976,385,54,periodontitis_stage_2,B,generalized,soap,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: NKDA; smoker ~8 cig/day.
+O: max CAL 4mm interproximal; recession 3mm #27; BOP 47%; PAN: moderate horizontal bone loss ~33%; max PD 5 mm.
+A: Generalized periodontitis Stage II Grade B.
+P: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE]."
+1279,512,73,periodontitis_stage_3,C,generalized,soap,False,none,False,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: no sig med hx; smoker ~19 cig/day.
+O: severe attachment loss; deep pockets posterior sextants; heavy BOP; missing #2, #8, #15, #30 (hx perio ext); radiographs: severe horizontal bone loss.
+A: Findings reviewed with pt.
+P: Perio referral; prosthetic consult for edentulous areas."
+476,190,51,periodontitis_stage_1,A,generalized,chart_summary,True,none,False,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- bleeding on probing 22% of sites
+- shallow sulci throughout
+- CAL up to 2mm
+- FMX: bone loss to coronal third (~7%)
+Med hx: HTN controlled; non-smoker.
+Tx plan: Prophy, flossing instruction. 6 mo recall."
+1877,749,74,periodontitis_stage_1,A,localized,narrative,False,none,False,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; former smoker, quit 2015. Exam: slight attachment loss, BOP generalized, probing depths within normal limits. Impression: See perio chart. SRP UR/LR, re-eval 6 wk. Pt moved; new address [LOCATION]."
+2653,1047,57,periodontitis_stage_2,C,generalized,narrative,False,old,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,unknown,periodontitis_stage_2,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: T2DM, last A1c 7.8; non-smoker. Exam: FMX: moderate horizontal bone loss, moderate attachment loss, mild pocketing, BOP generalized. Impression: AAP Case Type III. 4 quad SRP then perio maint q3mo."
+144,61,54,periodontitis_stage_2,B,generalized,chart_summary,True,none,False,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP 48%
+- CAL up to 3mm
+- radiographs: bone loss to middle third (~17%)
+- generalized 3-4mm pockets, localized #12 M 5mm, #22 B 4mm, #31 DL 4mm
+Dx: Findings reviewed with pt.
+Med hx: T2DM, last A1c 6.5; non-smoker.
+Tx plan: FM SRP, refer to periodontist."
+482,192,37,periodontitis_stage_1,A,generalized,narrative,True,none,False,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; non-smoker. Exam: bleeding on probing 33% of sites, BWX: bone loss to coronal third (~8%), attachment loss 1-1 mm, max PD 4 mm. SRP UR/LR, re-eval 6 wk. Pt moved; new address [LOCATION]."
+1006,399,72,gingivitis,NA,NA,narrative,True,none,False,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,unknown,unknown,unknown,periodontitis_stage_1,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: NKDA; never smoker. Exam: shallow sulci throughout, BOP 17%, CAL up to 1mm; recession 1mm #27. Impression: See perio chart. Prophy, flossing instruction. 6 mo recall. Next appt [DATE]."
+42,19,55,periodontitis_stage_2,B,localized,narrative,False,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: pre-diabetic A1c 5.8; non-smoker. Exam: BOP generalized, moderate pocketing posterior, FMX: moderate horizontal bone loss, moderate attachment loss. Impression: Localized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk."
+296,120,30,gingivitis,NA,NA,narrative,False,old,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,unknown,gingivitis,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: T2DM, last A1c 8.2; non-smoker. Exam: PAN: mild horizontal bone loss, no pocketing, heavy BOP, slight attachment loss. Impression: Plaque-induced gingivitis. Prophy + OHI, re-eval gingiva next recall. Pt moved; new address [LOCATION]."
+2698,1067,39,healthy,NA,NA,soap,False,old,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: no sig med hx; non-smoker.
+O: radiographs: crestal bone WNL; no pocketing; CAL 0; no bleeding on probing.
+A: Periodontium WNL.
+P: Adult prophy. RTC 6 mo."
+1711,682,50,periodontitis_stage_1,B,localized,soap,True,2017,True,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: T2DM, last A1c 6.8; former smoker, quit 2015.
+O: BOP 14%; max PD 4 mm; CAL up to 1mm; radiographs: bone loss to coronal third (~6%).
+A: Localized periodontitis Stage I Grade B.
+P: SRP UR/LR, re-eval 6 wk.
+
+-- copied from visit [DATE] --
+Dx at that visit: gingivitis. Pt declined SRP at that time."
+2593,1020,70,periodontitis_stage_2,B,localized,narrative,False,old,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.3; non-smoker. Exam: BOP generalized, BWX: moderate horizontal bone loss, moderate attachment loss, moderate pocketing posterior. Impression: Localized moderate chronic periodontitis. 4 quad SRP then perio maint q3mo."
+1187,476,58,periodontitis_stage_3,B,generalized,narrative,False,none,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: FMX: severe horizontal bone loss, vertical defect #3, missing #2, #25, #30 (hx perio ext), severe attachment loss, heavy BOP, deep pockets posterior sextants. Impression: See perio chart. FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+2507,988,21,healthy,NA,NA,soap,False,short,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; never smoker.
+O: no bleeding on probing; probing depths within normal limits; no attachment loss.
+A: Perio health.
+P: Prophy, OHI. Recall 6 mo. Next appt [DATE]."
+865,342,53,healthy,NA,NA,narrative,False,2017,False,healthy,healthy,healthy,healthy,healthy,gingivitis,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; former smoker, quit 2015. Exam: no bleeding on probing, FMX: crestal bone WNL, no pocketing. Impression: Clinical gingival health on an intact periodontium. Prophy, OHI. Recall 6 mo."
+1619,649,25,periodontitis_stage_4,C,localized,chart_summary,False,none,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- FMX: severe horizontal bone loss
+- BOP generalized
+- severe attachment loss
+- missing #2, #3, #8, #14, #15, #18, #19, #30 (hx perio ext)
+- deep pockets posterior sextants
+Dx: See perio chart.
+Med hx: NKDA; former smoker, quit 2015.
+Tx plan: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]."
+472,189,56,healthy,NA,NA,narrative,True,old,False,healthy,healthy,healthy,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: no sig med hx; smoker ~5 cig/day. Exam: minimal BOP, shallow sulci throughout, BWX: crestal bone WNL, CAL 0; recession 3mm #6. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo."
+1082,435,22,periodontitis_stage_2,C,generalized,soap,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: no sig med hx; former smoker, quit 2015.
+O: attachment loss 3-4 mm; PAN: bone loss to middle third (~33%); max PD 4 mm; BOP 49%.
+A: Generalized periodontitis Stage II Grade C.
+P: SRP 4 quads, re-eval 4-6 wk."
+828,327,23,healthy,NA,NA,chart_summary,False,short,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- FMX: crestal bone WNL
+- no attachment loss
+- no bleeding on probing
+- no pocketing
+Dx: Perio health.
+Med hx: HTN controlled; non-smoker.
+Tx plan: Prophy, OHI. Recall 6 mo."
+2876,1134,52,periodontitis_stage_1,A,generalized,chart_summary,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,unknown,unknown,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- slight attachment loss
+- shallow sulci throughout
+- localized BOP
+- FMX: mild horizontal bone loss
+Dx: Generalized periodontitis Stage I Grade A.
+Med hx: no sig med hx; former smoker, quit 2015.
+Tx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE]."
+2867,1131,28,healthy,NA,NA,narrative,True,2017,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: BWX: crestal bone WNL, minimal BOP, probing depths within normal limits, CAL 0. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo."
+2743,1085,66,periodontitis_stage_2,B,localized,narrative,True,none,False,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; non-smoker. Exam: BWX: bone loss to middle third (~23%), bleeding on probing 27% of sites, CAL up to 3mm, PD up to 4mm (#2 DL 3mm, #10 B 3mm). Impression: See perio chart. SRP UR/LR, re-eval 6 wk."
+1060,425,38,periodontitis_stage_3,C,localized,narrative,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_3,periodontitis_stage_3,unknown,unknown,unknown,periodontitis_stage_2,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: pre-diabetic A1c 6.3; former smoker, quit 2015. Exam: FMX: severe horizontal bone loss ~57%, generalized 6-7mm pockets, localized #14 ML 7mm, #19 MB 7mm, bleeding on probing 50% of sites, CAL up to 5mm. Impression: Localized periodontitis Stage II Grade C. SRP 4 quads, re-eval 4-6 wk. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+37,17,71,gingivitis,NA,NA,narrative,False,old,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: no sig med hx; never smoker. Exam: no pocketing, recession 3mm #27, localized BOP, BWX: crestal bone WNL. Impression: AAP Case Type I. Prophy, flossing instruction. 6 mo recall."
+1708,681,58,periodontitis_stage_2,B,localized,chart_summary,False,short,True,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- mild pocketing
+- FMX: moderate horizontal bone loss
+- BOP generalized
+- moderate attachment loss; recession 1mm #22
+Dx: Loc. perio St II Gr B.
+Med hx: HTN controlled; smoker ~3 cig/day.
+Tx plan: 4 quad SRP then perio maint q3mo.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage I periodontitis. Pt declined SRP at that time."
+2094,825,63,periodontitis_stage_2,B,localized,chart_summary,False,2017,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- mild pocketing
+- moderate attachment loss; recession 3mm #22
+- PAN: moderate horizontal bone loss
+- heavy BOP
+Dx: Localized periodontitis Stage III Grade B.
+Med hx: NKDA; never smoker.
+Tx plan: FM SRP, refer to periodontist. Next appt [DATE]."
+2732,1081,68,periodontitis_stage_4,B,generalized,narrative,True,none,True,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: generalized 8-9mm pockets, localized #2 DB 9mm, #5 ML 10mm, #12 MB 9mm, #15 M 9mm, PAN: severe horizontal bone loss ~56%, bleeding on probing 31% of sites, 10 teeth lost to periodontal disease, max CAL 8mm interproximal; recession 1mm #11. Perio referral; prosthetic consult for edentulous areas.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage III periodontitis. Pt declined SRP at that time."
+2124,839,51,periodontitis_stage_3,B,localized,narrative,False,none,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: severe attachment loss, deep pockets posterior sextants, BWX: severe horizontal bone loss, vertical defect #14, BOP generalized, hx extraction of 4 teeth d/t perio. FM SRP, refer to periodontist."
+710,281,22,gingivitis,NA,NA,soap,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: pre-diabetic A1c 6.2; non-smoker.
+O: slight attachment loss; heavy BOP; no pocketing.
+A: Localized periodontitis Stage I Grade B.
+P: SRP UR/LR, re-eval 6 wk. Next appt [DATE]."
+818,323,36,periodontitis_stage_3,C,generalized,soap,True,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; non-smoker.
+O: generalized 5-6mm pockets, localized #2 MB 6mm, #21 DL 6mm; PAN: severe horizontal bone loss ~59%; bleeding on probing 52% of sites; CAL up to 5mm; missing #30 (hx perio ext).
+A: Generalized periodontitis Stage IV Grade C.
+P: Perio referral; prosthetic consult for edentulous areas. Pt moved; new address [LOCATION]."
+515,205,45,gingivitis,NA,NA,chart_summary,True,none,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- radiographs: bone loss to coronal third (~6%)
+- bleeding on probing 41% of sites
+- probing depths within normal limits
+Dx: See perio chart.
+Med hx: NKDA; never smoker.
+Tx plan: Prophy, flossing instruction. 6 mo recall. Next appt [DATE]."
+94,41,70,gingivitis,NA,NA,narrative,True,2017,False,periodontitis_stage_1,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,unknown,unknown,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; former smoker, quit 2015. Exam: bleeding on probing 20% of sites, PD up to 4mm (#13 B 4mm, #23 L 4mm), CAL 0; recession 2mm #22. Impression: Localized periodontitis Stage I Grade B. SRP UR/LR, re-eval 6 wk."
+589,236,24,periodontitis_stage_2,B,localized,soap,True,2017,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: HTN controlled; former smoker, quit 2015.
+O: CAL up to 4mm; PD up to 4mm (#23 ML 4mm, #26 ML 3mm); BWX: bone loss to middle third (~21%); bleeding on probing 34% of sites.
+A: Localized periodontitis Stage III Grade B.
+P: FM SRP, refer to periodontist."
+311,125,22,gingivitis,NA,NA,soap,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,gingivitis,healthy,healthy,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: HTN controlled; never smoker.
+O: recession 3mm #11; BOP generalized; no pocketing; radiographs: mild horizontal bone loss.
+A: Localized periodontitis Stage I Grade B.
+P: Localized SRP, perio maint q4mo. Next appt [DATE]."
+3029,1194,65,periodontitis_stage_1,B,generalized,soap,False,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_2,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; smoker ~5 cig/day.
+O: mild pocketing; slight attachment loss; BOP generalized; radiographs: mild horizontal bone loss.
+A: Generalized periodontitis Stage II Grade B.
+P: SRP 4 quads, re-eval 4-6 wk. Next appt [DATE]."
+2616,1032,77,healthy,NA,NA,narrative,True,old,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: minimal BOP, CAL 0, probing depths within normal limits. Impression: Periodontium WNL. Prophy, OHI. Recall 6 mo."
+2199,870,55,periodontitis_stage_3,B,localized,chart_summary,True,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- max CAL 6mm interproximal; recession 1mm #6
+- PAN: severe horizontal bone loss ~50%
+- hx extraction of 1 teeth d/t perio
+- generalized 4-5mm pockets, localized #8 B 5mm, #25 ML 5mm, #27 D 6mm
+- bleeding on probing 39% of sites
+Dx: Localized periodontitis Stage IV Grade B.
+Med hx: HTN controlled; never smoker.
+Tx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+792,314,46,periodontitis_stage_3,B,localized,soap,True,2017,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; non-smoker.
+O: FMX: severe horizontal bone loss ~40%; bleeding on probing 64% of sites; PD up to 6mm (#7 B 6mm, #29 DL 6mm); CAL up to 8mm; 4 teeth lost to periodontal disease.
+A: Localized periodontitis Stage III Grade B.
+P: SRP 4 quads; perio consult for surgical eval. Next appt [DATE]."
+1136,458,78,gingivitis,NA,NA,chart_summary,False,short,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- slight attachment loss; recession 2mm #27
+- BOP generalized
+- probing depths within normal limits
+- PAN: mild horizontal bone loss
+Dx: Gingivitis.
+Med hx: HTN controlled; non-smoker.
+Tx plan: Prophy + OHI, re-eval gingiva next recall. Next appt [DATE]."
+1990,789,24,gingivitis,NA,NA,narrative,True,old,False,periodontitis_stage_1,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: BOP 13%, generalized 3-3mm pockets, localized #3 MB 3mm, #9 M 3mm, #14 D 3mm, PAN: mild horizontal bone loss ~9%. Impression: Localized slight chronic periodontitis. SRP UR/LR, re-eval 6 wk."
+2006,794,79,periodontitis_stage_3,B,localized,soap,True,old,False,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_3,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: NKDA; never smoker.
+O: 2 teeth lost to periodontal disease; max PD 8 mm; BOP 31%; BWX: severe horizontal bone loss ~38%; CAL up to 7mm; recession 2mm #22.
+A: Localized severe chronic periodontitis.
+P: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+875,345,72,gingivitis,NA,NA,narrative,False,none,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,unknown,gingivitis,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: NKDA; non-smoker. Exam: BWX: mild horizontal bone loss, no attachment loss; recession 2mm #27, BOP generalized, probing depths within normal limits. Impression: Findings reviewed with pt. Prophy + OHI, re-eval gingiva next recall. Next appt [DATE]."
+504,200,45,periodontitis_stage_1,B,localized,chart_summary,False,none,False,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,unknown,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- mild pocketing
+- FMX: mild horizontal bone loss
+- slight attachment loss
+- BOP generalized
+Med hx: HTN controlled; never smoker.
+Tx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE]."
+968,382,26,periodontitis_stage_3,C,localized,chart_summary,True,short,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,unknown,periodontitis_stage_3,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- attachment loss 6-7 mm
+- max PD 7 mm
+- bleeding on probing 61% of sites
+- missing #3, #18 (hx perio ext)
+- PAN: bone loss to apical third (~43%)
+Dx: Loc. perio St III Gr C.
+Med hx: HTN controlled; never smoker.
+Tx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+2144,848,65,gingivitis,NA,NA,chart_summary,False,short,False,gingivitis,gingivitis,gingivitis,healthy,healthy,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP generalized
+- slight attachment loss
+- mild pocketing
+- PAN: crestal bone WNL
+Dx: Gingivitis.
+Med hx: NKDA; former smoker, quit 2015.
+Tx plan: Prophy + OHI, re-eval gingiva next recall."
+2130,843,55,periodontitis_stage_2,B,localized,chart_summary,True,old,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BWX: bone loss to middle third (~17%)
+- bleeding on probing 43% of sites
+- max PD 4 mm
+- max CAL 3mm interproximal
+Dx: AAP Case Type III.
+Med hx: HTN controlled; never smoker.
+Tx plan: SRP 4 quads, re-eval 4-6 wk."
+348,140,73,periodontitis_stage_4,B,localized,soap,True,old,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: no sig med hx; former smoker, quit 2015.
+O: FMX: severe horizontal bone loss ~57%; bleeding on probing 67% of sites; 5 teeth lost to periodontal disease; max CAL 9mm interproximal; recession 2mm #27; generalized 7-8mm pockets, localized #22 ML 9mm, #29 ML 8mm.
+A: Localized severe chronic periodontitis.
+P: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]. Pt moved; new address [LOCATION]."
+2882,1136,27,healthy,NA,NA,narrative,True,2017,False,healthy,healthy,unknown,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: no sig med hx; never smoker. Exam: BOP <10%, shallow sulci throughout, no attachment loss. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo."
+2692,1065,41,periodontitis_stage_1,B,generalized,chart_summary,True,none,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- bleeding on probing 31% of sites
+- BWX: mild horizontal bone loss ~13%
+- attachment loss 1-2 mm
+- probing depths within normal limits
+Dx: Findings reviewed with pt.
+Med hx: HTN controlled; never smoker.
+Tx plan: SRP UR/LR, re-eval 6 wk."
+2631,1039,77,gingivitis,NA,NA,soap,True,old,False,gingivitis,gingivitis,periodontitis_stage_1,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: no sig med hx; former smoker, quit 2015.
+O: radiographs: crestal bone WNL; BOP 22%; shallow sulci throughout; CAL up to 1mm.
+A: Plaque-induced gingivitis.
+P: Prophy, flossing instruction. 6 mo recall."
+549,220,78,periodontitis_stage_2,A,localized,soap,False,short,False,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,unknown,periodontitis_stage_1,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: HTN controlled; non-smoker.
+O: BOP generalized; moderate pocketing posterior; BWX: moderate horizontal bone loss; moderate attachment loss.
+A: Stage I/Grade A perio.
+P: Localized SRP, perio maint q4mo."
+709,280,66,periodontitis_stage_4,B,localized,chart_summary,False,old,True,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- 9 teeth lost to periodontal disease
+- severe attachment loss
+- deep pockets posterior sextants
+- heavy BOP
+- FMX: severe horizontal bone loss, vertical defect #19
+Dx: Localized severe chronic periodontitis.
+Med hx: NKDA; non-smoker.
+Tx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage III periodontitis. Pt declined SRP at that time."
+1849,738,64,periodontitis_stage_3,B,generalized,chart_summary,False,old,True,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- PAN: severe horizontal bone loss
+- deep pockets posterior sextants
+- BOP generalized
+- severe attachment loss
+Dx: AAP Case Type IV.
+Med hx: no sig med hx; never smoker.
+Tx plan: SRP 4 quads; perio consult for surgical eval.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+221,90,73,periodontitis_stage_4,C,generalized,soap,True,old,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_4,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; non-smoker.
+O: PD up to 8mm (#2 M 7mm, #31 D 7mm); BOP 38%; BWX: bone loss to apical third (~76%); hx extraction of 8 teeth d/t perio; max CAL 9mm interproximal.
+A: AAP Case Type IV.
+P: Referral to periodontist for comprehensive tx plan. Next appt [DATE]."
+777,308,50,gingivitis,NA,NA,soap,True,none,False,gingivitis,periodontitis_stage_1,gingivitis,healthy,healthy,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: no sig med hx; former smoker, quit 2015.
+O: PD up to 4mm (#22 B 4mm, #28 D 3mm); max CAL 1mm interproximal; bleeding on probing 33% of sites.
+A: Findings reviewed with pt.
+P: Prophy + OHI, re-eval gingiva next recall. Next appt [DATE]."
+1638,655,75,periodontitis_stage_2,B,localized,narrative,False,short,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: moderate attachment loss, radiographs: moderate horizontal bone loss, moderate pocketing posterior, heavy BOP. Impression: Stage II/Grade B perio. SRP 4 quads, re-eval 4-6 wk."
+2049,809,37,gingivitis,NA,NA,narrative,False,2017,False,gingivitis,gingivitis,periodontitis_stage_1,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; never smoker. Exam: BOP generalized, shallow sulci throughout, no attachment loss, BWX: mild horizontal bone loss. Impression: Dental biofilm-induced gingivitis, localized. Prophy, flossing instruction. 6 mo recall."
+2208,875,64,healthy,NA,NA,chart_summary,True,2017,False,healthy,healthy,healthy,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- probing depths within normal limits
+- minimal BOP
+- BWX: crestal bone WNL
+Dx: Clinical gingival health on an intact periodontium.
+Med hx: no sig med hx; non-smoker.
+Tx plan: Prophy, OHI. Recall 6 mo."
+1661,665,34,healthy,NA,NA,narrative,True,old,False,gingivitis,gingivitis,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; never smoker. Exam: no BOP, probing depths within normal limits, no attachment loss; recession 1mm #22. Impression: AAP Case Type I. Prophy + OHI, re-eval gingiva next recall. Next appt [DATE]."
+2524,997,73,periodontitis_stage_3,B,generalized,soap,False,short,True,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: no sig med hx; former smoker, quit 2015.
+O: heavy BOP; missing #9, #19, #25 (hx perio ext); deep pockets posterior sextants; severe attachment loss; recession 2mm #27; FMX: severe horizontal bone loss.
+A: Gen. perio St IV Gr B.
+P: Perio referral; prosthetic consult for edentulous areas.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+1586,636,55,periodontitis_stage_1,A,localized,chart_summary,True,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,unknown,periodontitis_stage_1,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- CAL up to 1mm
+- PAN: crestal bone WNL
+- max PD 4 mm
+- BOP 22%
+Dx: Localized periodontitis Stage I Grade A.
+Med hx: no sig med hx; never smoker.
+Tx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE]."
+756,301,55,periodontitis_stage_1,C,generalized,soap,True,2017,True,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; smoker ~28 cig/day.
+O: probing depths within normal limits; radiographs: mild horizontal bone loss ~6%; attachment loss 1-1 mm; bleeding on probing 31% of sites.
+A: Generalized periodontitis Stage I Grade C.
+P: SRP UR/LR, re-eval 6 wk.
+
+-- copied from visit [DATE] --
+Dx at that visit: gingivitis. Pt declined SRP at that time."
+616,246,25,gingivitis,NA,NA,narrative,True,short,False,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: shallow sulci throughout, bleeding on probing 21% of sites, no attachment loss, radiographs: crestal bone WNL. Impression: Perio health. Prophy, OHI. Recall 6 mo."
+1095,441,79,periodontitis_stage_4,B,generalized,soap,False,2017,True,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,unknown,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: HTN controlled; smoker ~6 cig/day.
+O: severe attachment loss; deep pockets posterior sextants; BWX: severe horizontal bone loss, vertical defect #19; heavy BOP; hx extraction of 5 teeth d/t perio.
+A: Generalized periodontitis Stage IV Grade B.
+P: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage III periodontitis. Pt declined SRP at that time."
+1364,546,28,periodontitis_stage_4,C,generalized,soap,False,old,False,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: HTN controlled; never smoker.
+O: deep pockets posterior sextants; BOP generalized; severe attachment loss; radiographs: severe horizontal bone loss, vertical defect #14; 7 teeth lost to periodontal disease.
+A: AAP Case Type IV.
+P: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+1385,555,70,periodontitis_stage_1,A,localized,soap,True,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; former smoker, quit 2015.
+O: BOP 23%; CAL up to 2mm; max PD 4 mm.
+A: Localized periodontitis Stage I Grade A.
+P: Localized SRP, perio maint q4mo. Next appt [DATE]."
+2884,1138,62,healthy,NA,NA,narrative,True,short,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: NKDA; former smoker, quit 2015. Exam: probing depths within normal limits, BOP <10%. Impression: Perio health. Prophy, OHI. Recall 6 mo."
+1693,676,26,healthy,NA,NA,narrative,True,2017,False,healthy,healthy,gingivitis,healthy,healthy,healthy,healthy,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; never smoker. Exam: no attachment loss, no BOP, probing depths within normal limits, FMX: crestal bone WNL. Impression: Clinical gingival health on an intact periodontium. Adult prophy. RTC 6 mo."
+2065,815,20,gingivitis,NA,NA,soap,True,old,False,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: HTN controlled; former smoker, quit 2015.
+O: probing depths within normal limits; attachment loss 1-1 mm; BOP 23%; PAN: mild horizontal bone loss ~8%.
+A: Plaque-induced gingivitis.
+P: Prophy + OHI, re-eval gingiva next recall."
+2068,816,63,periodontitis_stage_3,B,localized,narrative,True,2017,True,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: pre-diabetic A1c 6.1; non-smoker. Exam: BOP 41%, PD up to 7mm (#5 ML 7mm, #15 L 7mm), radiographs: bone loss to apical third (~42%), hx extraction of 3 teeth d/t perio, max CAL 6mm interproximal; recession 1mm #6. Impression: Localized periodontitis Stage III Grade B. FM SRP, refer to periodontist. Pt moved; new address [LOCATION].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+190,80,63,periodontitis_stage_2,C,generalized,soap,True,old,True,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,unknown,unknown,unknown,periodontitis_stage_2,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: T2DM, last A1c 6.6; smoker ~29 cig/day.
+O: PD up to 5mm (#9 M 5mm, #20 DL 5mm); BOP 40%; BWX: moderate horizontal bone loss ~16%; CAL up to 4mm.
+A: AAP Case Type III.
+P: 4 quad SRP then perio maint q3mo.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage I periodontitis. Pt declined SRP at that time."
+1447,578,46,healthy,NA,NA,narrative,True,short,False,healthy,healthy,healthy,healthy,healthy,healthy,gingivitis,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: BOP <10%, no attachment loss; recession 2mm #6, PD 1-3mm WNL, FMX: crestal bone WNL. Impression: Perio health. Prophy, OHI. Recall 6 mo."
+1623,650,81,periodontitis_stage_2,B,generalized,soap,True,short,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: NKDA; non-smoker.
+O: BOP 18%; PD up to 5mm (#4 MB 4mm, #18 D 5mm); radiographs: bone loss to middle third (~24%); CAL up to 3mm.
+A: Perio IIB, gen.
+P: 4 quad SRP then perio maint q3mo."
+1181,474,80,gingivitis,NA,NA,narrative,False,none,False,gingivitis,gingivitis,unknown,gingivitis,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: mild pocketing, localized BOP, no attachment loss, BWX: mild horizontal bone loss. Impression: Findings reviewed with pt. Prophy + OHI, re-eval gingiva next recall."
+893,352,61,periodontitis_stage_4,C,generalized,chart_summary,False,none,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- FMX: severe horizontal bone loss
+- deep pockets posterior sextants
+- heavy BOP
+- severe attachment loss; recession 1mm #27
+- missing #3, #14, #18, #19, #24, #25, #31 (hx perio ext)
+Dx: See perio chart.
+Med hx: HTN controlled; former smoker, quit 2015.
+Tx plan: Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+678,268,67,periodontitis_stage_2,B,localized,soap,False,short,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: HTN controlled; former smoker, quit 2015.
+O: moderate attachment loss; PAN: moderate horizontal bone loss; BOP generalized; moderate pocketing posterior.
+A: Loc. perio St II Gr B.
+P: SRP 4 quads, re-eval 4-6 wk."
+1459,582,59,periodontitis_stage_3,B,generalized,soap,True,short,False,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.
+O: PAN: severe horizontal bone loss ~59%; missing #14, #24, #30 (hx perio ext); BOP 68%; max CAL 5mm interproximal; max PD 7 mm.
+A: Gen. perio St III Gr B.
+P: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]."
+400,162,32,periodontitis_stage_4,C,generalized,narrative,True,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_3,unknown,periodontitis_stage_4,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: CAL up to 9mm; recession 1mm #11, PAN: bone loss to apical third (~54%), max PD 9 mm, BOP 42%, missing #2, #3, #8, #9, #14, #15, #18, #19, #24, #30 (hx perio ext). Impression: Generalized periodontitis Stage IV Grade C. Perio referral; prosthetic consult for edentulous areas."
+3018,1190,58,gingivitis,NA,NA,narrative,False,short,False,gingivitis,gingivitis,unknown,healthy,healthy,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: FMX: crestal bone WNL, localized BOP, CAL 0, probing depths within normal limits. Impression: Gingivitis. Prophy, flossing instruction. 6 mo recall. Next appt [DATE]. Pt moved; new address [LOCATION]."
+198,82,55,gingivitis,NA,NA,narrative,False,none,False,gingivitis,periodontitis_stage_1,periodontitis_stage_1,healthy,healthy,gingivitis,periodontitis_stage_1,unknown,periodontitis_stage_1,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: NKDA; never smoker. Exam: BOP generalized, slight attachment loss, probing depths within normal limits. Prophy, flossing instruction. 6 mo recall."
+943,371,60,periodontitis_stage_1,B,generalized,narrative,False,old,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: T2DM, last A1c 6.8; former smoker, quit 2015. Exam: slight attachment loss, BWX: mild horizontal bone loss, BOP generalized, mild pocketing. Impression: Generalized slight chronic periodontitis. SRP UR/LR, re-eval 6 wk."
+1667,667,36,gingivitis,NA,NA,chart_summary,True,none,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- max PD 4 mm
+- CAL 0
+- BOP 31%
+Dx: See perio chart.
+Med hx: HTN controlled; former smoker, quit 2015.
+Tx plan: Prophy + OHI, re-eval gingiva next recall. Next appt [DATE]."
+1129,455,74,periodontitis_stage_3,B,generalized,chart_summary,True,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- max PD 7 mm
+- FMX: severe horizontal bone loss ~57%
+- attachment loss 4-5 mm
+- missing #2 (hx perio ext)
+- BOP 53%
+Dx: Generalized periodontitis Stage IV Grade B.
+Med hx: no sig med hx; never smoker.
+Tx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]."
+974,384,55,periodontitis_stage_3,C,localized,soap,True,2017,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: NKDA; former smoker, quit 2015.
+O: BOP 66%; hx extraction of 2 teeth d/t perio; FMX: severe horizontal bone loss ~58%; attachment loss 5-6 mm; max PD 7 mm.
+A: Localized periodontitis Stage III Grade C.
+P: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Pt moved; new address [LOCATION]."
+2429,961,24,periodontitis_stage_3,C,generalized,narrative,False,old,False,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; former smoker, quit 2015. Exam: heavy BOP, deep pockets posterior sextants, radiographs: severe horizontal bone loss, severe attachment loss, hx extraction of 1 teeth d/t perio. Impression: AAP Case Type IV. Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]. Pt moved; new address [LOCATION]."
+2967,1171,79,periodontitis_stage_3,B,localized,chart_summary,False,2017,True,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- hx extraction of 1 teeth d/t perio
+- heavy BOP
+- deep pockets posterior sextants
+- severe attachment loss
+- radiographs: severe horizontal bone loss, vertical defect #14
+Dx: Localized periodontitis Stage III Grade B.
+Med hx: HTN controlled; former smoker, quit 2015.
+Tx plan: SRP 4 quads; perio consult for surgical eval.
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+1324,528,80,periodontitis_stage_4,C,localized,chart_summary,False,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_4,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- severe attachment loss
+- 6 teeth lost to periodontal disease
+- heavy BOP
+- deep pockets posterior sextants
+- FMX: severe horizontal bone loss, vertical defect #19
+Dx: Localized periodontitis Stage IV Grade C.
+Med hx: T2DM, last A1c 10.5; non-smoker.
+Tx plan: Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+1049,420,39,periodontitis_stage_4,C,localized,narrative,True,short,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,unknown,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: T2DM, last A1c 8.5; never smoker. Exam: PD up to 7mm (#6 DB 6mm, #12 M 6mm), BOP 61%, attachment loss 4-5 mm, FMX: severe horizontal bone loss ~63%, hx extraction of 10 teeth d/t perio. Impression: Loc. perio St IV Gr C. Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+1288,515,33,periodontitis_stage_3,C,generalized,chart_summary,True,2017,True,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- generalized 6-7mm pockets, localized #8 DB 8mm, #10 DL 7mm, #27 ML 7mm
+- bleeding on probing 30% of sites
+- CAL up to 7mm
+- PAN: bone loss to apical third (~35%)
+Dx: Generalized periodontitis Stage III Grade C.
+Med hx: NKDA; former smoker, quit 2015.
+Tx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage II periodontitis. Pt declined SRP at that time."
+3014,1189,72,gingivitis,NA,NA,chart_summary,False,old,False,healthy,healthy,periodontitis_stage_1,gingivitis,gingivitis,periodontitis_stage_1,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- no pocketing
+- slight attachment loss
+- BOP generalized
+Dx: Periodontium WNL.
+Med hx: HTN controlled; non-smoker.
+Tx plan: Prophy, OHI. Recall 6 mo. Next appt [DATE]. Pt moved; new address [LOCATION]."
+958,377,36,gingivitis,NA,NA,narrative,True,none,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,unknown,unknown,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: no attachment loss, radiographs: bone loss to coronal third (~9%), BOP 16%, probing depths within normal limits. Impression: Findings reviewed with pt. Prophy + OHI, re-eval gingiva next recall."
+2716,1075,45,periodontitis_stage_1,A,localized,narrative,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,unknown,unknown,unknown,unknown,unknown,periodontitis_stage_1,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; never smoker. Exam: BOP generalized, PAN: mild horizontal bone loss, slight attachment loss, no pocketing. Impression: Localized periodontitis Stage I Grade A. SRP UR/LR, re-eval 6 wk."
+2971,1172,22,healthy,NA,NA,narrative,False,short,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,unknown,healthy,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: no sig med hx; smoker ~9 cig/day. Exam: no pocketing, radiographs: crestal bone WNL, no bleeding on probing. Impression: Perio health. Prophy, OHI. Recall 6 mo."
+656,261,23,gingivitis,NA,NA,soap,True,short,False,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: no sig med hx; non-smoker.
+O: PD up to 4mm (#14 DB 4mm, #28 DL 3mm); BOP 43%; BWX: crestal bone WNL; max CAL 1mm interproximal.
+A: Gingivitis.
+P: Prophy + OHI, re-eval gingiva next recall. Pt moved; new address [LOCATION]."
+2740,1084,63,periodontitis_stage_3,B,localized,narrative,False,none,False,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_3,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; non-smoker. Exam: severe attachment loss, BOP generalized, missing #2, #14, #18, #25 (hx perio ext), FMX: severe horizontal bone loss, vertical defect #3, deep pockets posterior sextants. SRP 4 quads, re-eval 4-6 wk."
+1144,461,55,periodontitis_stage_2,B,generalized,chart_summary,False,none,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- moderate attachment loss; recession 1mm #27
+- radiographs: moderate horizontal bone loss
+- moderate pocketing posterior
+- BOP generalized
+Dx: Findings reviewed with pt.
+Med hx: pre-diabetic A1c 6.4; former smoker, quit 2015.
+Tx plan: 4 quad SRP then perio maint q3mo."
+2925,1154,63,periodontitis_stage_4,C,generalized,narrative,False,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_2,gingivitis,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: BWX: severe horizontal bone loss, deep pockets posterior sextants, missing #3, #14, #18, #19, #24, #25, #30 (hx perio ext), heavy BOP, severe attachment loss. Impression: Generalized periodontitis Stage IV Grade C. Referral to periodontist for comprehensive tx plan. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE]."
+2225,883,79,periodontitis_stage_3,B,localized,narrative,False,old,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: NKDA; non-smoker. Exam: severe attachment loss, BWX: severe horizontal bone loss, deep pockets posterior sextants, hx extraction of 1 teeth d/t perio, heavy BOP. Impression: Localized severe chronic periodontitis. SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+1715,683,26,periodontitis_stage_3,C,generalized,chart_summary,True,short,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- generalized 6-7mm pockets, localized #12 DL 7mm, #20 B 7mm, #31 DB 8mm
+- BWX: severe horizontal bone loss ~41%
+- attachment loss 4-5 mm
+- 1 teeth lost to periodontal disease
+- BOP 38%
+Dx: Perio IIIC, gen.
+Med hx: HTN controlled; never smoker.
+Tx plan: FM SRP, refer to periodontist. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+2378,940,27,periodontitis_stage_2,C,localized,narrative,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; smoker ~7 cig/day. Exam: max CAL 3mm interproximal; recession 1mm #22, BOP 34%, radiographs: moderate horizontal bone loss ~31%, PD up to 5mm (#23 DB 4mm, #29 M 4mm). Impression: Localized periodontitis Stage II Grade C. 4 quad SRP then perio maint q3mo. Pt moved; new address [LOCATION]."
+631,252,58,gingivitis,NA,NA,narrative,True,none,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: NKDA; non-smoker. Exam: recession 3mm #27, bleeding on probing 20% of sites, shallow sulci throughout, radiographs: bone loss to coronal third (~6%). Impression: See perio chart. Prophy + OHI, re-eval gingiva next recall."
+771,306,80,periodontitis_stage_2,B,generalized,narrative,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for periodontal evaluation. Med hx: no sig med hx; smoker ~1 cig/day. Exam: PAN: moderate horizontal bone loss ~31%, max CAL 3mm interproximal, max PD 4 mm, bleeding on probing 46% of sites. Impression: Generalized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk. Pt moved; new address [LOCATION]."
+629,251,28,periodontitis_stage_4,C,localized,narrative,False,2017,False,periodontitis_stage_4,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_3,gingivitis,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: HTN controlled; never smoker. Exam: heavy BOP, deep pockets posterior sextants, 6 teeth lost to periodontal disease, PAN: severe horizontal bone loss, severe attachment loss. Impression: Localized periodontitis Stage IV Grade C. Referral to periodontist for comprehensive tx plan."
+453,180,26,healthy,NA,NA,chart_summary,True,none,False,healthy,healthy,healthy,healthy,healthy,healthy,gingivitis,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP <10%
+- radiographs: crestal bone WNL
+- CAL 0
+- PD 1-3mm WNL
+Dx: See perio chart.
+Med hx: HTN controlled; smoker ~15 cig/day.
+Tx plan: Adult prophy. RTC 6 mo."
+3031,1195,78,gingivitis,NA,NA,soap,True,old,False,gingivitis,gingivitis,periodontitis_stage_1,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; smoker ~4 cig/day.
+O: attachment loss 1-1 mm; PD 1-3mm WNL; radiographs: mild horizontal bone loss ~7%; BOP 10%.
+A: Plaque-induced gingivitis.
+P: Prophy + OHI, re-eval gingiva next recall."
+815,321,47,periodontitis_stage_2,B,localized,narrative,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,unknown,periodontitis_stage_2,unknown,unknown,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: NKDA; never smoker. Exam: max CAL 3mm interproximal, max PD 5 mm, PAN: bone loss to middle third (~28%), bleeding on probing 46% of sites. Impression: Localized periodontitis Stage II Grade B. SRP 4 quads, re-eval 4-6 wk. Next appt [DATE]."
+1952,775,70,periodontitis_stage_2,B,generalized,narrative,False,2017,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: pre-diabetic A1c 6.4; non-smoker. Exam: FMX: moderate horizontal bone loss, mild pocketing, BOP generalized, moderate attachment loss. Impression: Generalized periodontitis Stage III Grade B. FM SRP, refer to periodontist. Next appt [DATE]. Pt moved; new address [LOCATION]."
+379,154,41,periodontitis_stage_2,C,localized,soap,False,none,False,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: T2DM, last A1c 9.8; never smoker.
+O: moderate attachment loss; recession 1mm #22; moderate pocketing posterior; BOP generalized; PAN: moderate horizontal bone loss.
+A: Findings reviewed with pt.
+P: SRP UR/LR, re-eval 6 wk."
+279,112,44,periodontitis_stage_1,A,localized,soap,True,old,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,unknown,unknown,gingivitis,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: NKDA; non-smoker.
+O: generalized 3-3mm pockets, localized #25 L 3mm, #29 D 3mm; bleeding on probing 34% of sites; attachment loss 1-2 mm.
+A: Localized slight chronic periodontitis.
+P: Localized SRP, perio maint q4mo."
+1011,401,19,periodontitis_stage_1,B,generalized,soap,True,old,False,periodontitis_stage_2,periodontitis_stage_2,unknown,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: HTN controlled; never smoker.
+O: PD up to 4mm (#6 B 3mm, #15 MB 3mm); BWX: bone loss to coronal third (~11%); bleeding on probing 11% of sites; CAL up to 2mm.
+A: AAP Case Type III.
+P: 4 quad SRP then perio maint q3mo."
+934,368,48,periodontitis_stage_1,C,localized,narrative,False,2017,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for periodontal evaluation. Med hx: no sig med hx; smoker ~11 cig/day. Exam: slight attachment loss, FMX: mild horizontal bone loss, localized BOP, no pocketing. Impression: Localized periodontitis Stage I Grade C. Localized SRP, perio maint q4mo."
+569,228,70,periodontitis_stage_1,A,generalized,chart_summary,False,old,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_1,periodontitis_stage_1,unknown,periodontitis_stage_1,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP generalized
+- mild pocketing
+- slight attachment loss
+- FMX: mild horizontal bone loss
+Dx: AAP Case Type II.
+Med hx: no sig med hx; former smoker, quit 2015.
+Tx plan: SRP UR/LR, re-eval 6 wk. Next appt [DATE]."
+411,166,81,periodontitis_stage_3,B,generalized,soap,True,old,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,unknown,unknown,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio eval. Med hx: NKDA; non-smoker.
+O: max CAL 6mm interproximal; recession 1mm #27; hx extraction of 2 teeth d/t perio; BWX: severe horizontal bone loss ~59%; BOP 33%; max PD 7 mm.
+A: AAP Case Type IV.
+P: FM SRP, refer to periodontist."
+187,78,38,gingivitis,NA,NA,chart_summary,True,2017,False,gingivitis,gingivitis,periodontitis_stage_1,healthy,healthy,gingivitis,periodontitis_stage_1,unknown,gingivitis,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- bleeding on probing 22% of sites
+- CAL up to 1mm
+- generalized 3-3mm pockets, localized #2 DL 4mm, #14 DB 3mm
+- FMX: crestal bone WNL
+Dx: Dental biofilm-induced gingivitis, localized.
+Med hx: HTN controlled; smoker ~6 cig/day.
+Tx plan: Prophy, flossing instruction. 6 mo recall."
+2659,1050,72,periodontitis_stage_4,C,localized,narrative,False,none,True,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,unknown,periodontitis_stage_4,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: heavy BOP, severe attachment loss, deep pockets posterior sextants, FMX: severe horizontal bone loss, vertical defect #14, hx extraction of 6 teeth d/t perio. Impression: See perio chart. Perio referral; prosthetic consult for edentulous areas. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]. Next appt [DATE].
+
+-- copied from visit [DATE] --
+Dx at that visit: Stage III periodontitis. Pt declined SRP at that time."
+2173,860,45,periodontitis_stage_3,B,generalized,soap,False,old,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: no sig med hx; former smoker, quit 2015.
+O: radiographs: severe horizontal bone loss, vertical defect #3; severe attachment loss; BOP generalized; hx extraction of 4 teeth d/t perio; deep pockets posterior sextants.
+A: AAP Case Type III.
+P: 4 quad SRP then perio maint q3mo. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+2334,922,74,periodontitis_stage_1,A,generalized,soap,True,none,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_2,unknown,unknown,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: HTN controlled; never smoker.
+O: attachment loss 1-1 mm; BOP 18%; radiographs: bone loss to coronal third (~10%); PD 1-3mm WNL.
+A: 
+P: SRP UR/LR, re-eval 6 wk."
+1478,591,61,periodontitis_stage_4,C,localized,narrative,False,2017,False,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,unknown,periodontitis_stage_3,gingivitis,periodontitis_stage_3,periodontitis_stage_4,periodontitis_stage_4,probing_chart,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Pt seen for recall exam. Med hx: HTN controlled; former smoker, quit 2015. Exam: 10 teeth lost to periodontal disease, radiographs: severe horizontal bone loss, deep pockets posterior sextants, severe attachment loss, BOP generalized. Impression: Localized periodontitis Stage III Grade C. FM SRP, refer to periodontist."
+2235,887,62,healthy,NA,NA,soap,False,short,False,healthy,healthy,healthy,healthy,healthy,unknown,unknown,healthy,healthy,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: no sig med hx; former smoker, quit 2015.
+O: CAL 0; no bleeding on probing; no pocketing; FMX: crestal bone WNL.
+A: Perio health.
+P: Prophy, OHI. Recall 6 mo. Next appt [DATE]."
+1773,708,79,periodontitis_stage_3,B,generalized,narrative,True,short,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+Patient seen for recall exam. Med hx: NKDA; non-smoker. Exam: missing #2, #9, #15, #18 (hx perio ext), BOP 48%, FMX: bone loss to apical third (~60%), CAL up to 6mm, PD up to 7mm (#11 ML 6mm, #13 B 6mm). Impression: Perio IIIB, gen. FM SRP, refer to periodontist. Next appt [DATE]."
+988,390,77,gingivitis,NA,NA,soap,True,none,False,gingivitis,gingivitis,gingivitis,healthy,healthy,gingivitis,gingivitis,gingivitis,gingivitis,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for perio maint. Med hx: T2DM, last A1c 8.4; former smoker, quit 2015.
+O: FMX: mild horizontal bone loss ~9%; shallow sulci throughout; bleeding on probing 38% of sites.
+A: See perio chart.
+P: Prophy, flossing instruction. 6 mo recall."
+1598,642,56,periodontitis_stage_1,A,localized,chart_summary,False,none,False,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,unknown,unknown,periodontitis_stage_1,periodontitis_stage_1,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BOP generalized
+- slight attachment loss
+- BWX: mild horizontal bone loss
+- mild pocketing
+Dx: See perio chart.
+Med hx: NKDA; former smoker, quit 2015.
+Tx plan: Localized SRP, perio maint q4mo. Next appt [DATE]."
+1115,450,74,healthy,NA,NA,chart_summary,True,2017,False,healthy,healthy,healthy,healthy,healthy,healthy,healthy,unknown,healthy,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- BWX: crestal bone WNL
+- no BOP
+- CAL 0; recession 1mm #6
+- PD 1-3mm WNL
+Dx: Clinical gingival health on an intact periodontium.
+Med hx: no sig med hx; non-smoker.
+Tx plan: Prophy, OHI. Recall 6 mo."
+162,68,43,periodontitis_stage_1,A,generalized,soap,True,2017,True,periodontitis_stage_1,periodontitis_stage_1,periodontitis_stage_1,unknown,unknown,periodontitis_stage_2,periodontitis_stage_1,unknown,periodontitis_stage_1,notes,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for recall. Med hx: HTN controlled; former smoker, quit 2015.
+O: PD up to 4mm (#6 ML 3mm, #8 B 4mm); BWX: bone loss to coronal third (~11%); BOP 39%; CAL up to 1mm; recession 3mm #22.
+A: Generalized periodontitis Stage I Grade A.
+P: SRP UR/LR, re-eval 6 wk. Next appt [DATE].
+
+-- copied from visit [DATE] --
+Dx at that visit: gingivitis. Pt declined SRP at that time."
+76,33,73,periodontitis_stage_3,C,localized,chart_summary,True,none,False,periodontitis_stage_3,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_2,periodontitis_stage_3,periodontitis_stage_3,probing_chart,"Pt [NAME] ([ID])
+DOS: [DATE]  Provider: Dr. [NAME]
+
+PERIODONTAL CHARTING COMPLETED
+- max CAL 7mm interproximal
+- FMX: severe horizontal bone loss ~52%
+- missing #2, #14 (hx perio ext)
+- max PD 7 mm
+- BOP 47%
+Dx: Findings reviewed with pt.
+Med hx: HTN controlled; smoker ~30 cig/day.
+Tx plan: SRP 4 quads; perio consult for surgical eval. Referred to Dr. [NAME] at [LOCATION], ph [PHONE]."
+2491,982,30,periodontitis_stage_1,A,localized,soap,True,2017,False,periodontitis_stage_2,periodontitis_stage_2,periodontitis_stage_2,unknown,unknown,unknown,unknown,unknown,periodontitis_stage_2,notes,"Patient: [NAME]   DOB: [DATE]   MRN: [ID]
+DOS: [DATE]  Provider: Dr. [NAME]
+
+S: Pt presents for comprehensive exam. Med hx: HTN controlled; never smoker.
+O: max PD 4 mm; BOP 38%; radiographs: crestal bone WNL; CAL up to 2mm; recession 2mm #11.
+A: Localized periodontitis Stage II Grade A.
+P: SRP 4 quads, re-eval 4-6 wk."

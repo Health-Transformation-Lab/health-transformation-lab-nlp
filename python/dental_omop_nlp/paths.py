@@ -15,3 +15,8 @@ LABELS_DIR = DATA_ROOT / "labels"      # labeled notes + split
 RESULTS_DIR = DATA_ROOT / "results"    # scorer output, one file per run
 SAMPLES_DIR = REPO_ROOT / "data" / "samples"
 MODELS_YAML = REPO_ROOT / "models.yaml"
+
+# Study (chart review) paths
+DATASETS_DIR = REPO_ROOT / "data" / "datasets"   # committed: synthetic, de-identified
+REVIEW_DIR = DATA_ROOT / "review"                # Label Studio exports + parsed labels
+RAW_DIR = DATA_ROOT / "raw"                      # notes WITH (fake) PHI; never committed

@@ -8,7 +8,7 @@ from dental_omop_nlp.paths import LABELS_DIR, REPO_ROOT
 from dental_omop_nlp.rungs import rules_predict
 
 sys.path.insert(0, str(REPO_ROOT / "eval"))
-from score import score  # noqa: E402
+from score import score
 
 notes = pd.read_parquet(LABELS_DIR / "labeled_notes.parquet")
 notes["pred"] = [rules_predict(t) for t in notes["note_text"]]

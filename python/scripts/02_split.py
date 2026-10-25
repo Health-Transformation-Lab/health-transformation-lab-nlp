@@ -7,7 +7,7 @@ import pandas as pd
 from dental_omop_nlp.paths import LABELS_DIR, REPO_ROOT
 
 sys.path.insert(0, str(REPO_ROOT / "eval"))
-from split import make_split  # noqa: E402
+from split import make_split
 
 notes = pd.read_parquet(LABELS_DIR / "labeled_notes.parquet")
 split = make_split(notes)

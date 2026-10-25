@@ -1,6 +1,7 @@
 """The model ladder. Each rung: fit(train_df) -> predict(test_df) -> (labels, proba|None).
 
-rules_baseline       regex over the note text + the same staging rules as labels.py.
+note_rules           rules for clinical notes (note_reader.py): stated dx, else findings.
+rules_baseline       regex for the short templated notes + the staging rules in labels.py.
                      On synthetic notes this is a strong baseline because the numbers
                      are usually in the text; that is a property of synthetic data and
                      the reason real notes are the real test.
@@ -35,12 +36,12 @@ _PATTERNS = {
     "rbl": [rf"RBL ~?{_NUM}%", rf"{_NUM}% horizontal bone loss"],
     "lost": [rf"{_NUM} teeth previously lost"],
 }
-_NEG_BOP = re.compile(r"no BOP|BOP neg|no bleeding on probing", re.I)
+_NEG_BOP = re.compile(r"no BOP|BOP neg|no bleeding on probing", re.IGNORECASE)
 
 
 def _find(text: str, key: str) -> float | None:
     for p in _PATTERNS[key]:
-        m = re.search(p, text, re.I)
+        m = re.search(p, text, re.IGNORECASE)
         if m:
             return float(m.group(1))
     return None
@@ -52,6 +53,17 @@ def rules_predict(text: str) -> str:
                        max_cal_mm=_find(text, "cal") or 0.0, rbl_pct=min(_find(text, "rbl") or 0.0, 100),
                        teeth_lost_perio=int(_find(text, "lost") or 0))
     return label_chart(chart).value
+
+
+class NoteRules:
+    """Rules for clinical notes: stated diagnosis in any scheme, else findings (note_reader.py)."""
+
+    def fit(self, train: pd.DataFrame):
+        return self
+
+    def predict(self, test: pd.DataFrame):
+        from .note_reader import read_note
+        return [read_note(t) for t in test["note_text"]], None
 
 
 class RulesBaseline:
@@ -107,8 +119,12 @@ class HFEncoder:
                                         padding="max_length"), batched=True)
 
     def fit(self, train):
-        from transformers import (AutoModelForSequenceClassification, AutoTokenizer, Trainer,
-                                  TrainingArguments)
+        from transformers import (
+            AutoModelForSequenceClassification,
+            AutoTokenizer,
+            Trainer,
+            TrainingArguments,
+        )
         self.tok = AutoTokenizer.from_pretrained(self.hf_id)
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.hf_id, num_labels=len(LABELS), id2label=dict(enumerate(LABELS)),
@@ -131,6 +147,8 @@ class HFEncoder:
 def make_rung(rung_id: str, registry: dict, **hf_kwargs):
     if rung_id == "rules_baseline":
         return RulesBaseline()
+    if rung_id == "note_rules":
+        return NoteRules()
     if rung_id == "structured_baseline":
         return structured_baseline()
     if rung_id == "tfidf_logreg":

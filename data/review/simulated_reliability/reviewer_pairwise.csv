@@ -1,0 +1,7 @@
+a,b,kappa,weighted_kappa
+reviewer1@example.org,reviewer2@example.org,0.6867360046409481,0.9548577036310107
+reviewer1@example.org,reviewer3@example.org,0.6908822735110207,0.951702786377709
+reviewer1@example.org,reviewer4@example.org,0.7260558265020235,0.9526458540905568
+reviewer2@example.org,reviewer3@example.org,0.636748149530385,0.9433998570564627
+reviewer2@example.org,reviewer4@example.org,0.6865216760309332,0.9516789516789517
+reviewer3@example.org,reviewer4@example.org,0.6959122632103689,0.9469746677038591

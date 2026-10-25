@@ -145,7 +145,8 @@ models:
 ladders:
   # Rung order for the headline comparison. Same test split for every rung.
   classification:
-    - rules_baseline            # regex + shorthand expansion, no model
+    - note_rules                # stated dx in any scheme, else findings (clinical notes)
+    - rules_baseline            # regex + shorthand expansion, no model (templated notes)
     - structured_baseline       # logistic regression on chart numerics only
     - tfidf_logreg              # TF-IDF + logistic regression on the text
     - distilbert-base
