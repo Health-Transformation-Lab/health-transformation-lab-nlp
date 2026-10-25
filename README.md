@@ -51,7 +51,11 @@ record. [docs/omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md)
 
 - **Kappa:** agreement beyond chance (Cohen's for two raters, Fleiss' for many
   reviewers, weighted for ordered stages).
-- **Confidence intervals:** how sure each number is, by bootstrap.
+- **95% confidence intervals:** the range the true value plausibly falls in,
+  given that ~240 reviewed charts are a sample, not every chart. Overlapping
+  intervals mean two methods can't be called different. Computed by bootstrap
+  (resample the charts 1,000 times, recompute, keep the middle 95%), because
+  kappa has no simple formula.
 - **Unsafe rate:** errors graded by clinical severity, and results by difficulty
   level, after GlobalDentBench ([docs/dentbench_methods.md](docs/dentbench_methods.md)).
 
