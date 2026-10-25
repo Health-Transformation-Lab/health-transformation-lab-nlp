@@ -1,9 +1,9 @@
 {
- "sensitivity": 0.9368863955119214,
- "specificity": 0.8883928571428571,
- "n_pos": 713,
- "n_neg": 224,
- "nd_rate": 0.0360082304526749,
+ "sensitivity": 0.9611510791366906,
+ "specificity": 0.8646288209606987,
+ "n_pos": 695,
+ "n_neg": 229,
+ "nd_rate": 0.04938271604938271,
  "gate_fail_rate": 0.0,
- "judge_cost_usd_this_run": 8.503364874704026
+ "judge_cost_usd_this_run": 8.506226996842937
 }

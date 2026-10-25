@@ -240,3 +240,5 @@ data/corpus/*
 !data/corpus/simulated_cost_effectiveness*
 !data/corpus/simulated_judge_calibration.json
 !data/corpus/cost_benchmark.csv
+!data/corpus/simulated_judge_bakeoff.csv
+!data/review/simulated_reliability/by_level.csv

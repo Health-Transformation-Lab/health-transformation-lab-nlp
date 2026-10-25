@@ -17,6 +17,14 @@ calibrate_judge <- function(gold) {
        nd_rate = mean(gold$verdict == "not_determinable"))
 }
 
+# spec 002: judge bake-off statistic (Cohen's kappa, verdict vs truth on the calibration set)
+judge_kappa <- function(gold) {
+  g <- gold[gold$verdict %in% c("correct", "incorrect") & as.logical(gold$gate_ok), ]
+  a <- g$verdict == "correct"; b <- as.logical(g$truly_correct)
+  po <- mean(a == b); pe <- mean(a) * mean(b) + mean(!a) * mean(!b)
+  if (pe == 1) NA_real_ else (po - pe) / (1 - pe)
+}
+
 rogan_gladen <- function(p, sens, spec) {
   d <- sens + spec - 1
   if (!is.finite(d) || d <= 0) return(NA_real_)

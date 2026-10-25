@@ -26,6 +26,7 @@ in **February 2027**.
 - [x] AI models: note rules, TF-IDF (run); 12 BERT-family encoders (registry,
       fine-tune code written, not yet run)
 - [x] Design-review page for the Databricks RSA
+- [x] GlobalDentBench methods: severity-graded errors, difficulty levels, judge bake-off ([spec 002](../specs/002-dentbench-methods/spec.md))
 - [x] Realistic notes from published examples ([spec 001](../specs/001-realistic-dental-notes/spec.md), [note_realism.md](note_realism.md)); Spec Kit + Superpowers workflow ([CLAUDE.md](../CLAUDE.md))
 - [x] Cost-effectiveness at 1M+ notes: LLM judge (quote gate, OpenAI-compatible
       or `ai_query` backend), judge calibration on the reviewed charts,
@@ -68,6 +69,8 @@ in **February 2027**.
 5. **Holiday weeks** (Nov 23–27, Dec 24 – Jan 1) are already left out above.
 
 ## Open decisions
+
+- Periodontist sign-off on the error severity matrix ([dentbench_methods.md](dentbench_methods.md)) before any unsafe rate is reported
 
 - Judge model and endpoint (a different family from any LLM being judged), and whether the judge may see de-identified notes on a pay-per-token endpoint
 - Whether cost-effectiveness reports compute only or includes labeling and engineering time (recommend both)

@@ -106,6 +106,8 @@ def read_methods(df: pd.DataFrame) -> pd.DataFrame:
     # The chart IS the measured evidence, when it was done. Patel (2020) found
     # charting findings present for ~80% of patients in a real EDR.
     df["probing_chart"] = [ts if charted else UNKNOWN for ts, charted in zip(df["truth_status"], df["charted"])]
+    df["difficulty"] = [difficulty(d, s, c, cf) for d, s, c, cf in
+                        zip(df["dx_pattern"], df["stated_status"], df["truth_status"], df["copy_forward"])]
     pa = [phenotype_v0(r) for _, r in df.iterrows()]
     df["algorithm_v0"] = [p[0] for p in pa]
     df["algorithm_v0_decided_by"] = [p[1] for p in pa]
@@ -159,7 +161,7 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
         .assign(label_source="generator").to_csv(out_dir / "train.csv", index=False)
     (out_dir / "review_tasks.json").write_text(json.dumps(label_studio_tasks(review), indent=1))
     key_cols = ["visit_id", "person_id", "age", "truth_status", "truth_grade", "truth_extent",
-                "style", "numeric", "dx_scheme", "dx_pattern", "copy_forward", "stated_status", "notes", *READERS, "probing_chart",
+                "style", "numeric", "dx_scheme", "dx_pattern", "difficulty", "copy_forward", "stated_status", "notes", *READERS, "probing_chart",
                 "algorithm_v0", "algorithm_v0_decided_by", "note_text"]
     review[key_cols].to_csv(out_dir / "answer_key" / "review_key.csv", index=False)
     methods = ["notes", *READERS, "probing_chart"]
@@ -192,3 +194,23 @@ def build_corpus_sample(n_people: int, seed: int, engine: str = "regex") -> pd.D
     df, _ = apply_deid(df, engine)
     df = df[df["deid_passed"]]
     return df[["visit_id", "person_id", "note_text", "truth_status"]].reset_index(drop=True)
+
+
+TRANSLATE_PATTERNS = {"pre2017_severity", "legacy_old"}
+
+
+def difficulty(dx_pattern: str, stated_status: str, chart_status: str, copy_forward: bool) -> str:
+    """Difficulty level per chart (spec 002), adapted from GlobalDentBench's
+    L1 recall / L2 routine reasoning / L3 individualized reasoning:
+
+        L1  the note states the diagnosis in 2017 terms and it matches the chart
+        L2  the diagnosis must be translated (pre-2017 terms) or copied-forward
+            text must be ignored
+        L3  no diagnosis is written, or the written one disagrees with the chart,
+            so the status must be inferred from findings or a conflict resolved
+    """
+    if dx_pattern == "none" or stated_status != chart_status:
+        return "L3"
+    if dx_pattern in TRANSLATE_PATTERNS or bool(copy_forward):
+        return "L2"
+    return "L1"

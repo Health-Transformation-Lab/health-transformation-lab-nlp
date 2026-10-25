@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 from .labels import Status
+from .harm import unsafe_rates
 from .phenotype import cohen_kappa
 
 ORDER = [s.value for s in Status]
@@ -89,8 +90,27 @@ def reliability_report(labels: pd.DataFrame, key: pd.DataFrame, compare: dict[st
                      "kappa_vs_consensus": cohen_kappa(s[ok], cons[ok]),
                      "weighted_kappa_vs_consensus": weighted_kappa(s[ok], cons[ok]),
                      "mean_kappa_vs_each_reviewer": float(np.nanmean(
-                         [_kappa_where_both(s, wide[r]) for r in wide.columns]))})
+                         [_kappa_where_both(s, wide[r]) for r in wide.columns])),
+                     # spec 002: clinical severity of the errors (GlobalDentBench-style)
+                     **{k: v for k, v in unsafe_rates(cons[ok], s[ok]).items() if k != "n"}})
     return {"n_visits": int(wide.shape[0]), "n_reviewers": int(wide.shape[1]),
             "fleiss_kappa": fleiss_kappa(wide),
             "consensus_reached": float(cons.isin(ORDER).mean()),
             "pairwise": pd.DataFrame(pair), "methods": pd.DataFrame(rows), "consensus": cons}
+
+
+def by_level(key: pd.DataFrame, cons: pd.Series, compare: dict[str, pd.Series]) -> pd.DataFrame:
+    """Agreement with consensus per difficulty level (spec 002), plus the macro
+    average over levels (as GlobalDentBench macro-averages over reasoning levels)."""
+    rows = []
+    lev = key["difficulty"].reindex(cons.index)
+    for name, s in compare.items():
+        s = s.reindex(cons.index)
+        per = {}
+        for level in ("L1", "L2", "L3"):
+            ok = (lev == level) & cons.isin(ORDER) & s.isin(ORDER)
+            per[level] = float((s[ok] == cons[ok]).mean()) if ok.any() else float("nan")
+            rows.append({"method": name, "level": level, "n": int(ok.sum()), "pct_agree_consensus": per[level]})
+        rows.append({"method": name, "level": "macro", "n": int(sum(r["n"] for r in rows[-3:])),
+                     "pct_agree_consensus": float(np.nanmean(list(per.values())))})
+    return pd.DataFrame(rows)

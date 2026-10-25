@@ -64,6 +64,38 @@ def calibrate_judge(gold: pd.DataFrame) -> dict:
             "gate_fail_rate": float((~gold["gate_ok"]).mean())}
 
 
+def judge_kappa(gold: pd.DataFrame) -> float:
+    """Cohen's kappa between the judge's verdict and the truth (reviewer consensus)."""
+    from .phenotype import cohen_kappa
+    g = gold[gold["verdict"].isin([CORRECT, INCORRECT]) & gold["gate_ok"]]
+    return cohen_kappa((g["verdict"] == CORRECT), g["truly_correct"].astype(bool))
+
+
+def bakeoff(gold: pd.DataFrame, classifier_families: set[str] | None = None,
+            judge_families: dict[str, str] | None = None, n_boot: int = 500, seed: int = 0) -> pd.DataFrame:
+    """Compare candidate judges on the calibration set (spec 002; after GlobalDentBench's
+    five-judge comparison, but scored by kappa with a bootstrap CI rather than raw
+    acceptance). gold needs a judge_model column. The highest-kappa judge that is NOT
+    the same family as an evaluated LLM is selected."""
+    rng = np.random.default_rng(seed)
+    rows = []
+    for j, g in gold.groupby("judge_model"):
+        cal = calibrate_judge(g)
+        k = judge_kappa(g)
+        boots = [judge_kappa(g.iloc[rng.integers(0, len(g), len(g))]) for _ in range(n_boot)]
+        lo, hi = np.nanpercentile(boots, [2.5, 97.5])
+        fam = (judge_families or {}).get(j, "")
+        rows.append({"judge_model": j, "family": fam, "sensitivity": cal["sensitivity"],
+                     "specificity": cal["specificity"], "kappa": k, "kappa_ci_low": float(lo),
+                     "kappa_ci_high": float(hi), "n": int(cal["n_pos"] + cal["n_neg"]),
+                     "nd_rate": cal["nd_rate"], "gate_fail_rate": cal["gate_fail_rate"],
+                     "same_family_as_classifier": bool(fam) and fam in (classifier_families or set())})
+    t = pd.DataFrame(rows).sort_values("kappa", ascending=False).reset_index(drop=True)
+    eligible = t[~t["same_family_as_classifier"]]
+    t["selected"] = t["judge_model"] == (eligible.iloc[0]["judge_model"] if len(eligible) else None)
+    return t
+
+
 def rogan_gladen(p: float, sens: float, spec: float) -> float:
     denom = sens + spec - 1
     if not np.isfinite(denom) or denom <= 0:

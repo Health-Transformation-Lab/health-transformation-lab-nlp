@@ -26,7 +26,11 @@ flowchart LR
     K --> F
 ```
 
-1. **Calibrate the judge first.** On the 240 reviewed charts we know whether
+1. **Choose and calibrate the judge first.** Several candidate judges grade the
+   same reviewed-chart pairs; the one with the highest kappa against the
+   reviewers, and not from the same model family as any LLM being evaluated,
+   is selected (`judge_bakeoff.csv`; method from GlobalDentBench,
+   [dentbench_methods.md](dentbench_methods.md)). On the 240 reviewed charts we know whether
    each method's prediction matched the reviewers. The judge judges the same
    pairs, which gives its sensitivity and specificity. Good models are rarely
    wrong, so the readings from single sources (exam form, procedure codes) on

@@ -1,9 +1,12 @@
 """LLM judge: calibrate on the human-reviewed charts, then judge a sample of each
 method's predictions on the corpus.
 
-    # real judge (any OpenAI-compatible endpoint, e.g. Databricks Model Serving)
-    export JUDGE_BASE_URL=https://<workspace>/serving-endpoints JUDGE_API_KEY=... JUDGE_MODEL=<endpoint>
-    python scripts/15_judge.py --backend openai
+    # real judges (any OpenAI-compatible endpoint, e.g. Databricks Model Serving).
+    # Several candidates are calibrated on the reviewed charts (bake-off, spec 002);
+    # the best by kappa that is not the same family as an evaluated LLM judges the corpus.
+    export JUDGE_BASE_URL=https://<workspace>/serving-endpoints JUDGE_API_KEY=...
+    python scripts/15_judge.py --backend openai \
+        --judges endpoint-a=familyA,endpoint-b=familyB --classifier-families familyC
 
     # dry run, no LLM (verdicts simulated from the generator truth; output marked simulated)
     python scripts/15_judge.py --backend simulated --simulated-review
@@ -19,6 +22,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
+from dental_omop_nlp.cost_effectiveness import bakeoff
 from dental_omop_nlp.judge import PROMPT_VERSION, OpenAIJudge, SimulatedJudge
 from dental_omop_nlp.paths import CORPUS_DIR, COSTS_YAML, DATASETS_DIR, REVIEW_DIR
 
@@ -28,6 +32,11 @@ ap.add_argument("--simulated-review", action="store_true",
                 help="calibrate against simulated reviewer consensus (dry run)")
 ap.add_argument("--per-method", type=int, default=None, help="corpus notes judged per method")
 ap.add_argument("--seed", type=int, default=5)
+ap.add_argument("--judges", default=None,
+                help="candidate judges as name=family,... (openai: endpoint names). "
+                     "Simulated default: three judges with different error profiles")
+ap.add_argument("--classifier-families", default="",
+                help="model families of LLMs being evaluated; a judge of the same family is not selected")
 a = ap.parse_args()
 
 cfg = yaml.safe_load(COSTS_YAML.read_text())["judge"]
@@ -74,13 +83,30 @@ for f in sorted(glob.glob(str(CORPUS_DIR / "preds_*.parquet"))):
 corp = pd.DataFrame(corp_rows)
 
 
-def run(df: pd.DataFrame, judge_truth_col: str) -> pd.DataFrame:
+# Simulated candidates: (sensitivity, specificity). One strong, one lenient (says
+# "correct" too easily), one weak. The lenient one shares a family with the
+# simulated LLM classifier, so it can't be selected even if it scored well.
+SIM_JUDGES = {"sim-judge-a": (0.95, 0.91, "fam-a"), "sim-judge-b": (0.99, 0.62, "fam-llm"),
+              "sim-judge-c": (0.86, 0.84, "fam-c")}
+if a.judges:
+    judges = dict(x.split("=") for x in a.judges.split(","))
+elif sim:
+    judges = {k: v[2] for k, v in SIM_JUDGES.items()}
+else:
+    import os
+    judges = {os.environ["JUDGE_MODEL"]: ""}
+classifier_families = set(filter(None, a.classifier_families.split(","))) or ({"fam-llm"} if sim else set())
+
+
+def run(df: pd.DataFrame, judge_truth_col: str, judge_name: str) -> pd.DataFrame:
     if sim:
-        judge = SimulatedJudge({i: t for i, t in enumerate(df[judge_truth_col])})
+        se, sp, _ = SIM_JUDGES[judge_name]
+        judge = SimulatedJudge({i: t for i, t in enumerate(df[judge_truth_col])}, sensitivity=se,
+                               specificity=sp, seed=hash(judge_name) % 1000)
         verdicts = [judge(n, p, visit_id=i) for i, (n, p) in enumerate(zip(df["note"], df["pred"]))]
-        model_name = "simulated"
+        model_name = judge_name
     else:
-        judge = OpenAIJudge()
+        judge = OpenAIJudge(model=judge_name)
         verdicts = [judge(n, p) for n, p in zip(df["note"], df["pred"])]
         model_name = judge.model
     out = df.drop(columns=["note"]).copy()
@@ -96,13 +122,25 @@ def run(df: pd.DataFrame, judge_truth_col: str) -> pd.DataFrame:
 
 
 CORPUS_DIR.mkdir(parents=True, exist_ok=True)
-g = run(gold, "truth")
-g["truly_correct"] = g["pred"] == g["truth"]
+# ---- bake-off: every candidate judges the calibration set
+g_all = pd.concat([run(gold, "truth", j) for j in judges])
+g_all["truly_correct"] = g_all["pred"] == g_all["truth"]
+g_all.to_csv(CORPUS_DIR / f"{prefix}judgments_gold_all_candidates.csv", index=False)
+bo = bakeoff(g_all, classifier_families, judges)
+bo.to_csv(CORPUS_DIR / f"{prefix}judge_bakeoff.csv", index=False)
+if not bo["selected"].any():
+    raise SystemExit("no eligible judge: every candidate shares a family with an evaluated LLM")
+chosen = bo.loc[bo["selected"], "judge_model"].iloc[0]
+print("judge bake-off (kappa vs reviewer consensus):")
+print(bo[["judge_model", "family", "sensitivity", "specificity", "kappa", "kappa_ci_low", "kappa_ci_high",
+          "same_family_as_classifier", "selected"]].round(3).to_string(index=False))
+g = g_all[g_all["judge_model"] == chosen]
 g.to_csv(CORPUS_DIR / f"{prefix}judgments_gold.csv", index=False)
-c = run(corp, "truth").drop(columns=["truth"])   # corpus truth is never stored with judgments
+c = run(corp, "truth", chosen).drop(columns=["truth"])   # corpus truth is never stored with judgments
 c.to_csv(CORPUS_DIR / f"{prefix}judgments_corpus.csv", index=False)
 if prefix:
     print("*** SIMULATED: dry run, not a result ***")
+print(f"selected judge: {chosen}")
 print(f"calibration: {len(g)} judged pairs over {g['method'].nunique()} methods on reviewed charts")
 print(f"corpus: {len(c)} judged predictions over {c['method'].nunique()} methods")
 print(f"gate failures: gold {(~g['gate_ok']).mean():.1%}, corpus {(~c['gate_ok']).mean():.1%}")

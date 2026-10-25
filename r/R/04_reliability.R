@@ -47,6 +47,39 @@ consensus <- function(wide) {
   })
 }
 
+
+# ---- spec 002: clinical severity of errors (DRAFT matrix; see python/dental_omop_nlp/harm.py)
+severity <- function(truth, pred) {
+  t <- match(truth, STATUS_ORDER) - 1; p <- match(pred, STATUS_ORDER) - 1
+  ifelse(t == p, "S0",
+  ifelse(t < 2 & p < 2, "S0",
+  ifelse(t >= 2 & p < 2, ifelse(t >= 4, "S2", "S1"),
+  ifelse(t < 2 & p >= 2, "S1",
+  ifelse(p < t, ifelse(t >= 4, "S1", "S0"),
+  ifelse(p - t == 1, "S0", "S1"))))))
+}
+
+unsafe_rates <- function(truth, pred) {
+  ok <- truth %in% STATUS_ORDER & pred %in% STATUS_ORDER
+  if (!any(ok)) return(c(unsafe_rate = NA_real_, s2_rate = NA_real_))
+  s <- severity(truth[ok], pred[ok])
+  c(unsafe_rate = mean(s != "S0"), s2_rate = mean(s == "S2"))
+}
+
+by_level <- function(key, cons_df, compare) {
+  lev <- setNames(key$difficulty, key$visit_id)[as.character(cons_df$visit_id)]
+  cons <- cons_df$consensus
+  do.call(rbind, lapply(names(compare), function(nm) {
+    s <- unname(compare[[nm]][as.character(cons_df$visit_id)])
+    per <- sapply(c("L1", "L2", "L3"), function(l) {
+      ok <- lev == l & cons %in% STATUS_ORDER & s %in% STATUS_ORDER
+      if (any(ok, na.rm = TRUE)) mean(s[ok %in% TRUE] == cons[ok %in% TRUE]) else NA_real_
+    })
+    data.frame(method = nm, level = c("L1", "L2", "L3", "macro"),
+               pct_agree_consensus = c(per, mean(per, na.rm = TRUE)))
+  }))
+}
+
 reliability_report <- function(labels, key, compare) {
   wide <- reshape(labels[, c("visit_id", "reviewer", "status")], idvar = "visit_id",
                   timevar = "reviewer", direction = "wide")
@@ -65,7 +98,9 @@ reliability_report <- function(labels, key, compare) {
                pct_agree_consensus = mean(s[ok] == cons[ok]),
                kappa_vs_consensus = cohen_kappa(s[ok], cons[ok]),
                weighted_kappa_vs_consensus = weighted_kappa(s[ok], cons[ok]),
-               mean_kappa_vs_each_reviewer = mean(sapply(names(wide), function(r) both_k(s, wide[[r]])), na.rm = TRUE))
+               mean_kappa_vs_each_reviewer = mean(sapply(names(wide), function(r) both_k(s, wide[[r]])), na.rm = TRUE),
+               unsafe_rate = unsafe_rates(cons[ok], s[ok])[["unsafe_rate"]],
+               s2_rate = unsafe_rates(cons[ok], s[ok])[["s2_rate"]])
   })
   list(n_visits = nrow(wide), n_reviewers = ncol(wide), fleiss_kappa = fleiss_kappa(wide),
        consensus_reached = mean(cons %in% STATUS_ORDER), methods = do.call(rbind, rows),

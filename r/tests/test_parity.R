@@ -52,10 +52,19 @@ if (file.exists(py_rel) && file.exists("data/review/simulated_reviewer_labels.cs
   }), setdiff(py$method, "generator_chart_truth"))
   r <- reliability_report(labels, key, compare)$methods
   r <- r[match(py$method, r$method), ]
-  num <- c("coverage", "pct_agree_consensus", "kappa_vs_consensus", "weighted_kappa_vs_consensus", "mean_kappa_vs_each_reviewer")
+  num <- c("coverage", "pct_agree_consensus", "kappa_vs_consensus", "weighted_kappa_vs_consensus",
+           "mean_kappa_vs_each_reviewer", "unsafe_rate", "s2_rate")
   d <- max(abs(as.matrix(r[num]) - as.matrix(py[num])), na.rm = TRUE)
   cat(sprintf("reliability: max |R - Python| = %.2e over %d methods\n", d, nrow(py)))
   stopifnot(d < 1e-9)
+  # spec 002: agreement by difficulty level
+  py_lv <- read.csv("data/review/simulated_reliability/by_level.csv", stringsAsFactors = FALSE)
+  cons_df <- read.csv("data/review/simulated_reliability/consensus.csv", stringsAsFactors = FALSE)
+  r_lv <- by_level(key, cons_df, compare)
+  m <- merge(py_lv, r_lv, by = c("method", "level"), suffixes = c("_py", "_r"))
+  dl <- max(abs(m$pct_agree_consensus_py - m$pct_agree_consensus_r), na.rm = TRUE)
+  cat(sprintf("by level:    max |R - Python| = %.2e over %d rows\n", dl, nrow(m)))
+  stopifnot(nrow(m) == nrow(py_lv), dl < 1e-9)
 } else cat("reliability: skipped (run python scripts 12 --simulate and 13 --simulated first)\n")
 cat("parity OK (all sections)\n")
 
@@ -75,4 +84,16 @@ if (file.exists(py_ce)) {
   cat(sprintf("cost-effectiveness: max |R - Python| = %.2e over %d methods; frontier identical\n", d, nrow(py)))
   stopifnot(d < 1e-9)
 } else cat("cost-effectiveness: skipped (run python scripts 14-16 first)\n")
-cat("parity OK (incl. cost-effectiveness)\n")
+
+# 6. Judge bake-off kappa (spec 002).
+py_bo <- "data/corpus/simulated_judge_bakeoff.csv"
+if (file.exists(py_bo) && file.exists("data/corpus/simulated_judgments_gold_all_candidates.csv")) {
+  if (!exists("judge_kappa")) source("r/R/05_cost_effectiveness.R")
+  bo <- read.csv(py_bo, stringsAsFactors = FALSE)
+  all <- read.csv("data/corpus/simulated_judgments_gold_all_candidates.csv", stringsAsFactors = FALSE)
+  rk <- sapply(bo$judge_model, function(j) judge_kappa(all[all$judge_model == j, ]))
+  d <- max(abs(rk - bo$kappa))
+  cat(sprintf("judge bake-off: max |R - Python| kappa = %.2e over %d judges\n", d, nrow(bo)))
+  stopifnot(d < 1e-9)
+}
+cat("parity OK (incl. cost-effectiveness and judge bake-off)\n")

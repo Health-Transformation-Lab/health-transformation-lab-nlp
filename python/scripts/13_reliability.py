@@ -12,7 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
-from dental_omop_nlp.reliability import reliability_report
+from dental_omop_nlp.reliability import by_level, reliability_report
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--simulated", action="store_true")
@@ -33,8 +33,13 @@ out.mkdir(parents=True, exist_ok=True)
 rep["pairwise"].to_csv(out / "reviewer_pairwise.csv", index=False)
 rep["methods"].to_csv(out / "methods_vs_reviewers.csv", index=False)
 rep["consensus"].to_csv(out / "consensus.csv")
+lv = by_level(key, rep["consensus"], compare)
+lv.to_csv(out / "by_level.csv", index=False)
 if a.simulated:
     print("*** SIMULATED REVIEWERS: pipeline dry run, not a result ***")
 print(f"charts={rep['n_visits']} reviewers={rep['n_reviewers']} "
       f"Fleiss kappa={rep['fleiss_kappa']:.3f} consensus reached={rep['consensus_reached']:.1%}")
-print(rep["methods"].round(3).to_string(index=False))
+cols = ["method", "coverage", "n", "pct_agree_consensus", "kappa_vs_consensus", "unsafe_rate", "s2_rate"]
+print(rep["methods"][cols].round(3).to_string(index=False))
+print("\nagreement by difficulty (L1 stated in 2017 terms, L2 translate, L3 infer/resolve):")
+print(lv.pivot(index="method", columns="level", values="pct_agree_consensus").round(3).to_string())
