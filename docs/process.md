@@ -5,29 +5,29 @@ to this repo. The diagram is the study design; the table under it says where
 each box lives.
 
 ```mermaid
-%%{init: {"themeVariables": {"fontSize": "22px"}, "flowchart": {"wrappingWidth": 1400, "nodeSpacing": 30, "rankSpacing": 50, "padding": 18, "subGraphTitleMargin": {"top": 8, "bottom": 14}}}}%%
+%%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"wrappingWidth": 900, "nodeSpacing": 18, "rankSpacing": 40, "padding": 12, "subGraphTitleMargin": {"top": 6, "bottom": 10}}}}%%
 flowchart BT
-        N["Chart notes"]
-        E["Exam forms"]
-        PC["Proc codes<br/>(completed)"]
-        PP["Proc codes<br/>(planned)"]
-        DC["Proc diagnosis<br/>(completed)"]
-        DP["Proc diagnosis<br/>(planned)"]
-        PR["Probing chart<br/>• CAL<br/>• RBL<br/>• Tooth loss due to perio"]
+    N["Chart<br/>notes"]
+    E["Exam<br/>forms"]
+    PC["Proc codes<br/>completed"]
+    PP["Proc codes<br/>planned"]
+    DC["Proc dx<br/>completed"]
+    DP["Proc dx<br/>planned"]
+    PR["Probing chart<br/>CAL · RBL ·<br/>perio tooth loss"]
 
     subgraph Q["Qualitative"]
-        C["<b>Compare each method against each other</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Where do they agree and disagree?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
-        R["<b>Conduct qualitative review</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Two dental reviewers review charts together to assess the most accurate methods&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
+        C["<b>Compare each method against each other</b><br/>Where do they agree and disagree?"]
+        R["<b>Conduct qualitative review</b><br/>Two dental reviewers review charts together<br/>to assess the most accurate methods"]
     end
 
     subgraph V["Quantitative"]
-        A["<b>Produce rule-based phenotyping algorithm</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Based on findings from the qualitative review&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
-        QV["<b>Quantitative validation: chart review reliability assessment</b><br/>Many reviewers stage the same set of charts independently, compared to the rule-based algorithm and AI model"]
+        A["<b>Produce rule-based phenotyping algorithm</b><br/>Based on findings from the qualitative review"]
+        QV["<b>Quantitative validation: chart review reliability</b><br/>Many reviewers stage the same charts independently,<br/>compared to the rule-based algorithm and AI model"]
     end
 
     N & E & PC & PP & DC & DP & PR --> C
     C --> R --> A --> QV
-    N -. "notes only" .-> AI["AI model<br/>(BERT family)"]
+    N -. "notes only" .-> AI["AI model<br/>BERT family"]
     AI -.-> QV
 
     classDef src fill:#dbeafe,stroke:#1e3a5f,color:#0f172a
