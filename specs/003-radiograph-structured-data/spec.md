@@ -8,6 +8,10 @@
 
 **Input**: "Incorporate structured data extracted from radiographs to increase accuracy."
 
+> **Exploratory, for learning and training.** This spec explores a possible
+> proof of concept using simulated data and public information only. It is not
+> a vendor integration. See [docs/radiograph.md](../../docs/radiograph.md).
+
 ## Context
 
 Radiographic bone loss (RBL) is one of the three severity criteria for staging
