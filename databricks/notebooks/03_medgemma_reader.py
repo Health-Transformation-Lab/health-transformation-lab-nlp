@@ -25,7 +25,11 @@ import subprocess
 dbutils.widgets.text("rung", "medgemma-1.5-4b-it")  # noqa: F821
 dbutils.widgets.text("limit", "40")                  # noqa: F821  start small: GPU quota
 dbutils.widgets.text("shots", "0")                   # noqa: F821
-os.environ["HF_TOKEN"] = dbutils.secrets.get("dental", "hf_token")  # noqa: F821
+dbutils.widgets.text("catalog", "workspace")         # noqa: F821  set per target by databricks.yml
+dbutils.widgets.text("schema", "dental_dev")         # noqa: F821
+dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
+catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
+os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
 
 import torch  # noqa: E402
 
@@ -37,10 +41,11 @@ print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "n
 if not os.path.exists("../../data/datasets/answer_key/review_key.csv"):
     subprocess.run(["python", "../../python/scripts/10_build_study.py"], check=True)
 
-r = subprocess.run(["python", "../../python/scripts/11_ai_predict.py",
-                    "--rung", dbutils.widgets.get("rung"), "--backend", "hf",  # noqa: F821
-                    "--limit", dbutils.widgets.get("limit"), "--shots", dbutils.widgets.get("shots")],  # noqa: F821
-                   capture_output=True, text=True)
+args = ["python", "../../python/scripts/11_ai_predict.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
+        "--backend", "hf", "--shots", dbutils.widgets.get("shots")]  # noqa: F821
+if int(dbutils.widgets.get("limit") or 0):  # noqa: F821  0 = all review notes
+    args += ["--limit", dbutils.widgets.get("limit")]  # noqa: F821
+r = subprocess.run(args, capture_output=True, text=True)
 print(r.stdout[-3000:], r.stderr[-3000:])
 
 # COMMAND ----------
@@ -60,5 +65,6 @@ display(d.assign(correct=d.pred == d.truth).groupby("difficulty")["correct"].agg
 # COMMAND ----------
 
 # Keep the run: Delta table for tracking across runs (prompt variant, shots, adapter)
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")  # noqa: F821
 spark.createDataFrame(d.assign(run_ts=pd.Timestamp.now(tz="UTC"))).write.mode("append").saveAsTable(  # noqa: F821
-    "workspace.dental.llm_reader_runs")
+    f"{catalog}.{schema}.llm_reader_runs")

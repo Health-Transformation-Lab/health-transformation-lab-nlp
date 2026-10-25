@@ -68,6 +68,23 @@ Everything this repo relies on, and what it's used for.
     observational research.* npj Digital Medicine 2025;8.
     [doi:10.1038/s41746-025-01433-4](https://doi.org/10.1038/s41746-025-01433-4)
 
+## Knowledge graphs, retrieval and OMOP vocabulary
+
+29. **Lee J, Liu C, Kim JH, et al. (Columbia).** *Comparative effectiveness of knowledge graphs- and EHR
+    data-based medical concept embedding for phenotyping.* medRxiv 2020.
+    [link](https://www.medrxiv.org/content/10.1101/2020.07.14.20151274v1.abstract)
+30. **Ahmed A, Soby S, Aasman B, Mirhaji P.** *Automated OMOP concept mapping using multi-agent LLMs and
+    graph-enhanced semantic retrieval.* OHDSI Symposium 2025.
+    [PDF](https://www.ohdsi.org/wp-content/uploads/2025/10/508-Ahmed-Automated-OMOP-Concept-Mapping-Using-Multi-Agent-Large-Language-Models-and-Graph-Enhanced-Semantic-Retrieval-Report-Adil-Ahmed.pdf)
+31. **Thio S, Lewis M, Denaxas S, Dobson RJB.** *Unlocking electronic health records: a hybrid graph RAG
+    approach to safe clinical AI for patient QA.* arXiv 2602.00009. [link](https://www.arxiv.org/abs/2602.00009)
+32. **Zhao X, Liu S, Yang S-Y, Miao C.** *MedRAG.* arXiv 2502.04413. [link](https://arxiv.org/abs/2502.04413v2)
+
+## Platform
+
+33. **Databricks.** *Lakebase release notes.* [docs](https://docs.databricks.com/aws/en/release-notes/lakebase/)
+34. **Databricks.** *Free Edition limitations.* [docs](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations)
+
 ## Classification rules
 
 26. **American Academy of Periodontology.** *Staging and Grading Periodontitis* (worksheet).

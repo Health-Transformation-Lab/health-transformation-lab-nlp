@@ -1,0 +1,131 @@
+# Databricks Asset Bundle: deploys the notebooks as jobs to dev, uat and prod.
+#
+#   databricks bundle validate -t dev
+#   databricks bundle deploy   -t dev            # your own copy, prefixed [dev <you>]
+#   databricks bundle run      -t dev study_benchmark
+#
+# uat and prod are deployed by CI (.github/workflows/deploy.yml) as a service
+# principal. Per-environment settings are variables below; override any of them
+# with --var name=value or BUNDLE_VAR_<name>. Guide: docs/deployment.md.
+#
+# Personal learning project; synthetic data only in every target until the
+# real-data path is approved. See DISCLAIMER.md.
+
+bundle:
+  name: dental-omop-nlp
+
+include:
+  - databricks/resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for all tables and the data volume
+    default: workspace
+  schema:
+    description: Schema for tables and the data volume
+    default: dental_dev
+  n_people:
+    description: Synthetic people to generate in the benchmark job
+    default: "300"
+  judge_endpoint:
+    description: Model Serving endpoint for the LLM judge (approved for de-identified data)
+    default: none
+  warehouse_name:
+    description: SQL warehouse that runs the ai_query judge notebook
+    default: Serverless Starter Warehouse
+  warehouse_id:
+    description: Looked up from warehouse_name
+    lookup:
+      warehouse: ${var.warehouse_name}
+  reader_rung:
+    description: LLM note-reader rung from models.yaml
+    default: medgemma-1.5-4b-it
+  reader_limit:
+    description: Review notes the reader job processes (0 = all)
+    default: "40"
+  hf_secret_scope:
+    description: Secret scope holding hf_token (Hugging Face read token; HAI-DEF terms accepted)
+    default: dental
+  gpu_node_type:
+    description: GPU node type for the MedGemma job (uat/prod only)
+    default: g5.2xlarge
+  gpu_spark_version:
+    description: ML runtime with GPU support for the MedGemma job
+    default: 16.4.x-gpu-ml-scala2.12
+  service_principal:
+    description: Application id of the service principal that runs uat/prod jobs
+    default: "00000000-0000-0000-0000-000000000000"
+  users_group:
+    description: Workspace group that may view and run the jobs
+    default: users
+
+targets:
+  # Your own sandbox, e.g. Databricks Free Edition. Resources get a [dev <user>]
+  # prefix, schedules are paused, and everything is serverless.
+  dev:
+    mode: development
+    default: true
+    variables:
+      schema: dental_dev
+
+  # Shared test environment. Deployed by CI from main, runs as the service principal.
+  uat:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      service_principal_name: ${var.service_principal}
+    variables:
+      catalog: dental_uat
+      schema: dental
+      n_people: "1500"
+    permissions:
+      - group_name: ${var.users_group}
+        level: CAN_VIEW
+    resources:
+      jobs:
+        medgemma_reader: &medgemma_job
+          name: dental-omop-nlp medgemma reader (${bundle.target})
+          job_clusters:
+            - job_cluster_key: gpu
+              new_cluster:
+                spark_version: ${var.gpu_spark_version}
+                node_type_id: ${var.gpu_node_type}
+                num_workers: 0
+                spark_conf:
+                  spark.databricks.cluster.profile: singleNode
+                  spark.master: local[*]
+                custom_tags:
+                  ResourceClass: SingleNode
+                  project: dental-omop-nlp
+          tasks:
+            - task_key: read_notes
+              job_cluster_key: gpu
+              notebook_task:
+                notebook_path: databricks/notebooks/03_medgemma_reader.py
+                base_parameters:
+                  catalog: ${var.catalog}
+                  schema: ${var.schema}
+                  rung: ${var.reader_rung}
+                  limit: ${var.reader_limit}
+                  shots: "0"
+                  hf_secret_scope: ${var.hf_secret_scope}
+
+  # Production. Manual deploy from a tagged commit, approval required in CI.
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      service_principal_name: ${var.service_principal}
+    variables:
+      catalog: dental_prod
+      schema: dental
+      n_people: "1500"
+      reader_limit: "0"
+    permissions:
+      - group_name: ${var.users_group}
+        level: CAN_VIEW
+    resources:
+      jobs:
+        medgemma_reader: *medgemma_job

@@ -9,7 +9,7 @@
 # MAGIC 3. Baseline rungs (rules, structured, TF-IDF) — seconds
 # MAGIC 4. One encoder rung (DistilBERT) — minutes on CPU at this sample size
 # MAGIC 5. Optional: LLM challenger via `ai_query` on a Foundation Model endpoint
-# MAGIC 6. Results and OMOP tables land as Delta in `workspace.dental`
+# MAGIC 6. Results and OMOP tables land as Delta in `<catalog>.<schema>` (set per target in `databricks.yml`)
 # MAGIC
 # MAGIC **Free Edition notes:** serverless is Python/SQL only (no R). Limited serverless GPU is
 # MAGIC available from the notebook compute selector, subject to capacity and fair-use limits
@@ -130,7 +130,7 @@ display(all_res[all_res["class"] == ""].pivot(index="model_id", columns="metric"
 # MAGIC            note_text),
 # MAGIC     failOnError => false
 # MAGIC   ).result AS pred
-# MAGIC FROM workspace.dental.labeled_notes
+# MAGIC FROM <catalog>.<schema>.labeled_notes  -- e.g. workspace.dental_dev
 # MAGIC WHERE split = 'test';
 # MAGIC SELECT * FROM llm_preds LIMIT 10;
 

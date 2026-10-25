@@ -1,0 +1,60 @@
+# Deploy the bundle. dev and uat on demand (uat also on every push to main);
+# prod on demand only, gated by the "prod" GitHub environment (required reviewers).
+#
+# Each GitHub environment (dev, uat, prod) holds its own secrets:
+#   DATABRICKS_HOST, DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET   (service principal, OAuth M2M)
+# and variables passed to the bundle as BUNDLE_VAR_<name>, e.g.
+#   SERVICE_PRINCIPAL, JUDGE_ENDPOINT, WAREHOUSE_NAME, GPU_NODE_TYPE, USERS_GROUP
+name: deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Bundle target
+        type: choice
+        options: [dev, uat, prod]
+        default: uat
+      run_benchmark:
+        description: Run the study + benchmark job after deploying
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-${{ github.event.inputs.target || 'uat' }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.target || 'uat' }}
+    env:
+      TARGET: ${{ github.event.inputs.target || 'uat' }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+      BUNDLE_VAR_service_principal: ${{ vars.SERVICE_PRINCIPAL }}
+      BUNDLE_VAR_judge_endpoint: ${{ vars.JUDGE_ENDPOINT || 'none' }}
+      BUNDLE_VAR_warehouse_name: ${{ vars.WAREHOUSE_NAME || 'Serverless Starter Warehouse' }}
+      BUNDLE_VAR_gpu_node_type: ${{ vars.GPU_NODE_TYPE || 'g5.2xlarge' }}
+      BUNDLE_VAR_users_group: ${{ vars.USERS_GROUP || 'users' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stop if this environment isn't configured
+        if: env.DATABRICKS_HOST == ''
+        run: echo "No DATABRICKS_HOST for $TARGET; skipping." && exit 0
+      - uses: databricks/setup-cli@v0.270.0
+        if: env.DATABRICKS_HOST != ''
+      - name: Python tests before deploying
+        if: env.DATABRICKS_HOST != ''
+        run: pip install -e "./python[dev]" matplotlib && (cd python && pytest -q tests)
+      - name: Validate
+        if: env.DATABRICKS_HOST != ''
+        run: databricks bundle validate -t "$TARGET"
+      - name: Deploy
+        if: env.DATABRICKS_HOST != ''
+        run: databricks bundle deploy -t "$TARGET"
+      - name: Run benchmark job
+        if: env.DATABRICKS_HOST != '' && github.event.inputs.run_benchmark == 'true'
+        run: databricks bundle run -t "$TARGET" study_benchmark

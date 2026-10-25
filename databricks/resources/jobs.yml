@@ -1,0 +1,36 @@
+# Jobs deployed to every target. Notebook tasks without a cluster run on
+# serverless compute (the only option on Free Edition). The MedGemma GPU job is
+# defined per target in databricks.yml (uat/prod); in dev, run
+# databricks/notebooks/03_medgemma_reader.py interactively on serverless GPU.
+
+resources:
+  jobs:
+    study_benchmark:
+      name: dental-omop-nlp study + benchmark (${bundle.target})
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: build_and_benchmark
+          notebook_task:
+            notebook_path: ../notebooks/01_run_benchmark.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              n_people: ${var.n_people}
+              leak_assessment: "false"
+
+    llm_judge:
+      name: dental-omop-nlp LLM judge via ai_query (${bundle.target})
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: judge
+          notebook_task:
+            notebook_path: ../notebooks/02_llm_judge.sql
+            warehouse_id: ${var.warehouse_id}
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              judge_endpoint: ${var.judge_endpoint}

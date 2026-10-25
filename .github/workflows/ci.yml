@@ -1,0 +1,39 @@
+# Tests on every push and pull request: Python tests (incl. bundle structure),
+# R parity, and the bundle against its schema.
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -e "./python[dev]" matplotlib
+      - run: cd python && pytest -q tests
+
+  r-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+      - run: Rscript r/tests/test_parity.R
+
+  bundle:
+    # Validate needs a workspace; runs only when dev credentials are configured.
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: databricks/setup-cli@v0.270.0
+      - name: bundle validate (all targets)
+        if: env.DATABRICKS_HOST != ''
+        run: for t in dev uat prod; do databricks bundle validate -t $t; done
