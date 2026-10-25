@@ -23,8 +23,8 @@ import itertools
 import numpy as np
 import pandas as pd
 
-from .labels import Status
 from .harm import unsafe_rates
+from .labels import Status
 from .phenotype import cohen_kappa
 
 ORDER = [s.value for s in Status]
