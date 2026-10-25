@@ -141,6 +141,29 @@ models:
       chart lines that support a status) or for a RAG rung where the LLM is
       the classifier. Score it on retrieval metrics, not F1 on perio status.
 
+  # ---- medical LLMs (exploratory; see docs/medgemma.md) ---------------------
+  # Not runnable as classifier rungs yet. Check Hugging Face for the current
+  # MedGemma 1.5 ids and accept the HAI-DEF terms before downloading.
+  - id: medgemma-4b-it
+    hf: google/medgemma-4b-it
+    org: Google (Health AI Developer Foundations)
+    year: 2025
+    domain: medical
+    role: llm
+    max_len: 128000
+    paper: "MedGemma Technical Report (arXiv 2507.05201)"
+    note: Multimodal (text + image). Candidate zero-shot reader, LoRA fine-tune, judge, paraphraser.
+
+  - id: medgemma-27b-text-it
+    hf: google/medgemma-27b-text-it
+    org: Google (Health AI Developer Foundations)
+    year: 2025
+    domain: medical
+    role: llm
+    max_len: 128000
+    paper: "MedGemma Technical Report (arXiv 2507.05201)"
+    note: Text only. Candidate zero-shot reader and judge.
+
 # ---- benchmark groupings ---------------------------------------------------
 ladders:
   # Rung order for the headline comparison. Same test split for every rung.
@@ -169,6 +192,10 @@ ladders:
     - sapbert
   retrieval:
     - gte-moderncolbert
+  llm_challengers:
+    # exploratory; served on GPU or via ai_query, not by rungs.py yet
+    - medgemma-4b-it
+    - medgemma-27b-text-it
 
 # ---- shared settings ---------------------------------------------------------
 eval:

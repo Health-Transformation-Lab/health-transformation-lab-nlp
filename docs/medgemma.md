@@ -1,0 +1,65 @@
+# MedGemma: how it could be used here (exploratory note)
+
+> **Personal learning project.** Ideas for learning and practice, using public
+> information only. Not affiliated with Google or any other organization, and
+> not an organization's plan. See [DISCLAIMER](../DISCLAIMER.md).
+
+## What MedGemma is (public sources)
+
+- Open models from Google's Health AI Developer Foundations (HAI-DEF). MedGemma 1:
+  a **4B multimodal** model (pre-trained and instruction-tuned), a **27B
+  text-only** model and a **27B multimodal** model. Text and image in, text out;
+  context up to 128K tokens. Images were radiology (chest X-ray, CT),
+  dermatology, ophthalmology and histopathology; **dental imaging is not
+  mentioned**. The image encoder is also released on its own as **MedSigLIP**,
+  recommended for classification and retrieval without text generation
+  ([model card](https://developers.google.com/health-ai-developer-foundations/medgemma/model-card-v1)).
+- **MedGemma 1.5** (reported January 2026): 4B for offline / low-resource use,
+  27B still available; adds 3D CT/MRI and whole-slide pathology, longitudinal
+  X-rays, and better extraction from medical documents and EHR question
+  answering; alongside a new speech model, MedASR
+  ([BioPharmaTrend](https://www.biopharmatrend.com/news/google-updates-open-medical-ai-suite-with-new-imaging-and-speech-models-launches-100k-developer-hackathon-1464/)).
+- **Terms and limits:** governed by the HAI-DEF terms of use; a starting point
+  for developers, not intended to directly inform diagnosis or treatment;
+  must be validated on representative data; prompt-sensitive; watch for data
+  contamination (model card).
+
+## Where it fits in this repo
+
+| # | Use | How | Effort | Fits with |
+|---|-----|-----|--------|-----------|
+| 1 | **Note reader (LLM rung)** | Zero-/few-shot prompt: note in, JSON status / stage / grade / extent out, same schema and quote gate as the judge. 4B and 27B-text as two rungs | Low | Model ladder; difficulty levels; cost frontier |
+| 2 | **Fine-tuned note reader ("extend")** | Parameter-efficient fine-tuning (e.g. LoRA) of the 4B model on `train.csv` (synthetic labels), structured JSON output. Compare against the BERT ladder: does a 4B generative model beat a fine-tuned 150M encoder enough to justify its cost? | Medium; needs a GPU | BERT ladder; harm-weighted errors |
+| 3 | **Judge candidate** | Add to the judge bake-off. The same-family rule applies: if a MedGemma model is being graded, the judge must be from a different family, and vice versa | Low | `15_judge.py` bake-off |
+| 4 | **Note paraphraser for synthetic data** | Rewrite generated notes in varied clinical phrasing while keeping the label (as the UTHealth team did with GPT-4), then check with the reader and judge that the label survived. Reduces the "same author wrote notes and rules" problem | Medium | Spec 001 note realism |
+| 5 | **Radiograph extension ("extend", images)** | MedGemma wasn't trained on dental images. Options: (a) MedSigLIP image embeddings + a small classifier for bone loss; (b) fine-tune the 4B multimodal model on a public, licensed dental radiograph dataset. Output feeds the same structured radiograph schema as spec 003 | High; images and licences | Radiograph exploration |
+| 6 | **Grade from history** | Use the long context to read several visits at once and estimate progression (grade is about rate of change) | Medium | Grade reader |
+
+## Suggested order
+
+1. **Rung 1 first.** Cheap, and it answers the basic question: how does an
+   off-the-shelf medical LLM do on these notes, by difficulty level, and at
+   what cost per million notes?
+2. **Then rung 2** only if rung 1 is promising but not good enough.
+3. **Paraphrasing (4)** whenever the synthetic notes need more variety.
+4. **Images (5)** last: it needs public dental image data with a licence that
+   allows this, and GPU time.
+
+## Running it
+
+- **Laptop / CPU:** the 4B model, quantized, runs locally for small synthetic
+  tests (slow). Synthetic data only.
+- **Databricks:** register through MLflow and serve on GPU Model Serving;
+  batch-score with `ai_query`. Free Edition has no GPU, so it's for the small
+  tests only. Costs go in `costs.yaml` as a self-hosted GPU method.
+- **Evaluation:** the same split, scorer, harm grading, difficulty levels and
+  cost-effectiveness as every other method. Report prompt-sensitivity by running
+  two or three prompt variants.
+
+## Cautions
+
+- Not for clinical decisions (model terms). Every use here is a research exercise.
+- No dental training data in MedGemma 1, so expect to need adaptation.
+- If MedGemma reads the notes, don't let a Gemma-family model judge them.
+- Check the HAI-DEF terms before sharing fine-tuned weights.
+- Nothing identifiable goes in, ever. Synthetic notes only in this repo.

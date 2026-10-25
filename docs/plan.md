@@ -73,6 +73,8 @@ synthetic data until approved for internal use. Databricks is the eventual home.
 
 ## Open decisions
 
+- Whether to try MedGemma as a note reader, judge or paraphraser first ([medgemma.md](medgemma.md))
+
 - Periodontist sign-off on the error severity matrix ([dentbench_methods.md](dentbench_methods.md)) before any unsafe rate is reported
 
 - Judge model and endpoint (a different family from any LLM being judged), and whether the judge may see de-identified notes on a pay-per-token endpoint

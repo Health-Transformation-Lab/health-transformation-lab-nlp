@@ -59,6 +59,14 @@ Everything this repo relies on, and what it's used for.
 21. **Yavuz MB, et al.** AI detection of periodontal status in bitewing radiographs. EuroPerio10, 2022.
     [Dental Tribune summary](https://www.dental-tribune.com/news/artificial-intelligence-shows-promise-for-detecting-periodontal-status-in-bitewing-radiographs/)
 
+## Medical LLMs (exploratory)
+
+22. **Sellergren A, et al.** *MedGemma Technical Report.* [arXiv 2507.05201](https://arxiv.org/abs/2507.05201), 2025.
+23. **Google Health AI Developer Foundations.** *MedGemma model card.*
+    [developers.google.com](https://developers.google.com/health-ai-developer-foundations/medgemma/model-card-v1)
+24. **BioPharmaTrend.** *Google updates open medical AI suite with new imaging and speech models* (MedGemma 1.5, MedASR), January 2026.
+    [biopharmatrend.com](https://www.biopharmatrend.com/news/google-updates-open-medical-ai-suite-with-new-imaging-and-speech-models-launches-100k-developer-hackathon-1464/)
+
 ## Synthetic data
 
 11. **Tamizh Selvam T.** *Synthetic Dental Clinical Notes Dataset for Dental NLP
