@@ -56,23 +56,28 @@ Details: [process](docs/process.md#validation-criterion-as-reliable-as-a-human-r
 
 ## Models evaluated
 
-The 12 models from the evaluation sheet (Hugging Face ids in `models.yaml`):
+The 12 models from the evaluation sheet (also in `models.yaml`):
 
-| Model | Domain | Role |
-|---|---|---|
-| BERT base · DistilBERT | general | classifier |
-| ModernBERT base · large | general | classifier, long context |
-| Longformer | general | long context |
-| SciBERT | scientific | classifier |
-| BiomedBERT | biomedical | classifier |
-| BioClinical ModernBERT base · large | clinical | classifier, long context |
-| Clinical-Longformer | clinical | long context |
-| SapBERT | biomedical | concept mapping |
-| GTE-ModernColBERT | general | retrieval |
+| Model | Paper | Domain | Role |
+|---|---|---|---|
+| [BERT base](https://huggingface.co/google-bert/bert-base-uncased) | [arXiv 1810.04805](https://arxiv.org/abs/1810.04805) | general | classifier |
+| [DistilBERT](https://huggingface.co/distilbert/distilbert-base-uncased) | [arXiv 1910.01108](https://arxiv.org/abs/1910.01108) | general | classifier |
+| [ModernBERT base](https://huggingface.co/answerdotai/ModernBERT-base) | [arXiv 2412.13663](https://arxiv.org/abs/2412.13663) | general | classifier, long context |
+| [ModernBERT large](https://huggingface.co/answerdotai/ModernBERT-large) | [arXiv 2412.13663](https://arxiv.org/abs/2412.13663) | general | classifier, long context |
+| [Longformer](https://huggingface.co/allenai/longformer-base-4096) | [arXiv 2004.05150](https://arxiv.org/abs/2004.05150) | general | long context |
+| [SciBERT](https://huggingface.co/allenai/scibert_scivocab_uncased) | [arXiv 1903.10676](https://arxiv.org/abs/1903.10676) | scientific | classifier |
+| [BiomedBERT](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) | [arXiv 2007.15779](https://arxiv.org/abs/2007.15779) | biomedical | classifier |
+| [BioClinical ModernBERT base](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-base) | [arXiv 2506.10896](https://arxiv.org/abs/2506.10896) | clinical | classifier, long context |
+| [BioClinical ModernBERT large](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-large) | [arXiv 2506.10896](https://arxiv.org/abs/2506.10896) | clinical | classifier, long context |
+| [Clinical-Longformer](https://huggingface.co/yikuan8/Clinical-Longformer) | [arXiv 2201.11838](https://arxiv.org/abs/2201.11838) | clinical | long context |
+| [SapBERT](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) | [arXiv 2010.11784](https://arxiv.org/abs/2010.11784) | biomedical | concept mapping |
+| [GTE-ModernColBERT](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) | model card | general | retrieval |
 
 Plus baselines (`note_rules`, `tfidf_logreg`, `structured_baseline`,
-`fusion_tfidf_rad`) and exploratory MedGemma readers. **Status:** the 10
-classifier and long-context models train and predict with
+`fusion_tfidf_rad`) and exploratory MedGemma readers
+([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it), [4B](https://huggingface.co/google/medgemma-4b-it),
+[27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
+**Status:** the 10 classifier and long-context models train and predict with
 `scripts/11_ai_predict.py --rung <id>` but haven't been run yet (they need the
 Hugging Face downloads). Results so far are baselines on simulated reviewers.
 

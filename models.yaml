@@ -24,6 +24,7 @@ models:
     role: classifier
     max_len: 512
     paper: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"
+    paper_url: https://arxiv.org/abs/1810.04805
 
   - id: distilbert-base
     hf: distilbert/distilbert-base-uncased
@@ -33,6 +34,7 @@ models:
     role: classifier
     max_len: 512
     paper: "DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter"
+    paper_url: https://arxiv.org/abs/1910.01108
     note: >
       Sheet links distilbert-base-uncased-finetuned-sst-2-english, which is the
       SST-2 sentiment fine-tune. Use the base checkpoint above for our own
@@ -46,6 +48,7 @@ models:
     role: long_context
     max_len: 8192
     paper: "Smarter, Better, Faster, Longer: A Modern Bidirectional Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference"
+    paper_url: https://arxiv.org/abs/2412.13663
 
   - id: modernbert-large
     hf: answerdotai/ModernBERT-large
@@ -55,6 +58,7 @@ models:
     role: long_context
     max_len: 8192
     paper: "Smarter, Better, Faster, Longer (ModernBERT)"
+    paper_url: https://arxiv.org/abs/2412.13663
 
   - id: longformer-base
     hf: allenai/longformer-base-4096
@@ -64,6 +68,7 @@ models:
     role: long_context
     max_len: 4096
     paper: "Longformer: The Long-Document Transformer"
+    paper_url: https://arxiv.org/abs/2004.05150
 
   # ---- scientific / biomedical ---------------------------------------------
   - id: scibert
@@ -74,6 +79,7 @@ models:
     role: classifier
     max_len: 512
     paper: "SciBERT: A Pretrained Language Model for Scientific Text"
+    paper_url: https://arxiv.org/abs/1903.10676
 
   - id: biomedbert
     hf: microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext
@@ -83,6 +89,7 @@ models:
     role: classifier
     max_len: 512
     paper: "Domain-Specific Language Model Pretraining for Biomedical Natural Language Processing"
+    paper_url: https://arxiv.org/abs/2007.15779
     note: Formerly PubMedBERT.
 
   - id: sapbert
@@ -93,6 +100,7 @@ models:
     role: entity_linking
     max_len: 512
     paper: "Self-Alignment Pretraining for Biomedical Entity Representations"
+    paper_url: https://arxiv.org/abs/2010.11784
     note: >
       Trained for UMLS synonym alignment. Best use here is mapping note terms
       (e.g. "perio", "BOP", "SRP") to SNOMED/UMLS concepts for the OMOP
@@ -108,6 +116,7 @@ models:
     role: long_context
     max_len: 8192
     paper: "BioClinical ModernBERT: A State-of-the-Art Long-Context Encoder for Biomedical and Clinical NLP"
+    paper_url: https://arxiv.org/abs/2506.10896
 
   - id: bioclinical-modernbert-large
     hf: thomas-sounack/BioClinical-ModernBERT-large
@@ -117,6 +126,7 @@ models:
     role: long_context
     max_len: 8192
     paper: "BioClinical ModernBERT (large)"
+    paper_url: https://arxiv.org/abs/2506.10896
 
   - id: clinical-longformer
     hf: yikuan8/Clinical-Longformer
@@ -126,6 +136,7 @@ models:
     role: long_context
     max_len: 4096
     paper: "Clinical-Longformer and Clinical-BigBird: Transformers for long clinical sequences"
+    paper_url: https://arxiv.org/abs/2201.11838
 
   # ---- retrieval -----------------------------------------------------------
   - id: gte-moderncolbert
@@ -156,6 +167,7 @@ models:
     modality: multimodal
     max_len: 128000
     paper: "MedGemma Technical Report (arXiv 2507.05201); MedGemma 1.5 release, Jan 2026"
+    paper_url: https://arxiv.org/abs/2507.05201
     note: Newer 4B; better document/EHR extraction reported. Default reader to try first.
 
   - id: medgemma-4b-it
@@ -168,6 +180,7 @@ models:
     modality: multimodal
     max_len: 128000
     paper: "MedGemma Technical Report (arXiv 2507.05201)"
+    paper_url: https://arxiv.org/abs/2507.05201
     note: Multimodal (text + image). Candidate zero-shot reader, LoRA fine-tune, judge, paraphraser.
 
   - id: medgemma-27b-text-it
@@ -180,6 +193,7 @@ models:
     modality: text
     max_len: 128000
     paper: "MedGemma Technical Report (arXiv 2507.05201)"
+    paper_url: https://arxiv.org/abs/2507.05201
     note: Text only. Candidate zero-shot reader and judge.
 
 # ---- benchmark groupings ---------------------------------------------------
