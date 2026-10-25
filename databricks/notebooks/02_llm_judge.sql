@@ -2,7 +2,7 @@
 -- MAGIC %md
 -- MAGIC # LLM judge at corpus scale (ai_query)
 -- MAGIC
--- MAGIC Same prompt as `python/dental_omop_nlp/judge.py` (prompt version `judge-v1`), run as batch SQL.
+-- MAGIC Same prompt as `python/dental_omop_nlp/judge.py` (prompt version `judge-v2`, AAP worksheet rules), run as batch SQL.
 -- MAGIC
 -- MAGIC * Input: `${catalog}.${schema}.judge_queue` with columns `method, visit_id, note_text, pred`.
 -- MAGIC   Build it from a **stratified sample** of each method's predictions (not all million notes:
@@ -28,12 +28,15 @@ WITH raw AS (
       CONCAT(
         'You are a periodontist auditing an automated classifier. Judge whether the dental chart note ',
         'supports the predicted periodontal status under the 2017 AAP/EFP classification. ',
-        'healthy: no attachment loss, BOP < 10%. gingivitis: no attachment loss, BOP >= 10%. ',
-        'periodontitis_stage_1: CAL 1-2 mm, RBL < 15%, no perio tooth loss. ',
-        'periodontitis_stage_2: CAL 3-4 mm, RBL 15-33%, no perio tooth loss. ',
-        'periodontitis_stage_3: CAL >= 5 mm, RBL > 33%, <= 4 teeth lost to perio. ',
-        'periodontitis_stage_4: as stage 3 with >= 5 teeth lost to perio. ',
-        'Measured findings outrank a written diagnosis; worst site decides; ignore copied-forward text; ',
+        'Follow the AAP staging and grading worksheet. ',
+        'healthy: no interdental attachment loss, BOP < 10%. gingivitis: no interdental attachment loss, BOP >= 10%. ',
+        'Initial stage from interdental CAL at the worst site (I 1-2 mm, II 3-4 mm, III/IV >= 5 mm); ',
+        'use radiographic bone loss only when CAL is not recorded (I < 15%, II 15-33%, III/IV beyond coronal third). ',
+        'Tooth loss due to perio: 1-4 teeth -> at least stage 3; >= 5 -> stage 4. ',
+        'Complexity raises, never lowers: max probing depth > 4 mm -> at least stage 2; probing depth >= 6 mm, ',
+        'vertical bone loss >= 3 mm or class II/III furcation -> at least stage 3; at stage 3, mobility >= 2, ',
+        '< 20 remaining teeth, masticatory dysfunction, bite collapse, drifting/flaring or severe ridge defect -> stage 4. ',
+        'Measured findings outrank a written diagnosis; ignore copied-forward text; ',
         'slight=stage 1, moderate=stage 2, severe=stage 3 (4 if >= 5 teeth lost to perio).\n\n',
         'Note:\n<<<\n', note_text, '\n>>>\n\nPredicted status: ', pred,
         '\n\nIs the predicted status supported by the note?'
@@ -56,7 +59,7 @@ SELECT
    AND (r.result.verdict = 'not_determinable' OR (length(r.result.quote) > 0 AND instr(note_text, r.result.quote) > 0)))
                              AS gate_ok,
   coalesce(r.errorMessage, '') AS error,
-  'judge-v1'                 AS prompt_version,
+  'judge-v2'                 AS prompt_version,
   :judge_endpoint            AS judge_model
 FROM raw;
 

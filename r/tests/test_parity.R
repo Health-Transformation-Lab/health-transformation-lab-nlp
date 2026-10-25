@@ -5,6 +5,15 @@
 source("r/R/labels.R")
 source("eval/score.R")
 
+# 0. AAP worksheet edge cases: CAL missing, tooth loss, complexity factors.
+if (file.exists("data/labels/aap_rule_cases.csv")) {
+  g <- read.csv("data/labels/aap_rule_cases.csv", stringsAsFactors = FALSE)
+  r <- label_chart(g$pd, rep(30, nrow(g)), g$cal, g$rbl, g$lost, vertical_defect_mm = g$vd,
+                   furcation_class = g$fc, mobility_degree = g$mob, remaining_teeth = g$rem)
+  cat(sprintf("AAP rules: %d / %d edge cases agree\n", sum(r == g$label), nrow(g)))
+  stopifnot(all(r == g$label))
+} else cat("AAP rules: skipped (run python/scripts/export_rules_predictions.py first)\n")
+
 if (file.exists("data/labels/labeled_notes.csv")) {
 notes <- read.csv("data/labels/labeled_notes.csv", stringsAsFactors = FALSE)
 split <- read.csv("data/labels/split.csv")
@@ -65,6 +74,20 @@ if (file.exists(py_rel) && file.exists("data/review/simulated_reviewer_labels.cs
   dl <- max(abs(m$pct_agree_consensus_py - m$pct_agree_consensus_r), na.rm = TRUE)
   cat(sprintf("by level:    max |R - Python| = %.2e over %d rows\n", dl, nrow(m)))
   stopifnot(nrow(m) == nrow(py_lv), dl < 1e-9)
+  # 4b. AI vs humans: point estimates exact, bootstrap CI approximate (different RNG)
+  py_vh_f <- "data/review/simulated_reliability/agreement_vs_humans.csv"
+  if (file.exists(py_vh_f)) {
+    py_vh <- read.csv(py_vh_f, stringsAsFactors = FALSE)
+    w <- reshape(labels[, c("visit_id", "reviewer", "status")], idvar = "visit_id", timevar = "reviewer", direction = "wide")
+    rownames(w) <- w$visit_id; w$visit_id <- NULL; names(w) <- sub("^status\\.", "", names(w))
+    w <- w[order(as.numeric(rownames(w))), , drop = FALSE]
+    r_vh <- agreement_vs_humans(w, compare, n_boot = 200)
+    mm <- merge(py_vh, r_vh, by = "rater", suffixes = c(".py", ".r"))
+    d <- max(abs(mm$mean_kappa_vs_humans.py - mm$mean_kappa_vs_humans.r))
+    ci_d <- max(abs(c(mm$ci_low.py - mm$ci_low.r, mm$ci_high.py - mm$ci_high.r)), na.rm = TRUE)
+    cat(sprintf("vs humans:   max |R - Python| = %.2e over %d raters; CI bounds within %.3f\n", d, nrow(mm), ci_d))
+    stopifnot(nrow(mm) == nrow(py_vh), d < 1e-9, ci_d < 0.05)
+  }
 } else cat("reliability: skipped (run python scripts 12 --simulate and 13 --simulated first)\n")
 cat("parity OK (all sections)\n")
 

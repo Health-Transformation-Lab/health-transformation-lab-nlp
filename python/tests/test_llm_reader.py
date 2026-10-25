@@ -24,7 +24,8 @@ def _ans(status="periodontitis_stage_2", quote="Diagnosis: Localized Periodontit
 def test_judge_prompt_unchanged_after_sharing_criteria():
     assert judge.SYSTEM.startswith("You are a periodontist auditing")
     assert judge.CRITERIA in judge.SYSTEM
-    assert judge.PROMPT_VERSION == "judge-v1"
+    assert judge.PROMPT_VERSION == "judge-v2"
+    assert "use radiographic bone loss only when CAL is not recorded" in " ".join(judge.CRITERIA.split())
 
 
 def test_reader_prompt_shares_criteria_and_has_note():
@@ -32,7 +33,7 @@ def test_reader_prompt_shares_criteria_and_has_note():
     msgs = build_messages(NOTE)
     assert msgs[0]["role"] == "system" and judge.CRITERIA in msgs[0]["content"]
     assert NOTE in msgs[-1]["content"]
-    terse = build_messages(NOTE, variant="reader-v1-terse")
+    terse = build_messages(NOTE, variant="reader-v2-terse")
     assert terse[0]["content"] != msgs[0]["content"]
 
 

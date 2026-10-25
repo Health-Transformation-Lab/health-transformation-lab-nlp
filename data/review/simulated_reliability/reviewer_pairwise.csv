@@ -1,7 +1,7 @@
 a,b,kappa,weighted_kappa
-reviewer1@example.org,reviewer2@example.org,0.6571282684083994,0.9459845330160619
-reviewer1@example.org,reviewer3@example.org,0.6762087736151137,0.9445942027429037
-reviewer1@example.org,reviewer4@example.org,0.717087312414734,0.9473049824130789
-reviewer2@example.org,reviewer3@example.org,0.661435790281657,0.9423980350524158
-reviewer2@example.org,reviewer4@example.org,0.6466829943562986,0.9483562734614946
-reviewer3@example.org,reviewer4@example.org,0.7064075181546348,0.9511898343121111
+reviewer1@example.org,reviewer2@example.org,0.6348446053328624,0.943073216650446
+reviewer1@example.org,reviewer3@example.org,0.6745521461511172,0.9472844934357196
+reviewer1@example.org,reviewer4@example.org,0.7111676812396237,0.9489862889464327
+reviewer2@example.org,reviewer3@example.org,0.6342876091522051,0.9338772055625433
+reviewer2@example.org,reviewer4@example.org,0.6608741675120188,0.94700250144004
+reviewer3@example.org,reviewer4@example.org,0.715834756192208,0.9536687417083376

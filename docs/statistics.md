@@ -59,8 +59,11 @@ Where it's used now:
   accuracy over the corpus sample. Both the sample and the calibration set are
   resampled, so uncertainty about the judge itself is included.
 
-Not yet: the reliability tables (`13_reliability.py`) report kappa without CIs.
-Adding bootstrap CIs there (in Python and R) is an open item.
+- `reliability.agreement_vs_humans`: CI on each method's difference from the
+  human bar (acceptance test below). R computes its own bootstrap; point
+  estimates match Python exactly and the CIs within sampling noise.
+
+Not yet: the other reliability tables report kappa without CIs.
 
 ## Reading them together
 
@@ -68,6 +71,20 @@ A kappa of 0.72 for the model vs 0.68 for a second reviewer looks like a win.
 If the intervals are about 0.62–0.80 and 0.57–0.77, they overlap heavily and the
 honest claim is "comparable", not "better". Report kappa with its interval, and
 the number of charts behind it.
+
+## The acceptance test: as reliable as a person?
+
+The headline question is whether an AI model agrees with the reviewers **at
+least as much as they agree with each other** (after OHDSI's case-validation
+work; see [process.md](process.md#validation-criterion-as-reliable-as-a-human-reviewer)).
+
+- Human bar = mean kappa over all reviewer pairs.
+- Method score = its mean kappa against each reviewer.
+- Difference with a **paired** bootstrap CI: each resample draws the same charts
+  for the humans and the method, so chart difficulty cancels out.
+- **Non-inferiority margin** (default 0.05 kappa) is set before seeing results.
+  Non-inferior means the CI's lower bound clears −margin: "no worse than a person
+  by more than the margin", not "better than a person".
 
 ## Related corrections
 

@@ -53,7 +53,34 @@ flowchart BT
 | Rule-based phenotyping algorithm | `phenotype.phenotype_v0` + `RULES_V0` (placeholder hierarchy until the review sets it) | `algorithm_v0` column |
 | AI model | `rungs.py` + `models.yaml`; `scripts/11_ai_predict.py` trains on `train.csv`, predicts the review charts | `ai_predictions_<model>.csv` |
 | Many reviewers stage the same charts | Label Studio: `labelstudio/chart_review.xml`, tasks in `data/datasets/review_tasks.json` | Label Studio JSON export(s) |
-| Reliability: reviewers vs algorithm vs AI | `scripts/12_import_review.py`, `scripts/13_reliability.py` (Python) and `r/R/04_reliability.R` (R), parity-tested | Fleiss' kappa, consensus, each method vs reviewers |
+| Reliability: reviewers vs algorithm vs AI | `scripts/12_import_review.py`, `scripts/13_reliability.py` (Python) and `r/R/04_reliability.R` (R), parity-tested | Fleiss' kappa, consensus, each method vs reviewers, **AI vs human acceptance test** (below) |
+
+## Validation criterion: as reliable as a human reviewer
+
+The top box replicates the case-validation approach OHDSI presented for
+chronic-condition phenotypes: several people review the same cases
+independently, AI models review them too, and an AI is acceptable if it
+**agrees with the people at least as much as the people agree with each other**
+([OHDSI 2023 plenary, *Improving the reliability and scale of case validation*](https://www.youtube.com/watch?v=scUssf863TI),
+from about 49 min; Schuemie, Ostropolets et al., *npj Digital Medicine* 2025,
+[doi:10.1038/s41746-025-01433-4](https://doi.org/10.1038/s41746-025-01433-4)).
+They found wide variation between human reviewers, and LLM–human agreement
+comparable to human–human.
+
+How it's computed here (`reliability.agreement_vs_humans`, R twin in `04_reliability.R`):
+
+1. **Human bar:** mean Cohen's kappa over every pair of reviewers. Each reviewer
+   also gets their own mean kappa against the others, to show the human spread.
+2. **Each method** (AI model, rule-based algorithm, each source): mean kappa
+   against every reviewer.
+3. **Difference** = method − human bar, with a 95% paired bootstrap CI over charts.
+4. **Verdict** against a non-inferiority margin fixed before looking (default
+   0.05 kappa): *non-inferior* if the CI's lower bound is above −margin,
+   *inferior* if its upper bound is below −margin, else *inconclusive*.
+
+Comparing a method with the reviewer **consensus** instead would be unfair to the
+humans, because each reviewer helped make the consensus. Output:
+`data/review/[simulated_]reliability/agreement_vs_humans.csv`.
 
 ## What's real and what's simulated today
 

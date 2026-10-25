@@ -13,6 +13,11 @@ compare with the reviewers.
                         a source that is right when present but usually absent
                         is a different finding from one that is often wrong.
 
+    AI vs humans        the acceptance test (agreement_vs_humans): does a method
+                        agree with the reviewers at least as much as they agree
+                        with each other? After OHDSI's case-validation work
+                        (Schuemie, Ostropolets et al., npj Digit Med 2025).
+
 r/R/04_reliability.R computes the same numbers in R; the parity test checks.
 """
 
@@ -114,3 +119,55 @@ def by_level(key: pd.DataFrame, cons: pd.Series, compare: dict[str, pd.Series]) 
         rows.append({"method": name, "level": "macro", "n": int(sum(r["n"] for r in rows[-3:])),
                      "pct_agree_consensus": float(np.nanmean(list(per.values())))})
     return pd.DataFrame(rows)
+
+
+def agreement_vs_humans(wide: pd.DataFrame, compare: dict[str, pd.Series], n_boot: int = 500,
+                        seed: int = 0, margin: float = 0.05) -> pd.DataFrame:
+    """Is each method as reliable as a human reviewer?
+
+    Human bar: mean Cohen's kappa over all reviewer pairs. Each reviewer also
+    gets a row with their mean kappa against the OTHER reviewers (the spread of
+    humans). Each method: mean kappa against every reviewer. diff = method - bar.
+
+    A paired bootstrap over charts (same resample for the bar and every method)
+    gives a 95% CI for diff. Verdict, with a non-inferiority margin fixed in
+    advance: 'non-inferior' if ci_low > -margin; 'inferior' if ci_high < -margin;
+    otherwise 'inconclusive'. Comparing with consensus instead would be unfair to
+    the humans, since each reviewer is part of the consensus."""
+    revs = list(wide.columns)
+    pairs = list(itertools.combinations(revs, 2))
+
+    def bar(w):
+        return float(np.nanmean([_kappa_where_both(w[a], w[b]) for a, b in pairs]))
+
+    def vs_humans(s, w):
+        return float(np.nanmean([_kappa_where_both(s, w[r]) for r in revs]))
+
+    aligned = {k: v.reindex(wide.index) for k, v in compare.items()}
+    point_bar = bar(wide)
+    rows = [{"rater": "humans (mean pairwise)", "kind": "bar", "mean_kappa_vs_humans": point_bar}]
+    for r in revs:
+        others = [o for o in revs if o != r]
+        rows.append({"rater": f"human:{r}", "kind": "human", "mean_kappa_vs_humans": float(
+            np.nanmean([_kappa_where_both(wide[r], wide[o]) for o in others]))})
+    point = {k: vs_humans(s, wide) for k, s in aligned.items()}
+
+    rng = np.random.default_rng(seed)
+    n = len(wide)
+    boots = {k: [] for k in aligned}
+    W = wide.reset_index(drop=True)
+    S = {k: s.reset_index(drop=True) for k, s in aligned.items()}
+    for _ in range(n_boot):
+        idx = rng.integers(0, n, n)
+        wb = W.iloc[idx].reset_index(drop=True)
+        b = bar(wb)
+        for k, s in S.items():
+            boots[k].append(vs_humans(s.iloc[idx].reset_index(drop=True), wb) - b)
+    for k in aligned:
+        lo, hi = (np.nanpercentile(boots[k], [2.5, 97.5]) if n_boot else (np.nan, np.nan))
+        verdict = ("non-inferior" if lo > -margin else "inferior" if hi < -margin else "inconclusive")
+        rows.append({"rater": k, "kind": "method", "mean_kappa_vs_humans": point[k],
+                     "diff_vs_human_bar": point[k] - point_bar, "ci_low": float(lo), "ci_high": float(hi),
+                     "margin": margin, "verdict": verdict})
+    return pd.DataFrame(rows, columns=["rater", "kind", "mean_kappa_vs_humans", "diff_vs_human_bar",
+                                       "ci_low", "ci_high", "margin", "verdict"])

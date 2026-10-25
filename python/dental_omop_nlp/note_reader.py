@@ -80,7 +80,7 @@ def _num(pattern: str, t: str) -> float | None:
 
 def read_findings(text: str) -> str:
     t = current_text(text)
-    # Probing depth is reported but does not enter the staging rule (CAL/RBL/tooth loss do).
+    # Probing depth is not read here: in notes it is usually a site list, not the max.
     bop = _num(r"BOP (\d+)%|bleeding on probing (\d+)%", t)
     if bop is None:
         bop = 45 if re.search(r"heavy BOP", t, re.IGNORECASE) else 25 if re.search(r"BOP generalized", t, re.IGNORECASE) \
@@ -88,13 +88,17 @@ def read_findings(text: str) -> str:
     cal = _num(r"CAL up to (\d+)|max CAL (\d+)|attachment loss \d+-(\d+)", t)
     if cal is None:
         cal = 6 if re.search(r"severe attachment loss", t, re.IGNORECASE) else 3.5 if re.search(r"moderate attachment loss", t, re.IGNORECASE) \
-            else 1.5 if re.search(r"slight attachment loss", t, re.IGNORECASE) else 0
+            else 1.5 if re.search(r"slight attachment loss", t, re.IGNORECASE) else None
     rbl = _num(r"bone loss[^~\n]*~(\d+)%", t)
     if rbl is None:
         rbl = 45 if re.search(r"severe horizontal bone loss|apical third", t, re.IGNORECASE) else \
             25 if re.search(r"moderate horizontal bone loss|middle third", t, re.IGNORECASE) else \
-            8 if re.search(r"mild horizontal bone loss|coronal third", t, re.IGNORECASE) else 0
-    return label_chart(PerioChart(0, min(bop, 100), cal, min(rbl, 100), _teeth_lost(t))).value
+            8 if re.search(r"mild horizontal bone loss|coronal third", t, re.IGNORECASE) else None
+    if cal is None and rbl is None:
+        rbl = 0.0   # nothing charted: no evidence of loss
+    # AAP: stage from CAL; RBL only when CAL isn't in the note (labels.py)
+    return label_chart(PerioChart(0, min(bop, 100), cal, None if rbl is None else min(rbl, 100),
+                                  _teeth_lost(t))).value
 
 
 def read_note(text: str) -> str:

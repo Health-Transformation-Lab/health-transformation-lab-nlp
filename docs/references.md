@@ -59,6 +59,21 @@ Everything this repo relies on, and what it's used for.
 21. **Yavuz MB, et al.** AI detection of periodontal status in bitewing radiographs. EuroPerio10, 2022.
     [Dental Tribune summary](https://www.dental-tribune.com/news/artificial-intelligence-shows-promise-for-detecting-periodontal-status-in-bitewing-radiographs/)
 
+## Case validation (the acceptance test)
+
+27. **OHDSI.** *OHDSI2023 Plenary: Improving the reliability and scale of case validation*
+    (Ryan, Ostropolets, Schuemie). [YouTube](https://www.youtube.com/watch?v=scUssf863TI), from about 49 min.
+28. **Schuemie MJ, Ostropolets A, Zhuk A, Korsik U, Seo SI, Suchard MA, Hripcsak G, Ryan PB.**
+    *Standardized patient profile review using large language models for case adjudication in
+    observational research.* npj Digital Medicine 2025;8.
+    [doi:10.1038/s41746-025-01433-4](https://doi.org/10.1038/s41746-025-01433-4)
+
+## Classification rules
+
+26. **American Academy of Periodontology.** *Staging and Grading Periodontitis* (worksheet).
+    [perio.org PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf).
+    The rule source for this repo; see [staging_grading.md](staging_grading.md).
+
 ## Medical LLMs (exploratory)
 
 22. **Sellergren A, et al.** *MedGemma Technical Report.* [arXiv 2507.05201](https://arxiv.org/abs/2507.05201), 2025.

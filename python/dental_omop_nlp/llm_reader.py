@@ -40,24 +40,24 @@ from .judge import CRITERIA
 from .labels import LABELS
 
 GRADES = {"A", "B", "C"}
-EXTENTS = {"localized", "generalized"}
+EXTENTS = {"localized", "generalized", "molar_incisor"}
 
 _ANSWER = """Answer with JSON only:
 {"status": one of healthy, gingivitis, periodontitis_stage_1, periodontitis_stage_2, \
 periodontitis_stage_3, periodontitis_stage_4,
  "grade": "A" | "B" | "C" | null (null unless periodontitis),
- "extent": "localized" | "generalized" | null (null unless periodontitis),
+ "extent": "localized" | "generalized" | "molar_incisor" | null (null unless periodontitis),
  "quote": "the exact sentence or phrase from the note that decides the status, copied verbatim",
  "rationale": "one sentence"}"""
 
-PROMPTS = {
-    "reader-v1": ("You are a periodontist reading a de-identified dental chart note. Classify the "
+PROMPTS = {  # v2: AAP worksheet rules via the shared CRITERIA
+    "reader-v2": ("You are a periodontist reading a de-identified dental chart note. Classify the "
                   "patient's periodontal status at this visit under the 2017 AAP/EFP classification.\n\n"
                   + CRITERIA + "\n\n" + _ANSWER),
-    "reader-v1-terse": ("Classify periodontal status from this dental note (2017 AAP/EFP).\n\n"
+    "reader-v2-terse": ("Classify periodontal status from this dental note (2017 AAP/EFP).\n\n"
                         + CRITERIA + "\n\n" + _ANSWER),
 }
-DEFAULT_VARIANT = "reader-v1"
+DEFAULT_VARIANT = "reader-v2"
 USER = "Note:\n<<<\n{note}\n>>>"
 
 _FINDING_WORDS = ("CAL", "attachment", "bone loss", "RBL", "PD ", "probing", "BOP", "pocket")

@@ -107,6 +107,42 @@ reliability_report <- function(labels, key, compare) {
        consensus = data.frame(visit_id = as.integer(ids), consensus = cons))
 }
 
+# AI vs humans acceptance test (Python: reliability.agreement_vs_humans). Point
+# estimates match Python exactly; the bootstrap CI uses R's RNG, so it matches
+# only approximately.
+agreement_vs_humans <- function(wide, compare, n_boot = 500, seed = 0, margin = 0.05) {
+  revs <- names(wide); pairs <- combn(revs, 2, simplify = FALSE)
+  both_k <- function(a, b) { ok <- a %in% STATUS_ORDER & b %in% STATUS_ORDER; cohen_kappa(a[ok], b[ok]) }
+  bar <- function(w) mean(sapply(pairs, function(p) both_k(w[[p[1]]], w[[p[2]]])), na.rm = TRUE)
+  vs_h <- function(s, w) mean(sapply(revs, function(r) both_k(s, w[[r]])), na.rm = TRUE)
+  ids <- rownames(wide)
+  al <- lapply(compare, function(s) unname(s[ids]))
+  pb <- bar(wide)
+  rows <- list(data.frame(rater = "humans (mean pairwise)", kind = "bar", mean_kappa_vs_humans = pb,
+                          diff_vs_human_bar = NA, ci_low = NA, ci_high = NA, margin = NA, verdict = NA))
+  for (r in revs) {
+    o <- setdiff(revs, r)
+    rows[[length(rows) + 1]] <- data.frame(rater = paste0("human:", r), kind = "human",
+      mean_kappa_vs_humans = mean(sapply(o, function(x) both_k(wide[[r]], wide[[x]])), na.rm = TRUE),
+      diff_vs_human_bar = NA, ci_low = NA, ci_high = NA, margin = NA, verdict = NA)
+  }
+  set.seed(seed); n <- nrow(wide)
+  boots <- matrix(NA_real_, n_boot, length(al))
+  for (b in seq_len(n_boot)) {
+    idx <- sample.int(n, n, replace = TRUE)
+    wb <- wide[idx, , drop = FALSE]; bb <- bar(wb)
+    boots[b, ] <- sapply(al, function(s) vs_h(s[idx], wb) - bb)
+  }
+  for (j in seq_along(al)) {
+    p <- vs_h(al[[j]], wide)
+    ci <- if (n_boot) unname(quantile(boots[, j], c(0.025, 0.975), na.rm = TRUE, type = 7)) else c(NA, NA)
+    v <- if (ci[1] > -margin) "non-inferior" else if (ci[2] < -margin) "inferior" else "inconclusive"
+    rows[[length(rows) + 1]] <- data.frame(rater = names(al)[j], kind = "method", mean_kappa_vs_humans = p,
+      diff_vs_human_bar = p - pb, ci_low = ci[1], ci_high = ci[2], margin = margin, verdict = v)
+  }
+  do.call(rbind, rows)
+}
+
 if (sys.nframe() == 0) {
   sim <- identical(commandArgs(trailingOnly = TRUE)[1], "simulated")
   prefix <- if (sim) "simulated_" else ""
@@ -123,6 +159,14 @@ if (sys.nframe() == 0) {
   out <- file.path("data/review", paste0(prefix, "reliability"))
   dir.create(out, recursive = TRUE, showWarnings = FALSE)
   write.csv(rep$methods, file.path(out, "methods_vs_reviewers_R.csv"), row.names = FALSE)
+  w <- reshape(labels[, c("visit_id", "reviewer", "status")], idvar = "visit_id", timevar = "reviewer", direction = "wide")
+  rownames(w) <- w$visit_id; w$visit_id <- NULL; names(w) <- sub("^status\\.", "", names(w))
+  w <- w[order(as.numeric(rownames(w))), , drop = FALSE]
+  vh <- agreement_vs_humans(w, compare)
+  write.csv(vh, file.path(out, "agreement_vs_humans_R.csv"), row.names = FALSE)
+  cat("\nacceptance test (agree with reviewers at least as much as they agree with each other):\n")
+  print(vh[, c("rater", "mean_kappa_vs_humans", "diff_vs_human_bar", "ci_low", "ci_high", "verdict")],
+        digits = 3, row.names = FALSE)
   if (sim) cat("*** SIMULATED REVIEWERS: pipeline dry run, not a result ***\n")
   cat(sprintf("charts=%d reviewers=%d Fleiss kappa=%.3f consensus reached=%.1f%%\n",
               rep$n_visits, rep$n_reviewers, rep$fleiss_kappa, 100 * rep$consensus_reached))

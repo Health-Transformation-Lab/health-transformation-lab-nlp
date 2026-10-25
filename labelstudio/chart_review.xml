@@ -37,7 +37,7 @@
   </View>
 
   <View style="flex: 40%">
-    <Header value="Periodontal status (2017 AAP/EFP)"/>
+    <Header value="Periodontal status (AAP staging and grading worksheet; see docs/labeling_protocol.md)"/>
     <Choices name="status" toName="note" choice="single" required="true">
       <Choice value="healthy"/>
       <Choice value="gingivitis"/>
@@ -56,7 +56,7 @@
 
     <Header value="Extent (periodontitis only)"/>
     <Choices name="extent" toName="note" choice="single">
-      <Choice value="localized"/><Choice value="generalized"/>
+      <Choice value="localized"/><Choice value="generalized"/><Choice value="molar_incisor"/>
       <Choice value="NA"/><Choice value="cannot_determine"/>
     </Choices>
 

@@ -26,6 +26,12 @@ Compare methods → qualitative review → rule-based phenotyping algorithm →
 several reviewers stage the same charts in Label Studio, compared against the
 algorithm and the AI model. [docs/process.md](docs/process.md)
 
+**Staging and grading** follow the AAP worksheet
+([PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf)):
+stage from interdental CAL (RBL only if CAL is missing), raised by tooth loss
+and complexity; grade starts at B. Same rules for the synthetic truth,
+reviewers and LLMs. [docs/staging_grading.md](docs/staging_grading.md)
+
 ## Ground rules
 
 - **Synthetic data only.** No PHI, no real records, no employer or partner data, ever.
@@ -49,6 +55,12 @@ record. [docs/omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md)
 
 ## How results are measured
 
+- **Acceptance test:** does the AI agree with the reviewers at least as much as
+  they agree with each other? Each method's mean kappa vs each reviewer, compared
+  with the mean reviewer-pair kappa, with a bootstrap CI and a margin fixed in
+  advance. Replicates OHDSI's case-validation approach
+  ([video](https://www.youtube.com/watch?v=scUssf863TI) from ~49 min;
+  [paper](https://doi.org/10.1038/s41746-025-01433-4)). [docs/process.md](docs/process.md#validation-criterion-as-reliable-as-a-human-reviewer)
 - **Kappa:** agreement beyond chance (Cohen's for two raters, Fleiss' for many
   reviewers, weighted for ordered stages).
 - **95% confidence intervals:** the range the true value plausibly falls in,
@@ -60,6 +72,35 @@ record. [docs/omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md)
   level, after GlobalDentBench ([docs/dentbench_methods.md](docs/dentbench_methods.md)).
 
 Plain-language explanation: [docs/statistics.md](docs/statistics.md)
+
+## Models evaluated
+
+The 12 models from the evaluation sheet are registered in `models.yaml` and
+scored with the same split, reviewers and acceptance test as the baselines.
+
+| Model | Hugging Face id | Domain | Role |
+|---|---|---|---|
+| BERT base | `google-bert/bert-base-uncased` | general | classifier |
+| DistilBERT | `distilbert/distilbert-base-uncased` | general | classifier |
+| ModernBERT base | `answerdotai/ModernBERT-base` | general | classifier, long context |
+| ModernBERT large | `answerdotai/ModernBERT-large` | general | classifier, long context |
+| Longformer | `allenai/longformer-base-4096` | general | long context |
+| SciBERT | `allenai/scibert_scivocab_uncased` | scientific | classifier |
+| BiomedBERT | `microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext` | biomedical | classifier |
+| SapBERT | `cambridgeltl/SapBERT-from-PubMedBERT-fulltext` | biomedical | concept mapping (not a classifier) |
+| BioClinical ModernBERT base | `thomas-sounack/BioClinical-ModernBERT-base` | clinical | classifier, long context |
+| BioClinical ModernBERT large | `thomas-sounack/BioClinical-ModernBERT-large` | clinical | classifier, long context |
+| Clinical-Longformer | `yikuan8/Clinical-Longformer` | clinical | long context |
+| GTE-ModernColBERT | `lightonai/GTE-ModernColBERT-v1` | general | retrieval (not a classifier) |
+
+Also on the ladder: baselines (`note_rules`, `rules_baseline`,
+`structured_baseline`, `tfidf_logreg`, `fusion_tfidf_rad`) and exploratory
+MedGemma readers ([docs/medgemma.md](docs/medgemma.md)).
+
+**Status:** the 10 classifier and long-context models fine-tune and predict with
+`scripts/11_ai_predict.py --rung <id>`, but none has been run yet. That needs
+the Hugging Face downloads (laptop, Databricks, or Free Edition serverless GPU
+for the large ones). Results so far are the baselines on simulated reviewers.
 
 ## Datasets (`data/datasets/`, rebuilt by `scripts/10_build_study.py`)
 

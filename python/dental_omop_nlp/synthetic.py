@@ -48,7 +48,7 @@ def draw_chart(age: int, rng: random.Random) -> PerioChart:
     if sev == "gingivitis":
         return PerioChart(u(2, 4), u(10, 45), u(0, 0.9), u(0, 10))
     if sev == "mild":
-        return PerioChart(u(3, 4.5), u(10, 40), u(1, 2), u(0, 14))
+        return PerioChart(u(3, 4), u(10, 40), u(1, 2), u(0, 14))   # stage I: max PD <= 4 (AAP)
     if sev == "moderate":
         return PerioChart(u(4, 5.5), u(15, 50), u(3, 4), u(15, 33))
     if sev == "severe":

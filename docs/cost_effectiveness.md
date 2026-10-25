@@ -92,7 +92,7 @@ At corpus scale on Databricks, the judge runs as batch SQL with `ai_query`:
   models. Labeling, reviewer time, engineering, validation and monitoring
   usually dominate. The table reports compute; the paper should report both.
 - **Pin the judge.** Record the endpoint, model version and prompt version
-  (`judge-v1`) with every verdict. Re-calibrate whenever any of them changes.
+  (`judge-v2`) with every verdict. Re-calibrate whenever any of them changes.
 - **Don't let the judge grade itself.** If an LLM is also a candidate
   classifier, judge it with a different model family, or at minimum report
   that the judge and the classifier share a family.

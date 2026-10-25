@@ -38,19 +38,27 @@ from dataclasses import dataclass
 
 from .labels import LABELS
 
-PROMPT_VERSION = "judge-v1"
+PROMPT_VERSION = "judge-v2"   # v2: AAP worksheet rules (CAL first, complexity, grade)
 
 # Status definitions and rules, shared with the note reader (llm_reader.py).
-CRITERIA = """Status definitions:
-- healthy: no attachment loss, bleeding on probing (BOP) < 10% of sites
-- gingivitis: no attachment loss, BOP >= 10%
-- periodontitis_stage_1: interdental CAL 1-2 mm, radiographic bone loss (RBL) < 15%, no tooth loss due to perio
-- periodontitis_stage_2: CAL 3-4 mm, RBL 15-33%, no tooth loss due to perio
-- periodontitis_stage_3: CAL >= 5 mm, RBL > 33%, <= 4 teeth lost due to perio
-- periodontitis_stage_4: as stage 3 with >= 5 teeth lost due to perio
-Rules: measured findings outrank a written diagnosis; the worst site decides; ignore text \
-copied forward from previous visits; pre-2017 terms map slight=stage 1, moderate=stage 2, \
-severe=stage 3 (4 if >= 5 teeth lost to perio)."""
+CRITERIA = """Status definitions (AAP staging and grading worksheet, 2017 AAP/EFP):
+- healthy: no interdental attachment loss, bleeding on probing (BOP) < 10% of sites
+- gingivitis: no interdental attachment loss, BOP >= 10%
+- periodontitis_stage_1: interdental CAL 1-2 mm (RBL < 15% if CAL not recorded), no tooth loss due to perio, max probing depth <= 4 mm
+- periodontitis_stage_2: CAL 3-4 mm (RBL 15-33% if CAL not recorded), no tooth loss due to perio, max probing depth <= 5 mm
+- periodontitis_stage_3: CAL >= 5 mm (RBL beyond the coronal third if CAL not recorded) or 1-4 teeth lost due to perio
+- periodontitis_stage_4: stage 3 severity with >= 5 teeth lost due to perio or a need for complex rehabilitation
+Rules: the initial stage comes from interdental CAL at the worst site; use radiographic bone \
+loss only when CAL is not recorded. Complexity factors raise the stage, never lower it: probing \
+depth >= 6 mm, vertical bone loss >= 3 mm or class II/III furcation -> at least stage 3; at stage 3, \
+mobility degree >= 2, fewer than 20 remaining teeth, masticatory dysfunction, bite collapse, \
+drifting/flaring or a severe ridge defect -> stage 4. Measured findings outrank a written \
+diagnosis; ignore text copied forward from previous visits; pre-2017 terms map slight=stage 1, \
+moderate=stage 2, severe=stage 3 (4 if >= 5 teeth lost to perio).
+Grade (periodontitis only): start at B; use direct evidence of progression over 5 years if \
+present (none A, < 2 mm B, >= 2 mm C), else % bone loss / age (< 0.25 A, 0.25-1.0 B, > 1.0 C); \
+smoking < 10/day or diabetes with HbA1c < 7.0% -> at least B; >= 10/day or HbA1c >= 7.0% -> C.
+Extent: localized < 30% of teeth, generalized >= 30%, or molar/incisor pattern."""
 
 SYSTEM = ("You are a periodontist auditing an automated classifier. You judge whether a dental "
           "chart note supports a predicted periodontal status under the 2017 AAP/EFP classification.\n\n"

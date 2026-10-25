@@ -1,32 +1,41 @@
 # Periodontal status from a perio chart. R twin of python/dental_omop_nlp/labels.py.
-# Same rules, same thresholds; r/tests/test_parity.R checks the two agree on
-# every row of data/labels/labeled_notes.csv. See the Python docstring for the
-# clinical basis (2017 AAP/EFP, severity axis only).
+# Same rules, same thresholds; r/tests/test_parity.R checks the two agree.
+# Follows the AAP staging and grading worksheet (docs/staging_grading.md):
+# https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf
+#   1. initial stage from interdental CAL; RBL only when CAL is NA
+#   2. tooth loss: 1-4 teeth -> at least III, >= 5 -> IV
+#   3. complexity shifts up: PD > 4 -> >= II; PD >= 6, vertical defect >= 3 mm,
+#      furcation class >= II -> >= III; at III, complex rehabilitation
+#      (mobility >= 2, < 20 teeth, other) -> IV
 
 PERIO_LABELS <- c("healthy", "gingivitis", "periodontitis_stage_1",
                   "periodontitis_stage_2", "periodontitis_stage_3", "periodontitis_stage_4")
 
-label_chart <- function(max_probing_depth_mm, bop_pct, max_cal_mm, rbl_pct, teeth_lost_perio = 0) {
-  # Vectorised over equal-length inputs.
+label_chart <- function(max_probing_depth_mm, bop_pct, max_cal_mm, rbl_pct, teeth_lost_perio = 0,
+                        vertical_defect_mm = 0, furcation_class = 0, mobility_degree = 0,
+                        remaining_teeth = NA, complex_rehab = FALSE) {
+  # Vectorised over equal-length inputs; scalars recycle.
   n <- length(bop_pct)
-  teeth_lost_perio <- ifelse(is.na(teeth_lost_perio), 0, teeth_lost_perio)
-  stopifnot(all(bop_pct >= 0 & bop_pct <= 100), all(rbl_pct >= 0 & rbl_pct <= 100))
+  rep_n <- function(x) if (length(x) == 1) rep(x, n) else x
+  pd <- rep_n(max_probing_depth_mm); cal <- rep_n(max_cal_mm); rbl <- rep_n(rbl_pct)
+  lost <- rep_n(ifelse(is.na(teeth_lost_perio), 0, teeth_lost_perio))
+  vd <- rep_n(vertical_defect_mm); fc <- rep_n(furcation_class); mob <- rep_n(mobility_degree)
+  rem <- rep_n(remaining_teeth); rehab <- rep_n(complex_rehab)
+  stopifnot(all(!(is.na(cal) & is.na(rbl))), all(bop_pct >= 0 & bop_pct <= 100),
+            all(is.na(rbl) | (rbl >= 0 & rbl <= 100)))
 
-  out <- character(n)
-  no_loss <- max_cal_mm < 1 & rbl_pct < 15 & teeth_lost_perio == 0
-  out[no_loss] <- ifelse(bop_pct[no_loss] >= 10, "gingivitis", "healthy")
+  no_loss <- ifelse(!is.na(cal), cal < 1, rbl <= 0) & lost == 0
+  by_cal <- ifelse(cal <= 2, 1, ifelse(cal <= 4, 2, 3))
+  by_rbl <- ifelse(rbl < 15, 1, ifelse(rbl <= 33, 2, 3))
+  stage <- ifelse(!is.na(cal), by_cal, by_rbl)
+  stage <- ifelse(lost > 0, pmax(stage, 3), stage)
+  stage[lost >= 5] <- 4
+  stage <- ifelse(pd > 4, pmax(stage, 2), stage)
+  stage <- ifelse(pd >= 6 | vd >= 3 | fc >= 2, pmax(stage, 3), stage)
+  stage <- ifelse(stage == 3 & (rehab | mob >= 2 | (!is.na(rem) & rem < 20)), 4, stage)
 
-  idx <- which(!no_loss)
-  if (length(idx)) {
-    cal <- max_cal_mm[idx]; rbl <- rbl_pct[idx]; lost <- teeth_lost_perio[idx]
-    by_cal <- ifelse(cal <= 2, 1, ifelse(cal <= 4, 2, 3))
-    by_rbl <- ifelse(rbl < 15, 1, ifelse(rbl <= 33, 2, 3))
-    stage <- pmax(by_cal, by_rbl)
-    stage[lost > 0 & stage < 3] <- 3
-    stage[lost >= 5] <- 4
-    out[idx] <- paste0("periodontitis_stage_", stage)
-  }
-  out
+  ifelse(no_loss, ifelse(bop_pct >= 10, "gingivitis", "healthy"),
+         paste0("periodontitis_stage_", stage))
 }
 
 # ---- rules baseline: regex over the note text, then label_chart -------------
@@ -52,8 +61,10 @@ rules_predict <- function(texts) {
     neg <- grepl("no BOP|BOP neg|no bleeding on probing", t, ignore.case = TRUE)
     z <- function(x) ifelse(is.na(x), 0, x)
     bop <- if (neg) 0 else z(.find(t, "bop"))
-    label_chart(z(.find(t, "pd")), min(bop, 100), z(.find(t, "cal")),
-                min(z(.find(t, "rbl")), 100), z(.find(t, "lost")))
+    cal <- .find(t, "cal"); rbl <- .find(t, "rbl")
+    if (is.na(cal) && is.na(rbl)) rbl <- 0
+    label_chart(z(.find(t, "pd")), min(bop, 100), cal, if (is.na(rbl)) NA else min(rbl, 100),
+                z(.find(t, "lost")))
   }, character(1), USE.NAMES = FALSE)
 }
 

@@ -12,10 +12,13 @@ from pathlib import Path
 import pandas as pd
 
 from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
-from dental_omop_nlp.reliability import by_level, reliability_report
+from dental_omop_nlp.reliability import agreement_vs_humans, by_level, reliability_report
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--simulated", action="store_true")
+ap.add_argument("--n-boot", type=int, default=500)
+ap.add_argument("--margin", type=float, default=0.05,
+                help="non-inferiority margin in kappa, fixed before looking at results")
 a = ap.parse_args()
 prefix = "simulated_" if a.simulated else ""
 
@@ -44,3 +47,10 @@ cols = ["method", "coverage", "n", "pct_agree_consensus", "kappa_vs_consensus", 
 print(rep["methods"][cols].round(3).to_string(index=False))
 print("\nagreement by difficulty (L1 stated in 2017 terms, L2 translate, L3 infer/resolve):")
 print(lv.pivot(index="method", columns="level", values="pct_agree_consensus").round(3).to_string())
+
+wide = labels.pivot_table(index="visit_id", columns="reviewer", values="status", aggfunc="first")
+vh = agreement_vs_humans(wide, compare, n_boot=a.n_boot, margin=a.margin)
+vh.to_csv(out / "agreement_vs_humans.csv", index=False)
+print(f"\nacceptance test: agree with reviewers at least as much as they agree with each other "
+      f"(non-inferiority margin {a.margin} kappa, 95% bootstrap CI over charts):")
+print(vh.drop(columns=["margin"]).round(3).to_string(index=False))

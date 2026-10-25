@@ -1,9 +1,9 @@
 {
  "visits": 3042,
  "blocked_by_leak_gate": 0,
- "train_visits": 2426,
- "train_people": 963,
- "review_visits": 237,
+ "train_visits": 2459,
+ "train_people": 967,
+ "review_visits": 233,
  "deid_engine": "regex",
  "deid_char_recall": 1.0,
  "deid_non_phi_chars_removed": 0,
@@ -14,6 +14,6 @@
   "periodontitis_stage_3": 43,
   "periodontitis_stage_1": 41,
   "healthy": 36,
-  "periodontitis_stage_4": 26
+  "periodontitis_stage_4": 22
  }
 }

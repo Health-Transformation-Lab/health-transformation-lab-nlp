@@ -51,8 +51,11 @@ def _find(text: str, key: str) -> float | None:
 
 def rules_predict(text: str) -> str:
     bop = 0.0 if _NEG_BOP.search(text) else (_find(text, "bop") or 0.0)
+    cal, rbl = _find(text, "cal"), _find(text, "rbl")
+    if cal is None and rbl is None:
+        rbl = 0.0
     chart = PerioChart(max_probing_depth_mm=_find(text, "pd") or 0.0, bop_pct=min(bop, 100),
-                       max_cal_mm=_find(text, "cal") or 0.0, rbl_pct=min(_find(text, "rbl") or 0.0, 100),
+                       max_cal_mm=cal, rbl_pct=None if rbl is None else min(rbl, 100),
                        teeth_lost_perio=int(_find(text, "lost") or 0))
     return label_chart(chart).value
 
