@@ -7,7 +7,7 @@
  "deid_engine": "regex",
  "deid_char_recall": 1.0,
  "deid_non_phi_chars_removed": 0,
- "algorithm": "v0-placeholder",
+ "algorithm": "v0.1-placeholder",
  "review_status_mix": {
   "gingivitis": 48,
   "periodontitis_stage_2": 43,

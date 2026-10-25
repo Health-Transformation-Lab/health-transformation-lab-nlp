@@ -21,25 +21,38 @@ import pandas as pd
 from .sources import UNKNOWN
 
 METHODS = ["notes", "exam_form", "proc_codes_completed", "proc_codes_planned",
-           "proc_dx_completed", "proc_dx_planned", "probing_chart"]
+           "proc_dx_completed", "proc_dx_planned", "probing_chart", "radiograph_ai"]
 
 RULES_V0 = {
-    "version": "v0-placeholder",
+    "version": "v0.1-placeholder",
     # Trust order when sources disagree. Probing chart first: it is the measured
     # evidence the 2017 definitions are written against. Then the clinician's
     # written diagnosis, then diagnosis codes, then the form, then procedures.
+    # v0.1 (spec 003): when the probing chart is missing, the radiograph AI is a
+    # LOWER BOUND on stage (stage = worst criterion, RBL is one of them): if it
+    # shows more bone loss than the deciding source implies, raise to its stage.
+    # Tested against putting it ahead of the notes, which did worse (spec 003).
     "priority": ["probing_chart", "notes", "proc_dx_completed", "proc_dx_planned",
                  "exam_form", "proc_codes_completed", "proc_codes_planned"],
+    "radiograph_lower_bound": True,
 }
+_ORDER = ["healthy", "gingivitis", "periodontitis_stage_1", "periodontitis_stage_2",
+          "periodontitis_stage_3", "periodontitis_stage_4"]
 
 
 def phenotype_v0(row: pd.Series, rules: dict = RULES_V0) -> tuple[str, str]:
     """Returns (status, method that decided)."""
+    status, by = UNKNOWN, "none"
     for m in rules["priority"]:
         v = row.get(m, UNKNOWN)
         if isinstance(v, str) and v and v != UNKNOWN:
-            return v, m
-    return UNKNOWN, "none"
+            status, by = v, m
+            break
+    rad = row.get("radiograph_ai", UNKNOWN)
+    if rules.get("radiograph_lower_bound") and by != "probing_chart" and isinstance(rad, str) and rad in _ORDER:
+        if status not in _ORDER or _ORDER.index(rad) > _ORDER.index(status):
+            return rad, "radiograph_ai"
+    return status, by
 
 
 def cohen_kappa(a: pd.Series, b: pd.Series) -> float:

@@ -22,7 +22,8 @@ prefix = "simulated_" if a.simulated else ""
 labels = pd.read_csv(REVIEW_DIR / f"{prefix}reviewer_labels.csv")
 key = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id")
 compare = {m: key[m] for m in ["notes", "exam_form", "proc_codes_completed", "proc_codes_planned",
-                               "proc_dx_completed", "proc_dx_planned", "probing_chart", "algorithm_v0"]}
+                               "proc_dx_completed", "proc_dx_planned", "probing_chart", "radiograph_ai",
+                               "algorithm_v0"]}
 for f in sorted(glob.glob(str(DATASETS_DIR / "ai_predictions_*.csv"))):
     p = pd.read_csv(f).set_index("visit_id")["pred"]
     compare["ai:" + Path(f).stem.removeprefix("ai_predictions_")] = p

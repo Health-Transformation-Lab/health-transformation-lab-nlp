@@ -27,8 +27,10 @@ a = ap.parse_args()
 
 train = pd.read_csv(DATASETS_DIR / "train.csv").rename(columns={a.label: "target"})
 train = train.drop(columns=[c for c in ("label",) if c in train]).rename(columns={"target": "label"})
-review = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv")[["visit_id", "note_text"]]
-kw = {} if a.rung in ("rules_baseline", "tfidf_logreg") else {"epochs": a.epochs, "max_len": a.max_len}
+from dental_omop_nlp.radiograph import FEATURES as RAD_FEATURES  # noqa: E402
+
+review = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv")[["visit_id", "note_text", *RAD_FEATURES]]
+kw = {} if a.rung in ("rules_baseline", "note_rules", "tfidf_logreg", "fusion_tfidf_rad") else {"epochs": a.epochs, "max_len": a.max_len}
 model = make_rung(a.rung, load_registry(), **kw).fit(train)
 pred, proba = model.predict(review)
 out = review[["visit_id"]].assign(pred=pred)

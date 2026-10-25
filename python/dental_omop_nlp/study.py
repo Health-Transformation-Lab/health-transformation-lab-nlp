@@ -30,6 +30,10 @@ from .labels import PerioChart, Status, extent_of, grade_of, label_chart
 from .note_reader import read_note
 from .phenotype import RULES_V0, agreement_matrix, coverage, phenotype_v0
 from .phi import fake_person, fake_provider
+from .radiograph import FEATURES as RAD_FEATURES
+from .radiograph import features as rad_features
+from .radiograph import read_radiograph, simulate_radiograph, to_json
+from .radiograph import summary as rad_summary
 from .sources import READERS, UNKNOWN, generate_sources
 from .synthetic import draw_chart, draw_pct_teeth_involved, draw_risk
 
@@ -68,7 +72,11 @@ def generate_visits(n_people: int, seed: int) -> pd.DataFrame:
         chart = draw_chart(int(v.age), rng)
         status = label_chart(chart)
         grade = grade_of(status, chart.rbl_pct, int(v.age), risk.cigarettes_per_day, risk.hba1c)
-        extent = extent_of(status, draw_pct_teeth_involved(chart, rng))
+        pct_involved = draw_pct_teeth_involved(chart, rng)
+        extent = extent_of(status, pct_involved)
+        # Radiograph AI output (spec 003) on its own random stream, so adding it
+        # doesn't change any other source.
+        rad = simulate_radiograph(chart, pct_involved, random.Random(seed * 7919 + i))
         stated = _clinician_call(status, rng)
         text, phi, meta = render_clinical_note(chart, status, grade, extent, risk, person,
                                                fake_provider(rng), v.visit_date, rng, prev.get(v.person_id),
@@ -81,6 +89,8 @@ def generate_visits(n_people: int, seed: int) -> pd.DataFrame:
                          truth_status=status.value, truth_grade=grade, truth_extent=extent,
                          **{k: getattr(chart, k) for k in ("max_probing_depth_mm", "bop_pct", "max_cal_mm",
                                                            "rbl_pct", "teeth_lost_perio")},
+                         radiograph_json=to_json(rad), radiograph_summary=rad_summary(rad),
+                         radiograph_ai=read_radiograph(rad), **rad_features(rad),
                          **generate_sources(status, extent, rng)))
     return pd.DataFrame(rows)
 
@@ -134,6 +144,7 @@ def label_studio_tasks(review: pd.DataFrame) -> list[dict]:
         "proc_dx_completed": r.proc_dx_completed_raw or "(none)",
         "proc_dx_planned": r.proc_dx_planned_raw or "(none)",
         "probing_chart": r.probing_chart_text,
+        "radiograph": r.radiograph_summary,
         "age": int(r.age),
     }} for r in review.itertuples()]
 
@@ -156,15 +167,17 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
 
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "answer_key").mkdir(exist_ok=True)
-    train[["visit_id", "person_id", "note_text", "truth_status", "truth_grade", "truth_extent", "stated_status"]] \
+    train[["visit_id", "person_id", "note_text", "truth_status", "truth_grade", "truth_extent", "stated_status",
+           *RAD_FEATURES]] \
         .rename(columns={"truth_status": "label", "truth_grade": "grade", "truth_extent": "extent"}) \
         .assign(label_source="generator").to_csv(out_dir / "train.csv", index=False)
     (out_dir / "review_tasks.json").write_text(json.dumps(label_studio_tasks(review), indent=1))
     key_cols = ["visit_id", "person_id", "age", "truth_status", "truth_grade", "truth_extent",
-                "style", "numeric", "dx_scheme", "dx_pattern", "difficulty", "copy_forward", "stated_status", "notes", *READERS, "probing_chart",
+                "style", "numeric", "dx_scheme", "dx_pattern", "difficulty", "copy_forward", "stated_status", "notes", *READERS, "probing_chart", "radiograph_ai", "radiograph_summary",
+                *RAD_FEATURES,
                 "algorithm_v0", "algorithm_v0_decided_by", "note_text"]
     review[key_cols].to_csv(out_dir / "answer_key" / "review_key.csv", index=False)
-    methods = ["notes", *READERS, "probing_chart"]
+    methods = ["notes", *READERS, "probing_chart", "radiograph_ai"]
     agree = pd.concat([agreement_matrix(df, methods, "status").assign(level="status"),
                        agreement_matrix(df, methods, "perio").assign(level="perio")])
     agree.to_csv(out_dir / "method_agreement.csv", index=False)
@@ -193,7 +206,7 @@ def build_corpus_sample(n_people: int, seed: int, engine: str = "regex") -> pd.D
         df = df.rename(columns={c: c + "_raw"})
     df, _ = apply_deid(df, engine)
     df = df[df["deid_passed"]]
-    return df[["visit_id", "person_id", "note_text", "truth_status"]].reset_index(drop=True)
+    return df[["visit_id", "person_id", "note_text", "truth_status", *RAD_FEATURES]].reset_index(drop=True)
 
 
 TRANSLATE_PATTERNS = {"pre2017_severity", "legacy_old"}

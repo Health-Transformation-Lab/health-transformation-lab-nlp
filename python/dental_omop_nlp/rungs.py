@@ -96,6 +96,18 @@ def structured_baseline():
     return _SkWrap(LogisticRegression(max_iter=2000), CHART_COLS)
 
 
+def fusion_tfidf_rad():
+    """Note text + structured radiograph features (spec 003). Visits without a
+    radiograph get zeros plus rad_present = 0, so the model falls back to text."""
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import StandardScaler
+
+    from .radiograph import FEATURES
+    pre = ColumnTransformer([("text", TfidfVectorizer(ngram_range=(1, 2), min_df=2), "note_text"),
+                             ("rad", StandardScaler(), FEATURES)])
+    return _SkWrap(make_pipeline(pre, LogisticRegression(max_iter=3000)), ["note_text", *FEATURES])
+
+
 def tfidf_logreg():
     return _SkWrap(make_pipeline(TfidfVectorizer(ngram_range=(1, 2), min_df=2),
                                  LogisticRegression(max_iter=2000)), "note_text")
@@ -153,6 +165,8 @@ def make_rung(rung_id: str, registry: dict, **hf_kwargs):
         return structured_baseline()
     if rung_id == "tfidf_logreg":
         return tfidf_logreg()
+    if rung_id == "fusion_tfidf_rad":
+        return fusion_tfidf_rad()
     if rung_id == "llm_challenger":
         raise NotImplementedError("LLM rung runs on Databricks Model Serving; see databricks/notebooks")
     m = next((m for m in registry["models"] if m["id"] == rung_id), None)

@@ -18,6 +18,7 @@ compute:                       # $/hour for one node, all-in (VM + DBU)
 methods:
   note_rules:          {kind: local, hardware: cpu, throughput_source: measured}
   tfidf_logreg:        {kind: local, hardware: cpu, throughput_source: measured, train_hours: 0.05}
+  fusion_tfidf_rad:    {kind: local, hardware: cpu, throughput_source: measured, train_hours: 0.05}   # + radiograph AI licence, not priced here
   distilbert-base:     {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 400, train_hours: 0.5}
   bert-base:           {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 200, train_hours: 1.0}
   biomedbert:          {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 200, train_hours: 1.0}

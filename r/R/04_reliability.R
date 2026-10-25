@@ -113,7 +113,7 @@ if (sys.nframe() == 0) {
   labels <- read.csv(file.path("data/review", paste0(prefix, "reviewer_labels.csv")), stringsAsFactors = FALSE)
   key <- read.csv("data/datasets/answer_key/review_key.csv", stringsAsFactors = FALSE)
   m <- c("notes", "exam_form", "proc_codes_completed", "proc_codes_planned",
-         "proc_dx_completed", "proc_dx_planned", "probing_chart", "algorithm_v0")
+         "proc_dx_completed", "proc_dx_planned", "probing_chart", "radiograph_ai", "algorithm_v0")
   compare <- setNames(lapply(m, function(x) setNames(key[[x]], key$visit_id)), m)
   for (f in sort(Sys.glob("data/datasets/ai_predictions_*.csv"))) {
     p <- read.csv(f, stringsAsFactors = FALSE)

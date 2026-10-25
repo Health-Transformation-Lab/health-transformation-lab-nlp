@@ -149,6 +149,7 @@ ladders:
     - rules_baseline            # regex + shorthand expansion, no model (templated notes)
     - structured_baseline       # logistic regression on chart numerics only
     - tfidf_logreg              # TF-IDF + logistic regression on the text
+    - fusion_tfidf_rad          # TF-IDF text + structured radiograph AI features (spec 003)
     - distilbert-base
     - bert-base
     - scibert

@@ -9,6 +9,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 25% | Max interproximal CAL 2 mm | RBL 12% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 14% (#12, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/28 imaged; furcation 1; calculus 7 teeth",
    "age": 67
   }
  },
@@ -22,6 +23,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 3 mm | BOP 6% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 16% (#8, CEJ-crest 4.1 mm); teeth with >=15% bone loss 1/27 imaged; calculus 2 teeth; missing teeth 1",
    "age": 28
   }
  },
@@ -35,6 +37,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 31% | Max interproximal CAL 8 mm | RBL 58% | Teeth lost to perio: 10",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 40% (#20, CEJ-crest 7.2 mm); teeth with >=15% bone loss 1/6 imaged; calculus 2 teeth; missing teeth 11",
    "age": 63
   }
  },
@@ -48,6 +51,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 5 mm | BOP 49% | Max interproximal CAL 3 mm | RBL 21% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 30
   }
  },
@@ -61,6 +65,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 7% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#21, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 3 teeth",
    "age": 78
   }
  },
@@ -74,6 +79,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 57% (#30, CEJ-crest 9.5 mm); teeth with >=15% bone loss 5/13 imaged; furcation 3; calculus 9 teeth; missing teeth 3",
    "age": 56
   }
  },
@@ -87,6 +93,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 5% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 44
   }
  },
@@ -100,6 +107,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 60% (#24, CEJ-crest 9.8 mm); teeth with >=15% bone loss 4/17 imaged; vertical defects 1; calculus 5 teeth; missing teeth 11",
    "age": 24
   }
  },
@@ -113,6 +121,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 35% | Max interproximal CAL 1 mm | RBL 10% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 9% (#30, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 9 teeth",
    "age": 45
   }
  },
@@ -126,6 +135,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 10 mm | BOP 48% | Max interproximal CAL 6 mm | RBL 46% | Teeth lost to perio: 6",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 49% (#6, CEJ-crest 8.4 mm); teeth with >=15% bone loss 6/21 imaged; vertical defects 1; furcation 1; calculus 11 teeth; missing teeth 7",
    "age": 73
   }
  },
@@ -139,6 +149,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 69% | Max interproximal CAL 6 mm | RBL 42% | Teeth lost to perio: 2",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 30% (#21, CEJ-crest 5.8 mm); teeth with >=15% bone loss 1/14 imaged; calculus 5 teeth; missing teeth 2",
    "age": 68
   }
  },
@@ -152,6 +163,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.312",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 37% (#13, CEJ-crest 6.8 mm); teeth with >=15% bone loss 1/16 imaged; calculus 9 teeth; missing teeth 2",
    "age": 52
   }
  },
@@ -165,6 +177,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 2 mm | BOP 2% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 11% (#5, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/27 imaged; furcation 1; calculus 5 teeth; missing teeth 1",
    "age": 70
   }
  },
@@ -178,6 +191,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.323",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 56% (#12, CEJ-crest 9.2 mm); teeth with >=15% bone loss 9/16 imaged; vertical defects 3; furcation 1; calculus 5 teeth; missing teeth 1",
    "age": 67
   }
  },
@@ -191,6 +205,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.321",
    "probing_chart": "Max PD 4 mm | BOP 17% | Max interproximal CAL 1 mm | RBL 10% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 17% (#3, CEJ-crest 4.2 mm); teeth with >=15% bone loss 2/26 imaged; furcation 3; calculus 10 teeth; missing teeth 2",
    "age": 81
   }
  },
@@ -204,6 +219,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 23% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 23
   }
  },
@@ -217,6 +233,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 1 mm | BOP 5% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 8% (#15, CEJ-crest 3.0 mm); teeth with >=15% bone loss 0/16 imaged; calculus 2 teeth; missing teeth 2",
    "age": 48
   }
  },
@@ -230,6 +247,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 48% (#13, CEJ-crest 8.3 mm); teeth with >=15% bone loss 9/15 imaged; furcation 2; calculus 9 teeth; missing teeth 1",
    "age": 22
   }
  },
@@ -243,6 +261,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.321",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 17% (#20, CEJ-crest 4.2 mm); teeth with >=15% bone loss 2/15 imaged; calculus 6 teeth; missing teeth 1",
    "age": 33
   }
  },
@@ -256,6 +275,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX): image could not be read",
    "age": 38
   }
  },
@@ -269,6 +289,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 46% (#21, CEJ-crest 8.0 mm); teeth with >=15% bone loss 1/14 imaged; calculus 6 teeth; missing teeth 3",
    "age": 46
   }
  },
@@ -282,6 +303,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 30% | Max interproximal CAL 1 mm | RBL 13% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 15% (#30, CEJ-crest 4.0 mm); teeth with >=15% bone loss 2/28 imaged; furcation 1; calculus 14 teeth",
    "age": 75
   }
  },
@@ -295,6 +317,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 38% | Max interproximal CAL 4 mm | RBL 33% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 81
   }
  },
@@ -308,6 +331,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 74% | Max interproximal CAL 7 mm | RBL 70% | Teeth lost to perio: 6",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 66% (#28, CEJ-crest 10.6 mm); teeth with >=15% bone loss 8/9 imaged; furcation 2; calculus 4 teeth; missing teeth 8",
    "age": 69
   }
  },
@@ -321,6 +345,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 3% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 52
   }
  },
@@ -334,6 +359,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 8 mm | BOP 70% | Max interproximal CAL 9 mm | RBL 53% | Teeth lost to perio: 6",
+   "radiograph": "Radiograph AI (PAN): image could not be read",
    "age": 68
   }
  },
@@ -347,6 +373,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 8 mm | BOP 30% | Max interproximal CAL 6 mm | RBL 42% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 37% (#31, CEJ-crest 6.9 mm); teeth with >=15% bone loss 6/16 imaged; furcation 1; calculus 6 teeth",
    "age": 55
   }
  },
@@ -360,6 +387,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 24% | Max interproximal CAL 2 mm | RBL 12% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 25
   }
  },
@@ -373,6 +401,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 20% | Max interproximal CAL 1 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#30, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; calculus 4 teeth",
    "age": 62
   }
  },
@@ -386,6 +415,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 1 mm | BOP 9% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 12% (#12, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/15 imaged; furcation 1; missing teeth 2",
    "age": 56
   }
  },
@@ -399,6 +429,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 16% (#22, CEJ-crest 4.1 mm); teeth with >=15% bone loss 1/28 imaged; calculus 8 teeth",
    "age": 38
   }
  },
@@ -412,6 +443,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 7 mm | BOP 69% | Max interproximal CAL 5 mm | RBL 35% | Teeth lost to perio: 3",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 38% (#22, CEJ-crest 7.0 mm); teeth with >=15% bone loss 2/23 imaged; furcation 1; calculus 13 teeth; missing teeth 5",
    "age": 55
   }
  },
@@ -425,6 +457,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 8 mm | BOP 79% | Max interproximal CAL 9 mm | RBL 78% | Teeth lost to perio: 9",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 71% (#9, CEJ-crest 11.2 mm); teeth with >=15% bone loss 5/18 imaged; vertical defects 1; calculus 6 teeth; missing teeth 10",
    "age": 68
   }
  },
@@ -438,6 +471,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 2 mm | BOP 3% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 8% (#4, CEJ-crest 3.0 mm); teeth with >=15% bone loss 0/16 imaged; calculus 2 teeth",
    "age": 63
   }
  },
@@ -451,6 +485,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 4 mm | BOP 29% | Max interproximal CAL 0 mm | RBL 4% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 10% (#28, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/28 imaged; calculus 11 teeth",
    "age": 49
   }
  },
@@ -464,6 +499,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 27% | Max interproximal CAL 1 mm | RBL 5% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 9% (#28, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/15 imaged; calculus 4 teeth; missing teeth 2",
    "age": 35
   }
  },
@@ -477,6 +513,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 5 mm | BOP 19% | Max interproximal CAL 3 mm | RBL 22% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 24% (#26, CEJ-crest 5.1 mm); teeth with >=15% bone loss 4/26 imaged; furcation 2; calculus 10 teeth; missing teeth 2",
    "age": 77
   }
  },
@@ -490,6 +527,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 51% | Max interproximal CAL 5 mm | RBL 59% | Teeth lost to perio: 1",
+   "radiograph": "No radiograph at this visit",
    "age": 19
   }
  },
@@ -503,6 +541,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.321",
    "probing_chart": "Max PD 4 mm | BOP 19% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 15% (#2, CEJ-crest 3.9 mm); teeth with >=15% bone loss 1/27 imaged; furcation 1; calculus 9 teeth; missing teeth 1",
    "age": 54
   }
  },
@@ -516,6 +555,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 43% | Max interproximal CAL 1 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 37
   }
  },
@@ -529,6 +569,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 35% | Max interproximal CAL 1 mm | RBL 2% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX): image could not be read",
    "age": 69
   }
  },
@@ -542,6 +583,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 12% (#2, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 9 teeth",
    "age": 76
   }
  },
@@ -555,6 +597,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#13, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 1 teeth; missing teeth 2",
    "age": 44
   }
  },
@@ -568,6 +611,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.322",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 17% (#12, CEJ-crest 4.2 mm); teeth with >=15% bone loss 2/27 imaged; calculus 14 teeth; missing teeth 1",
    "age": 55
   }
  },
@@ -581,6 +625,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 6 mm | BOP 52% | Max interproximal CAL 6 mm | RBL 51% | Teeth lost to perio: 1",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 60% (#18, CEJ-crest 9.8 mm); teeth with >=15% bone loss 2/13 imaged; furcation 2; calculus 4 teeth; missing teeth 3",
    "age": 37
   }
  },
@@ -594,6 +639,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 35% | Max interproximal CAL 3 mm | RBL 17% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 19% (#5, CEJ-crest 4.4 mm); teeth with >=15% bone loss 6/28 imaged; furcation 1; calculus 14 teeth",
    "age": 77
   }
  },
@@ -607,6 +653,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 14% (#19, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/28 imaged; calculus 14 teeth",
    "age": 25
   }
  },
@@ -620,6 +667,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 5 mm | BOP 20% | Max interproximal CAL 4 mm | RBL 30% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 34% (#5, CEJ-crest 6.5 mm); teeth with >=15% bone loss 3/16 imaged; calculus 8 teeth",
    "age": 71
   }
  },
@@ -633,6 +681,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 8 mm | BOP 54% | Max interproximal CAL 7 mm | RBL 40% | Teeth lost to perio: 3",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 45% (#21, CEJ-crest 7.9 mm); teeth with >=15% bone loss 5/12 imaged; furcation 1; calculus 7 teeth; missing teeth 5",
    "age": 78
   }
  },
@@ -646,6 +695,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 69% | Max interproximal CAL 5 mm | RBL 47% | Teeth lost to perio: 3",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 46% (#18, CEJ-crest 8.0 mm); teeth with >=15% bone loss 11/24 imaged; vertical defects 1; calculus 4 teeth; missing teeth 4",
    "age": 50
   }
  },
@@ -659,6 +709,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 8 mm | BOP 70% | Max interproximal CAL 8 mm | RBL 66% | Teeth lost to perio: 10",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 66% (#30, CEJ-crest 10.6 mm); teeth with >=15% bone loss 4/5 imaged; furcation 2; calculus 4 teeth; missing teeth 11",
    "age": 54
   }
  },
@@ -672,6 +723,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 27% | Max interproximal CAL 2 mm | RBL 13% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 12% (#13, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 5 teeth; missing teeth 2",
    "age": 50
   }
  },
@@ -685,6 +737,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 6 mm | BOP 69% | Max interproximal CAL 7 mm | RBL 50% | Teeth lost to perio: 2",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 60% (#8, CEJ-crest 9.9 mm); teeth with >=15% bone loss 19/26 imaged; vertical defects 2; furcation 4; calculus 16 teeth; missing teeth 2",
    "age": 61
   }
  },
@@ -698,6 +751,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.312",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 16% (#12, CEJ-crest 4.1 mm); teeth with >=15% bone loss 2/27 imaged; calculus 9 teeth; missing teeth 1",
    "age": 36
   }
  },
@@ -711,6 +765,7 @@
    "proc_dx_completed": "K05.322",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 30% | Max interproximal CAL 3 mm | RBL 29% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 38% (#5, CEJ-crest 6.9 mm); teeth with >=15% bone loss 12/16 imaged; furcation 2; calculus 6 teeth; missing teeth 1",
    "age": 33
   }
  },
@@ -724,6 +779,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 37% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 14% (#12, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/26 imaged; furcation 1; calculus 8 teeth; missing teeth 2",
    "age": 59
   }
  },
@@ -737,6 +793,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 4 mm | BOP 29% | Max interproximal CAL 4 mm | RBL 33% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 36% (#12, CEJ-crest 6.7 mm); teeth with >=15% bone loss 5/16 imaged; furcation 1; calculus 7 teeth",
    "age": 54
   }
  },
@@ -750,6 +807,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "No radiograph at this visit",
    "age": 39
   }
  },
@@ -763,6 +821,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 4 mm | BOP 16% | Max interproximal CAL 0 mm | RBL 7% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 12% (#7, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/27 imaged; calculus 8 teeth; missing teeth 1",
    "age": 33
   }
  },
@@ -776,6 +835,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 5 mm | BOP 21% | Max interproximal CAL 4 mm | RBL 26% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 27% (#20, CEJ-crest 5.5 mm); teeth with >=15% bone loss 9/16 imaged; furcation 1; calculus 4 teeth",
    "age": 58
   }
  },
@@ -789,6 +849,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 22% | Max interproximal CAL 3 mm | RBL 16% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX): image could not be read",
    "age": 57
   }
  },
@@ -802,6 +863,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 15% (#19, CEJ-crest 4.0 mm); teeth with >=15% bone loss 1/16 imaged; calculus 6 teeth; missing teeth 1",
    "age": 66
   }
  },
@@ -815,6 +877,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 27% | Max interproximal CAL 0 mm | RBL 4% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 10% (#10, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/28 imaged; calculus 11 teeth",
    "age": 21
   }
  },
@@ -828,6 +891,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 78% | Max interproximal CAL 7 mm | RBL 66% | Teeth lost to perio: 6",
+   "radiograph": "No radiograph at this visit",
    "age": 39
   }
  },
@@ -841,6 +905,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 29% | Max interproximal CAL 1 mm | RBL 8% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 23
   }
  },
@@ -854,6 +919,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 53% | Max interproximal CAL 8 mm | RBL 56% | Teeth lost to perio: 3",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 65% (#28, CEJ-crest 10.4 mm); teeth with >=15% bone loss 5/12 imaged; furcation 2; calculus 6 teeth; missing teeth 5",
    "age": 24
   }
  },
@@ -867,6 +933,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 22% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 15% (#14, CEJ-crest 4.0 mm); teeth with >=15% bone loss 2/15 imaged; calculus 7 teeth; missing teeth 1",
    "age": 29
   }
  },
@@ -880,6 +947,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 17% | Max interproximal CAL 1 mm | RBL 10% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 15% (#24, CEJ-crest 4.0 mm); teeth with >=15% bone loss 1/27 imaged; furcation 1; calculus 9 teeth; missing teeth 1",
    "age": 23
   }
  },
@@ -893,6 +961,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 48% | Max interproximal CAL 10 mm | RBL 46% | Teeth lost to perio: 7",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 42% (#26, CEJ-crest 7.5 mm); teeth with >=15% bone loss 5/19 imaged; vertical defects 1; furcation 1; calculus 7 teeth; missing teeth 9",
    "age": 39
   }
  },
@@ -906,6 +975,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 8 mm | BOP 60% | Max interproximal CAL 7 mm | RBL 55% | Teeth lost to perio: 2",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 53% (#30, CEJ-crest 8.9 mm); teeth with >=15% bone loss 10/14 imaged; vertical defects 1; furcation 1; calculus 3 teeth; missing teeth 3",
    "age": 71
   }
  },
@@ -919,6 +989,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.321",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#30, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; calculus 6 teeth",
    "age": 52
   }
  },
@@ -932,6 +1003,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 3 mm | BOP 5% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 10% (#2, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/15 imaged; furcation 1; calculus 5 teeth; missing teeth 2",
    "age": 69
   }
  },
@@ -945,6 +1017,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 16% | Max interproximal CAL 2 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 14% (#29, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/15 imaged; calculus 4 teeth; missing teeth 2",
    "age": 39
   }
  },
@@ -958,6 +1031,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 8 mm | BOP 59% | Max interproximal CAL 6 mm | RBL 74% | Teeth lost to perio: 10",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 76% (#2, CEJ-crest 11.9 mm); teeth with >=15% bone loss 3/16 imaged; vertical defects 1; calculus 7 teeth; missing teeth 12",
    "age": 37
   }
  },
@@ -971,6 +1045,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 5 mm | BOP 32% | Max interproximal CAL 4 mm | RBL 16% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 22% (#14, CEJ-crest 4.9 mm); teeth with >=15% bone loss 3/14 imaged; calculus 5 teeth; missing teeth 2",
    "age": 38
   }
  },
@@ -984,6 +1059,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 9% (#20, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/15 imaged; missing teeth 2",
    "age": 62
   }
  },
@@ -997,6 +1073,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 3 mm | BOP 29% | Max interproximal CAL 0 mm | RBL 5% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 15% (#13, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/28 imaged; calculus 13 teeth",
    "age": 71
   }
  },
@@ -1010,6 +1087,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 6 mm | BOP 31% | Max interproximal CAL 8 mm | RBL 56% | Teeth lost to perio: 6",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 52% (#30, CEJ-crest 8.7 mm); teeth with >=15% bone loss 2/10 imaged; calculus 4 teeth; missing teeth 6",
    "age": 29
   }
  },
@@ -1023,6 +1101,7 @@
    "proc_dx_completed": "K05.322",
    "proc_dx_planned": "K05.321",
    "probing_chart": "Max PD 4 mm | BOP 47% | Max interproximal CAL 3 mm | RBL 27% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 23% (#31, CEJ-crest 5.0 mm); teeth with >=15% bone loss 5/15 imaged; furcation 1; calculus 7 teeth; missing teeth 2",
    "age": 31
   }
  },
@@ -1036,6 +1115,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 14% | Max interproximal CAL 2 mm | RBL 12% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 19% (#8, CEJ-crest 4.4 mm); teeth with >=15% bone loss 1/26 imaged; furcation 1; calculus 8 teeth; missing teeth 2",
    "age": 45
   }
  },
@@ -1049,6 +1129,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "No radiograph at this visit",
    "age": 60
   }
  },
@@ -1062,6 +1143,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 6 mm | BOP 26% | Max interproximal CAL 5 mm | RBL 44% | Teeth lost to perio: 4",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 40% (#15, CEJ-crest 7.2 mm); teeth with >=15% bone loss 1/24 imaged; calculus 12 teeth; missing teeth 4",
    "age": 79
   }
  },
@@ -1075,6 +1157,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 35% (#13, CEJ-crest 6.5 mm); teeth with >=15% bone loss 10/16 imaged; furcation 2; calculus 5 teeth",
    "age": 80
   }
  },
@@ -1088,6 +1171,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 30% | Max interproximal CAL 4 mm | RBL 26% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 28% (#29, CEJ-crest 5.7 mm); teeth with >=15% bone loss 2/15 imaged; calculus 8 teeth; missing teeth 1",
    "age": 64
   }
  },
@@ -1101,6 +1185,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 14% (#23, CEJ-crest 3.8 mm); teeth with >=15% bone loss 0/28 imaged; furcation 1; calculus 3 teeth",
    "age": 75
   }
  },
@@ -1114,6 +1199,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 1 mm | BOP 4% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 11% (#8, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/26 imaged; calculus 3 teeth; missing teeth 2",
    "age": 72
   }
  },
@@ -1127,6 +1213,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 2 mm | BOP 4% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 7% (#29, CEJ-crest 3.0 mm); teeth with >=15% bone loss 0/16 imaged; calculus 2 teeth",
    "age": 24
   }
  },
@@ -1140,6 +1227,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX): image could not be read",
    "age": 39
   }
  },
@@ -1153,6 +1241,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 23% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 15% (#20, CEJ-crest 4.0 mm); teeth with >=15% bone loss 1/16 imaged; furcation 1; calculus 6 teeth; missing teeth 1",
    "age": 72
   }
  },
@@ -1166,6 +1255,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 16% | Max interproximal CAL 2 mm | RBL 4% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 67
   }
  },
@@ -1179,6 +1269,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 5 mm | BOP 49% | Max interproximal CAL 3 mm | RBL 27% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 31% (#15, CEJ-crest 6.1 mm); teeth with >=15% bone loss 4/16 imaged; calculus 5 teeth",
    "age": 75
   }
  },
@@ -1192,6 +1283,7 @@
    "proc_dx_completed": "K05.322",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 20% | Max interproximal CAL 4 mm | RBL 18% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 25% (#6, CEJ-crest 5.3 mm); teeth with >=15% bone loss 7/28 imaged; calculus 9 teeth",
    "age": 49
   }
  },
@@ -1205,6 +1297,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 21% | Max interproximal CAL 1 mm | RBL 2% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 19% (#20, CEJ-crest 4.5 mm); teeth with >=15% bone loss 1/16 imaged; furcation 1; calculus 6 teeth",
    "age": 45
   }
  },
@@ -1218,6 +1311,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 5 mm | BOP 44% | Max interproximal CAL 4 mm | RBL 17% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 19% (#20, CEJ-crest 4.5 mm); teeth with >=15% bone loss 1/16 imaged; furcation 1; calculus 7 teeth; missing teeth 1",
    "age": 29
   }
  },
@@ -1231,6 +1325,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 44% | Max interproximal CAL 6 mm | RBL 43% | Teeth lost to perio: 4",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 46% (#28, CEJ-crest 8.0 mm); teeth with >=15% bone loss 7/11 imaged; vertical defects 1; furcation 1; calculus 9 teeth; missing teeth 6",
    "age": 47
   }
  },
@@ -1244,6 +1339,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 30% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#30, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; calculus 7 teeth",
    "age": 51
   }
  },
@@ -1257,6 +1353,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 4 mm | BOP 37% | Max interproximal CAL 1 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 11% (#18, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/15 imaged; furcation 1; calculus 6 teeth; missing teeth 2",
    "age": 48
   }
  },
@@ -1270,6 +1367,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 24% | Max interproximal CAL 1 mm | RBL 2% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 11% (#21, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/27 imaged; calculus 12 teeth; missing teeth 1",
    "age": 51
   }
  },
@@ -1283,6 +1381,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 5 mm | BOP 29% | Max interproximal CAL 3 mm | RBL 17% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 15% (#28, CEJ-crest 4.0 mm); teeth with >=15% bone loss 1/16 imaged; calculus 6 teeth; missing teeth 2",
    "age": 56
   }
  },
@@ -1296,6 +1395,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 44% | Max interproximal CAL 1 mm | RBL 4% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 9% (#13, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/26 imaged; furcation 1; calculus 10 teeth; missing teeth 2",
    "age": 70
   }
  },
@@ -1309,6 +1409,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 4 mm | BOP 20% | Max interproximal CAL 4 mm | RBL 28% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 27% (#9, CEJ-crest 5.5 mm); teeth with >=15% bone loss 4/28 imaged; furcation 1; calculus 14 teeth",
    "age": 74
   }
  },
@@ -1322,6 +1423,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 1 mm | BOP 3% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 11% (#28, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/16 imaged; calculus 4 teeth",
    "age": 49
   }
  },
@@ -1335,6 +1437,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 7 mm | BOP 40% | Max interproximal CAL 7 mm | RBL 73% | Teeth lost to perio: 9",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 77% (#3, CEJ-crest 12.0 mm); teeth with >=15% bone loss 6/17 imaged; furcation 1; calculus 9 teeth; missing teeth 11",
    "age": 43
   }
  },
@@ -1348,6 +1451,7 @@
    "proc_dx_completed": "K05.322",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 35% | Max interproximal CAL 4 mm | RBL 31% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 36% (#4, CEJ-crest 6.7 mm); teeth with >=15% bone loss 15/28 imaged; furcation 2; calculus 12 teeth",
    "age": 58
   }
  },
@@ -1361,6 +1465,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 6 mm | BOP 54% | Max interproximal CAL 6 mm | RBL 45% | Teeth lost to perio: 4",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 48% (#29, CEJ-crest 8.3 mm); teeth with >=15% bone loss 1/12 imaged; calculus 5 teeth; missing teeth 4",
    "age": 27
   }
  },
@@ -1374,6 +1479,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 5 mm | BOP 50% | Max interproximal CAL 4 mm | RBL 29% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 32% (#15, CEJ-crest 6.1 mm); teeth with >=15% bone loss 6/28 imaged; furcation 1; calculus 9 teeth",
    "age": 64
   }
  },
@@ -1387,6 +1493,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#21, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/16 imaged; calculus 3 teeth; missing teeth 1",
    "age": 63
   }
  },
@@ -1400,6 +1507,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 1 mm | BOP 7% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 11% (#28, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/16 imaged; calculus 3 teeth",
    "age": 29
   }
  },
@@ -1413,6 +1521,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 27% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 17% (#25, CEJ-crest 4.2 mm); teeth with >=15% bone loss 1/28 imaged; calculus 11 teeth",
    "age": 23
   }
  },
@@ -1426,6 +1535,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 4 mm | BOP 44% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 9% (#29, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/16 imaged; calculus 8 teeth",
    "age": 45
   }
  },
@@ -1439,6 +1549,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.312",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 12% (#5, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/16 imaged; calculus 6 teeth",
    "age": 55
   }
  },
@@ -1452,6 +1563,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.321",
    "probing_chart": "Max PD 4 mm | BOP 35% | Max interproximal CAL 4 mm | RBL 28% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 29% (#10, CEJ-crest 5.8 mm); teeth with >=15% bone loss 9/27 imaged; furcation 1; calculus 11 teeth; missing teeth 1",
    "age": 77
   }
  },
@@ -1465,6 +1577,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 4 mm | BOP 18% | Max interproximal CAL 4 mm | RBL 17% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 18% (#4, CEJ-crest 4.4 mm); teeth with >=15% bone loss 1/16 imaged; calculus 5 teeth",
    "age": 34
   }
  },
@@ -1478,6 +1591,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 6 mm | BOP 54% | Max interproximal CAL 6 mm | RBL 60% | Teeth lost to perio: 2",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 58% (#10, CEJ-crest 9.6 mm); teeth with >=15% bone loss 7/26 imaged; calculus 7 teeth; missing teeth 2",
    "age": 51
   }
  },
@@ -1491,6 +1605,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.321",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX): image could not be read",
    "age": 71
   }
  },
@@ -1504,6 +1619,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.321",
    "probing_chart": "Max PD 4 mm | BOP 23% | Max interproximal CAL 2 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 8% (#21, CEJ-crest 3.1 mm); teeth with >=15% bone loss 0/16 imaged; calculus 6 teeth",
    "age": 26
   }
  },
@@ -1517,6 +1633,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 28% | Max interproximal CAL 4 mm | RBL 24% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 18% (#22, CEJ-crest 4.4 mm); teeth with >=15% bone loss 3/28 imaged; furcation 1; calculus 15 teeth",
    "age": 30
   }
  },
@@ -1530,6 +1647,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 5 mm | BOP 41% | Max interproximal CAL 3 mm | RBL 27% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 36% (#19, CEJ-crest 6.7 mm); teeth with >=15% bone loss 21/27 imaged; furcation 1; calculus 9 teeth; missing teeth 1",
    "age": 47
   }
  },
@@ -1543,6 +1661,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 37% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 13% (#21, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 8 teeth",
    "age": 56
   }
  },
@@ -1556,6 +1675,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 2 mm | BOP 14% | Max interproximal CAL 1 mm | RBL 10% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 9% (#18, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/16 imaged; calculus 6 teeth; missing teeth 2",
    "age": 70
   }
  },
@@ -1569,6 +1689,7 @@
    "proc_dx_completed": "K05.322",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 31% | Max interproximal CAL 4 mm | RBL 26% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 34% (#31, CEJ-crest 6.4 mm); teeth with >=15% bone loss 10/27 imaged; calculus 9 teeth; missing teeth 1",
    "age": 58
   }
  },
@@ -1582,6 +1703,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 22% | Max interproximal CAL 0 mm | RBL 6% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 67
   }
  },
@@ -1595,6 +1717,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 3 mm | BOP 8% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 36
   }
  },
@@ -1608,6 +1731,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 39% | Max interproximal CAL 2 mm | RBL 14% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 14% (#4, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/28 imaged; furcation 1; calculus 9 teeth",
    "age": 35
   }
  },
@@ -1621,6 +1745,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "No radiograph at this visit",
    "age": 55
   }
  },
@@ -1634,6 +1759,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 43% | Max interproximal CAL 4 mm | RBL 25% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 30% (#6, CEJ-crest 5.9 mm); teeth with >=15% bone loss 7/27 imaged; calculus 9 teeth; missing teeth 1",
    "age": 42
   }
  },
@@ -1647,6 +1773,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 13% (#12, CEJ-crest 3.7 mm); teeth with >=15% bone loss 0/16 imaged; calculus 3 teeth",
    "age": 77
   }
  },
@@ -1660,6 +1787,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 15% (#28, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/15 imaged; calculus 2 teeth; missing teeth 2",
    "age": 21
   }
  },
@@ -1673,6 +1801,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 6 mm | BOP 72% | Max interproximal CAL 8 mm | RBL 54% | Teeth lost to perio: 10",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 56% (#14, CEJ-crest 9.2 mm); teeth with >=15% bone loss 2/18 imaged; vertical defects 1; calculus 9 teeth; missing teeth 10",
    "age": 32
   }
  },
@@ -1686,6 +1815,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 15% (#19, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/28 imaged; furcation 1; calculus 5 teeth",
    "age": 72
   }
  },
@@ -1699,6 +1829,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 26% (#13, CEJ-crest 5.4 mm); teeth with >=15% bone loss 1/10 imaged; furcation 1; calculus 3 teeth; missing teeth 7",
    "age": 43
   }
  },
@@ -1712,6 +1843,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 10% (#6, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/28 imaged; furcation 3; calculus 5 teeth",
    "age": 29
   }
  },
@@ -1725,6 +1857,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 11% (#20, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/28 imaged; calculus 11 teeth",
    "age": 34
   }
  },
@@ -1738,6 +1871,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 2 mm | BOP 8% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 14% (#13, CEJ-crest 3.8 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 1 teeth",
    "age": 22
   }
  },
@@ -1751,6 +1885,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 38% | Max interproximal CAL 6 mm | RBL 45% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 52% (#6, CEJ-crest 8.7 mm); teeth with >=15% bone loss 17/28 imaged; furcation 1; calculus 8 teeth",
    "age": 78
   }
  },
@@ -1764,6 +1899,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 2 mm | BOP 36% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 74
   }
  },
@@ -1777,6 +1913,7 @@
    "proc_dx_completed": "K05.322",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 4 mm | BOP 39% | Max interproximal CAL 4 mm | RBL 29% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 36% (#14, CEJ-crest 6.7 mm); teeth with >=15% bone loss 10/16 imaged; furcation 2; calculus 8 teeth",
    "age": 71
   }
  },
@@ -1790,6 +1927,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 5 mm | BOP 37% | Max interproximal CAL 3 mm | RBL 20% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 21% (#14, CEJ-crest 4.7 mm); teeth with >=15% bone loss 6/26 imaged; furcation 1; calculus 11 teeth; missing teeth 2",
    "age": 23
   }
  },
@@ -1803,6 +1941,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 9 mm | BOP 42% | Max interproximal CAL 10 mm | RBL 71% | Teeth lost to perio: 7",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 68% (#8, CEJ-crest 10.9 mm); teeth with >=15% bone loss 12/21 imaged; furcation 2; calculus 10 teeth; missing teeth 7",
    "age": 41
   }
  },
@@ -1816,6 +1955,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 40% | Max interproximal CAL 7 mm | RBL 52% | Teeth lost to perio: 1",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 50% (#5, CEJ-crest 8.5 mm); teeth with >=15% bone loss 4/15 imaged; furcation 3; calculus 3 teeth; missing teeth 1",
    "age": 22
   }
  },
@@ -1829,6 +1969,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 23% | Max interproximal CAL 0 mm | RBL 5% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 64
   }
  },
@@ -1842,6 +1983,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 56% | Max interproximal CAL 8 mm | RBL 55% | Teeth lost to perio: 4",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 62% (#10, CEJ-crest 10.1 mm); teeth with >=15% bone loss 5/24 imaged; calculus 9 teeth; missing teeth 4",
    "age": 44
   }
  },
@@ -1855,6 +1997,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 2 mm | BOP 14% | Max interproximal CAL 1 mm | RBL 8% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 8% (#4, CEJ-crest 3.0 mm); teeth with >=15% bone loss 0/16 imaged; calculus 9 teeth",
    "age": 50
   }
  },
@@ -1868,6 +2011,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#4, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 6 teeth",
    "age": 58
   }
  },
@@ -1881,6 +2025,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 4 mm | BOP 38% | Max interproximal CAL 4 mm | RBL 30% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 34% (#3, CEJ-crest 6.4 mm); teeth with >=15% bone loss 2/14 imaged; furcation 3; calculus 5 teeth; missing teeth 2",
    "age": 23
   }
  },
@@ -1894,6 +2039,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 40% | Max interproximal CAL 1 mm | RBL 5% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 15% (#22, CEJ-crest 4.0 mm); teeth with >=15% bone loss 1/27 imaged; calculus 19 teeth; missing teeth 1",
    "age": 61
   }
  },
@@ -1907,6 +2053,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.321",
    "probing_chart": "Max PD 3 mm | BOP 15% | Max interproximal CAL 2 mm | RBL 11% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 20% (#5, CEJ-crest 4.6 mm); teeth with >=15% bone loss 5/27 imaged; calculus 8 teeth; missing teeth 1",
    "age": 56
   }
  },
@@ -1920,6 +2067,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 11% (#29, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/27 imaged; furcation 1; calculus 4 teeth; missing teeth 1",
    "age": 22
   }
  },
@@ -1933,6 +2081,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 50% | Max interproximal CAL 6 mm | RBL 39% | Teeth lost to perio: 2",
+   "radiograph": "No radiograph at this visit",
    "age": 64
   }
  },
@@ -1946,6 +2095,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 67% | Max interproximal CAL 7 mm | RBL 35% | Teeth lost to perio: 1",
+   "radiograph": "No radiograph at this visit",
    "age": 26
   }
  },
@@ -1959,6 +2109,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 44% | Max interproximal CAL 0 mm | RBL 7% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 10% (#9, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/28 imaged; furcation 2; calculus 12 teeth",
    "age": 33
   }
  },
@@ -1972,6 +2123,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 31% | Max interproximal CAL 0 mm | RBL 8% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 18% (#30, CEJ-crest 4.3 mm); teeth with >=15% bone loss 1/16 imaged; furcation 1; calculus 7 teeth",
    "age": 28
   }
  },
@@ -1985,6 +2137,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 6 mm | BOP 49% | Max interproximal CAL 8 mm | RBL 55% | Teeth lost to perio: 2",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 56% (#18, CEJ-crest 9.2 mm); teeth with >=15% bone loss 10/14 imaged; furcation 2; calculus 5 teeth; missing teeth 2",
    "age": 50
   }
  },
@@ -1998,6 +2151,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 2 mm | BOP 14% | Max interproximal CAL 0 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 8% (#31, CEJ-crest 3.1 mm); teeth with >=15% bone loss 0/14 imaged; furcation 1; calculus 6 teeth; missing teeth 2",
    "age": 63
   }
  },
@@ -2011,6 +2165,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.321",
    "probing_chart": "Max PD 4 mm | BOP 25% | Max interproximal CAL 1 mm | RBL 1% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 12% (#19, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/28 imaged; calculus 15 teeth",
    "age": 56
   }
  },
@@ -2024,6 +2179,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 7 mm | BOP 69% | Max interproximal CAL 8 mm | RBL 38% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 37% (#29, CEJ-crest 6.8 mm); teeth with >=15% bone loss 5/15 imaged; calculus 5 teeth; missing teeth 1",
    "age": 19
   }
  },
@@ -2037,6 +2193,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 21% | Max interproximal CAL 0 mm | RBL 1% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 11% (#4, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/14 imaged; calculus 5 teeth; missing teeth 2",
    "age": 80
   }
  },
@@ -2050,6 +2207,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.313",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 24% (#11, CEJ-crest 5.1 mm); teeth with >=15% bone loss 6/27 imaged; calculus 14 teeth; missing teeth 1",
    "age": 68
   }
  },
@@ -2063,6 +2221,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 18% | Max interproximal CAL 4 mm | RBL 31% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 40% (#24, CEJ-crest 7.2 mm); teeth with >=15% bone loss 16/28 imaged; furcation 3; calculus 12 teeth",
    "age": 73
   }
  },
@@ -2076,6 +2235,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 2 mm | BOP 0% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 9% (#30, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/16 imaged; calculus 1 teeth",
    "age": 41
   }
  },
@@ -2089,6 +2249,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 12% (#19, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/15 imaged; furcation 1; calculus 7 teeth; missing teeth 2",
    "age": 32
   }
  },
@@ -2102,6 +2263,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 4 mm | BOP 41% | Max interproximal CAL 1 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX): image could not be read",
    "age": 49
   }
  },
@@ -2115,6 +2277,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 4 mm | BOP 32% | Max interproximal CAL 4 mm | RBL 16% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 21% (#14, CEJ-crest 4.8 mm); teeth with >=15% bone loss 3/16 imaged; furcation 1; calculus 7 teeth",
    "age": 27
   }
  },
@@ -2128,6 +2291,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 38% | Max interproximal CAL 7 mm | RBL 79% | Teeth lost to perio: 9",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 88% (#21, CEJ-crest 13.4 mm); teeth with >=15% bone loss 1/7 imaged; calculus 2 teeth; missing teeth 10",
    "age": 55
   }
  },
@@ -2141,6 +2305,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 56% (#12, CEJ-crest 9.2 mm); teeth with >=15% bone loss 3/14 imaged; vertical defects 1; furcation 1; calculus 8 teeth; missing teeth 3",
    "age": 68
   }
  },
@@ -2154,6 +2319,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 6 mm | BOP 40% | Max interproximal CAL 7 mm | RBL 41% | Teeth lost to perio: 5",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 46% (#7, CEJ-crest 8.0 mm); teeth with >=15% bone loss 7/21 imaged; calculus 10 teeth; missing teeth 7",
    "age": 26
   }
  },
@@ -2167,6 +2333,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 16% | Max interproximal CAL 0 mm | RBL 5% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 12% (#26, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/27 imaged; calculus 7 teeth; missing teeth 1",
    "age": 63
   }
  },
@@ -2180,6 +2347,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 5 mm | BOP 20% | Max interproximal CAL 4 mm | RBL 25% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 20% (#20, CEJ-crest 4.6 mm); teeth with >=15% bone loss 4/15 imaged; calculus 9 teeth; missing teeth 1",
    "age": 58
   }
  },
@@ -2193,6 +2361,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 15% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 18% (#5, CEJ-crest 4.3 mm); teeth with >=15% bone loss 1/28 imaged; furcation 1; calculus 10 teeth",
    "age": 46
   }
  },
@@ -2206,6 +2375,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 0% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 12% (#12, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/16 imaged; calculus 4 teeth; missing teeth 2",
    "age": 23
   }
  },
@@ -2219,6 +2389,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 1 mm | BOP 6% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 13% (#19, CEJ-crest 3.7 mm); teeth with >=15% bone loss 0/28 imaged; calculus 5 teeth",
    "age": 30
   }
  },
@@ -2232,6 +2403,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 25% | Max interproximal CAL 1 mm | RBL 6% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 74
   }
  },
@@ -2245,6 +2417,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 36% | Max interproximal CAL 2 mm | RBL 14% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 18% (#12, CEJ-crest 4.3 mm); teeth with >=15% bone loss 3/26 imaged; calculus 13 teeth; missing teeth 2",
    "age": 19
   }
  },
@@ -2258,6 +2431,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 25% | Max interproximal CAL 0 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 36
   }
  },
@@ -2271,6 +2445,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 50% | Max interproximal CAL 6 mm | RBL 43% | Teeth lost to perio: 10",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 44% (#2, CEJ-crest 7.7 mm); teeth with >=15% bone loss 1/6 imaged; vertical defects 1; furcation 1; calculus 4 teeth; missing teeth 10",
    "age": 41
   }
  },
@@ -2284,6 +2459,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 10 mm | BOP 33% | Max interproximal CAL 6 mm | RBL 74% | Teeth lost to perio: 10",
+   "radiograph": "No radiograph at this visit",
    "age": 39
   }
  },
@@ -2297,6 +2473,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 18% | Max interproximal CAL 2 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 38
   }
  },
@@ -2310,6 +2487,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#5, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged",
    "age": 27
   }
  },
@@ -2323,6 +2501,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 1 mm | BOP 5% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 43
   }
  },
@@ -2336,6 +2515,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 4 mm | BOP 41% | Max interproximal CAL 0 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 14% (#28, CEJ-crest 3.8 mm); teeth with >=15% bone loss 0/15 imaged; calculus 7 teeth; missing teeth 1",
    "age": 21
   }
  },
@@ -2349,6 +2529,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "No radiograph at this visit",
    "age": 26
   }
  },
@@ -2362,6 +2543,7 @@
    "proc_dx_completed": "K05.322",
    "proc_dx_planned": "K05.322",
    "probing_chart": "Max PD 4 mm | BOP 34% | Max interproximal CAL 4 mm | RBL 30% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 30% (#19, CEJ-crest 5.9 mm); teeth with >=15% bone loss 11/16 imaged; furcation 2; calculus 7 teeth; missing teeth 1",
    "age": 76
   }
  },
@@ -2375,6 +2557,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 2 mm | BOP 6% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 15% (#7, CEJ-crest 3.9 mm); teeth with >=15% bone loss 0/27 imaged; calculus 4 teeth; missing teeth 1",
    "age": 38
   }
  },
@@ -2388,6 +2571,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 5 mm | BOP 35% | Max interproximal CAL 4 mm | RBL 31% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 27% (#28, CEJ-crest 5.5 mm); teeth with >=15% bone loss 1/16 imaged; calculus 7 teeth",
    "age": 67
   }
  },
@@ -2401,6 +2585,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 30% | Max interproximal CAL 1 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 10% (#19, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; calculus 6 teeth",
    "age": 34
   }
  },
@@ -2414,6 +2599,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 7 mm | BOP 30% | Max interproximal CAL 7 mm | RBL 34% | Teeth lost to perio: 4",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 37% (#25, CEJ-crest 6.8 mm); teeth with >=15% bone loss 19/22 imaged; furcation 3; calculus 11 teeth; missing teeth 6",
    "age": 67
   }
  },
@@ -2427,6 +2613,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 5 mm | BOP 47% | Max interproximal CAL 3 mm | RBL 21% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 25% (#2, CEJ-crest 5.3 mm); teeth with >=15% bone loss 2/15 imaged; furcation 1; calculus 7 teeth; missing teeth 2",
    "age": 63
   }
  },
@@ -2440,6 +2627,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 48% (#2, CEJ-crest 8.2 mm); teeth with >=15% bone loss 14/27 imaged; vertical defects 1; furcation 3; calculus 7 teeth; missing teeth 1",
    "age": 21
   }
  },
@@ -2453,6 +2641,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 9 mm | BOP 74% | Max interproximal CAL 9 mm | RBL 68% | Teeth lost to perio: 7",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 8% (#19, CEJ-crest 3.1 mm); teeth with >=15% bone loss 0/9 imaged; calculus 2 teeth; missing teeth 7",
    "age": 61
   }
  },
@@ -2466,6 +2655,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 30% | Max interproximal CAL 0 mm | RBL 6% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 16% (#28, CEJ-crest 4.1 mm); teeth with >=15% bone loss 1/28 imaged; furcation 1; calculus 9 teeth",
    "age": 81
   }
  },
@@ -2479,6 +2669,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 11% | Max interproximal CAL 1 mm | RBL 8% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 12% (#21, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 3 teeth; missing teeth 1",
    "age": 24
   }
  },
@@ -2492,6 +2683,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 34% | Max interproximal CAL 1 mm | RBL 9% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 12% (#30, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/16 imaged; calculus 6 teeth",
    "age": 27
   }
  },
@@ -2505,6 +2697,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 40% | Max interproximal CAL 1 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#15, CEJ-crest 3.3 mm); teeth with >=15% bone loss 0/16 imaged; furcation 2; calculus 6 teeth",
    "age": 44
   }
  },
@@ -2518,6 +2711,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 40% | Max interproximal CAL 7 mm | RBL 45% | Teeth lost to perio: 3",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 58% (#5, CEJ-crest 9.6 mm); teeth with >=15% bone loss 2/13 imaged; calculus 6 teeth; missing teeth 3",
    "age": 22
   }
  },
@@ -2531,6 +2725,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 8 mm | BOP 51% | Max interproximal CAL 6 mm | RBL 52% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 57% (#4, CEJ-crest 9.4 mm); teeth with >=15% bone loss 2/16 imaged; furcation 1; calculus 10 teeth",
    "age": 20
   }
  },
@@ -2544,6 +2739,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.312",
    "probing_chart": "Max PD 6 mm | BOP 47% | Max interproximal CAL 7 mm | RBL 60% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 58% (#5, CEJ-crest 9.5 mm); teeth with >=15% bone loss 2/15 imaged; furcation 1; calculus 6 teeth; missing teeth 1",
    "age": 53
   }
  },
@@ -2557,6 +2753,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 7 mm | BOP 48% | Max interproximal CAL 7 mm | RBL 54% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 58% (#13, CEJ-crest 9.5 mm); teeth with >=15% bone loss 7/15 imaged; vertical defects 1; furcation 1; calculus 6 teeth; missing teeth 1",
    "age": 78
   }
  },
@@ -2570,6 +2767,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 75% (#24, CEJ-crest 11.7 mm); teeth with >=15% bone loss 6/18 imaged; vertical defects 1; calculus 7 teeth; missing teeth 10",
    "age": 28
   }
  },
@@ -2583,6 +2781,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 6 mm | BOP 62% | Max interproximal CAL 8 mm | RBL 37% | Teeth lost to perio: 3",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 40% (#31, CEJ-crest 7.2 mm); teeth with >=15% bone loss 9/25 imaged; calculus 9 teeth; missing teeth 3",
    "age": 60
   }
  },
@@ -2596,6 +2795,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 7 mm | BOP 29% | Max interproximal CAL 6 mm | RBL 42% | Teeth lost to perio: 2",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 44% (#30, CEJ-crest 7.7 mm); teeth with >=15% bone loss 10/13 imaged; furcation 5; calculus 4 teeth; missing teeth 4",
    "age": 49
   }
  },
@@ -2609,6 +2809,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 2 mm | BOP 40% | Max interproximal CAL 0 mm | RBL 8% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 9% (#4, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/16 imaged; calculus 8 teeth; missing teeth 1",
    "age": 45
   }
  },
@@ -2622,6 +2823,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 34% | Max interproximal CAL 0 mm | RBL 2% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 13% (#21, CEJ-crest 3.7 mm); teeth with >=15% bone loss 0/15 imaged; calculus 5 teeth; missing teeth 1",
    "age": 58
   }
  },
@@ -2635,6 +2837,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 23% | Max interproximal CAL 1 mm | RBL 11% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 14% (#15, CEJ-crest 3.8 mm); teeth with >=15% bone loss 0/26 imaged; calculus 10 teeth; missing teeth 2",
    "age": 52
   }
  },
@@ -2648,6 +2851,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 12% (#7, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/27 imaged; calculus 6 teeth; missing teeth 1",
    "age": 27
   }
  },
@@ -2661,6 +2865,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 2 mm | BOP 40% | Max interproximal CAL 1 mm | RBL 6% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 14% (#4, CEJ-crest 3.8 mm); teeth with >=15% bone loss 0/26 imaged; calculus 10 teeth; missing teeth 2",
    "age": 21
   }
  },
@@ -2674,6 +2879,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 6 mm | BOP 52% | Max interproximal CAL 6 mm | RBL 48% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 38
   }
  },
@@ -2687,6 +2893,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 26% | Max interproximal CAL 3 mm | RBL 29% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX): image could not be read",
    "age": 20
   }
  },
@@ -2700,6 +2907,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 8 mm | BOP 79% | Max interproximal CAL 5 mm | RBL 48% | Teeth lost to perio: 9",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 50% (#5, CEJ-crest 8.5 mm); teeth with >=15% bone loss 1/7 imaged; calculus 2 teeth; missing teeth 9",
    "age": 62
   }
  },
@@ -2713,6 +2921,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 7 mm | BOP 45% | Max interproximal CAL 7 mm | RBL 60% | Teeth lost to perio: 1",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 62% (#31, CEJ-crest 10.1 mm); teeth with >=15% bone loss 5/14 imaged; furcation 1; calculus 5 teeth; missing teeth 2",
    "age": 69
   }
  },
@@ -2726,6 +2935,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 64% (#3, CEJ-crest 10.3 mm); teeth with >=15% bone loss 20/26 imaged; vertical defects 1; furcation 3; calculus 16 teeth; missing teeth 2",
    "age": 55
   }
  },
@@ -2739,6 +2949,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 4 mm | BOP 33% | Max interproximal CAL 4 mm | RBL 19% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 27% (#12, CEJ-crest 5.5 mm); teeth with >=15% bone loss 2/16 imaged; calculus 5 teeth",
    "age": 66
   }
  },
@@ -2752,6 +2963,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 14% | Max interproximal CAL 0 mm | RBL 7% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 38
   }
  },
@@ -2765,6 +2977,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.322",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 26% (#28, CEJ-crest 5.4 mm); teeth with >=15% bone loss 13/28 imaged; furcation 1; calculus 11 teeth",
    "age": 18
   }
  },
@@ -2778,6 +2991,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 10 mm | BOP 49% | Max interproximal CAL 5 mm | RBL 47% | Teeth lost to perio: 5",
+   "radiograph": "No radiograph at this visit",
    "age": 31
   }
  },
@@ -2791,6 +3005,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 2 mm | BOP 6% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 12% (#5, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/28 imaged; calculus 6 teeth",
    "age": 70
   }
  },
@@ -2804,6 +3019,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 9% (#21, CEJ-crest 3.2 mm); teeth with >=15% bone loss 0/16 imaged; furcation 1; calculus 9 teeth; missing teeth 1",
    "age": 25
   }
  },
@@ -2817,6 +3033,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 20% (#12, CEJ-crest 4.7 mm); teeth with >=15% bone loss 1/16 imaged; calculus 6 teeth",
    "age": 33
   }
  },
@@ -2830,6 +3047,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 5 mm | BOP 18% | Max interproximal CAL 4 mm | RBL 21% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 58
   }
  },
@@ -2843,6 +3061,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.311",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 27% (#13, CEJ-crest 5.6 mm); teeth with >=15% bone loss 4/16 imaged; furcation 1; calculus 7 teeth",
    "age": 32
   }
  },
@@ -2856,6 +3075,7 @@
    "proc_dx_completed": "K05.312",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 32% | Max interproximal CAL 2 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (2BWX, sim-rad-ai sim-1.0): max bone loss 10% (#15, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/16 imaged; calculus 4 teeth; missing teeth 2",
    "age": 23
   }
  },
@@ -2869,6 +3089,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 3 mm | BOP 39% | Max interproximal CAL 2 mm | RBL 4% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 11% (#18, CEJ-crest 3.5 mm); teeth with >=15% bone loss 0/14 imaged; calculus 2 teeth; missing teeth 2",
    "age": 43
   }
  },
@@ -2882,6 +3103,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 16% | Max interproximal CAL 1 mm | RBL 7% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 15% (#3, CEJ-crest 4.0 mm); teeth with >=15% bone loss 1/16 imaged; calculus 3 teeth",
    "age": 30
   }
  },
@@ -2895,6 +3117,7 @@
    "proc_dx_completed": "K05.321",
    "proc_dx_planned": "K05.321",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "No radiograph at this visit",
    "age": 22
   }
  },
@@ -2908,6 +3131,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 6 mm | BOP 41% | Max interproximal CAL 8 mm | RBL 50% | Teeth lost to perio: 1",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 56% (#3, CEJ-crest 9.3 mm); teeth with >=15% bone loss 2/15 imaged; calculus 3 teeth; missing teeth 3",
    "age": 44
   }
  },
@@ -2921,6 +3145,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "Max PD 3 mm | BOP 26% | Max interproximal CAL 0 mm | RBL 6% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 22
   }
  },
@@ -2934,6 +3159,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 9 mm | BOP 79% | Max interproximal CAL 5 mm | RBL 75% | Teeth lost to perio: 6",
+   "radiograph": "Radiograph AI (4BWX): image could not be read",
    "age": 72
   }
  },
@@ -2947,6 +3173,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 8 mm | BOP 54% | Max interproximal CAL 7 mm | RBL 49% | Teeth lost to perio: 1",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 48% (#10, CEJ-crest 8.3 mm); teeth with >=15% bone loss 8/26 imaged; calculus 11 teeth; missing teeth 2",
    "age": 52
   }
  },
@@ -2960,6 +3187,7 @@
    "proc_dx_completed": "K05.311",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 19% | Max interproximal CAL 1 mm | RBL 14% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 16% (#14, CEJ-crest 4.1 mm); teeth with >=15% bone loss 2/16 imaged; calculus 5 teeth",
    "age": 33
   }
  },
@@ -2973,6 +3201,7 @@
    "proc_dx_completed": "K05.313",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 7 mm | BOP 70% | Max interproximal CAL 9 mm | RBL 66% | Teeth lost to perio: 8",
+   "radiograph": "No radiograph at this visit",
    "age": 64
   }
  },
@@ -2986,6 +3215,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 8% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "No radiograph at this visit",
    "age": 64
   }
  },
@@ -2999,6 +3229,7 @@
    "proc_dx_completed": "K05.323",
    "proc_dx_planned": "K05.323",
    "probing_chart": "Max PD 7 mm | BOP 59% | Max interproximal CAL 7 mm | RBL 53% | Teeth lost to perio: 1",
+   "radiograph": "No radiograph at this visit",
    "age": 23
   }
  },
@@ -3012,6 +3243,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.10",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "No radiograph at this visit",
    "age": 46
   }
  },
@@ -3025,6 +3257,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "Max PD 3 mm | BOP 37% | Max interproximal CAL 2 mm | RBL 12% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (PAN, sim-rad-ai sim-1.0): max bone loss 16% (#15, CEJ-crest 4.1 mm); teeth with >=15% bone loss 1/28 imaged; furcation 1; calculus 10 teeth",
    "age": 33
   }
  },
@@ -3038,6 +3271,7 @@
    "proc_dx_completed": "Z01.20",
    "proc_dx_planned": "Z01.20",
    "probing_chart": "Max PD 2 mm | BOP 0% | Max interproximal CAL 0 mm | RBL 0% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 10% (#4, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/16 imaged; calculus 3 teeth",
    "age": 28
   }
  },
@@ -3051,6 +3285,7 @@
    "proc_dx_completed": "(none)",
    "proc_dx_planned": "(none)",
    "probing_chart": "(not charted at this visit)",
+   "radiograph": "Radiograph AI (4BWX, sim-rad-ai sim-1.0): max bone loss 11% (#20, CEJ-crest 3.4 mm); teeth with >=15% bone loss 0/16 imaged; calculus 3 teeth",
    "age": 59
   }
  },
@@ -3064,6 +3299,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.313",
    "probing_chart": "Max PD 6 mm | BOP 47% | Max interproximal CAL 5 mm | RBL 41% | Teeth lost to perio: 4",
+   "radiograph": "No radiograph at this visit",
    "age": 56
   }
  },
@@ -3077,6 +3313,7 @@
    "proc_dx_completed": "K05.10",
    "proc_dx_planned": "K05.311",
    "probing_chart": "Max PD 4 mm | BOP 23% | Max interproximal CAL 2 mm | RBL 3% | Teeth lost to perio: 0",
+   "radiograph": "Radiograph AI (FMX, sim-rad-ai sim-1.0): max bone loss 12% (#15, CEJ-crest 3.6 mm); teeth with >=15% bone loss 0/28 imaged; calculus 8 teeth",
    "age": 43
   }
  }

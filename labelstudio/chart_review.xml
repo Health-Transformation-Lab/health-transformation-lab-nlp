@@ -32,6 +32,7 @@
     <Text name="proc_dx_completed" value="Procedure diagnosis completed (ICD-10): $proc_dx_completed"/>
     <Text name="proc_dx_planned" value="Procedure diagnosis planned (ICD-10): $proc_dx_planned"/>
     <Text name="probing_chart" value="Probing chart: $probing_chart"/>
+    <Text name="radiograph" value="$radiograph"/>
     <Text name="age" value="Age at visit: $age"/>
   </View>
 
@@ -68,6 +69,7 @@
       <Choice value="proc_dx_completed"/>
       <Choice value="proc_dx_planned"/>
       <Choice value="probing_chart"/>
+      <Choice value="radiograph"/>
     </Choices>
 
     <Header value="Sources conflict?"/>
