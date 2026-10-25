@@ -29,7 +29,7 @@ Rough CPU times (estimates, not measured):
 | Rules, structured, TF-IDF baselines | seconds |
 | Frozen embeddings (DistilBERT, BERT-base) | ~1–5 min |
 | Fine-tune DistilBERT / BERT-base, 2 epochs | ~5–20 min |
-| ModernBERT-large, BioClinical-ModernBERT-large | 30–60+ min; leave for paid Databricks compute |
+| ModernBERT-large, BioClinical-ModernBERT-large | 30–60+ min; use a GPU (Free Edition's limited serverless GPU from Python, or paid compute) |
 
 Apple Silicon Macs use the built-in GPU (MPS) for fine-tuning automatically.
 

@@ -49,9 +49,17 @@
 
 - **Laptop / CPU:** the 4B model, quantized, runs locally for small synthetic
   tests (slow). Synthetic data only.
-- **Databricks:** register through MLflow and serve on GPU Model Serving;
-  batch-score with `ai_query`. Free Edition has no GPU, so it's for the small
-  tests only. Costs go in `costs.yaml` as a self-hosted GPU method.
+- **Databricks Free Edition:** has limited serverless GPU in notebooks
+  (announced June 2026; subject to capacity, fair-use limits, no published
+  quota). Enough to try the 4B model on synthetic notes and possibly a small
+  LoRA fine-tune of it. It does **not** offer GPU serving endpoints or custom
+  models on GPU batch inference, so run MedGemma inside the notebook rather
+  than as an endpoint
+  ([limitations](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations),
+  [announcement](https://www.databricks.com/blog/whats-coming-next-free-edition)).
+  The 27B model is unlikely to fit.
+- **Paid Databricks:** register through MLflow, serve on GPU Model Serving, and
+  batch-score with `ai_query`. Costs go in `costs.yaml` as a self-hosted GPU method.
 - **Evaluation:** the same split, scorer, harm grading, difficulty levels and
   cost-effectiveness as every other method. Report prompt-sensitivity by running
   two or three prompt variants.

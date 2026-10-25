@@ -68,7 +68,8 @@ synthetic data until approved for internal use. Databricks is the eventual home.
    formats. Real notes need Presidio or a de-id model plus a human sample
    check. Budget a fix-and-rerun cycle.
 4. **GPU for the encoder ladder.** CPU is fine for the small models. The large
-   ones need GPU or get dropped from the paper.
+   ones need GPU: try Free Edition's limited serverless GPU (capacity not
+   guaranteed), otherwise paid compute or drop them.
 5. **Holiday weeks** (Nov 23–27, Dec 24 – Jan 1) are already left out above.
 
 ## Open decisions

@@ -11,7 +11,10 @@
 # MAGIC 5. Optional: LLM challenger via `ai_query` on a Foundation Model endpoint
 # MAGIC 6. Results and OMOP tables land as Delta in `workspace.dental`
 # MAGIC
-# MAGIC **Free Edition notes:** serverless is Python/SQL only (no R) and CPU only. The R side of
+# MAGIC **Free Edition notes:** serverless is Python/SQL only (no R). Limited serverless GPU is
+# MAGIC available from the notebook compute selector, subject to capacity and fair-use limits
+# MAGIC ([Databricks, June 2026](https://www.databricks.com/blog/whats-coming-next-free-edition));
+# MAGIC GPU *serving* endpoints are not. CPU is enough for this notebook. The R side of
 # MAGIC this repo runs locally or in Posit against the same `labeled_notes.csv` + `split.csv`.
 # MAGIC Get the repo in via *Workspace → Create → Git folder* with the public GitHub URL.
 
