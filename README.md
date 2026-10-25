@@ -31,7 +31,7 @@ patient-level test split.
 | `synthea/` | Synthea run script, config, and the custom dental modules (perio exam, caries, restorations). |
 | `omop/` | OMOP CDM 5.4 DDL subset plus the dental extension (`SITE`, `SITE_EVENT`) adopted from the OHDSI Dentistry Workgroup. |
 | `python/` | Python pipeline: Synthea CSV (or stand-in) → OMOP → labels → synthetic SOAP notes → rungs → score. |
-| `r/` | R pipeline: the same steps via OHDSI `ETL-Synthea`, `tidymodels` and `text`. |
+| `r/` | R pipeline: the same steps via OHDSI `ETL-Synthea`, `tidymodels` and `text`. Local run steps and GPU guidance in `r/README.md`. |
 | `eval/` | The shared scorer and the split definition. Both languages call this. |
 | `databricks/` | Notebooks that run the Python path on Databricks Free Edition. |
 | `docs/` | ADRs, the plan, and the working notes. |
