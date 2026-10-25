@@ -35,3 +35,5 @@ Standard vocabularies (SNOMED, LOINC, CDT) come from Athena
 (https://athena.ohdsi.org) and are not checked in; see each pipeline's
 README for where to drop the download. `DENTAL_LOCAL` concepts live here
 and are loaded after Athena.
+
+How dental data differs from medical data in OMOP: [../docs/omop_dental_vs_medical.md](../docs/omop_dental_vs_medical.md).

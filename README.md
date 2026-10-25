@@ -42,6 +42,40 @@ eighth source ([docs/radiograph.md](docs/radiograph.md)). Details:
   science in R. Both read the same files and produce the same numbers
   (parity-tested to 1e-16).
 
+## OMOP in dental vs medical data
+
+OMOP was built around medical claims and EHRs. Dental data tracks different
+things and puts the facts that matter most for periodontal research where core
+OMOP has no native place for them.
+
+**What's usually tracked** (varies by payer, state and system):
+
+- **Medical claims:** ICD-10-CM diagnoses (required), CPT/HCPCS procedures,
+  pharmacy claims (NDC). Little clinical detail.
+- **Medical EHR:** problem list, labs (LOINC), vitals, medications (RxNorm),
+  large volumes of clinical notes, radiology reports.
+- **Dental claims:** CDT procedure codes with **tooth number, surface and
+  quadrant**. Diagnosis code fields exist but are **often not required or
+  filled**. No measurements.
+- **Dental EHR:** CDT procedures **completed and planned** (treatment plan),
+  **perio chart** (probing depth, CAL, recession, bleeding, mobility,
+  furcation at 6 sites per tooth), radiograph images (rarely structured),
+  templated notes, health history form. Diagnoses are often **missing, free
+  text, or inconsistent with the charting**.
+
+**What that means in OMOP:**
+
+| | Medical | Dental |
+|---|---|---|
+| Diagnosis | `CONDITION_OCCURRENCE` from coded ICD-10 | Often has to be **inferred** from charting and notes (this project) |
+| Procedure | CPT/HCPCS, standard concepts | CDT/HCPCS D-codes can be non-standard in Athena; kept in source fields |
+| Tooth / surface / site | Not needed | No native table; `SITE` / `SITE_EVENT` extension proposed by the OHDSI Dentistry Workgroup |
+| Clinical measurements | `MEASUREMENT` with LOINC | Few standard concepts for per-site perio values; local concepts here |
+| Linkage | Within payer or health system | Dental and medical records (diabetes, smoking: inputs to **grade**) often live apart |
+
+Full comparison, how this repo maps each one, and sources:
+[docs/omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md).
+
 ## Datasets (in `data/datasets/`, regenerate with `scripts/10_build_study.py`)
 
 | File | What it is |

@@ -67,6 +67,9 @@ Everything this repo relies on, and what it's used for.
 24. **BioPharmaTrend.** *Google updates open medical AI suite with new imaging and speech models* (MedGemma 1.5, MedASR), January 2026.
     [biopharmatrend.com](https://www.biopharmatrend.com/news/google-updates-open-medical-ai-suite-with-new-imaging-and-speech-models-launches-100k-developer-hackathon-1464/)
 
+25. **Koski R, et al.** *Identifying Oral Health Concepts in OMOP-CDM Datasets.* OHDSI Symposium 2025.
+    [PDF](https://www.ohdsi.org/wp-content/uploads/2025/10/111-koski-robert_Identifying_Oral_Health_Concepts-Robert-Koski.pdf)
+
 ## Synthetic data
 
 11. **Tamizh Selvam T.** *Synthetic Dental Clinical Notes Dataset for Dental NLP
