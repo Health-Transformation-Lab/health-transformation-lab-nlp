@@ -6,5 +6,7 @@
 - [x] T004 [US3] tests then `deid_eval.damage_by_type`
 - [x] T005 `scripts/30_maccrobat_deid.py` (`--download` fetches the pinned file into data/raw/); run the local engines; docs/deidentification.md and docs/data_sources.md
 - [x] T006a Presidio (+guard, +regex_v2+guard)
-- [ ] T006 Run the transformer engines (hf_stanford, hf_obi) on CPU
+- [x] T006 Run the transformer engines (hf_stanford, hf_obi, with regex_v2+guard and with Presidio) on CPU
 - [x] T007 `maccrobat.load_brat`: the original figshare release (exact text and offsets, overlapping entities); default source of the script
+- [ ] T008 Add a month-year date shape to regex_v2, checked on a set it wasn't tuned on
+- [ ] T009 Medical terms in the guard (eponyms, vertebrae and ECG leads, mg/m2, "daily") if Presidio stays in an ensemble

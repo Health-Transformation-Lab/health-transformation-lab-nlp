@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-26
 
-**Status**: v1 implemented; local engines run on the 200 MACCROBAT documents
+**Status**: implemented; regex, Presidio and transformer engines run on the 200 MACCROBAT documents (CPU)
 
 **Input**: "We need to get another test pass using this data": MACCROBAT
 ([figshare](https://doi.org/10.6084/m9.figshare.9764942.v2), CC BY 4.0), whose annotations are

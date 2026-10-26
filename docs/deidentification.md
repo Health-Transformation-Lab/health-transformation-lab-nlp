@@ -263,6 +263,11 @@ scores in `data/deid/maccrobat_scores.csv`, `maccrobat_by_type.csv`). Run 2026-1
 | regex_v2 / regex_v2+guard | 0.27 | 0.004 |
 | presidio / presidio+guard | 0.97 | 0.034 |
 | presidio+regex_v2+guard | 0.99 | 0.036 |
+| hf_stanford / hf_stanford+guard | 0.98 | 0.002 |
+| hf_stanford+regex_v2+guard | 0.98 | 0.005 |
+| hf_obi | 0.97 | 0.005 |
+| hf_obi+regex_v2+guard | 0.98 | 0.008 |
+| hf_stanford+presidio+regex_v2+guard | 1.00 | 0.037 |
 
 **What it shows.**
 - **Month-year dates leak through the regex engines.** They catch full dates ("July 29, 2015",
@@ -275,6 +280,10 @@ scores in `data/deid/maccrobat_scores.csv`, `maccrobat_by_type.csv`). Run 2026-1
   vertebrae T1/T2, ECG leads V1–V4), eponyms read as names (Gaucher, Crohn, Bowen, Ehlers), "OCT" and
   visual acuity "6/18" as dates, "p.o." as a location. The dental guard doesn't cover these medical
   terms. It also removes every age and most relative dates, which aren't PHI but carry the timeline.
+- **hf_stanford is the best trade here**: 98% of the dates (2 of 105 leak) with the least clinical
+  damage of any engine (0.17%, below the regex engines). It also keeps what isn't PHI: no ages and
+  5% of relative dates removed, against 97% and 89% for Presidio. hf_obi finds as many dates but
+  removes 98% of ages. Adding Presidio reaches 100% recall at 20 times the clinical damage.
 - **Regex damage is low** (0.4%): Title Case terms read as names ("Glasgow Coma Scale") and slash
   triplets read as dates (pressures such as "72/34/47 mmHg").
 
