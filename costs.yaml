@@ -39,15 +39,21 @@ judge:                         # the LLM judge itself (used on samples, not the 
   sample_per_method: 400       # judged notes per method on the corpus sample
 
 # De-identification engines (spec 007; scripts/26_deid_benchmark.py).
-# !!! ILLUSTRATIVE SERVICE PRICES !!! The vendors' pricing pages list prices per region and
-# currency; fill usd_per_unit from them before using any number:
-#   Azure Health Data Services de-identification: per MB, 50 MB/month free
-#     https://azure.microsoft.com/pricing/details/health-data-services/
-#   Azure AI Language PII: per 1,000 text records (one record = 1,000 characters)
-#     https://azure.microsoft.com/pricing/details/cognitive-services/text-analytics/
-#   Amazon Comprehend Medical DetectPHI: per unit of 100 characters, 1-unit minimum per request;
-#     85,000 units free in the first month only (not counted here)
-#     https://aws.amazon.com/comprehend/medical/pricing/
+# Service prices, us-east, list price, checked 2026-10-26. Each line says where its number came from;
+# "unverified" = the vendor's own page couldn't be read from the authoring workspace.
+#   Amazon Comprehend Medical DetectPHI: AWS price list API (pricing.us-east-1.amazonaws.com,
+#     comprehendmedical, us-east-1). Per 100-character unit, 1-unit minimum per request, volume tiers.
+#     85,000 units free in the first month only (not counted).
+#   Azure Health Data Services de-identification: per MB after 50 MB/month free; $0.05/MB from a
+#     third-party summary (unverified; https://azure.microsoft.com/pricing/details/health-data-services/).
+#   Azure AI Language PII (Standard): per 1,000-character text record, volume tiers from a third-party
+#     reading of the Azure retail prices API, East US (unverified;
+#     https://azure.microsoft.com/pricing/details/language/).
+#   Databricks ai_mask / llm: Foundation Model APIs pay-per-token, Llama 3.3 70B = 7.143 DBU per 1M input
+#     and 21.429 DBU per 1M output tokens (Databricks docs) x $0.07/DBU (AWS us-east; third-party,
+#     unverified) = $0.50 / $1.50. Pay-per-token is rate-limited; large volumes need provisioned
+#     throughput (per hour), so this is a floor.
+# Volume tiers assume the whole corpus is processed in one billing month.
 deid:
   review:                        # human QA of a sample of de-identified notes, every engine
     qa_sample_share: 0.001       # 1 in 1,000 notes
@@ -57,14 +63,17 @@ deid:
     regex:          {kind: local, hardware: cpu, throughput_source: measured}
     regex_v2:       {kind: local, hardware: cpu, throughput_source: measured}
     presidio:       {kind: local, hardware: cpu, throughput_source: measured}
-    azure_deid:     {kind: service, unit: mb, usd_per_unit: 0.50, free_units: 50}                 # ILLUSTRATIVE price
-    azure_language: {kind: service, unit: record_1k_chars, usd_per_unit: 0.001, free_units: 0}   # ILLUSTRATIVE price
-    aws_comprehend: {kind: service, unit: record_100_chars, usd_per_unit: 0.0014, free_units: 0}  # ILLUSTRATIVE: third-party listing, not yet checked on the AWS page
+    azure_deid:     {kind: service, unit: mb, usd_per_unit: 0.05, free_units: 50}                 # unverified
+    azure_language: {kind: service, unit: record_1k_chars, usd_per_unit: 0.001, free_units: 0,     # unverified
+                     tiers: [[500000, 0.001], [2500000, 0.00075], [10000000, 0.0003], [null, 0.00025]]}
+    aws_comprehend: {kind: service, unit: record_100_chars, usd_per_unit: 0.0014, free_units: 0,   # AWS price list
+                     tiers: [[1000000, 0.0014], [2000000, 0.0005], [null, 0.00025]]}
     hf_stanford:    {kind: local, hardware: cpu, throughput_source: measured}   # measured on a 4-CPU container; a GPU is faster
     hf_obi:         {kind: local, hardware: cpu, throughput_source: measured}
-    llm:            {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
-                     prompt_overhead_tokens: 250, output_tokens: 80}            # ILLUSTRATIVE (a small hosted model)
-    ai_mask:        {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
-                     prompt_overhead_tokens: 150, output_tokens: 100}           # ILLUSTRATIVE: Databricks bills ai_mask as
-                                                                                # Foundation Model API tokens; it returns the whole note
+    llm:            {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,      # Llama 3.3 70B, as above
+                     prompt_overhead_tokens: 220, output_tokens: 80}            # LLM_DEID_SYSTEM is ~205 tokens; output ASSUMED
+    ai_mask:        {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,      # Llama 3.3 70B, as above
+                     prompt_overhead_tokens: 150, output_tokens: 10, output_echoes_note: 1}
+                     # ai_mask returns the whole note (output = note + masks); its own prompt isn't
+                     # published, so the 150-token overhead is ASSUMED
   # "+guard" adds no cost; an ensemble costs the sum of its engines.

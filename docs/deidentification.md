@@ -198,9 +198,8 @@ twice and count twice (2,975 scored spans).
 
 - **Engine cost.** Local engines: node-hours at the throughput **measured** here (regex about
   12,600 notes/s, regex v2 about 3,300, Presidio about 60, hf_stanford about 11 and hf_obi about 3
-  on CPU) × the CPU node price. Services: price per MB (Azure de-identification, 50 MB/month free) or
-  per 1,000-character record (Azure AI Language). Service prices in `costs.yaml` are
-  **ILLUSTRATIVE** until filled from the pricing pages.
+  on CPU) × the CPU node price (ILLUSTRATIVE $1/hour). Services: the vendor's own billing unit,
+  with volume tiers; table below.
 - **Review cost.** Human QA of 1 in 1,000 de-identified notes, the same for every engine.
 - **Outcome.** Leaked identifiers per 1M notes, then decoy damage as a tie-break.
 - **Frontier.** An engine is dominated if one that costs no more leaks no more. ICER = extra USD
@@ -209,9 +208,37 @@ twice and count twice (2,975 scored spans).
 With these inputs every local engine costs under $90 per 1M notes, even the transformers on CPU;
 the $3,000 review sample is most of the cost. So the choice comes down to leaks. On both tiers the
 frontier ends at hf_stanford+regex_v2+guard: about $21 more per 1M notes than
-presidio+regex_v2+guard buys about 375,000 fewer leaked identifiers (all tier). A cloud service at an
-illustrative $0.50/MB would add roughly $140 per 1M notes of about 320 characters. Its value would be
-any recall it adds on the unseen tier; that's the comparison to run once an Azure resource exists.
+presidio+regex_v2+guard buys about 375,000 fewer leaked identifiers (all tier).
+
+### What the paid services would cost
+
+Engine cost to de-identify **1 million notes** in one billing month, list prices, US East, checked
+2026-10-26. Not run here yet, so this compares **price only**, not quality.
+
+| Engine | Billed per | Price | 1M notes of 410 chars (study notes) | 1M queries of 151 chars (ASQ-PHI) | Price source |
+|---|---|---|---|---|---|
+| hf_stanford (local, CPU) | node-hour | ~11 notes/s measured | ~$25 | ~$25 | measured; node price ILLUSTRATIVE |
+| Azure Health Data Services de-id | MB, 50 MB/month free | $0.05/MB | ~$18 | ~$5 | third-party summary (unverified) |
+| Databricks `ai_mask` | token | $0.50 in / $1.50 out per 1M tokens | ~$295 | ~$166 | DBU rates: Databricks docs; $/DBU: third-party (unverified) |
+| Our LLM prompt (`llm`) on the same endpoint | token | same | ~$281 | ~$249 | same |
+| Azure AI Language PII | 1,000-char record | $1.00 per 1,000 to 500K, then $0.75 | ~$875 | ~$875 | third-party reading of Azure's price API (unverified) |
+| **Amazon Comprehend Medical** | 100 chars, 1-unit minimum | $0.0014 to 1M units, $0.0005 to 2M, then $0.00025 | **~$2,650** | ~$1,900 | **AWS price list API (verified)** |
+
+For scale, the human review sample costs about $3,000 per 1M notes with any engine.
+
+What drives the differences:
+
+- **Unit size.** Comprehend bills every 100 characters (a 410-character note is 5 units), Azure
+  Language every 1,000 (1 record), Azure de-id per megabyte. Short ASQ-PHI queries still pay
+  Comprehend's and Azure Language's one-unit minimum.
+- **`ai_mask` pays to get the note back.** It returns the whole masked note, so output tokens
+  (the expensive kind) grow with note length; our `llm` engine returns only the identifiers. Its
+  own prompt isn't published, so its 150-token overhead is assumed.
+- **Pay-per-token is a floor.** Databricks rate-limits pay-per-token endpoints and points large
+  workloads to provisioned throughput, billed per hour.
+
+Rates live in `costs.yaml` with the source for each. The unverified ones should be confirmed in the
+vendors' calculators before any number leaves this repo.
 
 Python and R compute the same frontier from `cost_inputs.csv` (parity test).
 

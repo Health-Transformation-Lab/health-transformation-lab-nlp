@@ -108,10 +108,22 @@ def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> flo
             units = n_notes * np.ceil(avg_chars / 100)
         else:
             raise ValueError(f"unknown unit {cfg['unit']}")
-        return max(units - cfg.get("free_units", 0), 0) * cfg["usd_per_unit"]
+        units = max(units - cfg.get("free_units", 0), 0)
+        tiers = cfg.get("tiers")
+        if isinstance(tiers, str):
+            tiers = parse_tiers(tiers)
+        if not tiers:
+            return units * cfg["usd_per_unit"]
+        cost, lo = 0.0, 0.0                                       # volume tiers: [[upper units, USD], ...]
+        for hi, usd in tiers:
+            hi = float("inf") if hi is None else hi
+            cost += max(min(units, hi) - lo, 0) * usd
+            lo = hi
+        return cost
     if cfg["kind"] == "llm":                                      # ~4 characters per token
         tin = cfg["prompt_overhead_tokens"] + avg_chars / 4
-        return n_notes * (tin * cfg["usd_per_1m_input_tokens"] + cfg["output_tokens"] * cfg["usd_per_1m_output_tokens"]) / 1e6
+        tout = cfg["output_tokens"] + (avg_chars / 4 if cfg.get("output_echoes_note") else 0)  # e.g. ai_mask
+        return n_notes * (tin * cfg["usd_per_1m_input_tokens"] + tout * cfg["usd_per_1m_output_tokens"]) / 1e6
     raise ValueError(f"unknown kind {cfg['kind']}")
 
 
@@ -147,7 +159,19 @@ def deid_frontier(t: pd.DataFrame) -> pd.DataFrame:
     return t
 
 
-_LLM_KEYS = ("usd_per_1m_input_tokens", "usd_per_1m_output_tokens", "prompt_overhead_tokens", "output_tokens")
+_LLM_KEYS = ("usd_per_1m_input_tokens", "usd_per_1m_output_tokens", "prompt_overhead_tokens", "output_tokens",
+             "output_echoes_note")
+
+
+def format_tiers(tiers) -> str:
+    """[[1e6, 0.0014], [None, 0.00025]] -> '1000000:0.0014;inf:0.00025' (cost_inputs.csv; R parses it)."""
+    return ";".join(f"{'inf' if hi is None else int(hi)}:{usd!r}" for hi, usd in tiers or [])
+
+
+def parse_tiers(s) -> list:
+    if not isinstance(s, str) or not s:
+        return []
+    return [[None if hi == "inf" else int(hi), float(usd)] for hi, usd in (t.split(":") for t in s.split(";"))]
 
 
 def cost_table(ci: pd.DataFrame) -> pd.DataFrame:
@@ -161,6 +185,7 @@ def cost_table(ci: pd.DataFrame) -> pd.DataFrame:
         compute = {"cpu_node_usd_per_hour": r0.cpu_node_usd_per_hour, "gpu_node_usd_per_hour": r0.gpu_node_usd_per_hour}
         eng = sum(engine_cost({"kind": r.kind, "hardware": r.hardware or "cpu", "notes_per_sec": r.notes_per_sec,
                                "unit": r.unit, "usd_per_unit": r.usd_per_unit, "free_units": r.free_units,
+                               "tiers": getattr(r, "tiers", ""),
                                **{k: getattr(r, k, 0.0) for k in _LLM_KEYS}},
                               int(r.n_notes), float(r.avg_chars), compute) for r in g.itertuples())
         rev = review_cost(int(r0.n_notes), {"qa_sample_share": r0.qa_sample_share,

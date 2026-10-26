@@ -131,6 +131,7 @@ for (tier, spec), g in scores[scores.tier.isin(a.tiers.split(","))].groupby(["ti
         rows.append({"tier": tier, "method": spec, "engine": member, "kind": e["kind"], "hardware": e.get("hardware", ""),
                      "notes_per_sec": e.get("notes_per_sec", float("nan")), "unit": e.get("unit", ""),
                      "usd_per_unit": e.get("usd_per_unit", float("nan")), "free_units": e.get("free_units", 0),
+                     "tiers": deid_eval.format_tiers(e.get("tiers")),
                      **{k: e.get(k, 0.0) for k in deid_eval._LLM_KEYS},
                      "n_notes": n_corpus, "avg_chars": s.avg_chars,
                      "leaked_per_1m_notes": s.leaked_per_1k_notes * 1000, "decoy_damage": s.decoy_damage,

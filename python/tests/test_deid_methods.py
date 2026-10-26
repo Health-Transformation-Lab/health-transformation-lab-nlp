@@ -373,3 +373,22 @@ def test_routed_engine_unions_only_the_routed_types():
     detect = deid.routed_engine({"a": {"NAME"}, "b": {"DATE"}}, {"a": _engine_a, "b": _engine_b}, guard=False)
     t = _route_records()[0]["text"]
     assert [t[s["start"]:s["end"]] for s in detect(t)] == ["Ana Ruiz", "3/4/2024"]
+
+
+def test_service_price_tiers_apply_by_volume_after_the_free_allowance():
+    # Comprehend Medical DetectPHI (AWS price list, us-east-1): 0.0014 to 1M units, 0.0005 to 2M, then 0.00025
+    cfg = {"kind": "service", "unit": "record_100_chars", "free_units": 0,
+           "tiers": [[1_000_000, 0.0014], [2_000_000, 0.0005], [None, 0.00025]]}
+    # 1M notes of 410 chars = 5 units each = 5M units
+    assert deid_eval.engine_cost(cfg, 1_000_000, 410, {}) == pytest.approx(1400 + 500 + 3_000_000 * 0.00025)
+    # the tier string written to cost_inputs.csv round-trips
+    assert deid_eval.parse_tiers(deid_eval.format_tiers(cfg["tiers"])) == cfg["tiers"]
+    free = dict(cfg, free_units=500_000)
+    assert deid_eval.engine_cost(free, 100_000, 410, {}) == pytest.approx(0.0)
+
+
+def test_llm_that_returns_the_whole_note_pays_output_tokens_for_it():
+    cfg = {"kind": "llm", "usd_per_1m_input_tokens": 1.0, "usd_per_1m_output_tokens": 4.0,
+           "prompt_overhead_tokens": 100, "output_tokens": 10, "output_echoes_note": 1}
+    # 1,000 notes x 400 chars: input 100 + 100 tokens; output 10 + 100 tokens (the masked note)
+    assert deid_eval.engine_cost(cfg, 1000, 400, {}) == pytest.approx(1000 * (200 * 1.0 + 110 * 4.0) / 1e6)
