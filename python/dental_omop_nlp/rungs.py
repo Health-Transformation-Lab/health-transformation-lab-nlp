@@ -119,6 +119,15 @@ def tfidf_logreg():
 
 
 # ---------------------------------------------------------------- transformers
+def _last_checkpoint(out_dir) -> str | None:
+    """Highest-step checkpoint-N folder in out_dir, or None."""
+    from pathlib import Path
+    d = Path(out_dir)
+    steps = [int(c.name.split("-")[1]) for c in d.glob("checkpoint-*") if c.name.split("-")[1].isdigit()] \
+        if d.is_dir() else []
+    return str(d / f"checkpoint-{max(steps)}") if steps else None
+
+
 class HFEncoder:
     """Fine-tune a Hugging Face encoder. CPU works for the small models on a few
     hundred notes; set epochs/max_len down on Databricks Free Edition."""
@@ -148,10 +157,11 @@ class HFEncoder:
             label2id={l: i for i, l in enumerate(LABELS)}, ignore_mismatched_sizes=True)
         args = TrainingArguments(output_dir=f"{self.out_dir}/{self.hf_id.replace('/', '__')}",
                                  num_train_epochs=self.epochs, per_device_train_batch_size=self.batch_size,
-                                 learning_rate=self.lr, logging_steps=20, save_strategy="no",
+                                 learning_rate=self.lr, logging_steps=20, save_strategy="steps",
+                                 save_steps=50, save_total_limit=1,
                                  report_to=[], seed=42)
         self.trainer = Trainer(model=self.model, args=args, train_dataset=self._ds(train))
-        self.trainer.train()
+        self.trainer.train(resume_from_checkpoint=_last_checkpoint(args.output_dir))   # resume after a restart
         return self
 
     def predict(self, test):
