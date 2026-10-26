@@ -88,6 +88,15 @@ def test_mlflow_experiment_and_uc_model_per_target():
     assert rm["catalog_name"] == "${var.catalog}" and rm["schema_name"] == "${var.schema}"
 
 
+def test_study_benchmark_passes_experiment_id_not_name():
+    """MLflow stores /Workspace/Users/... as /Users/..., so passing the name makes Terraform
+    see a changed value mid-apply ("Provider produced inconsistent final plan")."""
+    _, jobs = _load()
+    params = jobs["study_benchmark"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert params.get("experiment_id") == "${resources.experiments.dental_experiment.id}"
+    assert "experiment" not in params
+
+
 def test_judge_monitoring_job_only_in_uat_and_prod():
     """Production monitoring scores live traces, so it exists where there is live traffic."""
     root, jobs = _load()
