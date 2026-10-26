@@ -4,7 +4,7 @@
 > research plan. The timeline below is a practice exercise in planning a study
 > like this, not a commitment or deliverable. See [DISCLAIMER](../DISCLAIMER.md).
 
-Goal: phenotype periodontal status from a dental EHR, compare the sources (notes, exam forms, procedure codes and diagnoses, probing chart),
+Goal: phenotype periodontal status from a dental EHR, compare the evidence types (notes, exam forms, procedure codes and diagnoses, probing chart),
 derive a rule-based algorithm, and test whether a BERT-family model reading
 the notes performs like clinicians reviewing the full chart. Built in public on
 synthetic data until approved for internal use. Databricks is the eventual home.
@@ -13,13 +13,13 @@ synthetic data until approved for internal use. Databricks is the eventual home.
 
 ## Built
 
-- [x] Seven sources per visit, generated with realistic disagreement:
+- [x] Seven evidence types per visit, generated with realistic disagreement:
       notes (four diagnosis schemes, numbers or descriptors, copy-forward),
       exam forms (PSR), CDT codes completed/planned, ICD-10 diagnoses
       completed/planned, probing chart (present at ~80% of visits)
 - [x] Fake PHI in every note at known positions; de-identification with a
       dental allowlist; leak gate; recall measured to the character
-- [x] Readers for every source; pairwise method agreement and coverage
+- [x] Readers for every evidence type; pairwise method agreement and coverage
 - [x] Placeholder rule-based algorithm (`RULES_V0`)
 - [x] Datasets: train (~2,400 notes), review (~240 charts as Label Studio
       tasks), answer key
@@ -38,7 +38,7 @@ synthetic data until approved for internal use. Databricks is the eventual home.
 
 ## What the dry run shows (synthetic, simulated reviewers; not results)
 
-- Sources disagree as designed. Against the probing chart: notes κ 0.75,
+- Evidence types disagree as designed. Against the probing chart: notes κ 0.75,
   exam form 0.68, procedure codes ~0.60, diagnosis codes 0.55–0.79.
 - With four simulated reviewers, Fleiss' κ 0.69 and consensus on 95% of charts.
 - The rule-based placeholder tracks the probing chart because it trusts it

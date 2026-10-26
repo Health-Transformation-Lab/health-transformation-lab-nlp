@@ -1,4 +1,4 @@
-"""Rules that read status from a chart note's text (source 1).
+"""Rules that read status from a chart note's text (evidence type 1).
 
 Reads the clinician's stated diagnosis first, in any of the schemes clinicians
 use (2017 stage/grade, abbreviations, pre-2017 severity, AAP case types).

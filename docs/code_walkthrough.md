@@ -18,9 +18,9 @@ Pictures of the same: [medallion architecture](../diagrams/d0_medallion_architec
 
 | # | Step | Command | README section |
 |---|---|---|---|
-| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Sources](../README.md#dental-omop-nlp) |
+| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Evidence types](../README.md#dental-omop-nlp) |
 | 2 | [De-identify and gate](#2-de-identify-and-gate) | (inside step 1) | [Ground rules](../README.md#ground-rules) |
-| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Diagnostic evidence](../README.md#dental-omop-nlp) |
+| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Evidence types](../README.md#dental-omop-nlp) |
 | 4 | [Compare the evidence](#4-compare-the-evidence) | (inside step 1) | [Study process](process.md) |
 | 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#dental-omop-nlp) |
 | 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml) |

@@ -36,7 +36,7 @@ charts with other reviewers until the reliability round is closed.
    masticatory dysfunction, bite collapse, drifting/flaring, severe ridge
    defect) → IV.
 
-**When sources disagree:**
+**When evidence types disagree:**
 
 1. Measured findings (probing chart, radiographic bone loss) outrank a written
    diagnosis. If the note says "Stage II" and the chart shows CAL 6 mm with 40%
@@ -64,8 +64,8 @@ charts with other reviewers until the reliability round is closed.
 
 ## Also record
 
-- **Which sources decided it**: tick every source you relied on.
-- **Conflict**: yes if any two sources point to different statuses.
+- **Which evidence decided it**: tick every evidence type you relied on.
+- **Conflict**: yes if any two evidence types point to different statuses.
 - **Confidence**: 1–5.
 - **Evidence spans** (optional, helps train the NER model): highlight the
   diagnosis statement and the findings you used, using the labels on the left.

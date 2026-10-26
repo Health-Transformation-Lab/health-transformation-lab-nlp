@@ -1,6 +1,6 @@
 """Train an AI rung on the training set and predict the chart-review notes.
 
-The AI model reads ONLY the de-identified note. Reviewers see every source.
+The AI model reads ONLY the de-identified note. Reviewers see every evidence type.
 
     python scripts/11_ai_predict.py --rung tfidf_logreg
     python scripts/11_ai_predict.py --rung distilbert-base --epochs 2 --max-len 256
