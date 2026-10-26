@@ -80,6 +80,23 @@ def score_records(records: list[dict], detect) -> dict:
     return {"summary": summary, "by_category": by_cat, "per_note": per}
 
 
+def damage_by_type(records: list[dict], detect) -> pd.DataFrame:
+    """Per entity type (records carrying `entities`, e.g. maccrobat.load_bio): share of entities with
+    any character removed, and share of their characters removed."""
+    rows = []
+    for r in records:
+        red = _chars(detect(r["text"]))
+        for e in r["entities"]:
+            span = set(range(e["start"], e["end"]))
+            rows.append({"type": e["type"], "role": e["role"], "hit": bool(span & red),
+                         "chars": len(span), "removed": len(span & red)})
+    d = pd.DataFrame(rows)
+    t = (d.groupby(["role", "type"]).agg(n=("hit", "size"), n_touched=("hit", "sum"), chars=("chars", "sum"),
+                                          removed=("removed", "sum")).reset_index())
+    return (t.assign(touched=t.n_touched / t.n, chars_removed=t.removed / t.chars)
+            .drop(columns=["chars", "removed"]).sort_values(["role", "n"], ascending=[True, False]))
+
+
 def choose_routes(records: list[dict], engines: dict, min_precision: float = 0.8,
                   guard: bool = True) -> tuple[dict, pd.DataFrame]:
     """Route each identifier type to the engines that report it precisely. For every (engine, type

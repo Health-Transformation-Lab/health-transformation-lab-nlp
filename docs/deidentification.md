@@ -237,6 +237,48 @@ synthetic-only rule, and the i2b2 notes are normally under a data use agreement.
 `26_deid_benchmark.py --jsl48 data/raw/<file>`. It isn't priced: throughput was measured on short
 dental notes.
 
+## Results on MACCROBAT (200 real case reports, external; spec 008)
+
+[MACCROBAT](https://doi.org/10.6084/m9.figshare.9764942.v2) (Caufield 2019, CC BY 4.0) is 200 clinical
+case reports from PubMed Central, edited to the case details and annotated by hand. It is read here
+from its BIO labels (B = beginning, I = inside, O = outside an entity; Hugging Face mirror
+`ktgiahieu/maccrobat2018_2020`, pinned). It is the first **real** clinical prose these engines have
+seen, written by people other than the note generator. It was not built for PHI and has no names or
+contact details, so it checks two things:
+
+- **PHI recall** on a subset derived by rule from its `Date` and `Age` labels (HIPAA Safe Harbor):
+  83 dates with a month or day ("June 2013", "July 29, 2015"). No age is 90 or over.
+- **Clinical damage**: share of 11,414 clinical entities (symptoms, diseases, procedures, drugs,
+  doses, lab values, anatomy ...) with any character removed. This is over-redaction on real text.
+
+`python python/scripts/30_maccrobat_deid.py --download` (text goes to `data/raw/`, never committed;
+scores in `data/deid/maccrobat_scores.csv`, `maccrobat_by_type.csv`). Run 2026-10-26, local engines only:
+
+| Engine | PHI date recall | Clinical damage |
+|---|---|---|
+| regex | 0.20 | 0.004 |
+| regex+guard | 0.20 | 0.004 |
+| regex_v2 | 0.23 | 0.004 |
+| regex_v2+guard | 0.23 | 0.004 |
+
+Not run here: Presidio and the transformer engines (packages not installed; the PyTorch CPU index
+is blocked in this environment).
+
+**What it shows.**
+- **Month-year dates leak.** Both regex engines catch full dates ("July 29, 2015", "14/9/2005") but
+  none of the month-year dates ("January 2014", "in November 2014"), the most common form in these
+  reports. The synthetic notes always write full dates, so the challenge set couldn't show this.
+  The fix (a month-year shape in `regex_v2`) should be written and then checked on a set it wasn't
+  tuned on, not on this one.
+- **Clinical damage is low** (0.4%). What is removed is mostly Title Case terms read as names
+  ("Glasgow Coma Scale", "Computed Tomography") and slash triplets read as dates (pressures such as
+  "72/34/47 mmHg"). Of the non-PHI types, place names ("Emergency Department", 12% touched) and
+  ethnicity (10%) are removed most.
+
+**Limits.** The PHI subset is a rule over MACCROBAT's labels, not PHI annotation, and is small (83
+dates). Case reports are journal prose, already de-identified by the publisher, not chart notes.
+Spacing is rebuilt from the BIO tokens, so it is approximate. Scoring is Python only, as for spec 007.
+
 ## Combining engines: bigger unions and routing
 
 The `+` ensembles above are plain unions: anything any engine flags is removed. Two other ways to

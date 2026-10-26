@@ -1,0 +1,5 @@
+method,n_notes,n_phi,entity_recall,char_recall,char_precision,decoy_damage,leaked_per_1k_notes,avg_chars
+regex,200.0,83.0,0.2048,0.3706,0.0944,0.0037,330.0,2837.725
+regex+guard,200.0,83.0,0.2048,0.3706,0.0944,0.0037,330.0,2837.725
+regex_v2,200.0,83.0,0.2289,0.3982,0.0898,0.0038,320.0,2837.725
+regex_v2+guard,200.0,83.0,0.2289,0.3982,0.0898,0.0038,320.0,2837.725
