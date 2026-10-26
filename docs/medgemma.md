@@ -47,8 +47,24 @@ adapter. `models.yaml` marks these entries `gated: true` with the licence link.
 
 ## Implemented (spec 004)
 
-Uses 1 (reader), 2 (LoRA fine-tune) and 3 (judge family rule) are in the code;
-none has been run on real MedGemma weights yet (needs a GPU and accepted HAI-DEF terms).
+Uses 1 (reader), 2 (LoRA fine-tune) and 3 (judge family rule) are in the code.
+The zero-shot reader has been run once on real `medgemma-1.5-4b-it` weights (CPU,
+reader-v2, 240 review charts); the LoRA fine-tune has not (needs a GPU).
+
+**First real run (synthetic notes, generator truth; not clinical performance).**
+Accuracy 0.758 (95% CI 0.700-0.808) against note_rules' 0.788, paired difference
+-0.029 (-0.058 to 0.000); with the note rules deciding stage IV, 0.771. By difficulty:
+L1 100% (141), L2 97% (31), L3 16% (68). Gate pass 97.9%, fallback 2.1%, ~850 tokens
+in and ~75 out per note, ~27 s per note on 4 CPU cores. So it reads a written
+diagnosis well and does not yet stage from the chart findings when none is
+written; L3 is where few-shot, prompt variants or the LoRA fine-tune would have to
+help. Against the best encoder alone (`modernbert-base+cw`, 0.838) the difference is
+-0.079 (-0.154 to -0.013); on L3 the encoder gets 81%. Full tables:
+`data/datasets/ladder/ladder_vs_truth.csv` and `medgemma_vs_bert*.csv`.
+
+MedGemma 1.5 opens with a `<unused94>thought ... <unused95>` block; the hf backend
+suppresses it (it otherwise used up the 300 new tokens before the JSON) and
+`parse_answer` strips one if present.
 
 | Piece | Where |
 |---|---|
