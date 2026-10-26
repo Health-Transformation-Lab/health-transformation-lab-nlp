@@ -9,6 +9,7 @@ name: deploy
 on:
   push:
     branches: [main]
+    paths-ignore: ["docs/**", "**/*.md", "diagrams/**"]   # doc-only changes don't redeploy
   workflow_dispatch:
     inputs:
       target:

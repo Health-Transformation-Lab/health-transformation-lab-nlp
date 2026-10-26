@@ -1,10 +1,13 @@
 # Tests on every push and pull request: Python tests (incl. bundle structure),
 # R parity, and the bundle against its schema.
 name: ci
+# Changes that touch only docs (docs/, any .md, diagrams) skip CI: nothing they change is tested.
 on:
   push:
     branches: [main]
+    paths-ignore: ["docs/**", "**/*.md", "diagrams/**"]
   pull_request:
+    paths-ignore: ["docs/**", "**/*.md", "diagrams/**"]
 
 jobs:
   python:
