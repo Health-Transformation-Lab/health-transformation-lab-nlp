@@ -491,13 +491,9 @@ def routed_engine(routes: dict, engines: dict | None = None, guard: bool = True)
 
 
 def redact(text: str, spans: list[dict]) -> str:
-    out, last = [], 0
-    for s in sorted(spans, key=lambda s: s["start"]):
-        out.append(text[last:s["start"]])
-        out.append(f"[{s['type']}]")
-        last = s["end"]
-    out.append(text[last:])
-    return "".join(out)
+    """Replace each span with [TYPE]; a span nested in an earlier one adds nothing."""
+    from .deid_review import redact_map
+    return redact_map(text, spans)[0]
 
 
 def deidentify(text: str, engine: str = "regex") -> tuple[str, list[dict]]:

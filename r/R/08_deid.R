@@ -86,3 +86,131 @@ deid_cost_table <- function(ci) {
   }
   do.call(rbind, lapply(split(ci, factor(ci$tier, levels = unique(ci$tier))), one_tier))
 }
+
+# ---- Review flows (spec 008): R twin of deid_review.agreement and deid_review.wilson / qa_summary.
+# Reads data/deid/review/[simulated_]gold_spans.csv and qa_labels.csv from 31_deid_review_import.py.
+
+# Pairwise entity F1 on the notes both annotators did: exact (start, end), then also same category.
+# Rows with start = -1 are annotations with no spans (they count the note, not a span).
+deid_agreement <- function(spans) {
+  who <- sort(unique(spans$annotator))
+  if (length(who) < 2) return(data.frame())
+  out <- list()
+  for (i in seq_len(length(who) - 1)) for (j in (i + 1):length(who)) {
+    a <- who[i]; b <- who[j]
+    notes <- intersect(spans$note_id[spans$annotator == a], spans$note_id[spans$annotator == b])
+    m <- spans[spans$note_id %in% notes & spans$start >= 0, ]
+    sa <- m[m$annotator == a, ]; sb <- m[m$annotator == b, ]
+    k <- function(d, typed) unique(paste(d$note_id, d$start, d$end, if (typed) d$type else "", sep = "|"))
+    n <- nrow(sa) + nrow(sb)
+    f <- function(typed) if (n) 2 * length(intersect(k(sa, typed), k(sb, typed))) / n else NA_real_
+    out[[length(out) + 1]] <- data.frame(annotator_a = a, annotator_b = b, n_notes = length(notes),
+                                         f1_span = f(FALSE), f1_typed = f(TRUE), stringsAsFactors = FALSE)
+  }
+  do.call(rbind, out)
+}
+
+deid_wilson <- function(k, n, z = 1.959964) {
+  if (n == 0) return(c(p = NA, lo = NA, hi = NA))
+  p <- k / n
+  centre <- (p + z^2 / (2 * n)) / (1 + z^2 / n)
+  half <- z * sqrt(p * (1 - p) / n + z^2 / (4 * n^2)) / (1 + z^2 / n)
+  c(p = p, lo = max(0, centre - half), hi = min(1, centre + half))
+}
+
+# Leak-note rate (Wilson CI) and over-redaction rate, pooled (any reviewer) and per reviewer.
+deid_qa_summary <- function(labels) {
+  labels$flag <- labels$leak == "yes"; labels$over <- labels$over_redaction == "yes"
+  pooled <- data.frame(note_id = unique(labels$note_id))
+  pooled$flag <- tapply(labels$flag, labels$note_id, any)[as.character(pooled$note_id)]
+  pooled$over <- tapply(labels$over, labels$note_id, any)[as.character(pooled$note_id)]
+  one <- function(scope, g) {
+    w <- deid_wilson(sum(g$flag), nrow(g))
+    data.frame(scope = scope, n_notes = nrow(g), leak_notes = sum(g$flag), leak_rate = w[["p"]],
+               leak_lo = w[["lo"]], leak_hi = w[["hi"]], over_redaction_rate = mean(g$over), stringsAsFactors = FALSE)
+  }
+  rbind(one("pooled", pooled), do.call(rbind, lapply(sort(unique(labels$reviewer)),
+                                                     function(r) one(r, labels[labels$reviewer == r, ]))))
+}
+
+deid_parse_spans <- function(s) {
+  if (!length(s) || is.na(s) || !nzchar(s)) return(matrix(integer(), 0, 2))
+  do.call(rbind, lapply(strsplit(strsplit(s, ";", fixed = TRUE)[[1]], "-", fixed = TRUE), as.integer))
+}
+
+deid_runs <- function(chars) {
+  chars <- sort(unique(chars))
+  if (!length(chars)) return(matrix(integer(), 0, 2))
+  brk <- c(TRUE, diff(chars) != 1)
+  starts <- chars[brk]; ends <- c(chars[which(brk)[-1] - 1], chars[length(chars)]) + 1
+  cbind(starts, ends)
+}
+
+span_chars <- function(d) if (nrow(d)) unlist(mapply(function(a, b) seq.int(a, b - 1), d$start, d$end, SIMPLIFY = FALSE)) else integer()
+
+# Consensus: characters marked by at least half the note's annotators (one vote per annotator);
+# each run takes the most common category among the spans covering it (ties: alphabetical).
+deid_consensus <- function(spans) {
+  out <- list()
+  for (nid in unique(spans$note_id)) {
+    g <- spans[spans$note_id == nid, ]
+    k <- length(unique(g$annotator))
+    m <- g[g$start >= 0, ]
+    votes <- table(unlist(lapply(split(m, m$annotator), function(ga) unique(span_chars(ga)))))
+    keep <- as.integer(names(votes)[votes >= k / 2])
+    r <- deid_runs(keep)
+    for (i in seq_len(nrow(r))) {
+      cov <- m[m$start < r[i, 2] & m$end > r[i, 1], ]
+      tb <- table(cov$type)
+      top <- sort(names(tb)[tb == max(tb)], method = "radix")[1]   # C order, as Python
+      out[[length(out) + 1]] <- data.frame(note_id = nid, start = r[i, 1], end = r[i, 2], type = top,
+                                           stringsAsFactors = FALSE)
+    }
+  }
+  if (length(out)) do.call(rbind, out) else data.frame(note_id = integer(), start = integer(), end = integer(), type = character())
+}
+
+# Share of the generator's identifiers each annotator fully marked, aided vs unaided.
+deid_annotator_recall <- function(spans, gen) {
+  keys <- unique(spans[, c("annotator", "aided")])
+  do.call(rbind, lapply(seq_len(nrow(keys)), function(i) {
+    g <- spans[spans$annotator == keys$annotator[i] & spans$aided == keys$aided[i], ]
+    found <- 0; total <- 0
+    for (nid in unique(g$note_id)) {
+      marked <- span_chars(g[g$note_id == nid & g$start >= 0, ])
+      ph <- gen[gen$note_id == nid, ]
+      total <- total + nrow(ph)
+      found <- found + sum(vapply(seq_len(nrow(ph)), function(j) all(seq.int(ph$start[j], ph$end[j] - 1) %in% marked), logical(1)))
+    }
+    data.frame(annotator = keys$annotator[i], aided = keys$aided[i], n_notes = length(unique(g$note_id)),
+               n_phi = total, entity_recall = if (total) found / total else NA_real_, stringsAsFactors = FALSE)
+  }))
+}
+
+# Sensitivity, specificity and leak_span_recall against the answer key (qa_key.csv), per scope.
+deid_qa_vs_key <- function(labels, key) {
+  labels$leak_spans[is.na(labels$leak_spans)] <- ""; key$leak_spans[is.na(key$leak_spans)] <- ""
+  labels$flag <- labels$leak == "yes"
+  notes <- unique(labels$note_id)
+  pooled <- data.frame(note_id = notes, flag = as.vector(tapply(labels$flag, labels$note_id, any)[as.character(notes)]),
+                       leak_spans = vapply(notes, function(n) paste(labels$leak_spans[labels$note_id == n & nzchar(labels$leak_spans)],
+                                                                    collapse = ";"), character(1)), stringsAsFactors = FALSE)
+  truth <- setNames(key$n_true_leaks > 0, key$note_id)
+  one <- function(scope, g) {
+    t <- truth[as.character(g$note_id)]
+    hit <- 0; tot <- 0
+    for (i in seq_len(nrow(g))) {
+      mk <- deid_parse_spans(g$leak_spans[i])
+      lk <- deid_parse_spans(key$leak_spans[key$note_id == g$note_id[i]])
+      for (j in seq_len(nrow(lk))) {
+        tot <- tot + 1
+        hit <- hit + any(mk[, 1] < lk[j, 2] & mk[, 2] > lk[j, 1])
+      }
+    }
+    data.frame(scope = scope, sensitivity = if (any(t)) mean(g$flag[t]) else NA_real_,
+               specificity = if (any(!t)) mean(!g$flag[!t]) else NA_real_,
+               leak_span_recall = if (tot) hit / tot else NA_real_, stringsAsFactors = FALSE)
+  }
+  rbind(one("pooled", pooled), do.call(rbind, lapply(sort(unique(labels$reviewer)),
+                                                     function(r) one(r, labels[labels$reviewer == r, ]))))
+}
