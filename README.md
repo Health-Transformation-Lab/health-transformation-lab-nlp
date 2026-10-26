@@ -104,8 +104,9 @@ Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5
 - letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
   clearly better than the rules (difference CI excludes 0);
 - they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
-- class-weighted training (`--class-weight sqrt`) lifts ModernBERT base's stage IV recall only from 7% to 21%
-  (accuracy 84%) and leaves BERT base's at 0%; with 7 training examples, the rules-decide hybrid stays far better;
+- class-weighted training (`--class-weight sqrt`) gives **no reliable gain**: over three seeds ModernBERT base
+  averages 82% (80-84%) with stage IV recall 21%, 0%, 0%; BERT base stays at 0%. The seed alone moves accuracy
+  ~4 points, as much as the spread between encoders. The `+rules4` hybrid holds at 90-91% on every seed;
 - Bio_ClinicalBERT (trained on hospital notes) scores 80%, like the others.
 
 The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.

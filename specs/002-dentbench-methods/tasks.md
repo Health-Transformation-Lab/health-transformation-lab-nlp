@@ -29,7 +29,7 @@
 - [ ] T013 Dentist acceptance check on a sample of judge verdicts (GlobalDentBench-style), alongside kappa
 
 - [x] T015 Model ladder vs the synthetic truth (`ladder_eval.py`, `28_ladder_vs_truth.py`, R `10_ladder.R`): accuracy with paired bootstrap CIs vs note_rules, stage IV recall, unsafe/S2 rates, calibration error, and the rules-decide-stage-IV hybrid (`+rules4`)
-- [ ] T016 Class-weighted or oversampled fine-tuning for stage IV, compared with `+rules4`; 3 seeds per encoder
+- [x] T016 Class-weighted fine-tuning for stage IV (`--class-weight sqrt`), 3 seeds of ModernBERT base: no reliable gain (stage IV recall 21/0/0%); seed spread ~4 points; `+rules4` stable at 90-91%. Bio_ClinicalBERT added (80%); GatorTron-base queued (3 h on CPU)
 
 ## Phase 6: Polish
 
