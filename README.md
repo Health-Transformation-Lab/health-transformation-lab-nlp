@@ -75,6 +75,11 @@ Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[de
   methods can't be called different. [statistics](docs/statistics.md)
 - **Unsafe mistakes:** labels that could harm a patient if acted on, e.g. missed stage III–IV (tooth
   loss). Results also split by how hard the chart is ([details](docs/dentbench_methods.md#in-plain-words)).
+- **De-identification** is scored on two numbers that pull against each other, like a spam filter.
+  **Recall:** share of identifiers removed; *higher is better* (0.96 = 4 in 100 slip through).
+  **Over-redaction:** share of identifier-free text changed anyway; *lower is better* (0.89 = 89 in 100
+  clean notes damaged, which is bad). Best so far: hf_stanford+regex_v2+guard, recall 0.96,
+  over-redaction 0.35 ([details](docs/deidentification.md#how-to-read-the-numbers)).
 
 ## Models evaluated (the 12 from the evaluation sheet; `models.yaml`)
 

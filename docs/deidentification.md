@@ -96,8 +96,21 @@ dental terms.
 
 ## Results on the challenge set (400 notes, seed 7)
 
-Entity recall = share of identifiers fully removed (one surviving character counts as a leak).
-Decoy damage = share of dental decoys with any character removed.
+### How to read the numbers
+
+A de-identification method makes two kinds of mistake, like a spam filter: it can let an identifier
+through (spam in the inbox) or remove text that wasn't an identifier (a real email in the spam
+folder). Each number below measures one of them.
+
+| Number | Plain meaning | Better is | Example |
+|---|---|---|---|
+| **Recall** | Share of identifiers removed. One character left counts as a leak | **higher** (1.00 = none leaked) | 0.92 = 8 in 100 identifiers leak |
+| **Precision** | Of the characters removed, the share that really were identifiers | **higher** | 0.90 = 10% of what it removed was ordinary text |
+| **Decoy damage** | Share of dental terms that look like PHI (Glickman, Gracey 11/12, 6-5-6) that got cut | **lower** (0 = none cut) | 0.17 = 17 in 100 dental terms damaged |
+| **Over-redaction** | Share of notes with *no* identifiers that were changed anyway (ASQ-PHI only) | **lower** | 0.89 = 89 in 100 clean notes changed: bad |
+
+Recall protects patients; the other three protect the text the AI reads. A method that removed
+everything would have recall 1.00 and be useless, so they're always read together.
 
 | Engine | easy | hard | **unseen** | all | Precision | **Decoy damage** |
 |---|---|---|---|---|---|---|
