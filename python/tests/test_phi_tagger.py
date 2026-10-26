@@ -101,3 +101,21 @@ def test_align_labels_the_first_sub_token_only():
     assert phi_tagger.align(word_ids, ["O", "B-Age", "I-Age"], label2id) == [
         -100, label2id["O"], label2id["B-Age"], -100, label2id["I-Age"], -100]
     assert phi_tagger.LABELS[0] == "O" and len(phi_tagger.LABELS) == 7
+
+
+# ---------------------------------------------------------------- boundary rules and overlap scores
+def test_trim_function_words_fixes_date_edges_and_drops_empty_dates():
+    ws = ["The", "next", "day", ",", "Nine", "months", "after", "the", "operation", "and", "the", "end"]
+    tags = ["B-Date", "I-Date", "I-Date", "O", "B-Date", "I-Date", "I-Date", "I-Date", "O", "O", "B-Date", "O"]
+    out = phi_tagger.fix_dates(ws, tags, ["trim_function_words"])
+    assert phi_tagger.entities(out) == [("Date", 1, 3), ("Date", 4, 7)]
+    assert out[1] == "B-Date" and out[0] == "O" and out[10] == "O"
+    assert phi_tagger.fix_dates(ws, ["B-Age"] + tags[1:], ["trim_function_words"])[0] == "B-Age"   # other types untouched
+
+
+def test_overlap_score_counts_a_same_type_overlap_as_a_match():
+    gold = [["B-Date", "I-Date", "I-Date", "O", "B-Sex"]]
+    pred = [["O", "B-Date", "I-Date", "I-Date", "O"]]
+    exact = phi_tagger.score(gold, pred).set_index("type")
+    loose = phi_tagger.score(gold, pred, overlap=True).set_index("type")
+    assert exact.loc["Date", "f1"] == 0.0 and loose.loc["Date", "f1"] == 1.0 and loose.loc["Sex", "recall"] == 0.0

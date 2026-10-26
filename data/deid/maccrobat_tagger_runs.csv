@@ -1,0 +1,2 @@
+tag,model,lr,epochs,batch_size,weight_decay,warmup,max_words,seed,split_seed,train_minutes,val_f1_Age,val_f1_Date,val_f1_Sex,val_f1_weighted,test_f1_Age,test_f1_Date,test_f1_Sex,test_f1_weighted
+base_lr3e-5_e3,allenai/longformer-base-4096,3e-05,3,4,0.0,0.0,250,42,42,55.1,0.9756,0.4545,0.9744,0.6885,0.95,0.6856,0.9737,0.7677

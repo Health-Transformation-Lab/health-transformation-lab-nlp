@@ -114,15 +114,23 @@ def entities(tags: list[str]) -> list[tuple[str, int, int]]:
     return [tuple(e) for e in out]
 
 
-def score(gold: list[list[str]], pred: list[list[str]], types=TYPES) -> pd.DataFrame:
-    """Exact-span entity precision, recall, F1 per type, and the support-weighted average."""
+def score(gold: list[list[str]], pred: list[list[str]], types=TYPES, overlap: bool = False) -> pd.DataFrame:
+    """Entity precision, recall, F1 per type, and the support-weighted average. Exact span and type
+    (the usual seqeval rule); with overlap=True any same-type overlap counts, which shows how much of
+    the gap is boundaries alone."""
     rows = []
     for t in types:
-        g = {(d, *e[1:]) for d, tags in enumerate(gold) for e in entities(tags) if e[0] == t}
-        p = {(d, *e[1:]) for d, tags in enumerate(pred) for e in entities(tags) if e[0] == t}
-        tp = len(g & p)
-        prec = tp / len(p) if p else 0.0
-        rec = tp / len(g) if g else 0.0
+        g = [(d, *e[1:]) for d, tags in enumerate(gold) for e in entities(tags) if e[0] == t]
+        p = [(d, *e[1:]) for d, tags in enumerate(pred) for e in entities(tags) if e[0] == t]
+        if overlap:
+            def hit(x, ys):
+                return any(x[0] == y[0] and x[1] < y[2] and y[1] < x[2] for y in ys)
+            prec = sum(hit(x, g) for x in p) / len(p) if p else 0.0
+            rec = sum(hit(x, p) for x in g) / len(g) if g else 0.0
+        else:
+            tp = len(set(g) & set(p))
+            prec = tp / len(p) if p else 0.0
+            rec = tp / len(g) if g else 0.0
         rows.append({"type": t, "precision": prec, "recall": rec,
                      "f1": 2 * prec * rec / (prec + rec) if prec + rec else 0.0, "support": len(g)})
     d = pd.DataFrame(rows)
@@ -176,4 +184,25 @@ def regex_dates(text: str, spans: list[tuple[str, int, int]], tags: list[str], p
             for k, i in enumerate(idx):
                 if out[i] == "O":
                     out[i] = "I-Date" if k and out[idx[k - 1]].endswith("-Date") else "B-Date"
+    return out
+
+
+_FUNCTION_WORDS = {"the", "a", "an", "of", "this", "that", "these", "within", "in", "on", "at", "and", "to", ","}
+
+
+def fix_dates(words_: list[str], tags: list[str], rules) -> list[str]:
+    """Boundary rules on predicted Date entities. `trim_function_words`: drop leading and trailing
+    function words (the, of, within ...); a Date left empty is removed. Other types are untouched."""
+    out = list(tags)
+    if "trim_function_words" in rules:
+        for kind, a, b in entities(tags):
+            if kind != "Date":
+                continue
+            s, e = a, b
+            while s < e and words_[s].lower() in _FUNCTION_WORDS:
+                s += 1
+            while e > s and words_[e - 1].lower() in _FUNCTION_WORDS:
+                e -= 1
+            for i in range(a, b):
+                out[i] = "O" if not s <= i < e else ("B-Date" if i == s else "I-Date")
     return out
