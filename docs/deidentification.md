@@ -237,6 +237,134 @@ synthetic-only rule, and the i2b2 notes are normally under a data use agreement.
 `26_deid_benchmark.py --jsl48 data/raw/<file>`. It isn't priced: throughput was measured on short
 dental notes.
 
+## Results on MACCROBAT (200 real case reports, external; spec 009)
+
+[MACCROBAT](https://doi.org/10.6084/m9.figshare.9764942.v2) (Caufield 2019, CC BY 4.0) is 200 clinical
+case reports from PubMed Central, edited to the case details and annotated by hand. It is the first
+**real** clinical prose these engines have seen, written by people other than the note generator.
+The original release (brat files: text plus character offsets) is read by default; the same labels
+are also published as BIO tags (B = beginning, I = inside, O = outside an entity; Hugging Face mirror
+`ktgiahieu/maccrobat2018_2020`, `--source bio`). BIO can't hold overlapping entities, so the mirror has
+about half as many clinical entities, and its spacing is rebuilt from tokens.
+
+It was not built for PHI and has no names or contact details, so it checks two things:
+
+- **PHI recall** on a subset derived by rule from its `Date` and `Age` labels (HIPAA Safe Harbor):
+  105 dates with a month or day ("June 2013", "July 29, 2015"). No age is 90 or over.
+- **Clinical damage**: share of 22,272 clinical entities (symptoms, diseases, procedures, drugs,
+  doses, lab values, anatomy ...) with any character removed. This is over-redaction on real text.
+
+`python python/scripts/32_maccrobat_deid.py` (data committed in `data/external/maccrobat/`, CC BY 4.0;
+scores in `data/deid/maccrobat_scores.csv`, `maccrobat_by_type.csv`). Run 2026-10-26 on CPU:
+
+| Engine | PHI date recall | Clinical damage |
+|---|---|---|
+| regex / regex+guard | 0.22 | 0.004 |
+| regex_v2 / regex_v2+guard | 0.27 | 0.004 |
+| presidio / presidio+guard | 0.97 | 0.034 |
+| presidio+regex_v2+guard | 0.99 | 0.036 |
+| hf_stanford / hf_stanford+guard | 0.98 | 0.002 |
+| hf_stanford+regex_v2+guard | 0.98 | 0.005 |
+| hf_obi | 0.97 | 0.005 |
+| hf_obi+regex_v2+guard | 0.98 | 0.008 |
+| hf_stanford+presidio+regex_v2+guard | 1.00 | 0.037 |
+
+**What it shows.**
+- **Month-year dates leak through the regex engines.** They catch full dates ("July 29, 2015",
+  "14/9/2005") but not month-year dates ("January 2014", "in November 2014"), the most common form in
+  these reports. The synthetic notes always write full dates, so the challenge set couldn't show this.
+  The fix (a month-year shape in `regex_v2`) should be written and then checked on a set it wasn't
+  tuned on, not on this one.
+- **Presidio finds the dates but costs clinical text** (3.4%, about 9 times the regex engines):
+  frequencies read as dates ("daily", "weekly"), units and anatomy codes read as IDs ("m2" in mg/m2,
+  vertebrae T1/T2, ECG leads V1–V4), eponyms read as names (Gaucher, Crohn, Bowen, Ehlers), "OCT" and
+  visual acuity "6/18" as dates, "p.o." as a location. The dental guard doesn't cover these medical
+  terms. It also removes every age and most relative dates and years alone, which aren't PHI but carry the timeline.
+- **hf_stanford is the best trade here**: 98% of the dates (2 of 105 leak) with the least clinical
+  damage of any engine (0.17%, below the regex engines). It also keeps what isn't PHI: no ages and
+  5% of relative dates and years alone removed, against 97% and 89% for Presidio. hf_obi finds as many dates but
+  removes 98% of ages. Adding Presidio reaches 100% recall at 20 times the clinical damage.
+- **Regex damage is low** (0.4%): Title Case terms read as names ("Glasgow Coma Scale") and slash
+  triplets read as dates (pressures such as "72/34/47 mmHg").
+
+**Limits.** The PHI subset is a rule over MACCROBAT's labels, not PHI annotation, and is small (105
+dates). Case reports are journal prose, already de-identified by the publisher, not chart notes.
+Scoring is Python only, as for spec 007.
+
+## A fine-tuned PHI tagger on MACCROBAT (Age, Sex, Date; spec 010)
+
+Built after a course exercise on de-identification as sequence classification: tag every word
+B-/I-/O for MACCROBAT's own `Age`, `Sex` and `Date` labels, fine-tune Longformer, tune it (A), add
+regex post-processing of dates (B), and report the final system with its errors (C). Note that this
+label set isn't Safe Harbor: MACCROBAT's `Date` includes relative dates ("3 days later"), and sex and
+most ages aren't identifiers.
+
+**Set-up.** Original brat files to BIO words (`data/external/maccrobat/bio/`): 200 notes split by
+document (seed 42) into 140 train, 20 validation, 40 test. Training settings and post-processing are
+chosen on **validation**; the test set is reported for every run but never used to choose. Chunks of
+whole sentences up to 250 words; labels on each word's first sub-token; CPU, about 55 minutes per
+3-epoch run. Score: exact-span entity F1 per type (seqeval rule) and the support-weighted average
+("weighted F1"). `python/scripts/33_maccrobat_phi_tagger.py`, `34_phi_tagger_regex.py`; every run in
+`data/deid/maccrobat_tagger_runs.csv`, regex rows in `maccrobat_tagger_regex.csv`, error counts in
+`maccrobat_tagger_errors.csv`, each error of the model alone in `data/external/maccrobat/errors/`
+(`_val` for analysis, `_test` for the final report).
+
+**Task A: training settings** (2026-10-26; validation 89 entities, test 262):
+
+| Run | Model | lr | Epochs | Other | Val weighted F1 | Val Date F1 | Test weighted F1 |
+|---|---|---|---|---|---|---|---|
+| baseline | Longformer base | 3e-5 | 3 | | 0.69 | 0.45 | 0.77 |
+| **chosen** | Longformer base | 5e-5 | 3 | | **0.74** | **0.55** | **0.80** |
+| | Longformer base | 5e-5 | 5 | warm-up 10%, weight decay 0.01 | 0.74 | 0.53 | 0.77 |
+| | Clinical-Longformer | 5e-5 | 3 | | 0.68 | 0.43 | 0.79 |
+
+A higher learning rate helps; more epochs with warm-up and weight decay don't; the clinical
+pre-training doesn't help on journal case reports. Age (test F1 0.95) and Sex (0.99) are near
+ceiling in every run; Date (0.73) decides the average. Not tried (CPU time): batch size, longer
+chunks (the long-context point of Longformer), other seeds. With 20 validation notes, gaps under
+about 0.05 aren't reliable.
+
+**Task B: regex post-processing** (on the chosen model; `phi_tagger.DATE_PATTERNS` tag words the
+model left O; `trim_function_words` cuts leading and trailing function words from predicted dates):
+
+| Post-processing | Val weighted F1 | Test weighted F1 | Test Date F1 |
+|---|---|---|---|
+| none | 0.74 | 0.80 | 0.73 |
+| numeric, month-day-year, day-month-year, month-year (each) | 0.74 | 0.80 | 0.73 |
+| year (19xx/20xx alone) | 0.74 | 0.80 | 0.74 |
+| relative ("3 days later"), hospital day ("day 4") | 0.74 | 0.80 | 0.73 |
+| trim function words (chosen greedily on validation) | **0.81** | 0.77 | 0.69 |
+| all | 0.80 | 0.77 | 0.68 |
+
+- **Calendar-date patterns add nothing**: the model already finds every full and month-year date.
+- **Year alone** finds a few bare years the model misses ("in 1999"), on test only.
+- **Relative and hospital-day patterns** add spurious dates: MACCROBAT labels many of those phrases
+  as `Time` or leaves them unlabelled.
+- **Trimming function words** looks best on validation but loses on test. 57 of the 734 gold dates
+  start with a function word the annotators kept ("within 2 weeks", "at age 12", "a week later"),
+  and the rule strips them.
+
+**Task C: final system and its errors.** By the rule set before looking at test (choose on
+validation), the final system is Longformer base (lr 5e-5, 3 epochs, batch 4, 250-word chunks, seed
+42) with `trim_function_words`: **test weighted F1 0.77** (Age 0.95, Sex 0.99, Date 0.69). The model
+alone scores 0.80 on test; switching to it now would be choosing on test, so it is reported as the
+finding rather than the result: the 20-note validation set is too small to choose post-processing on.
+
+The kinds of error were read on the **validation** listing (the same groups show on test: on
+validation the boundary errors are mostly trailing words, "5th day of", "2 weeks after the", which
+is why trimming won there; on test more are leading words the annotators kept). Counts on test:
+
+| Test Date errors (model alone) | n | What they are |
+|---|---|---|
+| Wrong boundary | 27 | Same date, different edges: "the following morning" vs "following morning", "age of 19 years" vs "At the age of 19 years". Weighted F1 counting any one-to-one overlap is 0.91 on test (0.88 validation), against exact 0.80 |
+| Spurious | 29 | Mostly hours ("One hour later", "24 h later", "next morning"), which MACCROBAT labels `Time`, a type this label set drops; some look like unlabelled dates ("after 1 week", "day 4"); three a lone "the" |
+| Missed | 18 | Bare years ("1999", "2004"), vague time ("now", "Early on", "preoperative", "past year"), gestational and post-operative days ("37 weeks' gestation", "9th POD") |
+
+Next, if this is taken further: map MACCROBAT's `Time` to Date (or score them together); trim only
+trailing function words (seen on validation); use cross-validation over the 160 training notes
+instead of one 20-note validation set. The year pattern helped on test only, so it is a
+test-informed idea: it needs a fresh split before it is used.
+
 ## Combining engines: bigger unions and routing
 
 The `+` ensembles above are plain unions: anything any engine flags is removed. Two other ways to

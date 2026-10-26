@@ -71,7 +71,7 @@ needs confirming.
 | # | Item | Status |
 |---|---|---|
 | H1 | Chart notes are the only free text here and the only AI input. Inventory the real EHR's other free text (exam-form and perio-chart comments, radiograph interpretations, treatment-plan and procedure notes, referral/specialist letters, medical-history text, scanned documents) and decide which to de-identify and read | Open |
-| H2 | De-identification: the pipeline uses `regex`, which removes 20% of identifiers on held-out shapes. presidio+regex_v2+guard removes 57% and keeps 95% of dental terms; the Azure services are wired but not run ([deidentification.md](deidentification.md)). Next: run `azure_deid+regex_v2+guard` and `azure_language+regex_v2+guard` on the challenge set; fill real prices in `costs.yaml`; pick the engine on the unseen tier and switch `study.py`; add ASQ-PHI (MIT) as a second test set; keep a human review sample on real notes | Open |
+| H2 | De-identification: the pipeline uses `regex`, which removes 20% of identifiers on held-out shapes. presidio+regex_v2+guard removes 57% and keeps 95% of dental terms; the Azure services are wired but not run ([deidentification.md](deidentification.md)). Next: run `azure_deid+regex_v2+guard` and `azure_language+regex_v2+guard` on the challenge set; fill real prices in `costs.yaml`; pick the engine on the unseen tier and switch `study.py`; add ASQ-PHI (MIT) as a second test set; keep a human review sample on real notes. On real case reports (MACCROBAT, spec 009) regex and regex_v2 miss month-year dates (22% and 27% recall) while hf_stanford removes 98% with the least clinical damage (0.17%) | Open |
 
 ## Earlier items
 

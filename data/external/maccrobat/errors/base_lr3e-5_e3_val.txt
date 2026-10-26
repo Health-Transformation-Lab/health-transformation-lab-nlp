@@ -1,0 +1,62 @@
+19860925	gold Date	after recovery from the cold .	| . The strong dry cough persisted after recovery from the cold . The patient did not report any
+19860925	gold Date	6 months after the initial admission .	| by performing a lower right lobectomy 6 months after the initial admission . The final histological examination confirmed a
+19860925	pred Date	6 months after the initial admission	| by performing a lower right lobectomy 6 months after the initial admission . The final histological examination confirmed
+21254744	gold Date	three months after operation	| gelastic seizures or epileptic manifestations ; three months after operation he is still free of seizures
+21254744	pred Date	three months after	| gelastic seizures or epileptic manifestations ; three months after operation he is still free of
+21308977	gold Age	13 months of age	| Evidence for mitochondrial dysfunction began at 13 months of age with progressive muscle weakness , autonomic
+21308977	pred Date	13 months of age	| Evidence for mitochondrial dysfunction began at 13 months of age with progressive muscle weakness , autonomic
+23033875	gold Date	38th week of gestation	| was admitted to hospital in the 38th week of gestation with elevated blood pressure ( 150
+23033875	pred Date	Few hours after	| within their respective reference intervals . Few hours after admission to the hospital the contractions
+23033875	pred Date	Four hours postpartum	| postoperative course was initially inconspicuous . Four hours postpartum she experienced sudden epigastric pain .
+23033875	pred Date	Five hours postpartum	| uterine cavity without placenta residue . Five hours postpartum , the patient was transferred to
+23033875	pred Date	Sixteen hours postpartum	| furosemide failed to increase diuresis . Sixteen hours postpartum her blood pressure was 60 /
+23033875	pred Date	Twenty hours postpartum	| , oxygen saturation 98 % . Twenty hours postpartum patient developed again cardiopulmonary arrest .
+25410034	gold Date	48 h prior	| patient described a period of time 48 h prior to presentation ( and 12 h
+25410034	gold Date	12 h prior	| h prior to presentation ( and 12 h prior to the development of the rash
+25410034	gold Date	2 months after	| Residual scarring is beginning to fade 2 months after presentation .
+25410034	pred Date	2 months after presentation	| Residual scarring is beginning to fade 2 months after presentation .
+25884600	gold Date	second day	| to adequate hydration . On the second day of illness , he developed hypotension
+25884600	gold Date	3rd day	| Patient was electively ventilated on the 3rd day of illness due to severe respiratory
+25884600	gold Date	5th day	| μ mol / L by the 5th day of illness and ALT ( alanine
+25884600	gold Date	5th day	| Leptospira IgM antibody performed on the 5th day of illness was positive ( IgG
+25884600	pred Date	day of	| . Initial investigations performed on the day of admission revealed neutrophil leukocytosis , mild
+25884600	pred Date	second day of	| to adequate hydration . On the second day of illness , he developed hypotension with
+25884600	pred Date	3rd day of	| Patient was electively ventilated on the 3rd day of illness due to severe respiratory distress
+25884600	pred Date	day	| respiratory distress . On the same day , he developed rapid atrial fibrillation
+25884600	pred Date	5th day of	| μ mol / L by the 5th day of illness and ALT ( alanine transaminase
+25884600	pred Date	5th day of	| Leptospira IgM antibody performed on the 5th day of illness was positive ( IgG negative
+26216058	gold Date	within the next 4 weeks	| nerve palsy , which completely recovered within the next 4 weeks . The postoperative MRI showed a
+26216058	gold Date	more than 6 years	| At a follow - up of more than 6 years after treatment , there were still
+26216058	pred Date	the	| palsy , which completely recovered within the next 4 weeks . The postoperative
+26216058	pred Date	next 4 weeks	| , which completely recovered within the next 4 weeks . The postoperative MRI showed a
+26216058	pred Date	more than 6 years after	| At a follow - up of more than 6 years after treatment , there were still no
+26656340	pred Sex	child	| 4 - year - old female child presented at the outpatients department with
+27059701	gold Date	2 years after surgery	| The patient was disease - free 2 years after surgery .
+27059701	pred Date	2 years after	| The patient was disease - free 2 years after surgery .
+27842595	gold Date	2 weeks after	| developed acute dyspnea and general edema 2 weeks after the first CT scan . The
+27842595	gold Date	29 months after	| weeks for 5 months . At 29 months after the first operation , the patient
+27842595	pred Date	2 weeks after the	| developed acute dyspnea and general edema 2 weeks after the first CT scan . The second
+27842595	pred Date	29 months after the	| weeks for 5 months . At 29 months after the first operation , the patient required
+28103924	gold Date	At the age of 16 months	| uneventful gestation of normal duration . At the age of 16 months , he presented with a clinically
+28103924	gold Date	at the age of 18 months	| U / kg every 2 weeks at the age of 18 months . Thereafter , when the patient
+28103924	gold Date	From 2 weeks before	| daily ) after 1 month . From 2 weeks before starting miglustat therapy , the patient
+28103924	gold Date	since the age of 5 years	| regularly attended school with good performance since the age of 5 years .
+28103924	pred Date	age of 16 months	| of normal duration . At the age of 16 months , he presented with a clinically
+28103924	pred Date	age of 18 months	| kg every 2 weeks at the age of 18 months . Thereafter , when the patient
+28103924	pred Date	weeks	| was uptitrated during the first 4 weeks with the following scheme : one
+28103924	pred Date	weeks 1	| - third of target dose during weeks 1 and 2 , two - thirds
+28103924	pred Date	2	| target dose during weeks 1 and 2 , two - thirds of target
+28103924	pred Date	weeks 3	| - thirds of target dose during weeks 3 and 4 , and target dose
+28103924	pred Date	4	| target dose during weeks 3 and 4 , and target dose ( 100
+28103924	pred Date	2 weeks before	| ) after 1 month . From 2 weeks before starting miglustat therapy , the patient
+28103924	pred Date	of 5 years	| with good performance since the age of 5 years .
+28202869	gold Date	Six months after	| of IVCY ( Figure ) . Six months after the admission , a follow -
+28202869	gold Date	18 months after	| but did not obtain further improvements 18 months after the admission ( Table ) ,
+28202869	pred Date	Six months after the	| of IVCY ( Figure ) . Six months after the admission , a follow - up
+28202869	pred Date	18 months after the	| but did not obtain further improvements 18 months after the admission ( Table ) , we
+28248858	gold Date	4 and a half years	| evidence of recurrence of LCH for 4 and a half years follow - up .
+28272235	gold Date	23rd day	| was discharged from hospital on the 23rd day of surgery . Then after ,
+28272235	pred Date	months	| of the cause . Since 5 months , the severity of rectal bleeding
+28272235	pred Date	23rd day of	| was discharged from hospital on the 23rd day of surgery . Then after , no
+28272235	pred Date	6 months	| complication or recurrence was noticed during 6 months ’ follow - up . This
+28296775	pred Date	7 hours after	| patient died with hepatic encephalopathy at 7 hours after admission . Prior to the autopsy
