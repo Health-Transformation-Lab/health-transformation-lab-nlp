@@ -13,22 +13,21 @@ Because the generator inserts every identifier, it **knows where each one is**: 
 identifier is marked with its character span and category. That makes recall exact. Real notes
 never allow this; there you only have a human review sample.
 
-## Why the old test was too easy
+## The test set: three tiers, each adds a check
 
-The study notes put PHI in a few header shapes (`Patient:`, `MRN:`, `Dr.`), and the built-in regex
-was written against those same shapes. It removes 100% of them, which proves the plumbing,
-not the method. So there's a separate **challenge set** with three tiers:
+The **challenge set** is labeled fake PHI in three tiers. Each tier tests something the one before
+it can't:
 
-| Tier | What's in it | Why |
+| Tier | What's in it | What it adds |
 |---|---|---|
-| **easy** | The study notes' header shapes | Baseline |
-| **hard** | Prose shapes: first name alone, lowercase names, relatives, "Mrs" without a period, ages over 89, written-out dates, dotted and +1 phones, email, URL, SSN, health plan member IDs, street / city / ZIP, referral practices | The shapes real notes have |
-| **unseen** | Written **after** regex v2 and never used to tune it: ALL-CAPS and possessive names, names that are words (Rose, Will), O'/hyphenated names, nicknames, weekday dates, spaced phones, fax, apartment numbers, driver's licence, plate, device serial, IP address, social handle, employer | A held-out test. regex v2 was written alongside the hard tier, so its hard-tier score is optimistic |
+| **easy** | The study notes' header shapes (`Patient:`, `MRN:`, `Dr.`) | Confirms the pipeline removes the PHI the study notes carry |
+| **hard** | Prose shapes: first name alone, lowercase names, relatives, "Mrs" without a period, ages over 89, written-out dates, dotted and +1 phones, email, URL, SSN, health plan member IDs, street / city / ZIP, referral practices | Covers the shapes real notes have, beyond headers |
+| **unseen** | Written **after** regex v2 and never used to tune it: ALL-CAPS and possessive names, names that are words (Rose, Will), O'/hyphenated names, nicknames, weekday dates, spaced phones, fax, apartment numbers, driver's licence, plate, device serial, IP address, social handle, employer | A fair, held-out comparison: no method was tuned on it (regex v2 was written alongside the hard tier) |
 
 Every tier also has marked **dental decoys**: text that looks like PHI but must survive (Glickman
 and Miller classes, Gracey 11/12, tooth numbers, CDT and ICD codes, probing readings like 6-5-6,
-drug names, ages under 90). General PHI models tag "Glickman" as a name and "6-5-6" as a date;
-redacting them damages the text the classifiers read.
+drug names, ages under 90). They measure the other side of de-identification: whether the
+clinical text the classifiers read comes through intact.
 
 The categories follow HIPAA Safe Harbor and the 2014 i2b2/UTHealth annotation guidelines
 ([references](references.md#de-identification) 37–38). The names come from lists no engine uses.
@@ -44,21 +43,21 @@ The categories follow HIPAA Safe Harbor and the 2014 i2b2/UTHealth annotation gu
 | presidio-evaluator | Fake-PII sentence generator from templates, detector evaluation | yes, MIT | Another way to generate labeled fake PHI |
 | John Snow Labs | Clinical de-id pipelines in its licensed Healthcare NLP; public speed benchmarks on Databricks | the de-id models are licensed (trial and academic programs exist); no free test set found | Another engine to compare, if licensed |
 
-## Engines
+## Engines and what each adds
 
-| Engine | What it is | Runs here |
+| Engine | What it adds | Runs here |
 |---|---|---|
-| `regex` | Original: header cues, date / phone / ID shapes, capitalized name pairs, dental allowlist | yes |
-| `regex_v2` | regex plus relatives, Mrs/Dr without a period, "Name, DDS", ages > 89, email, URL, SSN, member IDs, more date and phone shapes, address parts, overlapping name pairs | yes |
-| `presidio` | Microsoft Presidio: spaCy NER and pattern recognizers, with the dental allowlist | yes (Python 3.12 + spaCy model) |
-| `azure_deid` | Azure Health Data Services de-identification service, TAG operation (27 PHI categories) | wired, tested with a fake client; needs `AZURE_DEID_ENDPOINT` |
-| `azure_language` | Azure AI Language PII detection, healthcare (PHI) domain | wired, tested with a fake client; needs `AZURE_LANGUAGE_ENDPOINT` and `_KEY` |
-| `hf_stanford` | Transformer NER trained for de-identification: StanfordAIMI/stanford-deidentifier-base (radiology reports and notes; MIT) | wired, tested with a fake pipeline; Hugging Face is blocked here, so run it on Databricks ([`06_deid_benchmark.py`](../databricks/notebooks/06_deid_benchmark.py)) |
-| `hf_obi` | Transformer NER: obi/deid_roberta_i2b2 (RoBERTa trained on the i2b2 2014 corpus; MIT) | same |
-| `llm` | An LLM asked to list every identifier verbatim (any OpenAI-compatible endpoint, e.g. a Databricks serving endpoint); values not found in the note are dropped | wired, tested with a fake reply; run on Databricks |
-| `jsl` | John Snow Labs Healthcare NLP, pretrained `clinical_deidentification` pipeline | wired, tested with a fake pipeline; needs a John Snow Labs licence (free academic licences; a trial through their Databricks installer) and Spark, so run it on Databricks |
-| `A+B` | Ensemble: the union of the engines' spans | |
-| `+guard` | Dental guard: drops any span inside a dental term | |
+| `regex` | Fast, exact and free; removes the header shapes (`Patient:`, `MRN:`, dates, phones) with no dental damage; the dental allowlist keeps BOP, SRP, FMX | yes |
+| `regex_v2` | Extends regex to prose shapes: relatives, Mrs/Dr without a period, "Name, DDS", ages > 89, email, URL, SSN, member IDs, more date, phone and address shapes. Catches formatted IDs that NER models miss | yes |
+| `presidio` | Microsoft Presidio: spaCy NER finds names and places from context, not from a fixed pattern, so it reaches shapes nobody wrote a rule for | yes (Python 3.12 + spaCy model) |
+| `hf_stanford` | Transformer NER trained specifically for clinical de-identification: StanfordAIMI/stanford-deidentifier-base (radiology reports and notes; MIT). Learned clinical context; free; runs on a CPU ([what is BERT?](bert.md)) | yes (CPU here; GPU on Databricks: [`06_deid_benchmark.py`](../databricks/notebooks/06_deid_benchmark.py)) |
+| `hf_obi` | A second clinical de-id transformer, obi/deid_roberta_i2b2 (RoBERTa trained on the i2b2 2014 corpus; MIT); a different training set, so a check on the first | yes, same |
+| `azure_deid` | Managed Azure Health Data Services de-identification (27 PHI categories): no model to host, vendor-maintained | wired, tested with a fake client; needs `AZURE_DEID_ENDPOINT` |
+| `azure_language` | Azure AI Language PII detection, healthcare (PHI) domain: a second managed option | wired, tested with a fake client; needs `AZURE_LANGUAGE_ENDPOINT` and `_KEY` |
+| `llm` | An LLM lists every identifier verbatim; reads context like a person and follows written instructions (e.g. "keep Glickman"). Values not found in the note are dropped | wired, tested with a fake reply; needs an endpoint (Databricks serving) |
+| `jsl` | John Snow Labs Healthcare NLP `clinical_deidentification` pipeline: a commercial clinical pipeline with Spark scale-out | wired, tested with a fake pipeline; needs a licence (free academic; trial through their Databricks installer) and Spark |
+| `A+B` | Ensemble, the union of the engines' spans: each engine covers the other's gaps | |
+| `+guard` | Dental guard: keeps dental terms (eponyms, tooth numbers, probing readings, codes) that general PHI models would remove, at no cost to recall | |
 
 `python scripts/26_deid_benchmark.py --engines azure_deid+regex_v2+guard` runs the Microsoft
 service plus regex plus guard, once an Azure resource is set up.
