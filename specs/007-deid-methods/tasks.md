@@ -16,3 +16,5 @@
 - [ ] T012b Run the llm engine (needs a serving endpoint) and score hf_stanford+presidio / hf_stanford+hf_obi ensembles
 - [x] T013 John Snow Labs engine (`jsl`, clinical_deidentification pipeline) tested with a fake pipeline; i2b2/n2c2 2014 loader (`--i2b2-2014`)
 - [ ] T014 Get a John Snow Labs licence (academic or trial) and n2c2 2014 access; run every engine on both
+- [x] T015 Databricks `ai_mask` engine: spans recovered from the masked text, tested with a fake reply; notebook widget for a SQL warehouse; token cost ILLUSTRATIVE
+- [ ] T016 Run `ai_mask` (+regex_v2+guard) on the challenge set and ASQ-PHI in a Databricks workspace; fill its token price

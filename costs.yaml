@@ -60,4 +60,7 @@ deid:
     hf_obi:         {kind: local, hardware: cpu, throughput_source: measured}
     llm:            {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
                      prompt_overhead_tokens: 250, output_tokens: 80}            # ILLUSTRATIVE (a small hosted model)
+    ai_mask:        {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
+                     prompt_overhead_tokens: 150, output_tokens: 100}           # ILLUSTRATIVE: Databricks bills ai_mask as
+                                                                                # Foundation Model API tokens; it returns the whole note
   # "+guard" adds no cost; an ensemble costs the sum of its engines.

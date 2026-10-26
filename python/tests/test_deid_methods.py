@@ -290,3 +290,28 @@ def test_hard_negative_damage_counts_phi_free_notes_with_anything_removed():
     s = deid_eval.score_records(recs, lambda t: [{"start": 0, "end": 5, "type": "NAME"}] if "Stage" in t else [])
     ext = s["summary"].set_index("tier").loc["external"]
     assert ext.n_hard_negatives == 2 and ext.hard_negative_damage == 0.5
+
+
+# ---------------------------------------------------------------- Databricks ai_mask
+def test_ai_mask_recovers_spans_from_masked_text():
+    t = "Pt Kwame Oyelaran seen 3/4/2024; Glickman class II on #19."
+    masked = "Pt [MASKED] seen [MASKED]; Glickman class II on #19."
+    spans = deid.detect_ai_mask(t, mask=lambda text, labels: masked)
+    assert [t[s["start"]:s["end"]] for s in spans] == ["Kwame Oyelaran", "3/4/2024"]
+    assert {s["type"] for s in spans} == {"PHI"}
+
+
+def test_ai_mask_falls_back_to_a_diff_when_the_model_also_rewrites_text():
+    t = "Pt Kwame Oyelaran seen 3/4/2024 for SRP."
+    masked = "Pt [MASKED] seen [MASKED] for scaling."           # 'SRP' rewritten: no exact piece match
+    spans = deid.detect_ai_mask(t, mask=lambda text, labels: masked)
+    got = [t[s["start"]:s["end"]] for s in spans]
+    assert "Kwame Oyelaran" in got and "3/4/2024" in got
+
+
+def test_ai_mask_is_registered_and_says_what_it_needs(monkeypatch):
+    assert "ai_mask" in deid.ENGINES and "ai_mask" in deid.CLOUD_ENGINES
+    assert "person" in deid.AI_MASK_LABELS and "date" in deid.AI_MASK_LABELS
+    monkeypatch.delenv("DATABRICKS_WAREHOUSE_ID", raising=False)
+    with pytest.raises(RuntimeError, match="DATABRICKS_WAREHOUSE_ID"):
+        deid.detect_ai_mask("x")

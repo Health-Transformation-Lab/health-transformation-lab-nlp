@@ -35,7 +35,7 @@ logging.getLogger("tldextract").setLevel(logging.CRITICAL)   # Presidio's URL re
 
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
            "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
-           "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "azure_deid",
+           "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "ai_mask", "ai_mask+regex_v2+guard", "azure_deid",
            "azure_deid+regex_v2+guard", "azure_language", "azure_language+regex_v2+guard"]
 ap = argparse.ArgumentParser()
 ap.add_argument("--engines", default=",".join(DEFAULT))
