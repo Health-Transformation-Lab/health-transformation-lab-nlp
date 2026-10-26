@@ -343,3 +343,33 @@ def test_ai_mask_is_registered_and_says_what_it_needs(monkeypatch):
     monkeypatch.delenv("DATABRICKS_WAREHOUSE_ID", raising=False)
     with pytest.raises(RuntimeError, match="DATABRICKS_WAREHOUSE_ID"):
         deid.detect_ai_mask("x")
+
+
+# ---------------------------------------------------------------- routed combination
+def _route_records():
+    t = "Pt Ana Ruiz seen 3/4/2024, BOP 6-5-6"
+    return [{"note_id": 1, "tier": "hard", "text": t, "decoys": [],
+             "phi": [{"start": 3, "end": 11, "text": "Ana Ruiz", "type": "PATIENT"},
+                     {"start": 17, "end": 25, "text": "3/4/2024", "type": "DATE"}]}]
+
+
+def _engine_a(t):   # names right; its "dates" are probing readings (wrong)
+    return [{"start": 3, "end": 11, "type": "NAME"}, {"start": 31, "end": 36, "type": "DATE"}]
+
+
+def _engine_b(t):   # dates right
+    return [{"start": 17, "end": 25, "type": "DATE"}]
+
+
+def test_routes_keep_only_engine_types_that_were_precise_on_the_training_tiers():
+    routes, table = deid_eval.choose_routes(_route_records(), {"a": _engine_a, "b": _engine_b}, min_precision=0.8,
+                                            guard=False)
+    assert routes == {"a": {"NAME"}, "b": {"DATE"}}
+    row = table.set_index(["engine", "type"]).loc[("a", "DATE")]
+    assert row.precision == 0.0 and not row.kept
+
+
+def test_routed_engine_unions_only_the_routed_types():
+    detect = deid.routed_engine({"a": {"NAME"}, "b": {"DATE"}}, {"a": _engine_a, "b": _engine_b}, guard=False)
+    t = _route_records()[0]["text"]
+    assert [t[s["start"]:s["end"]] for s in detect(t)] == ["Ana Ruiz", "3/4/2024"]

@@ -22,6 +22,7 @@ filled from the vendor's pricing page.
 """
 
 import argparse
+import functools
 import json
 import logging
 
@@ -38,7 +39,8 @@ DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "pr
            "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
            "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "ai_mask", "ai_mask+regex_v2+guard",
            "azure_deid", "azure_deid+regex_v2+guard", "azure_language", "azure_language+regex_v2+guard",
-           "aws_comprehend", "aws_comprehend+regex_v2+guard"]
+           "aws_comprehend", "aws_comprehend+regex_v2+guard",
+           "hf_stanford+hf_obi+regex_v2+guard", "hf_stanford+presidio+regex_v2+guard", "routed+guard"]
 ap = argparse.ArgumentParser()
 ap.add_argument("--engines", default=",".join(DEFAULT))
 ap.add_argument("--n-notes", type=int, default=400)
@@ -46,6 +48,11 @@ ap.add_argument("--seed", type=int, default=7)
 ap.add_argument("--external", default=None,
                 help="another labeled PHI set (JSONL/JSON, e.g. ASQ-PHI) scored as tier 'external'")
 ap.add_argument("--i2b2-2014", default=None, help="folder of the n2c2 2014 XML notes (data use agreement)")
+ap.add_argument("--route-engines", default="hf_stanford,hf_obi,presidio,regex_v2",
+                help="engines 'routed+guard' may draw on; each keeps only the types it was precise on")
+ap.add_argument("--route-min-precision", type=float, default=0.8)
+ap.add_argument("--route-train-tiers", default="easy,hard",
+                help="tiers the routes are chosen on; score them on the others (unseen, external)")
 ap.add_argument("--tiers", default="all,unseen",
                 help="tiers priced: all (the mix) and unseen (held out from regex_v2's design)")
 a = ap.parse_args()
@@ -65,18 +72,40 @@ with open(RAW_DIR / "deid_challenge.jsonl", "w") as f:
 cfg = yaml.safe_load(COSTS_YAML.read_text())
 dcfg, compute, n_corpus = cfg["deid"], cfg["compute"], cfg["corpus_notes"]
 
-scores, cats, not_run, speed = [], [], [], {}
+# Each engine runs once per note: unions and routes reuse the cached spans (throughput below is
+# measured on the uncached engines).
+RAW_ENGINES = dict(deid.ENGINES)
+for _name, _fn in RAW_ENGINES.items():
+    deid.ENGINES[_name] = functools.lru_cache(maxsize=None)(lambda t, _fn=_fn: tuple(_fn(t)))
+
+
+def _routed():
+    names = a.route_engines.split(",")
+    train = [r for r in ch if r["tier"] in a.route_train_tiers.split(",")]
+    routes, table = deid_eval.choose_routes(train, {n: lambda t, n=n: list(deid.ENGINES[n](t)) for n in names},
+                                            min_precision=a.route_min_precision)
+    table.to_csv(DEID_DIR / "routes.csv", index=False)
+    print("routes:", {e: sorted(t) for e, t in routes.items()})
+    return deid.routed_engine(routes, {n: lambda t, n=n: list(deid.ENGINES[n](t)) for n in names}), names
+
+
+scores, cats, not_run, speed, members_of = [], [], [], {}, {}
 for spec in a.engines.split(","):
-    detect = deid.get_engine(spec)
+    members = [p for p in spec.split("+") if p != "guard"]
     try:
+        if spec == "routed+guard":
+            detect, members = _routed()
+        else:
+            detect = deid.get_engine(spec)
         detect(ch[0]["text"])
     except Exception as e:  # noqa: BLE001 - missing package, model or endpoint: record and skip
         not_run.append({"method": spec, "reason": f"{type(e).__name__}: {str(e)[:160]}"})
         print(f"{spec}: not run ({type(e).__name__})")
         continue
-    for member in [p for p in spec.split("+") if p != "guard"]:
+    members_of[spec] = members
+    for member in members:
         if member not in speed and member not in deid.CLOUD_ENGINES:
-            speed[member] = deid_eval.measure_throughput(ch[:100], deid.get_engine(member))
+            speed[member] = deid_eval.measure_throughput(ch[:100], RAW_ENGINES[member])
     r = deid_eval.score_records(ch, detect)
     scores.append(r["summary"].assign(method=spec))
     cats.append(r["by_category"].assign(method=spec))
@@ -95,7 +124,7 @@ pd.DataFrame(not_run, columns=["method", "reason"]).to_csv(DEID_DIR / "not_run.c
 rows = []
 for (tier, spec), g in scores[scores.tier.isin(a.tiers.split(","))].groupby(["tier", "method"], sort=False):
     s = g.iloc[0]
-    for member in [p for p in spec.split("+") if p != "guard"]:
+    for member in members_of[spec]:
         e = dict(dcfg["engines"][member])
         if e["kind"] == "local":
             e["notes_per_sec"] = speed[member]

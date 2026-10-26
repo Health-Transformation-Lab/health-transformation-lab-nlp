@@ -461,6 +461,18 @@ def get_engine(spec: str):
     return detect
 
 
+def routed_engine(routes: dict, engines: dict | None = None, guard: bool = True):
+    """Union of each engine's spans of only its routed types (deid_eval.choose_routes), then the
+    dental guard. Types are filtered per engine before spans merge, since merging keeps one type."""
+    engines = engines or ENGINES
+
+    def detect(text: str) -> list[dict]:
+        spans = _merge([s for name, kinds in routes.items() for s in engines[name](text) if s["type"] in kinds])
+        return dental_guard(text, spans) if guard else spans
+    detect.__name__ = "routed" + ("+guard" if guard else "")
+    return detect
+
+
 def redact(text: str, spans: list[dict]) -> str:
     out, last = [], 0
     for s in sorted(spans, key=lambda s: s["start"]):

@@ -60,6 +60,30 @@ def score_records(records: list[dict], detect) -> dict:
     return {"summary": summary, "by_category": by_cat, "per_note": per}
 
 
+def choose_routes(records: list[dict], engines: dict, min_precision: float = 0.8,
+                  guard: bool = True) -> tuple[dict, pd.DataFrame]:
+    """Route each identifier type to the engines that report it precisely. For every (engine, type
+    the engine reports), precision = share of its flagged characters that are PHI, after the dental
+    guard. Pairs at or above min_precision are kept. Choose on training tiers only (easy, hard) and
+    score on held-out ones, or the routes are graded on the notes that picked them."""
+    from .deid import dental_guard
+    hit: dict = {}
+    for r in records:
+        phi = _chars(r["phi"])
+        for name, fn in engines.items():
+            spans = fn(r["text"])
+            for s in (dental_guard(r["text"], spans) if guard else spans):
+                c = set(range(s["start"], s["end"]))
+                h = hit.setdefault((name, s["type"]), [0, 0])
+                h[0] += len(c & phi)
+                h[1] += len(c)
+    table = pd.DataFrame([{"engine": e, "type": t, "chars": n, "precision": k / n if n else 0.0}
+                          for (e, t), (k, n) in hit.items()])
+    table["kept"] = table.precision >= min_precision
+    routes = {e: set(g.type[g.kept]) for e, g in table.groupby("engine")}
+    return {e: t for e, t in routes.items() if t}, table.sort_values(["engine", "type"]).reset_index(drop=True)
+
+
 def measure_throughput(records: list[dict], detect, min_seconds: float = 0.5) -> float:
     """Notes per second on this machine (local engines)."""
     n, t0 = 0, time.perf_counter()
