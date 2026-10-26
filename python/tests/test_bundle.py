@@ -8,6 +8,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 VAR = re.compile(r"\$\{var\.([a-z_]+)\}")
+GOLD_CATALOG = "${resources.schemas.gold.catalog_name}"
+GOLD_SCHEMA = "${resources.schemas.gold.name}"
 WIDGET = re.compile(r"""widgets\.(?:text|dropdown)\(\s*["']([a-z_]+)["']|CREATE WIDGET TEXT ([a-z_]+)""")
 
 
@@ -87,7 +89,7 @@ def test_mlflow_experiment_and_uc_model_per_target():
     assert "${bundle.target}" in "".join(m["experiments"]["dental_experiment"]["name"]) or \
         "${workspace.root_path}" in m["experiments"]["dental_experiment"]["name"]
     rm = m["registered_models"]["perio_note_classifier"]
-    assert rm["catalog_name"] == "${var.catalog}" and rm["schema_name"] == "${var.schema}"
+    assert rm["catalog_name"] == GOLD_CATALOG and rm["schema_name"] == GOLD_SCHEMA
 
 
 def test_judge_monitoring_job_only_in_uat_and_prod():
@@ -98,3 +100,29 @@ def test_judge_monitoring_job_only_in_uat_and_prod():
         t = root["targets"][env]["resources"]["jobs"]["judge_monitoring"]["tasks"][0]["notebook_task"]
         assert t["base_parameters"]["experiment_id"] == "${resources.experiments.dental_experiment.id}"
         assert t["base_parameters"]["sample_rate"] == "${var.judge_sample_rate}"
+
+
+def test_bundle_creates_the_medallion_catalogs_and_gold_schema():
+    """bronze_/silver_/dental_omop_perio catalogs and the gold schema are bundle
+    resources, so a deploy creates them; prevent_destroy keeps `bundle destroy`
+    from dropping data."""
+    uc = yaml.safe_load((ROOT / "databricks/resources/unity_catalog.yml").read_text())["resources"]
+    names = {k: c["name"] for k, c in uc["catalogs"].items()}
+    assert names == {"bronze": "bronze_${var.catalog}", "silver": "silver_${var.catalog}", "gold": "${var.catalog}"}
+    gold = uc["schemas"]["gold"]
+    assert gold["catalog_name"] == "${resources.catalogs.gold.name}" and gold["name"] == "${var.schema}"
+    for r in [*uc["catalogs"].values(), gold]:
+        assert r["lifecycle"]["prevent_destroy"] is True
+
+
+def test_jobs_write_to_the_bundle_schema():
+    # Via the resource, not ${var.catalog}: dev mode prefixes UC resource names
+    # (dev_<user>_...) and jobs must follow the name the deploy actually created.
+    root, jobs = _load()
+    seen = 0
+    for name, task, _ in _tasks(root, jobs):
+        p = task["notebook_task"].get("base_parameters", {})
+        if "catalog" in p:
+            assert (p["catalog"], p["schema"]) == (GOLD_CATALOG, GOLD_SCHEMA), name
+            seen += 1
+    assert seen >= 3

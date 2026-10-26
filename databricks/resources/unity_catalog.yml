@@ -1,0 +1,36 @@
+# Unity Catalog containers the bundle owns: the medallion catalogs and the gold
+# schema the jobs, data volume and registered model live in (docs/deployment.md).
+# Each target is its own workspace, so the names are the same everywhere; in dev
+# mode Databricks prefixes them dev_<user>_, which is why jobs reference these
+# resources instead of ${var.catalog}.
+#
+# prevent_destroy: `bundle destroy` must never drop a catalog or schema with data
+# in it. Remove the catalog by hand if you really mean to.
+# Needs Databricks CLI >= 0.288 (catalogs resource) and CREATE CATALOG on the
+# metastore for whoever deploys.
+
+resources:
+  catalogs:
+    bronze:
+      name: bronze_${var.catalog}
+      comment: Raw (bronze) layer for dental-omop-perio. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    silver:
+      name: silver_${var.catalog}
+      comment: Cleaned (silver) layer for dental-omop-perio. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    gold:
+      name: ${var.catalog}
+      comment: Gold layer for dental-omop-perio. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+
+  schemas:
+    gold:
+      catalog_name: ${resources.catalogs.gold.name}
+      name: ${var.schema}
+      comment: Study tables, data volume and perio_note_classifier. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true

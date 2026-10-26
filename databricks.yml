@@ -131,8 +131,8 @@ targets:
               notebook_task:
                 notebook_path: databricks/notebooks/03_medgemma_reader.py
                 base_parameters:
-                  catalog: ${var.catalog}
-                  schema: ${var.schema}
+                  catalog: ${resources.schemas.gold.catalog_name}
+                  schema: ${resources.schemas.gold.name}
                   rung: ${var.reader_rung}
                   limit: ${var.reader_limit}
                   shots: "0"

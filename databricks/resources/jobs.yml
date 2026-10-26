@@ -15,8 +15,8 @@ resources:
           notebook_task:
             notebook_path: ../notebooks/01_run_benchmark.py
             base_parameters:
-              catalog: ${var.catalog}
-              schema: ${var.schema}
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
               n_people: ${var.n_people}
               leak_assessment: "false"
               experiment: ${resources.experiments.dental_experiment.name}
@@ -47,6 +47,6 @@ resources:
             notebook_path: ../notebooks/02_llm_judge.sql
             warehouse_id: ${var.warehouse_id}
             base_parameters:
-              catalog: ${var.catalog}
-              schema: ${var.schema}
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
               judge_endpoint: ${var.judge_endpoint}

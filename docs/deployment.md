@@ -24,13 +24,18 @@ variables.
 Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
 schema names are the same everywhere. Catalogs follow a medallion layout:
 `bronze_dental_omop_perio` (raw), `silver_dental_omop_perio` (cleaned) and
-`dental_omop_perio` (gold). The bundle writes to the gold catalog only. The
-catalog must already exist in each workspace; the jobs create the schema and
-volume, not the catalog.
+`dental_omop_perio` (gold). The bundle creates all three catalogs and the gold
+schema on deploy (`databricks/resources/unity_catalog.yml`, with
+`prevent_destroy` so `bundle destroy` never drops them); notebook 01 creates the
+`data` volume. The jobs write to the gold schema only. Deploying needs Databricks
+CLI 0.288 or later and `CREATE CATALOG` on the metastore. (The old
+`dental_uat` / `dental_prod` catalogs were placeholders the bundle never created;
+you had to make them by hand.)
 
 In dev (`mode: development`) Databricks prefixes Unity Catalog resources with
-`dev_<user short name>_` instead of `[dev <you>]`, so the registered model is
-`dental_omop_perio.dental_omop_perio.dev_<you>_perio_note_classifier`. Deployed
+`dev_<user short name>_` instead of `[dev <you>]`: the catalogs, schema and
+registered model all get it, and the jobs follow because they reference the
+schema resource rather than the `catalog`/`schema` variables. Deployed
 from CI by the service principal, `<you>` is the principal's short name (e.g.
 `dev_dental_omop_ci_perio_note_classifier`). uat and prod have no prefix.
 
@@ -85,7 +90,8 @@ One-time setup in GitHub → Settings → Environments:
    `DATABRICKS_CLIENT_SECRET` (a service principal's OAuth M2M credentials), and
    variables `SERVICE_PRINCIPAL`, `JUDGE_ENDPOINT`, `WAREHOUSE_NAME`,
    `GPU_NODE_TYPE`, `USERS_GROUP` as needed.
-3. In each workspace: the service principal can use the catalog/schema, the
+3. In each workspace: the service principal has `CREATE CATALOG` on the
+   metastore (the bundle creates the catalogs) and can use the
    warehouse and the serving endpoint; create the `dental` secret scope with
    `hf_token` for the MedGemma job.
 
