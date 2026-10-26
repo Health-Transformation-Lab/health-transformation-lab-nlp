@@ -13,7 +13,7 @@
 - [ ] T010 Pick the engine on the unseen tier; switch study.py's default; keep a human review sample on real notes
 - [x] T011 AI engines: transformer NER (hf_stanford, hf_obi) and LLM (llm) with a verbatim-only rule; LLM token cost in Python and R; Databricks notebook 06_deid_benchmark.py
 - [x] T012 Run the transformer engines (hf_stanford, hf_obi, alone and with regex_v2+guard) on CPU now that Hugging Face is reachable; rows merged into data/deid, docs updated
-- [ ] T012b Run the llm engine (needs a serving endpoint) and score hf_stanford+presidio / hf_stanford+hf_obi ensembles
+- [ ] T012b Run the llm engine on a pay-per-token endpoint via `06_deid_benchmark.py` (notebook ready for Free Edition: auto-detects the warehouse, copies results into the Git folder); hf_stanford+presidio / hf_stanford+hf_obi ensembles are scored
 - [x] T013 John Snow Labs engine (`jsl`, clinical_deidentification pipeline) tested with a fake pipeline; i2b2/n2c2 2014 loader (`--i2b2-2014`)
 - [ ] T014 Get a John Snow Labs licence (academic or trial) and n2c2 2014 access; run every engine on both
 - [x] T015 Databricks `ai_mask` engine: spans recovered from the masked text, tested with a fake reply; notebook widget for a SQL warehouse; token cost ILLUSTRATIVE
