@@ -35,6 +35,7 @@ import random
 import time
 import urllib.request
 from dataclasses import dataclass
+from typing import ClassVar
 
 from .labels import LABELS
 
@@ -80,6 +81,95 @@ USER = """Note:
 Predicted status: {pred}
 
 Is the predicted status supported by the note?"""
+
+
+# ---- spec 002 T011: each component judged separately (GlobalDentBench's "key points").
+# A prediction can have the right stage and the wrong grade; one overall verdict hides that.
+COMPONENTS = ("status", "grade", "extent")
+GRADES = ("A", "B", "C")
+EXTENTS = ("localized", "generalized", "molar_incisor")
+PROMPT_VERSION_COMPONENTS = "judge-components-v1"
+
+COMPONENT_SYSTEM = ("You are a periodontist auditing an automated classifier. Judge each part of its "
+                    "prediction separately against the dental chart note, under the 2017 AAP/EFP "
+                    "classification.\n\n" + CRITERIA + """
+
+Grade and extent apply only to periodontitis: if the predicted status is not periodontitis,
+answer "not_applicable" for both. Answer with JSON only, one object per part:
+{"status": {"verdict": "correct" | "incorrect" | "not_determinable", "supported": a status or null, "quote": "..."},
+ "grade": {"verdict": "correct" | "incorrect" | "not_determinable" | "not_applicable", "supported": "A" | "B" | "C" | null, "quote": "..."},
+ "extent": {"verdict": "correct" | "incorrect" | "not_determinable" | "not_applicable", "supported": "localized" | "generalized" | "molar_incisor" | null, "quote": "..."}}
+Each quote is the exact text from the note that decides that part, copied verbatim.""")
+
+COMPONENT_USER = """Note:
+<<<
+{note}
+>>>
+
+Prediction:
+status: {status}
+grade: {grade}
+extent: {extent}
+
+Judge each part."""
+
+_ALLOWED = {"status": (None, *LABELS), "grade": (None, *GRADES), "extent": (None, *EXTENTS)}
+
+
+def gate_components(note: str, out: dict, pred_status: str) -> dict[str, tuple[bool, str]]:
+    """Quote gate and schema check per component: {component: (ok, reason)}."""
+    perio = str(pred_status).startswith("periodontitis")
+    res = {}
+    for c in COMPONENTS:
+        o = out.get(c) or {}
+        v = o.get("verdict")
+        allowed = {"correct", "incorrect", "not_determinable"} | ({"not_applicable"} if c != "status" else set())
+        if v not in allowed:
+            res[c] = (False, "bad verdict")
+        elif c != "status" and not perio and v != "not_applicable":
+            res[c] = (False, "must be not_applicable")
+        elif o.get("supported") not in _ALLOWED[c]:
+            res[c] = (False, f"bad {c}")
+        elif v in ("correct", "incorrect") and (not (o.get("quote") or "").strip() or o["quote"].strip() not in note):
+            res[c] = (False, "quote not in note")
+        else:
+            res[c] = (True, "")
+    return res
+
+
+@dataclass
+class ComponentVerdict:
+    verdict: str
+    supported: str | None
+    quote: str
+    quote_ok: bool
+    error: str = ""
+
+
+class SimulatedComponentJudge:
+    """Dry-run component judge: knows each component's truth; errs at fixed rates per component."""
+
+    simulated = True
+    RATES: ClassVar[dict] = {"status": (0.93, 0.88), "grade": (0.85, 0.80), "extent": (0.88, 0.82)}  # (sens, spec)
+
+    def __init__(self, truth: dict[int, dict], nd_rate: float = 0.04, seed: int = 13):
+        self.truth, self.nd, self.rng = truth, nd_rate, random.Random(seed)
+
+    def __call__(self, note: str, pred: dict, visit_id: int) -> dict[str, ComponentVerdict]:
+        t, out = self.truth[visit_id], {}
+        for c in COMPONENTS:
+            if c != "status" and not str(pred.get("status", "")).startswith("periodontitis"):
+                out[c] = ComponentVerdict("not_applicable", None, "", True)
+                continue
+            se, sp = self.RATES[c]
+            if self.rng.random() < self.nd:
+                v = "not_determinable"
+            elif pred.get(c) == t.get(c):
+                v = "correct" if self.rng.random() < se else "incorrect"
+            else:
+                v = "incorrect" if self.rng.random() < sp else "correct"
+            out[c] = ComponentVerdict(v, t.get(c) if v == "incorrect" else pred.get(c), "simulated", True)
+        return out
 
 
 @dataclass
@@ -146,6 +236,25 @@ class OpenAIJudge:
                 err = f"{type(e).__name__}: {e}"
                 time.sleep(2 ** attempt)
         return Verdict("", None, "", "", False, 0, 0, 0.0, err)
+
+
+def judge_components_openai(j: OpenAIJudge, note: str, pred: dict) -> dict[str, ComponentVerdict]:
+    """One call, three verdicts, through the same OpenAI-compatible endpoint as OpenAIJudge."""
+    body = json.dumps({"model": j.model, "temperature": j.temperature, "max_tokens": 500,
+                       "messages": [{"role": "system", "content": COMPONENT_SYSTEM},
+                                    {"role": "user", "content": COMPONENT_USER.format(
+                                        note=note, status=pred.get("status"), grade=pred.get("grade") or "none",
+                                        extent=pred.get("extent") or "none")}]}).encode()
+    req = urllib.request.Request(f"{j.base_url}/chat/completions", data=body, method="POST",
+                                 headers={"Authorization": f"Bearer {j.api_key}", "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            out = _parse(json.loads(r.read())["choices"][0]["message"]["content"])
+    except Exception as e:  # noqa: BLE001 - record the error per component, don't stop the batch
+        return {c: ComponentVerdict("", None, "", False, f"{type(e).__name__}: {e}") for c in COMPONENTS}
+    ok = gate_components(note, out, pred.get("status", ""))
+    return {c: ComponentVerdict((out.get(c) or {}).get("verdict", ""), (out.get(c) or {}).get("supported"),
+                                (out.get(c) or {}).get("quote", ""), ok[c][0], ok[c][1]) for c in COMPONENTS}
 
 
 class SimulatedJudge:

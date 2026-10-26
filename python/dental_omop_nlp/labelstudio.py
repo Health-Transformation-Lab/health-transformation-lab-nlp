@@ -71,6 +71,7 @@ def simulate_export(tasks: list[dict], key: pd.DataFrame, n_reviewers: int = 4,
     sometimes defers to the clinician's written dx, sometimes says
     cannot_determine. Purely for testing the pipeline."""
     rng = random.Random(seed)
+    rng_ge = random.Random(seed + 1000)   # grade/extent: own stream, so status labels don't change
     truth = key.set_index("visit_id")
     order = [s.value for s in Status]
     reviewers = [{"id": i + 1, "email": f"reviewer{i + 1}@example.org",
@@ -91,8 +92,14 @@ def simulate_export(tasks: list[dict], key: pd.DataFrame, n_reviewers: int = 4,
                    {"from_name": "confidence", "to_name": "note", "type": "rating",
                     "value": {"rating": rng.randint(3, 5)}}]
             if s.startswith("periodontitis"):
-                res.append({"from_name": "grade", "to_name": "note", "type": "choices",
-                            "value": {"choices": [row["truth_grade"] if isinstance(row["truth_grade"], str) else "B"]}})
+                g = row["truth_grade"] if isinstance(row["truth_grade"], str) else "B"
+                if rng_ge.random() < rv["err"]:
+                    g = rng_ge.choice([x for x in "ABC" if x != g])
+                e = row["truth_extent"] if isinstance(row.get("truth_extent"), str) else "generalized"
+                if rng_ge.random() < rv["err"] / 2:
+                    e = "localized" if e == "generalized" else "generalized"
+                res.append({"from_name": "grade", "to_name": "note", "type": "choices", "value": {"choices": [g]}})
+                res.append({"from_name": "extent", "to_name": "note", "type": "choices", "value": {"choices": [e]}})
             anns.append({"completed_by": {"id": rv["id"], "email": rv["email"]}, "result": res,
                          "was_cancelled": False, "lead_time": round(rng.uniform(40, 240), 1)})
         out.append({"id": vid, "data": t["data"], "annotations": anns})

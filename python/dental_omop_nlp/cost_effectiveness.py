@@ -64,6 +64,15 @@ def calibrate_judge(gold: pd.DataFrame) -> dict:
             "gate_fail_rate": float((~gold["gate_ok"]).mean())}
 
 
+def calibrate_components(gold: pd.DataFrame) -> pd.DataFrame:
+    """gold: component, verdict, truly_correct, gate_ok (one row per chart and component).
+    One calibration row per component (spec 002 T011); not_applicable rows are dropped."""
+    rows = []
+    for comp, g in gold[gold["verdict"] != "not_applicable"].groupby("component", sort=False):
+        rows.append({"component": comp, **calibrate_judge(g)})
+    return pd.DataFrame(rows)
+
+
 def judge_kappa(gold: pd.DataFrame) -> float:
     """Cohen's kappa between the judge's verdict and the truth (reviewer consensus)."""
     from .phenotype import cohen_kappa

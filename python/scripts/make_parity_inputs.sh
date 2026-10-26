@@ -15,5 +15,6 @@ python scripts/20_data_quality.py
 python scripts/22_build_sites.py
 python scripts/14_benchmark_cost.py --simulate-missing
 python scripts/15_judge.py --backend simulated --simulated-review
+python scripts/27_component_judge.py --simulated
 python scripts/16_cost_effectiveness.py --simulated
 python scripts/26_deid_benchmark.py      # engines that can run here; Presidio and Azure are skipped if unavailable

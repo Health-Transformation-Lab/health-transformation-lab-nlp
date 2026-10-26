@@ -21,7 +21,7 @@ avoiding. Full mapping: `docs/dentbench_methods.md`.
 | Safety severity S0/S1/S2 for every response; unsafe rate = (S1+S2)/all | Grade every misclassification by clinical consequence; report unsafe and S2 rates per method alongside agreement |
 | Reasoning levels L1 recall / L2 routine / L3 individualized, macro-averaged | Difficulty levels per note (stated in 2017 terms / needs translation / must infer or resolve conflict); report agreement per level |
 | Judge chosen from 5 candidates by dentist acceptance (2 dentists, 1,800 judgments) | Judge bake-off on the reviewed charts; pick by kappa against reviewers |
-| Answers decomposed into key points, each judged covered or not | Judge status, grade and extent as separate verdicts (planned, T011) |
+| Answers decomposed into key points, each judged covered or not | Judge status, grade and extent as separate verdicts (T011: `judge.COMPONENT_SYSTEM`, `scripts/27_component_judge.py`) |
 | Expert audit of a ~30% subset of generated cases | Clinician plausibility audit of synthetic notes (spec 001 T012), sized as a share of the review set |
 
 | GlobalDentBench gap | What we do instead |

@@ -34,6 +34,14 @@ an earlier visit (level 2). The hardest have no written diagnosis, or one that c
 chart (level 3). Agreement is reported per level, so a method that only handles easy charts
 doesn't look better than it is.
 
+**One verdict per part.** GlobalDentBench splits each answer into key points and judges each one.
+Here the judge gives a separate verdict for status, grade and extent (`scripts/27_component_judge.py`),
+so a prediction with the right stage but the wrong grade isn't simply "correct" or "incorrect".
+Each part gets its own judge calibration (sensitivity and specificity against reviewer consensus).
+Simulated dry run (not a result): the note-rules reader agrees with reviewer consensus on 81% of
+statuses, 99% of grades and 93% of extents where both say periodontitis. Grade has almost no wrong
+predictions to calibrate on, so its judge specificity isn't measurable yet.
+
 Both ideas come from GlobalDentBench (a dental AI benchmark, arXiv 2605.24636), which grades AI
 answers to dental questions the same way.
 

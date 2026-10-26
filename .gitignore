@@ -241,6 +241,8 @@ data/corpus/*
 !data/corpus/simulated_judge_calibration.json
 !data/corpus/cost_benchmark.csv
 !data/corpus/simulated_judge_bakeoff.csv
+!data/corpus/simulated_component_gold.csv
+!data/corpus/simulated_component_calibration.csv
 !data/review/simulated_reliability/by_level.csv
 data/datasets/sft_reader_records.jsonl
 

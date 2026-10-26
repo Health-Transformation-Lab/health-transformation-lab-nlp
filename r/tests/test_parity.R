@@ -153,6 +153,22 @@ if (file.exists(sp) && file.exists("data/review/simulated_reviewer_labels.csv") 
   }
 } else cat("spec 005 twins: skipped (run python scripts 18 --simulated and 21 first)\n")
 
+# 11. Component verdicts (spec 002 T011): R calibrate_judge per component == Python calibrate_components.
+if (file.exists("data/corpus/simulated_component_gold.csv")) {
+  source("r/R/05_cost_effectiveness.R")
+  g <- read.csv("data/corpus/simulated_component_gold.csv", stringsAsFactors = FALSE)
+  g <- g[g$verdict != "not_applicable", ]
+  py <- read.csv("data/corpus/simulated_component_calibration.csv", stringsAsFactors = FALSE)
+  r <- do.call(rbind, lapply(py$component, function(cp) {
+    c0 <- calibrate_judge(g[g$component == cp, ])
+    data.frame(component = cp, sensitivity = c0$sensitivity, specificity = c0$specificity)
+  }))
+  m <- merge(r, py, by = "component")
+  d <- max(abs(c(m$sensitivity.x - m$sensitivity.y, m$specificity.x - m$specificity.y)))
+  cat(sprintf("components:   %d components, max |R - Python| = %.2e\n", nrow(m), d))
+  stopifnot(nrow(m) == 3, d < 1e-12)
+} else cat("components: skipped (run python/scripts/27_component_judge.py --simulated first)\n")
+
 cat("parity OK (all sections)\n")
 
 # 5. Cost-effectiveness: point estimates, costs, dominance and ICER match Python.

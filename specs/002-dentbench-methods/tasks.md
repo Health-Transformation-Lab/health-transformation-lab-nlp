@@ -24,7 +24,7 @@
 
 ## Phase 5: Later
 
-- [ ] T011 Component verdicts (status, grade, extent judged separately), after the grade/extent readers are validated
+- [x] T011 Component verdicts (status, grade, extent judged separately), after the grade/extent readers are validated
 - [ ] T012 Periodontist sign-off on the severity matrix (owner: dental reviewer)
 - [ ] T013 Dentist acceptance check on a sample of judge verdicts (GlobalDentBench-style), alongside kappa
 
