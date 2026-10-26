@@ -117,6 +117,7 @@ placeholder (chart first, radiograph as a lower bound) as `algorithm_v0`.
 
 Every model reads **only** the de-identified note. Baselines (rules, TF-IDF,
 TF-IDF + radiograph features), the 12-model BERT ladder, and LLM readers.
+What a BERT model is, in plain words: [bert.md](bert.md).
 
 - Code: [`rungs.py`](../python/dental_omop_nlp/rungs.py) `make_rung`; [`models.yaml`](../models.yaml) (Hugging Face ids, papers);
   [`llm_reader.py`](../python/dental_omop_nlp/llm_reader.py); [`scripts/11_ai_predict.py`](../python/scripts/11_ai_predict.py).
