@@ -11,7 +11,7 @@ an architect's view on. Context: [process.md](process.md), [plan.md](plan.md).
 
 ## What the system does
 
-For each dental visit, seven sources (chart notes, exam forms, completed and
+For each dental visit, seven data sources in the record (chart notes, exam forms, completed and
 planned procedure codes, completed and planned procedure diagnoses, the probing
 chart) each suggest a periodontal status. We compare them, derive a rule-based
 phenotyping algorithm, train BERT-family models on the notes, and validate all

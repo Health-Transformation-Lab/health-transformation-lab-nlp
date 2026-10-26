@@ -9,26 +9,29 @@ Can periodontal status be phenotyped from a dental EHR, and can AI reading the
 chart notes match clinicians? This repo runs that study end to end on **synthetic**
 data, to learn the pipeline, the reviewer workflow and the analysis.
 
-<img src="docs/img/process.png" alt="Study process" width="520">
+<img src="docs/img/process.png" alt="Study process" width="420">
 
 **What a phenotype is:** a computable definition of a condition, meaning a rule or model that reads a
 patient's record and assigns a label the same way every time. Here the label is periodontal status:
 healthy, gingivitis or periodontitis stage I–IV (with grade and extent). Dental records rarely hold a
 reliable assigned diagnosis, so the phenotype has to be derived from the evidence below.
 
-**Sources read for each visit:**
+**Data sources for each visit.** Here "source" means a part of the patient's dental record
+(not a citation). Each one suggests a periodontal status, and they often disagree:
 
-- **Chart notes** (free text)
-- **Exam forms** (structured fields, e.g. PSR score, perio status)
-- **Procedure codes**, completed and planned (CDT, e.g. D4341 scaling and root planing)
-- **Procedure diagnosis codes**, completed and planned (ICD-10-CM, e.g. K05.3x)
-- **Probing chart** (attachment loss, bone loss, teeth lost to periodontitis)
+| # | Source | What it is | Rule-based phenotype |
+|---|---|---|---|
+| 1 | Chart note | Free text the clinician writes | 3rd |
+| 2 | Exam form | Structured fields, e.g. PSR score, perio status | 1st |
+| 3–4 | Procedure diagnoses, completed / planned | ICD-10-CM codes, e.g. K05.3x | 2nd |
+| 5–6 | Procedure codes, completed / planned | CDT codes, e.g. D4341 scaling and root planing | compared, not used |
+| 7 | Probing chart | Attachment loss, bone loss, teeth lost | 4th |
 
-**Free text:** in this repo the chart notes are the only free text, and the only input the AI models
-read. Real records have more (exam-form and perio-chart comments, radiograph interpretations,
-treatment-plan notes, referral letters, medical-history text): see [action items](docs/action_items.md).
+The phenotype takes the first source in that order with an answer; all 24 orders are scored
+against the reviewers so a better one can replace it. A radiograph AI reading can only raise the stage.
 
-Details: [docs/process.md](docs/process.md).
+**Free text:** here the chart notes are the only free text and the only AI input; real records have
+more (form and chart comments, radiograph reports, referral letters): [action items](docs/action_items.md). Details: [process.md](docs/process.md).
 
 **Two classification systems:** the 2017 AAP/EFP staging and grading, following the AAP worksheet
 ([PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf)),
@@ -46,10 +49,10 @@ step, with links to the code; the Databricks notebook
 |---|---|---|
 | 1 | Generate synthetic patients over time (8 clinics): notes, exam forms, procedure codes and diagnoses, probing chart; fake PHI in notes | [1](docs/code_walkthrough.md#1-generate-the-synthetic-study) |
 | 2 | De-identify; a leak gate blocks any note with PHI left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
-| 3 | Read each source; compare them; build the rule-based phenotype (study-design order) | [3–5](docs/code_walkthrough.md#3-read-each-source) |
+| 3 | Read each source; compare them; build the rule-based phenotype (sources in the order above) | [3–5](docs/code_walkthrough.md#3-read-each-source) |
 | 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
 | 5 | Reviewers stage the same charts in Label Studio | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
-| 6 | Reliability and the acceptance test, on six and five categories; every source order scored | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
+| 6 | Reliability and the acceptance test, on six and five categories; all 24 source orders scored | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
 | 7 | Over time and at scale: plausibility, data quality, clinic prevalence, progression | [10–12](docs/code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
 | 8 | Site-level charts, both classifications, three OMOP storage designs, Lakebase | [13–15](docs/code_walkthrough.md#13-site-level-charts-both-classifications) |
 | 9 | 1M+ notes: LLM judge and cost; deploy to dev, UAT, prod | [16–18](docs/code_walkthrough.md#16-llm-judge-and-cost-at-1m-notes) |
@@ -58,9 +61,8 @@ Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[de
 
 ## Ground rules
 
-- **Synthetic data only.** No PHI, real records, or employer or partner data, ever.
-  A de-identification leak gate guards Label Studio and every model.
-- **Python and R, one contract:** same files, same numbers (parity-tested to 1e-9).
+- **Synthetic data only.** No PHI, real records, or employer or partner data, ever; a leak gate
+  guards Label Studio and every model. **Python and R** give the same numbers (parity-tested to 1e-9).
 
 ## How results are measured
 
@@ -101,11 +103,7 @@ Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol]
 | **Diagrams**: [medallion architecture](diagrams/d0_medallion_architecture.png), study process, platform, ERD, site storage, MLOps, flows | [diagrams/](diagrams/README.md) |
 | Site-level data in OMOP: 32 teeth × 6 sites, derived measures, 2017 AAP/EFP **and 2012 CDC/AAP**, three storage designs on Postgres/Lakebase, concept mapping, Atlas feasibility | [site_level_omop.md](docs/site_level_omop.md) |
 | Integrated phenotype (five categories, source order), patients over time, clinic prevalence, data quality, prediction | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
-| Dental vs medical data in OMOP: what claims and EHRs track, tooth/site gaps | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md) |
-| Data: synthetic notes, review set, public datasets | [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
-| MLflow and MLOps: tracking, Unity Catalog models with champion/challenger gated by the acceptance test, MLflow GenAI LLM judge | [mlops.md](docs/mlops.md) |
-| Deploying: Asset Bundle with **dev, UAT, prod** targets and variables; CI | [deployment.md](docs/deployment.md) |
-| Results storage; Lakebase for review queue, live labels, run ledger | [results_storage.md](docs/results_storage.md) |
-| Retrieval, OMOP synonyms/ancestors/relationships, graphs: 8 test cases | [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
-| Financial trade-offs: inference vs review hours vs accuracy | [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md) |
-| Exploratory: radiograph findings; MedGemma | [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
+| Dental vs medical data in OMOP; synthetic notes, review set, public datasets | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md), [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
+| MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
+| Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
+| Financial trade-offs; exploratory radiograph findings and MedGemma | [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |

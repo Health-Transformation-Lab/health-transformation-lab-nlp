@@ -152,8 +152,28 @@ stage III–IV per clinic, with Wilson 95% intervals, compared with NHANES 2009�
 
 ## 12. Predict progression
 
-Next-visit progression from the current visit's phenotype, chart values and
-risk factors; people split 70/30; AUROC with bootstrap CI; permutation importance.
+**Question:** looking only at what's in today's visit, can we tell whose gum disease
+will be worse at their next visit?
+
+- **What counts as "worse":** the next visit's phenotype is a higher category than
+  today's, e.g. healthy → periodontitis, or stage II → stage III.
+- **What the model sees (today's visit only):** today's phenotype; chart measurements
+  (deepest pocket, bleeding %, attachment loss, bone loss, teeth lost); age, smoking,
+  diabetes; whether the patient was treated before.
+- **Model:** logistic regression, a simple, explainable model.
+- **Fair test:** 70% of *patients* train the model and the other 30% test it. Splitting
+  by patient, not by visit, stops the model from being tested on someone it has already seen.
+- **How good is it: AUROC.** Pick one patient who got worse and one who didn't; AUROC is
+  how often the model gives the first a higher risk. 0.5 is a coin flip, 1.0 is perfect,
+  and 0.7–0.8 is typical of useful clinical risk scores. The 95% confidence interval
+  (bootstrap) is the range the true value plausibly falls in.
+- **What drives it: permutation importance.** Shuffle one input at random and see how
+  much AUROC drops. A big drop means the model relies on that input.
+
+**Simulated dry run (synthetic data, not a result):** 3,143 visit pairs, 23% got worse;
+AUROC 0.70 (95% CI 0.66–0.74). Today's stage matters most (people already at a high stage
+have less room to move up), then attachment loss and prior treatment. Smoking and diabetes
+barely register, because the synthetic histories are too short for them to show (action item D3).
 
 - Code: [`prediction.py`](../python/dental_omop_nlp/prediction.py); [`scripts/21_predict_progression.py`](../python/scripts/21_predict_progression.py).
 - Output: `data/datasets/prediction/`.

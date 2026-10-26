@@ -8,9 +8,9 @@ Model: standardized logistic regression; people split 70/30 by seed so no
 person is in both. Reported: AUROC on held-out pairs with a bootstrap 95% CI,
 and permutation importance (drop in AUROC when a feature is shuffled).
 
-On synthetic data the important features are, by construction, the ones the
-generator uses for progression (smoking, diabetes, existing disease, therapy).
-The point here is the pipeline; on real data, compare the ranking with
+The generator uses smoking, diabetes, existing disease and therapy for
+progression, but over <= 3 years of history only existing disease and therapy
+show up in the importance ranking (action item D3). The point here is the pipeline; on real data, compare the ranking with
 established risk factors (the AAP grade modifiers are smoking and diabetes).
 """
 
