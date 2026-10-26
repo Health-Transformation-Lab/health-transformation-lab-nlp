@@ -104,14 +104,19 @@ Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5
 - letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
   clearly better than the rules (difference CI excludes 0);
 - they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
-- class-weighted training (`--class-weight sqrt`) only lifts ModernBERT base's stage IV recall from 7% to 21%
-  (accuracy 84%); with 7 training examples, the rules-decide hybrid stays far better.
+- class-weighted training (`--class-weight sqrt`) gives **no reliable gain**: over three seeds ModernBERT base
+  averages 82% (80-84%) with stage IV recall 21%, 0%, 0%; BERT base stays at 0%. The seed alone moves accuracy
+  ~4 points, as much as the spread between encoders. The `+rules4` hybrid holds at 90-91% on every seed;
+- Bio_ClinicalBERT (trained on hospital notes) scores 80%, like the others.
 
 The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
 
 **MedGemma vs BERT:** `29_medgemma_vs_bert.py` scores each MedGemma run (zero-shot, few-shot, LoRA)
 against the best encoder on the same charts (paired CI, stage IV recall, by note difficulty, fallback
-rate, assumed cost). MedGemma has **not run yet** (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; a GPU helps:
+rate, assumed cost). First real run, `medgemma-1.5-4b-it` zero-shot on CPU: **0.758** (0.700-0.808)
+vs 0.838 for `modernbert-base+cw`, difference -0.079 (-0.154 to -0.013); 100% / 97% / 16% on
+L1 / L2 / L3, so it reads a written diagnosis but doesn't yet stage from the chart
+([details](docs/medgemma.md)). Few-shot and LoRA not run yet (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; LoRA needs a GPU:
 [notebook 03](databricks/notebooks/03_medgemma_reader.py)); `--simulated` is a dry run, not a result.
 
 ## Action items

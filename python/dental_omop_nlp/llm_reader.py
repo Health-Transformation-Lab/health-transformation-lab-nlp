@@ -119,8 +119,16 @@ def sft_records(train: pd.DataFrame, variant: str = DEFAULT_VARIANT) -> list[dic
 
 
 # ---------------------------------------------------------------- parse + gate
+THOUGHT_START, THOUGHT_END = "<unused94>", "<unused95>"  # MedGemma 1.5 thinking markers
+
+
 def parse_answer(raw: str, note: str) -> dict:
     out = {"status": None, "grade": "NA", "extent": "NA", "quote": "", "gate_ok": False, "error": ""}
+    if THOUGHT_START in raw:
+        if THOUGHT_END not in raw:
+            out["error"] = "parse: thought not closed"
+            return out
+        raw = raw[raw.rindex(THOUGHT_END) + len(THOUGHT_END):]
     try:
         s = raw[raw.index("{"): raw.rindex("}") + 1]
         d = json.loads(s)
@@ -216,8 +224,12 @@ class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
         inputs = self.proc.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True,
                                                return_dict=True, return_tensors="pt").to(self.model.device)
         n = inputs["input_ids"].shape[-1]
+        tok = getattr(self.proc, "tokenizer", self.proc)
+        think = tok.convert_tokens_to_ids(THOUGHT_START)
+        # answer directly: a thought block would use up max_new_tokens before the JSON
+        no_think = {"suppress_tokens": [think]} if think != tok.unk_token_id else {}
         with torch.inference_mode():
-            out = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens, do_sample=False)
+            out = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens, do_sample=False, **no_think)
         gen = out[0][n:]
         return {"raw": self.proc.decode(gen, skip_special_tokens=True), "input_tokens": int(n),
                 "output_tokens": len(gen), "latency_s": time.time() - t0}

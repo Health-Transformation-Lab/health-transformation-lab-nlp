@@ -56,6 +56,16 @@ def test_parse_failures_are_flagged(raw, why):
     assert not out["gate_ok"] and why in out["error"]
 
 
+def test_parse_skips_medgemma_thought_block():
+    # MedGemma 1.5 may think first: <unused94>thought ... <unused95> then the answer.
+    from dental_omop_nlp.llm_reader import parse_answer
+    draft = _ans(status="healthy")
+    out = parse_answer(f"<unused94>thought\nDraft: {draft}\nNo, it is stage II.<unused95>{_ans()}", NOTE)
+    assert out["gate_ok"] and out["status"] == "periodontitis_stage_2"
+    cut = parse_answer("<unused94>thought\nThe note says {stage} and then I ran out of tokens", NOTE)
+    assert not cut["gate_ok"] and "thought not closed" in cut["error"]
+
+
 def test_parse_normalizes_grade_and_extent():
     from dental_omop_nlp.llm_reader import parse_answer
     out = parse_answer(_ans(status="healthy", grade=None, extent=None), NOTE)
