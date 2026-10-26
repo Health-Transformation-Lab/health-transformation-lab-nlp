@@ -59,6 +59,10 @@ ai:fusion_tfidf_rad,L1,134,0.8582089552238806
 ai:fusion_tfidf_rad,L2,31,0.7096774193548387
 ai:fusion_tfidf_rad,L3,60,0.7166666666666667
 ai:fusion_tfidf_rad,macro,225,0.7615176804151287
+ai:modernbert-base,L1,134,0.8582089552238806
+ai:modernbert-base,L2,31,0.6451612903225806
+ai:modernbert-base,L3,60,0.75
+ai:modernbert-base,macro,225,0.7511234151821538
 ai:note_rules,L1,134,0.9850746268656716
 ai:note_rules,L2,31,1.0
 ai:note_rules,L3,60,0.31666666666666665
