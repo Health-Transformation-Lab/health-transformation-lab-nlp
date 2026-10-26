@@ -17,25 +17,30 @@ variables.
 | Runs as | you | service principal | service principal |
 | Workspace path | your home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
 | Workspace | your dev workspace | the UAT workspace | the prod workspace |
-| Catalog.schema | `dental_omop_perio.dental_omop_perio` | same | same |
+| Catalog | `dental_omop` (schemas below) | same | same |
 | `n_people` | 300 | 1,500 | 1,500 |
 | MedGemma GPU job | no (run notebook 03 on serverless GPU) | yes, single-node GPU cluster | yes, all review notes |
 
 Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
-schema names are the same everywhere. Catalogs follow a medallion layout:
-`bronze_dental_omop_perio` (raw), `silver_dental_omop_perio` (cleaned) and
-`dental_omop_perio` (gold). The bundle creates all three catalogs and the gold
-schema on deploy (`databricks/resources/unity_catalog.yml`, with
-`prevent_destroy` so `bundle destroy` never drops them); notebook 01 creates the
-`data` volume. The jobs write to the gold schema only. Deploying needs Databricks
-CLI 0.288 or later and `CREATE CATALOG` on the metastore. (The old
-`dental_uat` / `dental_prod` catalogs were placeholders the bundle never created;
-you had to make them by hand.)
+schema names are the same everywhere. One catalog, one schema per layer:
+
+| Schema in `dental_omop` | Holds |
+|---|---|
+| `landing_dental_omop_perio` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
+| `bronze_dental_omop_perio` | raw tables (empty for now) |
+| `silver_dental_omop_perio` | cleaned tables (empty for now) |
+| `gold_dental_omop_perio` | OMOP and study tables, `benchmark_results`, `judgments`, `llm_reader_runs`, `perio_note_classifier` |
+
+The bundle creates the catalog, all four schemas and the volume on deploy
+(`databricks/resources/unity_catalog.yml`), each with `prevent_destroy` so
+`bundle destroy` never drops them. Deploying needs Databricks CLI 0.288 or later
+and `CREATE CATALOG` on the metastore. (The old `dental_uat` / `dental_prod`
+catalogs were placeholders the bundle never created; you had to make them by hand.)
 
 In dev (`mode: development`) Databricks prefixes Unity Catalog resources with
-`dev_<user short name>_` instead of `[dev <you>]`: the catalogs, schema and
-registered model all get it, and the jobs follow because they reference the
-schema resource rather than the `catalog`/`schema` variables. Deployed
+`dev_<user short name>_` instead of `[dev <you>]`: the catalog, schemas, volume
+and registered model all get it, and the jobs follow because they reference the
+resources rather than the `catalog`/`domain` variables. Deployed
 from CI by the service principal, `<you>` is the principal's short name (e.g.
 `dev_dental_omop_ci_perio_note_classifier`). uat and prod have no prefix.
 
@@ -43,7 +48,7 @@ from CI by the service principal, `<you>` is the principal's short name (e.g.
 
 | Variable | Default | What it sets |
 |---|---|---|
-| `catalog`, `schema` | `dental_omop_perio`, `dental_omop_perio` | where tables, the data volume and the registered model go |
+| `catalog`, `domain` | `dental_omop`, `dental_omop_perio` | the catalog, and the suffix of the `landing_`/`bronze_`/`silver_`/`gold_` schemas |
 | `n_people` | `300` | synthetic people in the benchmark job |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |

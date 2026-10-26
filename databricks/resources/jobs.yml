@@ -17,6 +17,7 @@ resources:
             base_parameters:
               catalog: ${resources.schemas.gold.catalog_name}
               schema: ${resources.schemas.gold.name}
+              landing_schema: ${resources.volumes.data.schema_name}
               n_people: ${var.n_people}
               leak_assessment: "false"
               experiment: ${resources.experiments.dental_experiment.name}

@@ -13,7 +13,7 @@
 | Model predictions, LLM reader details | `data/datasets/ai_predictions_<rung>.csv`, `llm_details_<rung>.csv` | CSV |
 | Judge verdicts, cost-effectiveness | `data/corpus/` | CSV / Parquet / PNG |
 | Model runs (optional) | MLflow (`pip install -e ".[track]"`; workspace MLflow on Databricks) | MLflow runs |
-| On Databricks | `dental_omop_perio.dental_omop_perio.*` Delta tables (notebook 01); `llm_reader_runs` (notebook 03) | Delta |
+| On Databricks | `dental_omop.gold_dental_omop_perio.*` Delta tables (notebook 01); `llm_reader_runs` (notebook 03) | Delta |
 | OMOP target for model output | `NOTE_NLP` (a flag for review, never `CONDITION_OCCURRENCE`) | OMOP table |
 
 Files in git are fine for a synthetic learning repo: every result is

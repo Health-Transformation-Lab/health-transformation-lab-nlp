@@ -44,14 +44,14 @@ def test_three_targets_with_expected_modes():
         assert "/Shared/" in t[env]["workspace"]["root_path"]
 
 
-def test_every_target_uses_the_same_catalog_and_schema():
+def test_every_target_uses_the_same_catalog_and_domain():
     # dev, uat and prod are separate workspaces, so the Unity Catalog names are the
-    # same everywhere: <catalog>.<schema> = dental_omop_perio.dental_omop_perio (gold).
+    # same everywhere: catalog dental_omop, schemas <layer>_dental_omop_perio.
     root, _ = _load()
     d = {k: v["default"] for k, v in root["variables"].items() if "default" in v}
     places = {env: (t.get("variables", {}).get("catalog", d["catalog"]),
-                    t.get("variables", {}).get("schema", d["schema"])) for env, t in root["targets"].items()}
-    assert set(places.values()) == {("dental_omop_perio", "dental_omop_perio")}, places
+                    t.get("variables", {}).get("domain", d["domain"])) for env, t in root["targets"].items()}
+    assert set(places.values()) == {("dental_omop", "dental_omop_perio")}, places
 
 
 def test_every_variable_used_is_defined():
@@ -102,16 +102,19 @@ def test_judge_monitoring_job_only_in_uat_and_prod():
         assert t["base_parameters"]["sample_rate"] == "${var.judge_sample_rate}"
 
 
-def test_bundle_creates_the_medallion_catalogs_and_gold_schema():
-    """bronze_/silver_/dental_omop_perio catalogs and the gold schema are bundle
-    resources, so a deploy creates them; prevent_destroy keeps `bundle destroy`
-    from dropping data."""
+def test_bundle_creates_the_catalog_layer_schemas_and_landing_volume():
+    """One catalog (dental_omop) with landing / bronze / silver / gold schemas, all
+    bundle resources so a deploy creates them; the data volume lives in landing.
+    prevent_destroy keeps `bundle destroy` from dropping data."""
     uc = yaml.safe_load((ROOT / "databricks/resources/unity_catalog.yml").read_text())["resources"]
-    names = {k: c["name"] for k, c in uc["catalogs"].items()}
-    assert names == {"bronze": "bronze_${var.catalog}", "silver": "silver_${var.catalog}", "gold": "${var.catalog}"}
-    gold = uc["schemas"]["gold"]
-    assert gold["catalog_name"] == "${resources.catalogs.gold.name}" and gold["name"] == "${var.schema}"
-    for r in [*uc["catalogs"].values(), gold]:
+    assert {k: c["name"] for k, c in uc["catalogs"].items()} == {"dental_omop": "${var.catalog}"}
+    layers = ("landing", "bronze", "silver", "gold")
+    assert {k: sc["name"] for k, sc in uc["schemas"].items()} == {k: f"{k}_${{var.domain}}" for k in layers}
+    assert {sc["catalog_name"] for sc in uc["schemas"].values()} == {"${resources.catalogs.dental_omop.name}"}
+    vol = uc["volumes"]["data"]
+    assert vol["catalog_name"] == "${resources.schemas.landing.catalog_name}"
+    assert vol["schema_name"] == "${resources.schemas.landing.name}" and vol["volume_type"] == "MANAGED"
+    for r in [*uc["catalogs"].values(), *uc["schemas"].values(), vol]:
         assert r["lifecycle"]["prevent_destroy"] is True
 
 
@@ -125,4 +128,8 @@ def test_jobs_write_to_the_bundle_schema():
         if "catalog" in p:
             assert (p["catalog"], p["schema"]) == (GOLD_CATALOG, GOLD_SCHEMA), name
             seen += 1
+        if "landing_schema" in p:
+            assert p["landing_schema"] == "${resources.volumes.data.schema_name}", name
     assert seen >= 3
+    bench = jobs["study_benchmark"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert bench["landing_schema"] == "${resources.volumes.data.schema_name}"
