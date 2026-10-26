@@ -58,4 +58,5 @@ jobs:
         run: databricks bundle deploy -t "$TARGET"
       - name: Run benchmark job
         if: env.DATABRICKS_HOST != '' && github.event.inputs.run_benchmark == 'true'
-        run: databricks bundle run -t "$TARGET" study_benchmark
+        # Returns once Databricks has started the run; follow it from the Run URL in the log.
+        run: databricks bundle run -t "$TARGET" --no-wait study_benchmark

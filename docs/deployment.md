@@ -12,7 +12,7 @@ variables.
 | | dev | uat | prod |
 |---|---|---|---|
 | Purpose | your sandbox (e.g. Free Edition) | shared test | production |
-| Bundle mode | `development` (resources prefixed `[dev <you>]`, schedules paused) | `production` | `production` |
+| Bundle mode | default (no name prefixes; schedules paused by preset) | `production` | `production` |
 | Deployed by | you, from your laptop | CI on push to `main`, or on demand | CI on demand, after approval |
 | Runs as | you | service principal | service principal |
 | Workspace path | your home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
@@ -37,12 +37,19 @@ The bundle creates the catalog, all four schemas and the volume on deploy
 and `CREATE CATALOG` on the metastore. (The old `dental_uat` / `dental_prod`
 catalogs were placeholders the bundle never created; you had to make them by hand.)
 
-In dev (`mode: development`) Databricks prefixes Unity Catalog resources with
-`dev_<user short name>_` instead of `[dev <you>]`: the catalog, schemas, volume
-and registered model all get it, and the jobs follow because they reference the
-resources rather than the `catalog`/`domain` variables. Deployed
-from CI by the service principal, `<you>` is the principal's short name (e.g.
-`dev_dental_omop_ci_perio_note_classifier`). uat and prod have no prefix.
+No target uses `mode: development`. That mode prefixes every name (`[dev <user>]`
+on jobs, `dev_<user>_` on catalogs, schemas, volumes and registered models, which
+is where names like `dev_dental_omop_ci_perio_note_classifier` came from). The
+workspace separates environments, so names are identical in dev, uat and prod.
+The dev target keeps schedules paused with `presets.trigger_pause_status`.
+Resources an earlier development-mode deploy created under `dev_` names are not
+removed by this; drop them by hand once nothing uses them.
+
+If a catalog, schema or volume already exists in a workspace (made by hand, or
+deployed by someone else's copy of the bundle), deploy fails rather than take it
+over. Adopt it once with, e.g.,
+`databricks bundle deployment bind dental_omop dental_omop -t dev`
+(resource key, then the object's name), and likewise for the schemas and volume.
 
 ## Variables
 

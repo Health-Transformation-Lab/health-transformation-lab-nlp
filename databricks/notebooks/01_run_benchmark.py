@@ -7,7 +7,8 @@
 # MAGIC 1. Build synthetic OMOP tables + labeled SOAP notes (no Synthea/Java needed; stand-in population)
 # MAGIC 2. Patient-level split
 # MAGIC 3. Baseline rungs (rules, structured, TF-IDF) — seconds
-# MAGIC 4. One encoder rung (DistilBERT) — minutes on CPU at this sample size
+# MAGIC 4. One encoder rung (DistilBERT) — minutes on CPU at this sample size; `run_encoder=false` skips it
+# MAGIC    and the torch install (the bundle's dev target does, as a quick smoke test)
 # MAGIC 5. Optional: LLM challenger via `ai_query` on a Foundation Model endpoint
 # MAGIC 6. Results and OMOP tables land as Delta in the gold schema; files in the landing volume
 # MAGIC    (`databricks/resources/unity_catalog.yml`)
@@ -21,7 +22,19 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -q -e ../../python[models,track]
+dbutils.widgets.dropdown("run_encoder", "true", ["true", "false"])
+
+# COMMAND ----------
+
+import subprocess, sys
+
+run_encoder = dbutils.widgets.get("run_encoder") == "true"
+pip = [sys.executable, "-m", "pip", "install", "-q"]
+if run_encoder:
+    # CPU-only torch (~200 MB) instead of PyPI's default CUDA build (~2.5 GB with the
+    # nvidia-* wheels); serverless here is CPU. Installed first so [models] finds it.
+    subprocess.check_call(pip + ["torch", "--index-url", "https://download.pytorch.org/whl/cpu"])
+subprocess.check_call(pip + ["-e", "../../python[models,track]" if run_encoder else "../../python[track]"])
 
 # COMMAND ----------
 
@@ -30,6 +43,8 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 import os
+
+run_encoder = dbutils.widgets.get("run_encoder") == "true"   # widget defined above the install
 
 dbutils.widgets.text("catalog", "dental_omop")
 dbutils.widgets.text("schema", "gold_dental_omop_perio")              # tables
@@ -110,7 +125,8 @@ results = [run(r) for r in ["rules_baseline", "structured_baseline", "tfidf_logr
 # COMMAND ----------
 
 # One encoder rung. CPU, so keep it small: ~600 notes x 2 epochs x 192 tokens is a few minutes.
-results.append(run("distilbert-base", epochs=2, max_len=192, batch_size=16))
+if run_encoder:
+    results.append(run("distilbert-base", epochs=2, max_len=192, batch_size=16))
 
 # COMMAND ----------
 

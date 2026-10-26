@@ -1,7 +1,7 @@
 # Databricks Asset Bundle: deploys the notebooks as jobs to dev, uat and prod.
 #
 #   databricks bundle validate -t dev
-#   databricks bundle deploy   -t dev            # your own copy, prefixed [dev <you>]
+#   databricks bundle deploy   -t dev            # the dev workspace, same names as uat/prod
 #   databricks bundle run      -t dev study_benchmark
 #
 # uat and prod are deployed by CI (.github/workflows/deploy.yml) as a service
@@ -30,6 +30,9 @@ variables:
   n_people:
     description: Synthetic people to generate in the benchmark job
     default: "300"
+  run_encoder:
+    description: Fine-tune the DistilBERT rung in the benchmark job (installs CPU torch; adds ~10 min)
+    default: "false"
   judge_endpoint:
     description: Model Serving endpoint for the LLM judge (approved for de-identified data)
     default: none
@@ -75,11 +78,14 @@ variables:
     default: users
 
 targets:
-  # Your own sandbox, e.g. Databricks Free Edition. Resources get a [dev <user>]
-  # prefix, schedules are paused, and everything is serverless.
+  # The dev workspace (e.g. Databricks Free Edition). Not `mode: development`: that
+  # prefixes every name ([dev <user>] jobs, dev_<user>_ catalogs and schemas), and
+  # the workspace already separates environments. Names are the same in every
+  # target. Schedules stay paused; everything is serverless.
   dev:
-    mode: development
     default: true
+    presets:
+      trigger_pause_status: PAUSED
 
   # Shared test environment. Deployed by CI from main, runs as the service principal.
   uat:
@@ -90,6 +96,7 @@ targets:
       service_principal_name: ${var.service_principal}
     variables:
       n_people: "1500"
+      run_encoder: "true"
       lakebase_instance: dental-uat
       lakebase_schema: cdm
     permissions:
@@ -145,6 +152,7 @@ targets:
     run_as:
       service_principal_name: ${var.service_principal}
     variables:
+      run_encoder: "true"
       lakebase_instance: dental-prod
       lakebase_schema: cdm
       n_people: "1500"

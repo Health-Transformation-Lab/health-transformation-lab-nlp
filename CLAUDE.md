@@ -74,3 +74,7 @@ needed to use them. To refresh them to a newer Spec Kit:
 - Seeds: every generator and sampler takes one; defaults are fixed.
 - Paths: use `dental_omop_nlp.paths`, never hard-code `data/`.
 - Names: simulated files `simulated_*`, simulated methods `sim:<name>`, calibration-only methods `calib:<name>`.
+- Databricks names: identical in every target (catalog `dental_omop`, schemas
+  `landing_`/`bronze_`/`silver_`/`gold_dental_omop_perio`). Never add `dev_`,
+  `[dev <user>]` or per-environment prefixes or suffixes, and never use
+  `mode: development` (it adds them): each environment is its own workspace.

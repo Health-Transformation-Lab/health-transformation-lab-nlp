@@ -19,6 +19,7 @@ resources:
               schema: ${resources.schemas.gold.name}
               landing_schema: ${resources.volumes.data.schema_name}
               n_people: ${var.n_people}
+              run_encoder: ${var.run_encoder}
               leak_assessment: "false"
               experiment: ${resources.experiments.dental_experiment.name}
 

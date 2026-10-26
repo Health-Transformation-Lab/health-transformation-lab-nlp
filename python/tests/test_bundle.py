@@ -37,7 +37,11 @@ def test_three_targets_with_expected_modes():
     root, _ = _load()
     t = root["targets"]
     assert set(t) == {"dev", "uat", "prod"}
-    assert t["dev"]["mode"] == "development" and t["dev"]["default"]
+    # No development mode in dev: it prefixes every name ([dev <user>] jobs,
+    # dev_<user>_ catalogs/schemas/models). The workspace separates environments.
+    assert "mode" not in t["dev"] and t["dev"]["default"]
+    assert t["dev"]["presets"] == {"trigger_pause_status": "PAUSED"}
+    assert "name_prefix" not in root.get("presets", {})
     for env in ("uat", "prod"):
         assert t[env]["mode"] == "production"
         assert "service_principal_name" in t[env]["run_as"]
@@ -119,8 +123,8 @@ def test_bundle_creates_the_catalog_layer_schemas_and_landing_volume():
 
 
 def test_jobs_write_to_the_bundle_schema():
-    # Via the resource, not ${var.catalog}: dev mode prefixes UC resource names
-    # (dev_<user>_...) and jobs must follow the name the deploy actually created.
+    # Via the resource, not ${var.catalog}, so a deploy creates the schema before
+    # any job that writes to it.
     root, jobs = _load()
     seen = 0
     for name, task, _ in _tasks(root, jobs):
@@ -133,3 +137,24 @@ def test_jobs_write_to_the_bundle_schema():
     assert seen >= 3
     bench = jobs["study_benchmark"][0]["tasks"][0]["notebook_task"]["base_parameters"]
     assert bench["landing_schema"] == "${resources.volumes.data.schema_name}"
+
+
+def test_encoder_rung_off_in_dev_on_in_uat_and_prod():
+    """Dev is a quick smoke test: no DistilBERT fine-tune, no torch install."""
+    root, jobs = _load()
+    bench = jobs["study_benchmark"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert bench["run_encoder"] == "${var.run_encoder}"
+    d = root["variables"]["run_encoder"]["default"]
+    got = {env: t.get("variables", {}).get("run_encoder", d) for env, t in root["targets"].items()}
+    assert got == {"dev": "false", "uat": "true", "prod": "true"}
+
+
+def test_benchmark_notebook_installs_cpu_torch_only_for_the_encoder():
+    nb = (ROOT / "databricks/notebooks/01_run_benchmark.py").read_text()
+    assert "download.pytorch.org/whl/cpu" in nb
+    assert 'if run_encoder:\n    results.append(run("distilbert-base"' in nb
+
+
+def test_deploy_does_not_wait_for_the_benchmark_run():
+    wf = (ROOT / ".github/workflows/deploy.yml").read_text()
+    assert "bundle run -t \"$TARGET\" --no-wait study_benchmark" in wf
