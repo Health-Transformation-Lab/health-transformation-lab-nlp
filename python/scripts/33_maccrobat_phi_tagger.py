@@ -81,7 +81,7 @@ train = encode(train_ids)
 out_dir = REPO_ROOT / "python" / "runs" / "phi_tagger" / tag
 args = TrainingArguments(output_dir=str(out_dir), learning_rate=a.lr, num_train_epochs=a.epochs,
                          per_device_train_batch_size=a.batch_size, weight_decay=a.weight_decay,
-                         warmup_ratio=a.warmup, seed=a.seed, save_strategy="no", logging_steps=20,
+                         warmup_steps=a.warmup, seed=a.seed, save_strategy="no", logging_steps=20,
                          report_to=[], use_cpu=not torch.cuda.is_available())
 t0 = time.time()
 Trainer(model=model, args=args, train_dataset=train,
