@@ -104,6 +104,8 @@ Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5
 - letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
   clearly better than the rules (difference CI excludes 0);
 - they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
+- class-weighted training (`--class-weight sqrt`) only lifts ModernBERT base's stage IV recall from 7% to 21%
+  (accuracy 84%); with 7 training examples, the rules-decide hybrid stays far better.
 
 The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
 
