@@ -247,6 +247,9 @@ class SimulatedReader:
 
 def make_backend(entry: dict, kind: str, **kw):
     if kind == "hf":
+        if entry.get("gated") and not (os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")):
+            raise RuntimeError(f"{entry['hf']} is gated ({entry.get('license', 'see its model card')}): accept "
+                               "the terms on its Hugging Face page, then set HF_TOKEN to a read token from that account")
         return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"))
     if kind == "openai":
         return OpenAIChat(model=kw.get("endpoint"))

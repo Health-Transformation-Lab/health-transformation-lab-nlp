@@ -23,3 +23,14 @@ def test_llm_summary_reports_fallback_and_gate_per_rung():
     s = llm_reader.summarize_details(d)
     assert s["gate_pass"] == pytest.approx(0.75) and s["fallback"] == pytest.approx(0.25)
     assert s["input_tokens_mean"] == pytest.approx(415) and s["latency_s_mean"] == pytest.approx(2.0)
+
+
+def test_gated_model_without_token_names_the_licence(monkeypatch):
+    for v in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"):
+        monkeypatch.delenv(v, raising=False)
+    entry = {"id": "medgemma-1.5-4b-it", "hf": "google/medgemma-1.5-4b-it", "gated": True,
+             "license": "HAI-DEF terms of use, https://example.org/terms"}
+    with pytest.raises(RuntimeError, match="HAI-DEF terms"):
+        llm_reader.make_backend(entry, "hf")
+    monkeypatch.setenv("HF_TOKEN", "x")
+    assert llm_reader.make_backend(entry, "hf").hf_id == "google/medgemma-1.5-4b-it"

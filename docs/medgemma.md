@@ -35,6 +35,16 @@
 | 5 | **Radiograph extension ("extend", images)** | MedGemma wasn't trained on dental images. Options: (a) MedSigLIP image embeddings + a small classifier for bone loss; (b) fine-tune the 4B multimodal model on a public, licensed dental radiograph dataset. Output feeds the same structured radiograph schema as spec 003 | High; images and licences | Radiograph exploration |
 | 6 | **Grade from history** | Use the long context to read several visits at once and estimate progression (grade is about rate of change) | Medium | Grade reader |
 
+## Licence requirement
+
+Every MedGemma model is **gated** on Hugging Face under the
+[HAI-DEF terms of use](https://developers.google.com/health-ai-developer-foundations/terms).
+Before any run: accept the terms on the model's Hugging Face page with your own account, then make a
+read token from that account available as `HF_TOKEN` (cloud environment secret, or the Databricks
+secret scope `dental` / `hf_token` for notebook 03). Without both, the download fails with 401/403.
+The terms also govern sharing outputs and fine-tuned weights: check them before publishing a LoRA
+adapter. `models.yaml` marks these entries `gated: true` with the licence link.
+
 ## Implemented (spec 004)
 
 Uses 1 (reader), 2 (LoRA fine-tune) and 3 (judge family rule) are in the code;
