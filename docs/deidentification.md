@@ -24,6 +24,12 @@ it can't:
 | **hard** | Prose shapes: first name alone, lowercase names, relatives, "Mrs" without a period, ages over 89, written-out dates, dotted and +1 phones, email, URL, SSN, health plan member IDs, street / city / ZIP, referral practices | Covers the shapes real notes have, beyond headers |
 | **unseen** | Written **after** regex v2 and never used to tune it: ALL-CAPS and possessive names, names that are words (Rose, Will), O'/hyphenated names, nicknames, weekday dates, spaced phones, fax, apartment numbers, driver's licence, plate, device serial, IP address, social handle, employer | A fair, held-out comparison: no method was tuned on it (regex v2 was written alongside the hard tier) |
 
+**What "unseen" means, in plain words.** Rules are written by looking at examples. regex v2's
+rules were written while looking at the hard tier, so they score 100% there, like a student graded
+on the exact questions they studied. The unseen tier is the final exam: identifier shapes added only
+after the rules were frozen, which nobody tuned any method against. Real notes will contain shapes
+no one thought of, so the unseen score is the best guess at how a method will do on them.
+
 Every tier also has marked **dental decoys**: text that looks like PHI but must survive (Glickman
 and Miller classes, Gracey 11/12, tooth numbers, CDT and ICD codes, probing readings like 6-5-6,
 drug names, ages under 90). They measure the other side of de-identification: whether the
