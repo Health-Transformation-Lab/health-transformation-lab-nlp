@@ -279,6 +279,7 @@ def test_jsl_engine_reads_chunks_with_inclusive_ends():
     assert "jsl" in deid.ENGINES and "jsl" in deid.CLOUD_ENGINES
 
 
+@pytest.mark.filterwarnings("error")
 def test_i2b2_2014_loader_reads_xml_tags(tmp_path):
     from dental_omop_nlp.phi_challenge import load_i2b2_2014
     note = "Record date: 2090-01-02\\nMr. Bo Li seen at Oak Clinic."

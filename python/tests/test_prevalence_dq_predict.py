@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from dental_omop_nlp.prevalence import NHANES_2009_2014, prevalence_by, wilson_ci
 
@@ -50,21 +51,26 @@ def test_data_quality_checks():
     assert set(r["category"]) == {"conformance", "completeness", "plausibility"}
 
 
+@pytest.mark.filterwarnings("error")
 def test_progression_model_learns_risk_factors():
     from dental_omop_nlp.prediction import FEATURES, make_pairs, train_eval
     rng = np.random.default_rng(0)
     rows = []
     for pid in range(600):
-        smoke = int(rng.random() < 0.3) * 15
+        # every feature varies and none is a copy of another: constant or collinear columns make the
+        # unpenalized fit singular (LinAlgWarning), which real visits don't produce
+        smoke = int(rng.choice([0, 5, 15], p=[0.55, 0.15, 0.3]))   # 30% smoke 10+ a day, as before
         stage = int(rng.integers(2, 5))
+        age, diabetes = int(rng.integers(30, 80)), bool(rng.random() < 0.2)
         for k in range(3):
-            if k and rng.random() < (0.5 if smoke else 0.1):
+            if k and rng.random() < (0.5 if smoke >= 10 else 0.1):
                 stage = min(stage + 1, 5)
             rows.append({"visit_id": pid * 10 + k, "person_id": pid, "clinic_id": 1, "visit_seq": k,
-                         "visit_date": f"202{k}-01-01", "age": 50, "cigarettes_per_day": smoke,
-                         "diabetes": False, "treated_before": False, "rec_max_probing_depth_mm": 5,
-                         "rec_bop_pct": 30, "rec_max_cal_mm": stage, "rec_rbl_pct": 10 * stage,
-                         "rec_teeth_lost_perio": 0, "charted": True,
+                         "visit_date": f"202{k}-01-01", "age": age, "cigarettes_per_day": smoke,
+                         "diabetes": diabetes, "treated_before": bool(rng.random() < 0.3),
+                         "rec_max_probing_depth_mm": int(rng.integers(3, 8)), "rec_bop_pct": int(rng.integers(5, 60)),
+                         "rec_max_cal_mm": stage + rng.normal(0, 0.5), "rec_rbl_pct": 10 * stage + rng.normal(0, 4),
+                         "rec_teeth_lost_perio": int(rng.integers(0, 3)), "charted": bool(rng.random() < 0.9),
                          "phenotype": ["healthy", "gingivitis", "periodontitis_stage_1", "periodontitis_stage_2",
                                        "periodontitis_stage_3", "periodontitis_stage_4"][stage]})
     pairs = make_pairs(pd.DataFrame(rows), "phenotype")

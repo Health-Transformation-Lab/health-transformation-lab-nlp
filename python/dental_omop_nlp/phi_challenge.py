@@ -280,8 +280,9 @@ def load_i2b2_2014(folder, tier: str = "i2b2_2014") -> list[dict]:
     for f in sorted(Path(folder).glob("*.xml")):
         root = ET.parse(f).getroot()
         text = root.findtext("TEXT") or ""
+        tags = root.find("TAGS")   # an Element with no children is falsy, so test for None
         phi = [{"start": int(e.get("start")), "end": int(e.get("end")), "text": e.get("text", ""),
-                "type": e.get("TYPE", e.tag)} for e in (root.find("TAGS") or [])]
+                "type": e.get("TYPE", e.tag)} for e in (tags if tags is not None else [])]
         out.append({"note_id": f.stem, "tier": tier, "text": text, "phi": sorted(phi, key=lambda s: s["start"]),
                     "decoys": []})
     return out
