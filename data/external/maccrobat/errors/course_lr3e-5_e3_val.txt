@@ -1,0 +1,40 @@
+train_000	gold Date	age 13	| 500 ) , respectively , at age 13 years. Thyroid function was normal. Repeat
+train_000	pred Date	age 13 years.	| 500 ) , respectively , at age 13 years. Thyroid function was normal. Repeat peak
+train_011	gold Date	After a month	| renal failure and recurring pleural effusions. After a month of postoperative care , the patient
+train_018	gold Date	3 and 6 months after	| determined using catheterization before and at 3 and 6 months after the procedure. The results are shown
+train_018	gold Date	3 - month	| in Table 2. At the patient’s 3 - month follow - up examination , he
+train_018	pred Date	next	| trunk. The patient was discharged the next morning. No noteworthy changes before or
+train_018	pred Date	3	| determined using catheterization before and at 3 and 6 months after the procedure.
+train_018	pred Date	6 months after	| catheterization before and at 3 and 6 months after the procedure. The results are shown
+train_018	pred Date	3 -	| in Table 2. At the patient’s 3 - month follow - up examination ,
+train_030	gold Date	age of	| complained of rectal bleeding at the age of 2. He went hospital numerous times
+train_030	pred Date	age of 2.	| complained of rectal bleeding at the age of 2. He went hospital numerous times for
+train_030	pred Date	the past	| one of his hospital visit in the past ( patient forgot the date )
+train_030	pred Date	5 months	| proper treatment of the cause. Since 5 months , the severity of rectal bleeding
+train_066	gold Date	2006	| a 24 - mm homograft in 2006 ( at the age of 41
+train_066	pred Date	age of 41	| homograft in 2006 ( at the age of 41 ) . Follow - up evaluations
+train_085	gold Date	At the	| hyperplasia ( ADH ) involving fibroadenoma. At the age of 19 years , the
+train_085	gold Age	age of 19 years	| ADH ) involving fibroadenoma. At the age of 19 years , the patient underwent a neck
+train_085	gold Date	At the age of 21 years	| thyroid ( Fig.1 A ) . At the age of 21 years , she visited the hospital due
+train_085	gold Date	At the age of 22 years	| ( p.I101 Nfs X6 ) . At the age of 22 years , the patient presented with a
+train_085	pred Date	age of 19 years	| ADH ) involving fibroadenoma. At the age of 19 years , the patient underwent a neck
+train_085	pred Date	age of 21 years	| Fig.1 A ) . At the age of 21 years , she visited the hospital due
+train_085	pred Date	age of 22 years	| Nfs X6 ) . At the age of 22 years , the patient presented with a
+train_096	gold Date	after 3 months	| to deteriorate and died at home after 3 months after the initial diagnosis .
+train_096	pred Date	after 3 months after the	| to deteriorate and died at home after 3 months after the initial diagnosis .
+train_104	gold Date	previous years	| to normal lung function parameters in previous years as measured by body plethysmography and
+train_104	gold Date	After 6 weeks	| and Staphylococcus aureus on several occasions. After 6 weeks of ivacaftor treatment , the patient
+train_104	gold Date	after 6 weeks	| mmol/l before ivacaftor to 40 mmol/l after 6 weeks and 52 mmol/l after 41 weeks
+train_104	gold Date	after 41 weeks	| after 6 weeks and 52 mmol/l after 41 weeks ( normal < 30 mmol/l [
+train_104	gold Date	after 41 weeks	| ( +0.5 z - score ) after 41 weeks of ivacaftor therapy. The LCI (
+train_104	gold Date	after 41 weeks	| 8.3 after 6 weeks and 7.8 after 41 weeks of ivacaftor treatment ( Table 1
+train_104	pred Date	after 6	| mmol/l before ivacaftor to 40 mmol/l after 6 weeks and 52 mmol/l after 41
+train_104	pred Date	after 6 weeks	| MBW decreased from 14.5 to 8.3 after 6 weeks and 7.8 after 41 weeks of
+train_120	gold Date	48 h prior	| patient described a period of time 48 h prior to presentation ( and 12 h
+train_120	gold Date	12 h prior	| h prior to presentation ( and 12 h prior to the development of the rash
+train_120	pred Date	48	| patient described a period of time 48 h prior to presentation ( and
+train_120	pred Date	12	| h prior to presentation ( and 12 h prior to the development of
+train_140	gold Date	at 11 days	| H. cinaedi. A blood culture obtained at 11 days was positive for H. cinaedi ,
+train_140	gold Date	at 15 days	| cinaedi , but a culture obtained at 15 days was negative. The patient’s cellulitis gradually
+train_140	pred Date	11 days	| cinaedi. A blood culture obtained at 11 days was positive for H. cinaedi ,
+train_140	pred Date	15 days	| , but a culture obtained at 15 days was negative. The patient’s cellulitis gradually

@@ -27,3 +27,15 @@ base_lr5e-5_e3,model+regex,trim_function_words,Age,wrong_type,1
 base_lr5e-5_e3,model+regex,trim_function_words,Date,boundary,36
 base_lr5e-5_e3,model+regex,trim_function_words,Date,missed,18
 base_lr5e-5_e3,model+regex,trim_function_words,Date,spurious,26
+course_lr3e-5_e3,model,,Age,spurious,1
+course_lr3e-5_e3,model,,Age,wrong_type,1
+course_lr3e-5_e3,model,,Date,boundary,23
+course_lr3e-5_e3,model,,Date,missed,6
+course_lr3e-5_e3,model,,Date,spurious,21
+course_lr3e-5_e3,model,,Sex,spurious,1
+course_lr3e-5_e3,model+regex,year,Age,spurious,1
+course_lr3e-5_e3,model+regex,year,Age,wrong_type,1
+course_lr3e-5_e3,model+regex,year,Date,boundary,23
+course_lr3e-5_e3,model+regex,year,Date,missed,6
+course_lr3e-5_e3,model+regex,year,Date,spurious,31
+course_lr3e-5_e3,model+regex,year,Sex,spurious,1
