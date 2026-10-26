@@ -59,6 +59,15 @@ def split_docs(ids: list[str], test_share: float = 0.2, seed: int = 42) -> tuple
     return sorted(ids[n_test:]), sorted(ids[:n_test])
 
 
+def three_way_split(ids: list[str], test_share: float = 0.2, n_val: int = 20,
+                    seed: int = 42) -> tuple[list[str], list[str], list[str]]:
+    """(train, val, test): the 80:20 test split, then n_val of the training notes held out for
+    validation. Settings are chosen on val; test is read once."""
+    train, test = split_docs(ids, test_share, seed)
+    val = split_docs(train, n_val / len(train), seed)[1]
+    return [i for i in train if i not in set(val)], val, test
+
+
 def write_conll(docs: list[dict], path) -> None:
     """One "word tag" per line, a blank line between sentences, -DOCSTART- before each note."""
     lines = []
@@ -98,6 +107,20 @@ def align(word_ids: list, tags: list[str], label2id: dict) -> list[int]:
     return out
 
 
+def word_tags(word_ids: list, best: list[int], n_words: int, labels: list[str] = LABELS) -> list[str]:
+    """Sub-token predictions (argmax label ids) back to one tag per word, from each word's first
+    sub-token. A word with no sub-token means the chunk was truncated: raise rather than tag it O."""
+    tags, prev = [None] * n_words, None
+    for j, w in enumerate(word_ids):
+        if w is not None and w != prev:
+            tags[w] = labels[int(best[j])]
+        prev = w
+    if None in tags:
+        raise ValueError(f"truncated: {tags.count(None)} of {n_words} words got no sub-token; "
+                         "lower --max-words or raise --max-length")
+    return tags
+
+
 # ------------------------------------------------------------------ scores
 def entities(tags: list[str]) -> list[tuple[str, int, int]]:
     """(type, start, end) word ranges; an I- that doesn't continue its type starts an entity."""
@@ -122,11 +145,15 @@ def score(gold: list[list[str]], pred: list[list[str]], types=TYPES, overlap: bo
     for t in types:
         g = [(d, *e[1:]) for d, tags in enumerate(gold) for e in entities(tags) if e[0] == t]
         p = [(d, *e[1:]) for d, tags in enumerate(pred) for e in entities(tags) if e[0] == t]
-        if overlap:
-            def hit(x, ys):
-                return any(x[0] == y[0] and x[1] < y[2] and y[1] < x[2] for y in ys)
-            prec = sum(hit(x, g) for x in p) / len(p) if p else 0.0
-            rec = sum(hit(x, p) for x in g) / len(g) if g else 0.0
+        if overlap:                                   # one-to-one: a gold entity matches one prediction
+            free, m = list(p), 0
+            for x in g:
+                y = next((y for y in free if x[0] == y[0] and x[1] < y[2] and y[1] < x[2]), None)
+                if y is not None:
+                    free.remove(y)
+                    m += 1
+            prec = m / len(p) if p else 0.0
+            rec = m / len(g) if g else 0.0
         else:
             tp = len(set(g) & set(p))
             prec = tp / len(p) if p else 0.0

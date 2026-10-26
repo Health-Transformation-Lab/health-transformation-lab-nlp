@@ -10,7 +10,9 @@ are scored for every row but never used to choose.
 Writes (aggregates only):
   data/deid/maccrobat_tagger_regex.csv    per pattern set: val and test F1 (Date, weighted)
   data/deid/maccrobat_tagger_errors.csv   test error kinds per type, model alone and with the chosen set
-  data/external/maccrobat/errors/<tag>.txt  each test error with its words and context (public text)
+  data/external/maccrobat/errors/<tag>_{val,test}.txt  each error of the model alone (no post-processing),
+                                           with its words and context (public text). Analyse val; test
+                                           is listed for the final report only
 """
 
 import argparse
@@ -78,24 +80,22 @@ old = pd.read_csv(path) if path.exists() else pd.DataFrame()
 old = old[old.tag != a.tag] if len(old) else old
 pd.concat([old, table], ignore_index=True).to_csv(path, index=False)
 
-errs, listing = [], []
+errs = []
 for label, patterns in (("model", []), ("model+regex", chosen)):
-    gold, out = run("test", patterns)
-    for (t, kind), n in sorted(phi_tagger.error_kinds(gold, out).items()):
+    for (t, kind), n in sorted(phi_tagger.error_kinds(*run("test", patterns)).items()):
         errs.append({"tag": a.tag, "system": label, "patterns": "+".join(patterns), "type": t, "kind": kind, "n": n})
-    if label == "model+regex":
-        for i, g, p in zip(pred["test"], gold, out):
-            w = docs[i]["words"]
-            for e in phi_tagger.entities(g):
-                if e not in phi_tagger.entities(p):
-                    listing.append(f"{i}\tgold {e[0]}\t{' '.join(w[e[1]:e[2]])}\t| {' '.join(w[max(0, e[1] - 6):e[2] + 6])}")
-            for e in phi_tagger.entities(p):
-                if e not in phi_tagger.entities(g):
-                    listing.append(f"{i}\tpred {e[0]}\t{' '.join(w[e[1]:e[2]])}\t| {' '.join(w[max(0, e[1] - 6):e[2] + 6])}")
+(EXTERNAL_DIR / "maccrobat" / "errors").mkdir(parents=True, exist_ok=True)
+for split in ("val", "test"):
+    listing = []
+    for i, p in pred[split].items():
+        w, g, q = docs[i]["words"], phi_tagger.entities(p["gold"]), phi_tagger.entities(p["pred"])
+        for side, mine, other in (("gold", g, q), ("pred", q, g)):
+            for e in mine:
+                if e not in other:
+                    listing.append(f"{i}\t{side} {e[0]}\t{' '.join(w[e[1]:e[2]])}\t| {' '.join(w[max(0, e[1] - 6):e[2] + 6])}")
+    (EXTERNAL_DIR / "maccrobat" / "errors" / f"{a.tag}_{split}.txt").write_text("\n".join(listing) + "\n")
 path = DEID_DIR / "maccrobat_tagger_errors.csv"
 old = pd.read_csv(path) if path.exists() else pd.DataFrame()
 old = old[old.tag != a.tag] if len(old) else old
 pd.concat([old, pd.DataFrame(errs)], ignore_index=True).to_csv(path, index=False)
-(EXTERNAL_DIR / "maccrobat" / "errors").mkdir(parents=True, exist_ok=True)
-(EXTERNAL_DIR / "maccrobat" / "errors" / f"{a.tag}.txt").write_text("\n".join(listing) + "\n")
 print("chosen:", chosen or "none", "| wrote", DEID_DIR)

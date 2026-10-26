@@ -1,26 +1,31 @@
-17803823	gold Date	a year earlier	| corticosteroiods and three infusions of Infliximab a year earlier . There had been no extra
-17803823	pred Date	year earlier	| and three infusions of Infliximab a year earlier . There had been no extra
 18236639	gold Date	within four months after	| lingual and laryngeal functions was obtained within four months after surgery .
+18236639	pred Date	The	| the throat pack without problems . The following day the patient complained of
+18236639	pred Date	within	| lingual and laryngeal functions was obtained within four months after surgery .
 18236639	pred Date	four months after	| and laryngeal functions was obtained within four months after surgery .
+18416479	gold Date	January and June 2002	| daily , was started . In January and June 2002 , the patient underwent endoscopic variceal
 18416479	gold Date	just before admission	| to 8 × 109 / L just before admission . Before the deterioration of thrombocytopenia
 18416479	gold Date	admission	| received no other medication . On admission , the patient had neither purpura
-18416479	pred Date	d 22	| g daily , was added on d 22 to 24 . However , the
+18416479	pred Date	January and	| daily , was started . In January and June 2002 , the patient underwent
+18416479	pred Date	June 2002	| was started . In January and June 2002 , the patient underwent endoscopic variceal
+18416479	pred Date	22	| daily , was added on d 22 to 24 . However , the
 19307547	gold Age	newborn	| A newborn boy of healthy nonconsanguineous parents was
+19307547	gold Sex	boy	| A newborn boy of healthy nonconsanguineous parents was delivered
 19307547	gold Date	37 weeks ’ gestation	| healthy nonconsanguineous parents was delivered at 37 weeks ’ gestation by cesarean section . His mother
 19307547	gold Date	20 days	| inheritance . The infant died at 20 days of respiratory failure . At autopsy
-19307547	pred Sex	newborn	| A newborn boy of healthy nonconsanguineous parents was
 19307547	pred Age	32 years old	| . His mother ( primipara , 32 years old ) had been admitted to our
+19307547	pred Date	days	| . The infant died at 20 days of respiratory failure . At autopsy
 19860006	pred Date	One hour later	| patient was initially haemodynamically stable . One hour later her condition suddenly worsened . She
 19860006	pred Date	24 h later	| second blood transfusion and completely recovered 24 h later . The patient remained in bed
 21923918	gold Date	1999	| past history included COPD diagnosed in 1999 and a myocardial infarction in 2002
 21923918	gold Date	2002	| 1999 and a myocardial infarction in 2002 . The patient had smoked approximately
-21923918	gold Date	9th POD	| x - ray obtained on the 9th POD showed normal esophageal and gastric transit
+21923918	gold Date	Nine months after	| routine medical follow - up . Nine months after the operation , CT and esophagogastroduodenoscopy
+21923918	gold Date	Three months after	| 20 mg / day ) . Three months after the splenectomy , multiple liver metastases
+21923918	pred Date	Nine months after the	| routine medical follow - up . Nine months after the operation , CT and esophagogastroduodenoscopy were
+21923918	pred Date	Three months after the	| 20 mg / day ) . Three months after the splenectomy , multiple liver metastases were
+22719160	pred Date	17 years after	| aromatase inhibitor letrozole . In the 17 years after chemotherapy , she had been active
 22781096	gold Date	16 years	| on his growth . At age 16 years , height and weight was −
-22781096	gold Date	A year later	| since 14 years of age . A year later , photophobia and bilateral cataracts were
 22781096	gold Date	now	| years of age . He is now blind . At 14 years of
 22781096	pred Date	age 16 years	| effect on his growth . At age 16 years , height and weight was −
-22781096	pred Date	year later	| 14 years of age . A year later , photophobia and bilateral cataracts were
-23076693	pred Date	after 72	| culture did not show any growth after 72 h of incubation . A lesional
 23076693	pred Date	after 1 week	| lesions responded dramatically and subsided completely after 1 week of treatment ( figure 3A ,
 23124805	gold Date	1 year after this treatment was started	| there was an initial improvement , 1 year after this treatment was started uveitis worsened , and at age
 23124805	gold Date	age 12	| started uveitis worsened , and at age 12 years infliximab was discontinued . Adalimumab
@@ -29,10 +34,13 @@
 23155491	gold Date	Early on	| years in Hawai ‘ i . Early on he did not use sunscreen ,
 23155491	gold Date	past year	| been a smoker . Within the past year he discontinued 6 - MP and
 23155491	gold Date	shortly after	| small bowel , and passed away shortly after .
+23155491	pred Date	This	| for the subsequent ten years . This past year , however , he
+23155491	pred Date	year	| a smoker . Within the past year he discontinued 6 - MP and
 25023062	gold Date	seventh day	| The patient developed dyspnea on the seventh day of therapy . A physical examination
+25023062	pred Date	the	| . The patient developed dyspnea on the seventh day of therapy . A
 25023062	pred Date	seventh day of therapy	| The patient developed dyspnea on the seventh day of therapy . A physical examination revealed blood
 25155594	gold Date	2004	| pancreatic insufficiency , liver transplantation in 2004 , steroid - induced diabetes ,
-25155594	pred Date	January	| The patient was periodically hospitalized from January to July 2013 and was treated
+25155594	pred Date	January to	| The patient was periodically hospitalized from January to July 2013 and was treated for
 25155594	pred Date	July 2013	| was periodically hospitalized from January to July 2013 and was treated for recurrent respiratory
 25246819	gold Date	At the age of 19 years	| ( ADH ) involving fibroadenoma . At the age of 19 years , the patient underwent a neck
 25246819	gold Date	At the age of 21 years	| ( Fig . 1A ) . At the age of 21 years , she visited the hospital due
@@ -41,36 +49,34 @@
 25246819	pred Date	age of 21 years	| . 1A ) . At the age of 21 years , she visited the hospital due
 25246819	pred Date	age of 22 years	| . I101NfsX6 ) . At the age of 22 years , the patient presented with a
 25370695	gold Date	day of the visit	| reported 7 / 10 at the day of the visit . Past medical history was remarkable
-25370695	pred Date	day	| reported 7 / 10 at the day of the visit . Past medical
+25370695	pred Date	day of	| reported 7 / 10 at the day of the visit . Past medical history
 25759562	gold Date	after at least 1 year	| 2 and 3 , but discontinued after at least 1 year due to non - compliance ;
-25759562	gold Date	2 d	| resolution of her abdominal pain in 2 d . She was discharged on long
 25759562	gold Date	1 , 3 , 6 , and 12 mo postprocedure	| and Doppler US examination performed at 1 , 3 , 6 , and 12 mo postprocedure confirmed a patent shunt . Her
-25759562	pred Date	least 1 year	| 3 , but discontinued after at least 1 year due to non - compliance ;
-25759562	pred Date	after 1 year	| - term warfarin and remained asymptomatic after 1 year of follow - up . Most
-25759562	pred Date	12 mo	| , 3 , 6 , and 12 mo postprocedure confirmed a patent shunt .
+25759562	gold Date	3 mo after	| . 9 cm in diameter at 3 mo after TIPS ( Figure 1B ) ,
+25759562	pred Date	1 year	| , but discontinued after at least 1 year due to non - compliance ;
+25759562	pred Date	1 year	| term warfarin and remained asymptomatic after 1 year of follow - up . Most
+25759562	pred Date	3 mo	| . 9 cm in diameter at 3 mo after TIPS ( Figure 1B )
 26664317	gold Age	A 49 - year - old	| A 49 - year - old man , with no history of
 26664317	pred Age	49 - year - old	| A 49 - year - old man , with no history of
-26664317	pred Date	next day	| . The patient was extubated the next day and his postsurgical course was uncomplicated
+26664317	pred Date	the next day	| ring . The patient was extubated the next day and his postsurgical course was uncomplicated
 26664317	pred Date	one - year	| he was asymptomatic , and his one - year follow - up transthoracic echocardiogram confirmed
-26670309	pred Date	next morning	| . The patient was discharged the next morning . No noteworthy changes before or
+26670309	pred Date	the next morning	| trunk . The patient was discharged the next morning . No noteworthy changes before or
+27130218	gold Date	after 12 days	| reduced . The diuretic was discontinued after 12 days of treatment . The electrocardiogram disclosed
 27130218	gold Date	on the fifth day	| 3 and ​ 4 ) performed on the fifth day showed complete recovery of myocardial function
 27130218	pred Date	Three hours after	| pressure in the normal range . Three hours after delivery of healthy male infant ,
+27130218	pred Date	12 days	| . The diuretic was discontinued after 12 days of treatment . The electrocardiogram disclosed
 27130218	pred Date	fifth day	| ​ 4 ) performed on the fifth day showed complete recovery of myocardial function
 27196481	gold Date	after 3 months	| IFN ) - alpha and , after 3 months of treatment , a new abdominal
-27196481	pred Date	after	| IFN ) - alpha and , after 3 months of treatment , a
 27741115	gold Date	after 1 month	| brain lesions . It was discontinued after 1 month after the onset of the disease
+27741115	gold Date	43 days after	| chemotherapy . The patient was discharged 43 days after admission . No neurological event occurred
 27741115	gold Date	One year after	| and no lymph node enlargement . One year after the diagnosis , remission of MCD
-27741115	pred Date	after 1 month after	| brain lesions . It was discontinued after 1 month after the onset of the disease ,
-27741115	pred Date	day 1	| ( 40 mg / day from day 1 to day 4 ) was started
-27741115	pred Date	day 4	| / day from day 1 to day 4 ) was started together with plasma
+27741115	pred Date	after	| brain lesions . It was discontinued after 1 month after the onset of
+27741115	pred Date	1 month after	| lesions . It was discontinued after 1 month after the onset of the disease ,
+27741115	pred Date	43 days after admission	| chemotherapy . The patient was discharged 43 days after admission . No neurological event occurred after
 27741115	pred Date	One year after the diagnosis	| and no lymph node enlargement . One year after the diagnosis , remission of MCD is persistent
-27773410	gold Date	1st POD	| for 2 days . Echocardiography on 1st POD revealed improvement in LVEF to 20
-27773410	gold Date	4th POD	| and uneventful recovery . Echocardiography on 4th POD revealed improvement in LVEF to 30
-27773410	pred Date	after 3 days	| diastolic pressure . Angiography was performed after 3 days of decongestive therapy which revealed critical
-27773410	pred Date	1st	| for 2 days . Echocardiography on 1st POD revealed improvement in LVEF to
-27773410	pred Date	4th	| and uneventful recovery . Echocardiography on 4th POD revealed improvement in LVEF to
-27821134	gold Date	day of	| facilitate intraoperative testing . On the day of the operation , the patient underwent
-27821134	pred Date	day	| facilitate intraoperative testing . On the day of the operation , the patient
+27821134	gold Date	age of 49 years	| man diagnosed with PD at the age of 49 years . Fluctuations with recurring “ off
+27821134	pred Date	years	| PD at the age of 49 years . Fluctuations with recurring “ off
+27821134	pred Date	the	| : 00 p . m . the following day without any neurological deficit
 27928148	pred Date	following morning	| down next to the bed the following morning unable to move . The patient
 27928148	pred Date	Four hours after	| intracranial pressure from suspected trauma . Four hours after presentation , her strength had progressively
 27928148	pred Date	time of this report	| feeding jejunostomy tube placement at the time of this report .
@@ -78,19 +84,15 @@
 28151882	gold Date	preoperative	| ( VAS ) . VAS for preoperative , 1 week after operation ,
 28151882	gold Date	preoperative	| operation . Kyphotic Cobb angle for preoperative , 1 week after operation ,
 28151882	pred Date	3 days postoperative	| The drainage tube was removed at 3 days postoperative when volume of drainage was less
-28154700	gold Date	within 7 days	| uneventful . Patient was discharged home within 7 days in a good general condition .
-28154700	pred Date	7 days	| . Patient was discharged home within 7 days in a good general condition .
+28173879	gold Date	Two months before	| ( Fig . 1 ) . Two months before admission , he had developed chronic
 28173879	gold Date	at 11 days	| cinaedi . A blood culture obtained at 11 days was positive for H . cinaedi
 28173879	gold Date	at 15 days	| cinaedi , but a culture obtained at 15 days was negative . The patient ’
 28173879	gold Date	6 months after	| , and he had no recurrence 6 months after this therapy . His stool culture
+28173879	pred Date	Two months before admission	| ( Fig . 1 ) . Two months before admission , he had developed chronic diarrhea
 28173879	pred Date	11 days	| . A blood culture obtained at 11 days was positive for H . cinaedi
 28173879	pred Date	15 days	| , but a culture obtained at 15 days was negative . The patient ’
 28173879	pred Date	6 months after this therapy	| , and he had no recurrence 6 months after this therapy . His stool culture was negative
-28196820	gold Date	a month after	| ( figure 1A ) , and a month after the first surgery ( figure 1B
-28196820	gold Date	a month after	| CT scan ( figure 2B ) a month after the surgery showed a resolution of
-28196820	gold Date	10 days	| until it was completely withdrawn in 10 days ; and the need for extra
-28196820	pred Date	month after	| figure 1A ) , and a month after the first surgery ( figure 1B
-28196820	pred Date	month after	| scan ( figure 2B ) a month after the surgery showed a resolution of
+28196820	pred Sex	infant	| A 3 - month - old infant from the UAE with a genetically
 28196820	pred Date	1 month after	| months after the first surgery , 1 month after starting NAVA and prior to the
 28196820	pred Date	turned	| figure 2B ) . When he turned 1 year old , after several
 28248891	gold Date	2 weeks after radiotherapy	| A PET - CT scan performed 2 weeks after radiotherapy showed an 80 % reduction in
@@ -99,24 +101,28 @@
 28248891	gold Date	One month later ,	| therapy , hemorrhaging was resolved . One month later , the patient again experienced intermittent hematochezia
 28248891	pred Date	2 weeks after	| A PET - CT scan performed 2 weeks after radiotherapy showed an 80 % reduction
 28248891	pred Date	Two months after	| were evaluated every 2 months . Two months after therapy , chest , and abdominal
-28248891	pred Date	1 week	| supportive care were prescribed . After 1 week of therapy , hemorrhaging was resolved
+28248891	pred Date	1	| supportive care were prescribed . After 1 week of therapy , hemorrhaging was
 28248891	pred Date	One month later	| therapy , hemorrhaging was resolved . One month later , the patient again experienced intermittent
 28403092	gold Date	3 days before the operation	| VPA twice per day was initiated 3 days before the operation . The patient tolerated the administration
 28403092	gold Date	during the first 2 postoperative days	| ( 1200 mg , intravenously ) during the first 2 postoperative days . Because of her stomach and
 28403092	gold Date	within 48 hours	| , and she achieved complete consciousness within 48 hours ( GCS = 15 ) .
-28403092	gold Date	within 4 days	| decreased dramatically and returned to normal within 4 days ( Fig . 3 ) .
 28403092	pred Date	3 days before	| VPA twice per day was initiated 3 days before the operation . The patient tolerated
 28403092	pred Date	Thirty minutes before	| and its texture was medium . Thirty minutes before the end of surgery , 800
+28403092	pred Date	postoperative days	| intravenously ) during the first 2 postoperative days . Because of her stomach and
+28403092	pred Date	postoperative	| meningioma . At 3 am on postoperative day 4 , the patient was
 28403092	pred Date	day 4	| . At 3 am on postoperative day 4 , the patient was suddenly found
+28403092	pred Date	hours	| could not be excluded within 24 hours , glucocorticoid , mannitol , and
 28403092	pred Date	48 hours	| and she achieved complete consciousness within 48 hours ( GCS = 15 ) .
-28403092	pred Date	4 days	| dramatically and returned to normal within 4 days ( Fig . 3 ) .
+28403092	pred Date	postoperative	| Fig . 3 ) . On postoperative day 15 ( 8 days after
 28403092	pred Date	8 days after	| . On postoperative day 15 ( 8 days after the discontinuation of VPA ) ,
+28403099	gold Date	2012	| 2010 , pulmonary wedge resection in 2012 , and transarterial chemoembolization twice in
 28403099	gold Date	After the following 1 month	| . 3E – G ) . After the following 1 month , substance phase MR revealed low
 28403099	gold Date	Until 5 months	| ( Fig . 3H ) . Until 5 months after 4 ablations , CT showed
+28403099	pred Date	the	| 2E and F ) . On the 2nd day , postoperative CEUS images
 28403099	pred Date	After	| . 3E – G ) . After the following 1 month , substance
-28403099	pred Date	following 1 month	| – G ) . After the following 1 month , substance phase MR revealed low
+28403099	pred Date	the following 1 month	| 3E – G ) . After the following 1 month , substance phase MR revealed low
 28403099	pred Date	5 months after 4	| Fig . 3H ) . Until 5 months after 4 ablations , CT showed the tumor
 28422883	gold Date	after following for 12 months	| and was free from air leak after following for 12 months ( Fig . 1B ) .
-28422883	pred Date	6 months	| body weight loss 6 kg within 6 months . After sputum analysis and chest
+28422883	pred Date	within 6 months	| unintentional body weight loss 6 kg within 6 months . After sputum analysis and chest
 28422883	pred Date	June to July 2014	| cGY in 25 fractions ) from June to July 2014 . In October 2014 , surgical
-28422883	pred Date	few months ago	| patient just received neoadjuvant chemoradiotherapy a few months ago , the flaps harvested from chest
+28422883	pred Date	a few months ago	| the patient just received neoadjuvant chemoradiotherapy a few months ago , the flaps harvested from chest

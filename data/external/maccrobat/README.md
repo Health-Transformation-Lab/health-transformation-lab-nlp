@@ -1,9 +1,9 @@
-# MACCROBAT (public test data)
+# MACCROBAT (public data)
 
 **Not synthetic.** 200 clinical case reports from PubMed Central, already published and
 de-identified, edited by the dataset's author to the case details and annotated by hand. Kept here
-as an external test set under the public-dataset exception (constitution v1.2.0); never mixed into
-this project's synthetic data and never presented as its patient records.
+as external evaluation and training data under the public-dataset exception (constitution v1.2.0);
+never mixed into this project's synthetic data and never presented as its patient records.
 
 | | |
 |---|---|
@@ -16,8 +16,8 @@ this project's synthetic data and never presented as its patient records.
 
 | Path | What | Made by |
 |---|---|---|
-| `bio/train.txt`, `bio/val.txt`, `bio/test.txt` | The annotations filtered to `Age`, `Sex` and `Date` (all other types become `O`), split by document (seed 42): 40 test notes, then 20 of the remaining 160 held out for validation, 140 train. One `word tag` per line, blank line between sentences, `-DOCSTART- O` before each note. Words are `\w+` runs or single punctuation marks | `python/scripts/33_maccrobat_phi_tagger.py` (`phi_tagger.bio_docs`, `split_docs`, `write_conll`) |
-| `errors/<run>.txt` | Every test-set entity a run got wrong (gold or predicted, type, words, context) | `python/scripts/34_phi_tagger_regex.py` |
+| `bio/train.txt`, `bio/val.txt`, `bio/test.txt` | The annotations filtered to `Age`, `Sex` and `Date` (all other types become `O`), split by document (seed 42; `phi_tagger.three_way_split`): 40 test notes, then 20 of the remaining 160 held out for validation, 140 train. Where two of these labels overlap, the first in the `.ann` file wins (3 of 1,133 entities lost, e.g. a phrase labelled both Age and Date). One `word tag` per line, blank line between sentences, `-DOCSTART- O` before each note. Words are `\w+` runs or single punctuation marks | `python/scripts/33_maccrobat_phi_tagger.py` (`phi_tagger.bio_docs`, `split_docs`, `write_conll`) |
+| `errors/<run>_val.txt`, `errors/<run>_test.txt` | Every entity the model alone (no post-processing) got wrong, gold or predicted, with type, words and context. Error analysis reads `_val`; `_test` is for the final report | `python/scripts/34_phi_tagger_regex.py` |
 
 Used by spec 009 (de-identification engines on real prose) and spec 010 (a fine-tuned Age/Sex/Date
 tagger). Scores: `data/deid/maccrobat_*.csv`; write-up: `docs/deidentification.md`.

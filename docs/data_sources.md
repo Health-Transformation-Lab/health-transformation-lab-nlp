@@ -27,10 +27,10 @@ fairer test, and real notes are the real one.
 | **UTHealth / UCSF synthetic notes** (Chuang, Lee, Tokede, Lin, Brandon, Tran, Jiang, Walji; [arXiv 2407.21050](https://arxiv.org/abs/2407.21050v3)) | 450 notes generated with GPT-4 from 15 de-identified templates, labeled status / stage / grade / extent / subtype; RoBERTa trained on them, tested on 240 dentist-labeled real notes per site | Release not stated in the paper | Same label schema as this repo. Ask the authors |
 | **Cross-institutional dental EHR entity extraction via generative AI synthetic notes** ([NSF PAR](https://par.nsf.gov/biblio/10639435-cross-institutional-dental-electronic-health-record-entity-extraction-via-generative-artificial-intelligence-synthetic-notes)) | Follow-on from the same group | Not checked (page blocked automated access) | Ask the authors along with the one above |
 
-## Public real-text test sets
+## Public real-text datasets
 
 Published, already de-identified and licensed for redistribution, so committed under
-`data/external/<name>/` with a README (constitution v1.2.0). Test data only: never mixed into the
+`data/external/<name>/` with a README (constitution v1.2.0). Evaluation and training data for their own experiments: never mixed into the
 synthetic sets.
 
 

@@ -10,7 +10,7 @@ It was not built for PHI and holds no names or contact details, so it tests two 
 Everything else (relative dates, a year alone, ages under 90, sex, places, ethnicity) is "other".
 
 Public, already de-identified, CC BY 4.0: committed under data/external/maccrobat/ with its README
-(constitution v1.2.0). It is an external test set only, never mixed into the synthetic data.
+(constitution v1.2.0). External evaluation and training data; never mixed into the synthetic sets.
 """
 
 from __future__ import annotations

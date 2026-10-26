@@ -13,7 +13,8 @@ Read `DISCLAIMER.md` and `.specify/memory/constitution.md` first. The short vers
 - **Synthetic only. No PHI, ever.** Don't add real notes, real names, or
   employer data anywhere, including tests and prompt examples. One exception:
   published, already de-identified datasets licensed for redistribution (MACCROBAT,
-  CC BY 4.0) live in `data/external/<name>/` with a README giving source and licence.
+  CC BY 4.0) live in `data/external/<name>/` with a README giving source and licence,
+  for evaluation and training only, never mixed into the synthetic sets.
   Data-use-agreement sets (i2b2/n2c2) never go in.
 - **Python and R stay in parity.** If you change labels, scoring, reliability
   or cost-effectiveness on one side, change the other and run the parity test.

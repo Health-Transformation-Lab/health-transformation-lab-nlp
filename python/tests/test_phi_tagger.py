@@ -119,3 +119,42 @@ def test_overlap_score_counts_a_same_type_overlap_as_a_match():
     exact = phi_tagger.score(gold, pred).set_index("type")
     loose = phi_tagger.score(gold, pred, overlap=True).set_index("type")
     assert exact.loc["Date", "f1"] == 0.0 and loose.loc["Date", "f1"] == 1.0 and loose.loc["Sex", "recall"] == 0.0
+
+
+# ---------------------------------------------------------------- review fixes
+def test_three_way_split_is_disjoint_and_seeded():
+    ids = [str(i) for i in range(200)]
+    tr, va, te = phi_tagger.three_way_split(ids, test_share=0.2, n_val=20, seed=42)
+    assert (len(tr), len(va), len(te)) == (140, 20, 40)
+    assert not (set(tr) & set(va) or set(tr) & set(te) or set(va) & set(te))
+    assert (tr, va, te) == phi_tagger.three_way_split(ids, test_share=0.2, n_val=20, seed=42)
+    assert te == phi_tagger.split_docs(ids, 0.2, 42)[1]            # same test set as the 80:20 split
+
+
+def test_word_tags_take_the_first_sub_token_and_refuse_truncation():
+    labels = ["O", "B-Age", "I-Age", "B-Date", "I-Date", "B-Sex", "I-Sex"]
+    ids = [None, 0, 1, 1, 2, None]
+    best = [0, 0, 1, 5, 2, 0]
+    assert phi_tagger.word_tags(ids, best, 3, labels) == ["O", "B-Age", "I-Age"]
+    import pytest
+    with pytest.raises(ValueError, match="truncated"):
+        phi_tagger.word_tags([None, 0, 1, None], [0, 0, 1, 0], 3, labels)
+
+
+def test_regex_dates_extend_a_model_date_with_inside_tags():
+    text = "Seen in January 2014 ."
+    ws = phi_tagger.words(text)
+    tags = ["O", "O", "B-Date", "O", "O"]
+    assert phi_tagger.regex_dates(text, ws, tags, ["month_year"]) == ["O", "O", "B-Date", "I-Date", "O"]
+
+
+def test_a_line_break_ends_a_sentence():
+    [d] = phi_tagger.bio_docs([{"note_id": "1", "text": "Fever\nCough began", "entities": []}])
+    assert d["sents"] == [(0, 1), (1, 3)]
+
+
+def test_overlap_score_matches_one_to_one_so_fragments_do_not_count_twice():
+    gold = [["B-Date", "I-Date", "I-Date", "I-Date"]]
+    pred = [["B-Date", "B-Date", "B-Date", "B-Date"]]
+    s = phi_tagger.score(gold, pred, overlap=True).set_index("type")
+    assert s.loc["Date", "recall"] == 1.0 and s.loc["Date", "precision"] == 0.25

@@ -49,9 +49,7 @@ from transformers import (
 )
 
 docs = {d["note_id"]: d for d in phi_tagger.bio_docs(maccrobat.load_brat(a.zip))}
-train_ids, test_ids = phi_tagger.split_docs(list(docs), 0.2, a.split_seed)
-val_ids = phi_tagger.split_docs(train_ids, a.n_val / len(train_ids), a.split_seed)[1]
-train_ids = [i for i in train_ids if i not in set(val_ids)]
+train_ids, val_ids, test_ids = phi_tagger.three_way_split(list(docs), 0.2, a.n_val, a.split_seed)
 bio_dir = EXTERNAL_DIR / "maccrobat" / "bio"
 bio_dir.mkdir(parents=True, exist_ok=True)
 for name, ids in (("train", train_ids), ("val", val_ids), ("test", test_ids)):
@@ -93,17 +91,13 @@ def predict(ids):
     preds = {}
     for i in ids:
         d = docs[i]
-        tags = ["O"] * len(d["words"])
+        tags = []
         for s, e in phi_tagger.chunks(d, a.max_words):
             enc = tok(d["words"][s:e], is_split_into_words=True, truncation=True, max_length=a.max_length,
                       return_tensors="pt")
             with torch.no_grad():
-                logits = model(**{k: v for k, v in enc.items()}).logits[0].numpy()
-            prev = None
-            for j, w in enumerate(enc.word_ids()):
-                if w is not None and w != prev:
-                    tags[s + w] = phi_tagger.LABELS[int(np.argmax(logits[j]))]
-                prev = w
+                logits = model(**enc.to(model.device)).logits[0].float().cpu().numpy()
+            tags += phi_tagger.word_tags(enc.word_ids(), np.argmax(logits, axis=-1), e - s)
         preds[i] = tags
     return preds
 

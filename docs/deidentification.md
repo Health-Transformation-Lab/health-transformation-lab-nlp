@@ -306,7 +306,8 @@ whole sentences up to 250 words; labels on each word's first sub-token; CPU, abo
 3-epoch run. Score: exact-span entity F1 per type (seqeval rule) and the support-weighted average
 ("weighted F1"). `python/scripts/33_maccrobat_phi_tagger.py`, `34_phi_tagger_regex.py`; every run in
 `data/deid/maccrobat_tagger_runs.csv`, regex rows in `maccrobat_tagger_regex.csv`, error counts in
-`maccrobat_tagger_errors.csv`, each test error in `data/external/maccrobat/errors/`.
+`maccrobat_tagger_errors.csv`, each error of the model alone in `data/external/maccrobat/errors/`
+(`_val` for analysis, `_test` for the final report).
 
 **Task A: training settings** (2026-10-26; validation 89 entities, test 262):
 
@@ -349,16 +350,20 @@ validation), the final system is Longformer base (lr 5e-5, 3 epochs, batch 4, 25
 alone scores 0.80 on test; switching to it now would be choosing on test, so it is reported as the
 finding rather than the result: the 20-note validation set is too small to choose post-processing on.
 
+The kinds of error were read on the **validation** listing (the same groups show on test: on
+validation the boundary errors are mostly trailing words, "5th day of", "2 weeks after the", which
+is why trimming won there; on test more are leading words the annotators kept). Counts on test:
+
 | Test Date errors (model alone) | n | What they are |
 |---|---|---|
-| Wrong boundary | 27 | Same date, different edges: "the following morning" vs "following morning", "age of 19 years" vs "At the age of 19 years". Overlap F1 is 0.91 against exact 0.80 |
+| Wrong boundary | 27 | Same date, different edges: "the following morning" vs "following morning", "age of 19 years" vs "At the age of 19 years". Weighted F1 counting any one-to-one overlap is 0.91 on test (0.88 validation), against exact 0.80 |
 | Spurious | 29 | Mostly hours ("One hour later", "24 h later", "next morning"), which MACCROBAT labels `Time`, a type this label set drops; some look like unlabelled dates ("after 1 week", "day 4"); three a lone "the" |
 | Missed | 18 | Bare years ("1999", "2004"), vague time ("now", "Early on", "preoperative", "past year"), gestational and post-operative days ("37 weeks' gestation", "9th POD") |
 
-Next, if this is taken further: map MACCROBAT's `Time` to Date (or score them together), trim only
-trailing function words (a rule from the training annotations, to be checked on a new split), add
-the year pattern, and use cross-validation over the 160 training notes instead of one 20-note
-validation set.
+Next, if this is taken further: map MACCROBAT's `Time` to Date (or score them together); trim only
+trailing function words (seen on validation); use cross-validation over the 160 training notes
+instead of one 20-note validation set. The year pattern helped on test only, so it is a
+test-informed idea: it needs a fresh split before it is used.
 
 ## Combining engines: bigger unions and routing
 

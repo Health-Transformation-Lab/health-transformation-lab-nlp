@@ -22,8 +22,10 @@ de-identification and the leak gate.
 **Public datasets (exception, v1.2.0).** A dataset that is already published, already
 de-identified by its publisher and licensed for redistribution (e.g. MACCROBAT, CC BY 4.0) may
 be committed under `data/external/<name>/`, unchanged or with documented derived files, next to
-a README giving source, licence, attribution and changes. It is used only as an external test
-set: never mixed into synthetic data, never presented as this project's patient records.
+a README giving source, licence, attribution and changes. It is used as external evaluation
+and training data for its own experiments: never mixed into the synthetic sets, never presented
+as this project's patient records. Being de-identified by its publisher, it is exempt from the
+leak gate above.
 Datasets under a data use agreement or a vendor's terms (i2b2/n2c2, the John Snow Labs
 benchmark) stay out of the repo.
 
