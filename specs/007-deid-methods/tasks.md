@@ -9,7 +9,7 @@
 - [ ] T007 Run azure_deid and azure_language (+regex_v2+guard) on the challenge set (needs an Azure resource)
 - [ ] T008 Fill real service prices in costs.yaml from the pricing pages
 - [x] T009 Second test set: `load_external` + `26_deid_benchmark.py --external` (any labeled JSONL/JSON)
-- [ ] T009b Attach ASQ-PHI (Mendeley Data is blocked from the workspace), confirm its field names, score it
+- [x] T009b ASQ-PHI downloaded from Mendeley Data; `load_external` reads its release format; every local engine scored on it, with over-redaction on its hard negatives
 - [ ] T010 Pick the engine on the unseen tier; switch study.py's default; keep a human review sample on real notes
 - [x] T011 AI engines: transformer NER (hf_stanford, hf_obi) and LLM (llm) with a verbatim-only rule; LLM token cost in Python and R; Databricks notebook 06_deid_benchmark.py
 - [x] T012 Run the transformer engines (hf_stanford, hf_obi, alone and with regex_v2+guard) on CPU now that Hugging Face is reachable; rows merged into data/deid, docs updated

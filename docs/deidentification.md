@@ -44,7 +44,7 @@ The categories follow HIPAA Safe Harbor and the 2014 i2b2/UTHealth annotation gu
 |---|---|---|---|
 | HHS Safe Harbor guidance | The 18 identifiers that must be removed | yes | Category list |
 | 2014 i2b2/UTHealth (n2c2) | Standard clinical de-id benchmark and annotation guidelines | guidelines yes; corpus needs a data use agreement | Category scheme used; corpus not used |
-| ASQ-PHI (2025) | 1,051 fully synthetic clinical search queries, PHI tagged, with hard negatives | yes, MIT | Second test set: `26_deid_benchmark.py --external asq_phi.jsonl` (download blocked here; attach it) |
+| ASQ-PHI (2025) | 1,051 fully synthetic clinical search queries, PHI tagged, with hard negatives | yes, MIT | Second test set, scored below: `26_deid_benchmark.py --external synthetic_clinical_queries.txt` (the file as downloaded) |
 | SHIELD (Stanford) | 1,381 real notes with surrogate PHI, adjudicated spans | access by request | Real-note shapes, if access is granted |
 | presidio-evaluator | Fake-PII sentence generator from templates, detector evaluation | yes, MIT | Another way to generate labeled fake PHI |
 | John Snow Labs | Clinical de-id pipelines in its licensed Healthcare NLP; public speed benchmarks on Databricks | the de-id models are licensed (trial and academic programs exist); no free test set found | Another engine to compare, if licensed |
@@ -88,7 +88,7 @@ must stay **outside the repo**:
 | i2b2 2006 | Discharge summaries | n2c2 data use agreement | same XML shape; untested |
 | PhysioNet *Deidentified Medical Text* | 2,434 nursing notes, the original deid gold standard | PhysioNet credentialed access (training + DUA) | `--external` after conversion |
 | SHIELD (Stanford, 2026) | 1,381 diverse notes, 10,229 adjudicated spans | by request | `--external` |
-| ASQ-PHI (2025) | 1,051 synthetic clinical queries with hard negatives | open, MIT | `--external` |
+| ASQ-PHI (2025) | 1,051 synthetic clinical queries with hard negatives | open, MIT | `--external` (scored; see below) |
 | Text Anonymization Benchmark | 1,268 court cases (not clinical) | open source | not clinical; skip |
 
 None is dental. The challenge set's dental decoys stay the only test of over-redacting
@@ -136,12 +136,53 @@ What each method adds:
 identifiers survive even the best ensemble. No engine finds street addresses, and URLs are mostly
 missed. Combining hf_stanford with Presidio or hf_obi (for dates) is the next combination to score.
 
+## Results on ASQ-PHI (1,051 queries, external)
+
+[ASQ-PHI](https://data.mendeley.com/datasets/csz5dzp7nx/1) (Weatherhead et al., MIT) is a second,
+independent test set: 1,051 short clinical search queries written by GPT-4o, 2,973 tagged identifiers
+in 13 Safe Harbor types, and 219 **hard negatives**, queries that look like they carry PHI but don't.
+It adds what the challenge set can't: text nobody here wrote, in a different form (questions, not
+chart notes), and a direct measure of over-redaction. It has no dental text, so the dental guard has
+nothing to protect there.
+
+Over-redaction = share of the 219 PHI-free queries with anything removed (the paper's
+"over-redaction rate").
+
+| Engine | Recall | Precision | **Over-redaction** |
+|---|---|---|---|
+| regex | 0.31 | 0.96 | 0.10 |
+| regex_v2 | 0.53 | 0.97 | 0.10 |
+| presidio | 0.54 | 0.72 | 0.90 |
+| presidio+regex_v2+guard | 0.76 | 0.76 | 0.91 |
+| hf_obi | 0.66 | 0.94 | 0.90 |
+| hf_obi+regex_v2+guard | 0.69 | 0.93 | 0.89 |
+| hf_stanford | 0.95 | 0.98 | **0.27** |
+| **hf_stanford+regex_v2+guard** | **0.96** | 0.97 | 0.35 |
+| *Published baseline: Amazon Comprehend Medical, threshold 0.5 (dataset paper)* | *0.95* | | *0.89* |
+
+What it adds to the picture:
+
+- **It confirms the challenge-set ranking on text written by someone else.** hf_stanford+regex_v2+guard
+  is again the best (0.96 recall) and again on the cost frontier.
+- **It separates the engines on over-redaction.** hf_stanford leaves 73% of PHI-free queries untouched;
+  Presidio and hf_obi change about 90% of them, as Comprehend Medical did in the paper. For search
+  queries sent to an outside tool, that's the difference between a useful query and a gutted one.
+- **regex_v2 adds formatted IDs and emails** (emails 0.97, which hf_stanford misses entirely), at the
+  cost of raising over-redaction from 0.27 to 0.35.
+- **Still leaking:** about 4% of identifiers, mostly unique identifiers (0.43 recall) and some
+  locations (`data/deid/by_category.csv`, tier `external`).
+
+The Comprehend Medical row is the paper's number, not a run here. Our recall is strict (an identifier
+counts as removed only if every character is), so it can be lower than a looser match would give.
+One ASQ-PHI tag's value doesn't appear verbatim in its query and can't be scored; two values appear
+twice and count twice (2,975 scored spans).
+
 ## Cost-effectiveness
 
 `data/deid/cost_effectiveness.csv`, per 1M notes, for the full mix (`all`) and the held-out tier (`unseen`):
 
 - **Engine cost.** Local engines: node-hours at the throughput **measured** here (regex about
-  13,000 notes/s, regex v2 about 3,600, Presidio about 75, hf_stanford about 7 and hf_obi about 3
+  12,600 notes/s, regex v2 about 3,300, Presidio about 60, hf_stanford about 11 and hf_obi about 3
   on CPU) × the CPU node price. Services: price per MB (Azure de-identification, 50 MB/month free) or
   per 1,000-character record (Azure AI Language). Service prices in `costs.yaml` are
   **ILLUSTRATIVE** until filled from the pricing pages.
@@ -152,7 +193,7 @@ missed. Combining hf_stanford with Presidio or hf_obi (for dates) is the next co
 
 With these inputs every local engine costs under $90 per 1M notes, even the transformers on CPU;
 the $3,000 review sample is most of the cost. So the choice comes down to leaks. On both tiers the
-frontier ends at hf_stanford+regex_v2+guard: about $33 more per 1M notes than
+frontier ends at hf_stanford+regex_v2+guard: about $21 more per 1M notes than
 presidio+regex_v2+guard buys about 375,000 fewer leaked identifiers (all tier). A cloud service at an
 illustrative $0.50/MB would add roughly $140 per 1M notes of about 320 characters. Its value would be
 any recall it adds on the unseen tier; that's the comparison to run once an Azure resource exists.
