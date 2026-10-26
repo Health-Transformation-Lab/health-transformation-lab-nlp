@@ -28,8 +28,6 @@ lora = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30", "peft>=0.11", "t
 db = ["sqlalchemy>=2", "psycopg[binary]>=3.1"]
 # Experiment tracking; on Databricks the workspace MLflow is used instead.
 track = ["mlflow>=3.4"]                 # tracking, UC registry, GenAI judges (make_judge)
-# Service principal setup (scripts/32_service_principal.py --apply)
-databricks = ["databricks-sdk>=0.60"]
 dev = ["pytest>=8", "ruff>=0.5"]
 
 [build-system]

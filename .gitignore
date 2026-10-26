@@ -151,7 +151,6 @@ activemq-data/
 
 # Environments
 .env
-.databricks-sp-*.env
 .envrc
 .venv
 env/
