@@ -89,6 +89,23 @@ if (file.exists(py_rel) && file.exists("data/review/simulated_reviewer_labels.cs
     stopifnot(nrow(mm) == nrow(py_vh), d < 1e-9, ci_d < 0.05)
   }
 } else cat("reliability: skipped (run python scripts 12 --simulate and 13 --simulated first)\n")
+# 9. De-identification cost-effectiveness: R 08_deid.R == Python deid_eval.cost_table (spec 007).
+if (file.exists("data/deid/cost_inputs.csv") && file.exists("data/deid/cost_effectiveness.csv")) {
+  source("r/R/08_deid.R")
+  ci <- read.csv("data/deid/cost_inputs.csv", stringsAsFactors = FALSE)
+  ci$unit[is.na(ci$unit)] <- ""; ci$hardware[is.na(ci$hardware)] <- ""
+  r <- deid_cost_table(ci)
+  py <- read.csv("data/deid/cost_effectiveness.csv", stringsAsFactors = FALSE)
+  m <- merge(r, py, by = c("tier", "method"), suffixes = c(".r", ".p"))
+  stopifnot(nrow(m) == nrow(py), nrow(m) == nrow(r))
+  num <- c("cost_usd", "leaked_per_1m_notes", "icer_usd_per_leak_avoided")
+  d <- max(sapply(num, function(k) { x <- abs(m[[paste0(k, ".r")]] - m[[paste0(k, ".p")]]); max(ifelse(is.na(x), 0, x)) }))
+  same_na <- all(is.na(m$icer_usd_per_leak_avoided.r) == is.na(m$icer_usd_per_leak_avoided.p))
+  cat(sprintf("de-id CE: %d rows, max |R - Python| = %.2e, dominated agree: %s\n", nrow(m), d,
+              all(m$dominated.r == as.logical(m$dominated.p))))
+  stopifnot(d < 1e-6, same_na, all(m$dominated.r == as.logical(m$dominated.p)))
+} else cat("de-id CE: skipped (run python/scripts/26_deid_benchmark.py first)\n")
+
 cat("parity OK (all sections)\n")
 
 # 5. Cost-effectiveness: point estimates, costs, dominance and ICER match Python.

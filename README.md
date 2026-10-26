@@ -13,7 +13,9 @@ data, to learn the pipeline, the reviewer workflow and the analysis.
 
 **What a phenotype is:** a computable definition of a condition, meaning a rule or model that reads a
 patient's record and assigns a label the same way every time. Here the label is periodontal status:
-healthy, gingivitis or periodontitis stage I–IV (with grade and extent). Dental records rarely hold a
+healthy; **gingivitis** (bleeding gums, no lasting damage); or **periodontitis** (lost gum attachment
+and bone), with a **stage** I–IV (how severe), **grade** A–C (how fast) and **extent** (how many teeth):
+[in plain words](docs/staging_grading.md#in-plain-words). Dental records rarely hold a
 reliable assigned diagnosis, so the phenotype has to be derived from the evidence below.
 
 **Diagnostic evidence for each visit:** seven parts of the dental record that each suggest a
@@ -106,4 +108,4 @@ Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol]
 | Dental vs medical data in OMOP; synthetic notes, review set, public datasets | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md), [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
 | MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
 | Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
-| Financial trade-offs; exploratory radiograph findings and MedGemma | [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
+| De-identification: labeled fake-PHI test set, regex vs Presidio vs Azure, cost-effectiveness; financial trade-offs; radiographs, MedGemma | [deidentification.md](docs/deidentification.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |

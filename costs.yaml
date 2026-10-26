@@ -37,3 +37,23 @@ judge:                         # the LLM judge itself (used on samples, not the 
   prompt_overhead_tokens: 450
   output_tokens: 80
   sample_per_method: 400       # judged notes per method on the corpus sample
+
+# De-identification engines (spec 007; scripts/26_deid_benchmark.py).
+# !!! ILLUSTRATIVE SERVICE PRICES !!! The vendors' pricing pages list prices per region and
+# currency; fill usd_per_unit from them before using any number:
+#   Azure Health Data Services de-identification: per MB, 50 MB/month free
+#     https://azure.microsoft.com/pricing/details/health-data-services/
+#   Azure AI Language PII: per 1,000 text records (one record = 1,000 characters)
+#     https://azure.microsoft.com/pricing/details/cognitive-services/text-analytics/
+deid:
+  review:                        # human QA of a sample of de-identified notes, every engine
+    qa_sample_share: 0.001       # 1 in 1,000 notes
+    minutes_per_note: 3
+    usd_per_hour: 60             # ILLUSTRATIVE
+  engines:
+    regex:          {kind: local, hardware: cpu, throughput_source: measured}
+    regex_v2:       {kind: local, hardware: cpu, throughput_source: measured}
+    presidio:       {kind: local, hardware: cpu, throughput_source: measured}
+    azure_deid:     {kind: service, unit: mb, usd_per_unit: 0.50, free_units: 50}                 # ILLUSTRATIVE price
+    azure_language: {kind: service, unit: record_1k_chars, usd_per_unit: 0.001, free_units: 0}   # ILLUSTRATIVE price
+  # "+guard" adds no cost; an ensemble costs the sum of its engines.

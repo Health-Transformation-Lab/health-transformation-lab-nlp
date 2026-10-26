@@ -67,6 +67,10 @@ residual scan flags anything PHI-shaped.
 - Code: [`phi.py`](../python/dental_omop_nlp/phi.py), [`deid.py`](../python/dental_omop_nlp/deid.py) (`deidentify`, `leak_check`, `residual_scan`); `study.apply_deid`.
 - Output: `data/datasets/deid_report.csv`. Raw notes with fake PHI stay in `data/raw/` (gitignored).
 - Check: recall 1.0, nothing blocked, over-redaction 0 in `build_summary.json`.
+- That check is easy by design: the regex was written against the same note shapes. A harder,
+  labeled challenge set (hard and held-out tiers, dental look-alikes) compares regex, regex v2,
+  Presidio and the Azure services, with costs: [deidentification.md](deidentification.md),
+  [`scripts/26_deid_benchmark.py`](../python/scripts/26_deid_benchmark.py), R [`08_deid.R`](../r/R/08_deid.R).
 
 ## 3. Read the diagnostic evidence
 

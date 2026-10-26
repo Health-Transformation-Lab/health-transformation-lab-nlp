@@ -1,0 +1,165 @@
+"""Spec 007: de-identification methods on a labeled fake-PHI challenge set, and their cost-effectiveness."""
+
+import pandas as pd
+import pytest
+
+from dental_omop_nlp import deid, deid_eval
+from dental_omop_nlp.phi import FIRST, LAST
+from dental_omop_nlp.phi_challenge import CATEGORIES, CH_FIRST, CH_LAST, build_challenge
+
+
+@pytest.fixture(scope="module")
+def ch():
+    return build_challenge(n_notes=120, seed=3)
+
+
+# ---------------------------------------------------------------- US1 challenge set
+def test_challenge_is_seeded_and_every_span_matches_its_text(ch):
+    assert [r["text"] for r in build_challenge(n_notes=120, seed=3)] == [r["text"] for r in ch]
+    for r in ch:
+        for s in r["phi"] + r["decoys"]:
+            assert r["text"][s["start"]:s["end"]] == s["text"]
+    assert {r["tier"] for r in ch} == {"easy", "hard", "unseen"}
+
+
+def test_challenge_covers_the_hipaa_and_i2b2_categories(ch):
+    seen = {s["type"] for r in ch for s in r["phi"]}
+    assert set(CATEGORIES) <= seen
+    for c in ("PATIENT", "DOCTOR", "RELATIVE", "AGE", "DATE", "PHONE", "EMAIL", "URL", "SSN",
+              "MEDICAL_RECORD", "HEALTH_PLAN", "STREET", "CITY", "ZIP", "ORGANIZATION"):
+        assert c in CATEGORIES
+
+
+def test_challenge_names_are_not_the_generator_names():
+    from dental_omop_nlp.phi_challenge import UNSEEN_FIRST, UNSEEN_LAST
+    assert not set(CH_FIRST + UNSEEN_FIRST) & set(FIRST) and not set(CH_LAST + UNSEEN_LAST) & set(LAST)
+
+
+def test_hard_tier_has_dental_decoys_that_look_like_phi(ch):
+    decoys = " ".join(s["text"] for r in ch for s in r["decoys"])
+    for d in ("Glickman", "Miller", "D4341", "#"):
+        assert d in decoys
+    for r in ch:   # decoys and PHI never overlap
+        phi = {i for s in r["phi"] for i in range(s["start"], s["end"])}
+        assert not any(i in phi for s in r["decoys"] for i in range(s["start"], s["end"]))
+
+
+# ---------------------------------------------------------------- US2 engines
+def test_regex_v2_catches_shapes_v1_misses():
+    t = "Spoke with her husband Kwame Oyelaran at kwame.o@example.org; SSN 123-45-6789; 92 yo."
+    v1 = {t[s["start"]:s["end"]] for s in deid.detect_regex(t)}
+    v2 = {t[s["start"]:s["end"]] for s in deid.detect_regex_v2(t)}
+    assert "kwame.o@example.org" not in v1
+    assert {"Kwame Oyelaran", "kwame.o@example.org", "123-45-6789", "92"} <= v2
+
+
+def test_dental_guard_keeps_dental_terms():
+    t = "Glickman class II furcation #19; Miller class I recession; SRP D4341; PD 6-5-6 mm"
+    spans = [{"start": t.index("Glickman"), "end": t.index("Glickman") + 8, "type": "NAME"},
+             {"start": t.index("6-5-6"), "end": t.index("6-5-6") + 5, "type": "DATE"}]
+    assert deid.dental_guard(t, spans) == []
+
+
+def test_ensemble_is_the_union_then_the_guard():
+    t = "Pt Imani Featherstone, Glickman class II at #30, call 205.555.0147"
+    out = deid.redact(t, deid.get_engine("regex+regex_v2+guard")(t))
+    assert "Imani" not in out and "205.555.0147" not in out
+    assert "Glickman class II" in out and "#30" in out
+
+
+class _FakeIndex:
+    def __init__(self, v):
+        self.code_point = v
+
+
+class _FakeEntity:
+    def __init__(self, cat, off, ln):
+        self.category, self.offset, self.length = cat, _FakeIndex(off), _FakeIndex(ln)
+
+
+class _FakeDeidClient:
+    def deidentify_text(self, body):
+        text = body["inputText"] if isinstance(body, dict) else body.input_text
+        i = text.index("Kwame")
+
+        class R:
+            tagger_result = type("T", (), {"entities": [_FakeEntity("Patient", i, 5)]})()
+        return R()
+
+
+class _FakeLanguageClient:
+    def recognize_pii_entities(self, docs, **kw):
+        assert kw.get("domain_filter") in ("phi", "PHI") or str(kw.get("domain_filter")).lower().endswith("phi")
+        text = docs[0]
+        i = text.index("205")
+
+        class E:
+            category, offset, length = "PhoneNumber", i, 12
+
+        class D:
+            entities, is_error = [E()], False
+        return [D()]
+
+
+def test_azure_deid_parses_tagger_entities():
+    t = "Pt Kwame seen today."
+    assert deid.detect_azure_deid(t, client=_FakeDeidClient()) == [{"start": 3, "end": 8, "type": "PATIENT"}]
+
+
+def test_azure_language_parses_pii_entities():
+    t = "call 205.555.0147 today"
+    assert deid.detect_azure_language(t, client=_FakeLanguageClient()) == [{"start": 5, "end": 17, "type": "PHONE"}]
+
+
+def test_cloud_engine_without_endpoint_says_so(monkeypatch):
+    monkeypatch.delenv("AZURE_DEID_ENDPOINT", raising=False)
+    with pytest.raises(RuntimeError, match="AZURE_DEID_ENDPOINT"):
+        deid.detect_azure_deid("x")
+
+
+# ---------------------------------------------------------------- US3 scores
+def test_scores_on_a_hand_made_case():
+    rec = {"note_id": 1, "tier": "hard", "text": "Pt Ana Ruiz, #3 MB",
+           "phi": [{"start": 3, "end": 11, "text": "Ana Ruiz", "type": "PATIENT"}],
+           "decoys": [{"start": 13, "end": 15, "text": "#3", "type": "TOOTH"}]}
+    full = deid_eval.score_records([rec], lambda t: [{"start": 3, "end": 11, "type": "NAME"}])
+    half = deid_eval.score_records([rec], lambda t: [{"start": 3, "end": 6, "type": "NAME"},
+                                                     {"start": 13, "end": 15, "type": "ID"}])
+    f, h = full["summary"].iloc[0], half["summary"].iloc[0]
+    assert f.entity_recall == 1 and f.decoy_damage == 0 and f.char_precision == 1
+    assert h.entity_recall == 0 and h.leaked_per_1k_notes == 1000 and h.decoy_damage == 1
+    assert h.char_recall == pytest.approx(3 / 8)
+
+
+def test_regex_v2_beats_v1_on_the_hard_tier(ch):
+    s1 = deid_eval.score_records(ch, deid.get_engine("regex"))["summary"].set_index("tier")
+    s2 = deid_eval.score_records(ch, deid.get_engine("regex_v2+guard"))["summary"].set_index("tier")
+    assert s2.loc["hard", "entity_recall"] > s1.loc["hard", "entity_recall"]
+    assert s2.loc["hard", "decoy_damage"] <= s1.loc["hard", "decoy_damage"]
+
+
+# ---------------------------------------------------------------- US4 cost-effectiveness
+def test_service_cost_uses_size_and_free_allowance():
+    cfg = {"kind": "service", "unit": "mb", "usd_per_unit": 2.0, "free_units": 50}
+    assert deid_eval.engine_cost(cfg, n_notes=1_000_000, avg_chars=1000, compute={}) == pytest.approx(
+        (1_000_000 * 1000 / 1e6 - 50) * 2.0)
+    rec = {"kind": "service", "unit": "record_1k_chars", "usd_per_unit": 1.0 / 1000, "free_units": 0}
+    assert deid_eval.engine_cost(rec, n_notes=10, avg_chars=1500, compute={}) == pytest.approx(20 / 1000)
+    loc = {"kind": "local", "notes_per_sec": 100}
+    assert deid_eval.engine_cost(loc, n_notes=360_000, avg_chars=1, compute={"cpu_node_usd_per_hour": 2.0}) == pytest.approx(2.0)
+
+
+def test_frontier_marks_dominated_and_prices_leaks_avoided():
+    t = pd.DataFrame({"method": ["a", "b", "c"], "cost_usd": [10.0, 30.0, 50.0],
+                      "leaked_per_1m_notes": [500.0, 100.0, 200.0]})
+    f = deid_eval.deid_frontier(t).set_index("method")
+    assert not f.loc["a", "dominated"] and not f.loc["b", "dominated"] and f.loc["c", "dominated"]
+    assert f.loc["b", "icer_usd_per_leak_avoided"] == pytest.approx(20 / 400)
+    assert f.loc["b", "compared_to"] == "a"
+
+
+def test_frontier_prefers_less_dental_damage_at_a_tie():
+    t = pd.DataFrame({"method": ["plain", "guarded"], "cost_usd": [5.0, 5.0],
+                      "leaked_per_1m_notes": [100.0, 100.0], "decoy_damage": [0.4, 0.05]})
+    f = deid_eval.deid_frontier(t).set_index("method")
+    assert f.loc["plain", "dominated"] and not f.loc["guarded", "dominated"]

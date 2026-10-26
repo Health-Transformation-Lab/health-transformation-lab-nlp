@@ -1,0 +1,5 @@
+method,reason
+azure_deid,RuntimeError: AZURE_DEID_ENDPOINT is not set: this engine calls an Azure service (synthetic or de-identified data only)
+azure_deid+regex_v2+guard,RuntimeError: AZURE_DEID_ENDPOINT is not set: this engine calls an Azure service (synthetic or de-identified data only)
+azure_language,RuntimeError: AZURE_LANGUAGE_ENDPOINT is not set: this engine calls an Azure service (synthetic or de-identified data only)
+azure_language+regex_v2+guard,RuntimeError: AZURE_LANGUAGE_ENDPOINT is not set: this engine calls an Azure service (synthetic or de-identified data only)

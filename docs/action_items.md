@@ -42,7 +42,7 @@ needs confirming.
 
 | # | Difference | What the repo does now | Action | Owner | Status |
 |---|---|---|---|---|---|
-| D1 | Prediction model wasn't in the repo | Next-visit progression from the current visit (`21_predict_progression.py`): AUROC with bootstrap CI, permutation importance | Define the outcome (stage up? any CAL gain?) and horizon (next visit? 1, 3, 5 years?) | study lead | Done, confirm |
+| D1 | The study design calls for predicting who gets worse; this repo had no prediction step until spec 005 added one | Predicts whether the next visit's phenotype is worse, from the current visit only (`21_predict_progression.py`; explained in [walkthrough step 12](code_walkthrough.md#12-predict-progression)) | Define the outcome (stage up? any CAL gain?) and horizon (next visit? 1, 3, 5 years?) | study lead | Done, confirm |
 | D2 | Dry run: with the phenotype as outcome, **22.6%** of visit pairs "progress" vs **7.5%** in truth; the model mostly learns phenotype noise (current stage dominates) | Reported for both outcomes | Correct for misclassification, or use outcomes only when the source is stable (B2) | data science | Open |
 | D3 | Even against truth, smoking and diabetes barely register: stage changes are rare over ≤ 3 years | — | Longer follow-up, or model CAL change directly; compare importance with published risk factors | data science | Open |
 
@@ -71,6 +71,7 @@ needs confirming.
 | # | Item | Status |
 |---|---|---|
 | H1 | Chart notes are the only free text here and the only AI input. Inventory the real EHR's other free text (exam-form and perio-chart comments, radiograph interpretations, treatment-plan and procedure notes, referral/specialist letters, medical-history text, scanned documents) and decide which to de-identify and read | Open |
+| H2 | De-identification: the pipeline uses `regex`, which removes 20% of identifiers on held-out shapes. presidio+regex_v2+guard removes 57% and keeps 95% of dental terms; the Azure services are wired but not run ([deidentification.md](deidentification.md)). Next: run `azure_deid+regex_v2+guard` and `azure_language+regex_v2+guard` on the challenge set; fill real prices in `costs.yaml`; pick the engine on the unseen tier and switch `study.py`; add ASQ-PHI (MIT) as a second test set; keep a human review sample on real notes | Open |
 
 ## Earlier items
 

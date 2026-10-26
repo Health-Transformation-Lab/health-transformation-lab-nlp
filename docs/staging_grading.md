@@ -9,6 +9,29 @@ Every part of the repo follows this worksheet: the synthetic ground truth,
 the rule readers, the reviewer protocol, and the LLM judge and reader prompts.
 Change one and you must change them all (table at the end).
 
+## In plain words
+
+| Label | What it means | How it's decided here |
+|---|---|---|
+| **Healthy** | Gums don't bleed much; no damage to the tooth's support | No attachment loss, no bone loss, bleeding at < 10% of sites |
+| **Gingivitis** | Inflamed, bleeding gums. Reversible: cleaning and home care fix it | Bleeding at ≥ 10% of sites, but no attachment or bone loss |
+| **Periodontitis** | The gum has detached from the tooth and bone has been lost. Permanent: treatment stops it getting worse, but lost support doesn't grow back | Any interdental attachment loss (CAL ≥ 1 mm), bone loss, or tooth lost to gum disease |
+
+Periodontitis then gets three more labels:
+
+- **Stage (I, II, III, IV): how severe and how hard to treat.** Mostly from the worst
+  attachment loss: I is 1–2 mm (early), II is 3–4 mm (moderate), III and IV are 5 mm or more.
+  Teeth lost to gum disease and complicating factors (deep pockets, bone defects, loose teeth,
+  few teeth left) push it up. Stage IV means the bite itself needs rebuilding.
+- **Grade (A, B, C): how fast it's progressing, and how likely to keep going.** A is slow, B
+  moderate (the default), C rapid. Judged from bone loss over 5 years when available,
+  otherwise from bone loss relative to age (a lot of loss in a young patient means fast).
+  Smoking and poorly controlled diabetes raise it.
+- **Extent: how much of the mouth is involved.** Localized (fewer than 30% of teeth),
+  generalized (30% or more), or a molar/incisor pattern (typical of disease that starts young).
+
+A full label reads like "generalized periodontitis, stage III, grade B".
+
 ## Stage
 
 **Not periodontitis:** no interdental attachment loss (CAL < 1 mm; or, if CAL
