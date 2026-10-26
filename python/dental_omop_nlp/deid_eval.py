@@ -81,6 +81,9 @@ def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> flo
         else:
             raise ValueError(f"unknown unit {cfg['unit']}")
         return max(units - cfg.get("free_units", 0), 0) * cfg["usd_per_unit"]
+    if cfg["kind"] == "llm":                                      # ~4 characters per token
+        tin = cfg["prompt_overhead_tokens"] + avg_chars / 4
+        return n_notes * (tin * cfg["usd_per_1m_input_tokens"] + cfg["output_tokens"] * cfg["usd_per_1m_output_tokens"]) / 1e6
     raise ValueError(f"unknown kind {cfg['kind']}")
 
 
@@ -116,6 +119,9 @@ def deid_frontier(t: pd.DataFrame) -> pd.DataFrame:
     return t
 
 
+_LLM_KEYS = ("usd_per_1m_input_tokens", "usd_per_1m_output_tokens", "prompt_overhead_tokens", "output_tokens")
+
+
 def cost_table(ci: pd.DataFrame) -> pd.DataFrame:
     """cost_inputs.csv rows (one per method x member engine) -> one row per method with the frontier."""
     if "tier" in ci and ci["tier"].nunique() > 1:
@@ -126,7 +132,8 @@ def cost_table(ci: pd.DataFrame) -> pd.DataFrame:
         r0 = g.iloc[0]
         compute = {"cpu_node_usd_per_hour": r0.cpu_node_usd_per_hour, "gpu_node_usd_per_hour": r0.gpu_node_usd_per_hour}
         eng = sum(engine_cost({"kind": r.kind, "hardware": r.hardware or "cpu", "notes_per_sec": r.notes_per_sec,
-                               "unit": r.unit, "usd_per_unit": r.usd_per_unit, "free_units": r.free_units},
+                               "unit": r.unit, "usd_per_unit": r.usd_per_unit, "free_units": r.free_units,
+                               **{k: getattr(r, k, 0.0) for k in _LLM_KEYS}},
                               int(r.n_notes), float(r.avg_chars), compute) for r in g.itertuples())
         rev = review_cost(int(r0.n_notes), {"qa_sample_share": r0.qa_sample_share,
                                             "minutes_per_note": r0.minutes_per_note, "usd_per_hour": r0.review_usd_per_hour})

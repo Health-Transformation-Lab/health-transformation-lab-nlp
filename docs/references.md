@@ -161,6 +161,16 @@ Everything this repo relies on, and what it's used for.
     across infrastructures* (benchmarks on Databricks).
     [johnsnowlabs.com](https://www.johnsnowlabs.com/clinical-de-identification-at-scale-pipeline-design-and-speed-accuracy-trade-offs-across-infrastructures/)
 
+46. **Chambon PJ, Wu C, Steinkamp JM, Adleberg J, Cook TS, Langlotz CP.** *Automated deidentification of
+    radiology reports combining transformer and "hide in plain sight" rule-based methods.* J Am Med Inform
+    Assoc, [doi:10.1093/jamia/ocac219](https://doi.org/10.1093/jamia/ocac219). Model:
+    [StanfordAIMI/stanford-deidentifier-base](https://huggingface.co/StanfordAIMI/stanford-deidentifier-base) (MIT).
+47. **Robust DeID** (OBI) — package [robust-deid](https://pypi.org/project/robust-deid/); model [obi/deid_roberta_i2b2](https://huggingface.co/obi/deid_roberta_i2b2)
+    (RoBERTa trained on i2b2 2014; MIT).
+48. **Kocaman V, Santas M, Gul Y, Butgul M, Talby D.** *Can zero-shot commercial APIs deliver regulatory-grade
+    clinical text de-identification?* [arXiv:2503.20794](https://arxiv.org/abs/2503.20794), 2025. Authors are
+    from John Snow Labs, one of the compared vendors.
+
 ## Tools
 
 16. **Spec Kit** (GitHub) — spec-driven development. [github.com/github/spec-kit](https://github.com/github/spec-kit)

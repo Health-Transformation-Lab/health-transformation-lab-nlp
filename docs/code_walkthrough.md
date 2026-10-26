@@ -63,9 +63,15 @@ chart, and a structured radiograph AI read.
 **In plain words:** the synthetic notes contain fake patient identifiers (names, dates of birth,
 record numbers, phone numbers), put there on purpose so we can test removing them. Three steps:
 
-1. **Remove.** A pattern-matching engine finds the identifiers and replaces each with a tag such
-   as `[NAME]` or `[DATE]`. A list of dental abbreviations (BOP, SRP, MB, DL ...) stops it from
-   removing clinical terms that look like names.
+1. **Remove.** An engine finds the identifiers and replaces each with a tag such as `[NAME]` or
+   `[DATE]`. The study pipeline still uses the simplest engine (patterns plus a list of dental
+   abbreviations it must not touch), and that's the weak point: on held-out shapes it removes only
+   20% of identifiers. The standard methods are compared on a separate, harder test set
+   ([deidentification.md](deidentification.md)): improved patterns, Presidio (an NER model),
+   two transformer models trained for clinical de-identification (Stanford, OBI), an LLM, and
+   Microsoft's Azure services, alone and combined, with a dental guard so clinical terms survive.
+   Best measured so far: Presidio + improved patterns + guard, 57% on held-out shapes. Choosing the
+   pipeline's engine is action item H2.
 2. **Final check (the "leak gate").** We know every fake identifier we put in, so we search the
    cleaned note for each one. If even one survived, the note is held back: it never reaches
    Label Studio, the reviewers or any AI model.

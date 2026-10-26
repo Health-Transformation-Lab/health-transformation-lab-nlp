@@ -11,3 +11,5 @@
 - [x] T009 Second test set: `load_external` + `26_deid_benchmark.py --external` (any labeled JSONL/JSON)
 - [ ] T009b Attach ASQ-PHI (Mendeley Data is blocked from the workspace), confirm its field names, score it
 - [ ] T010 Pick the engine on the unseen tier; switch study.py's default; keep a human review sample on real notes
+- [x] T011 AI engines: transformer NER (hf_stanford, hf_obi) and LLM (llm) with a verbatim-only rule; LLM token cost in Python and R; Databricks notebook 06_deid_benchmark.py
+- [ ] T012 Run the AI engines on Databricks (Hugging Face and serving endpoints are blocked from this workspace) and add their rows to the results

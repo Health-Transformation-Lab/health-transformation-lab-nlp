@@ -34,8 +34,9 @@ from dental_omop_nlp.phi_challenge import build_challenge
 logging.getLogger("tldextract").setLevel(logging.CRITICAL)   # Presidio's URL recognizer tries the network
 
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
-           "presidio+regex_v2+guard", "azure_deid", "azure_deid+regex_v2+guard", "azure_language",
-           "azure_language+regex_v2+guard"]
+           "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
+           "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "azure_deid",
+           "azure_deid+regex_v2+guard", "azure_language", "azure_language+regex_v2+guard"]
 ap = argparse.ArgumentParser()
 ap.add_argument("--engines", default=",".join(DEFAULT))
 ap.add_argument("--n-notes", type=int, default=400)
@@ -94,6 +95,7 @@ for (tier, spec), g in scores[scores.tier.isin(a.tiers.split(","))].groupby(["ti
         rows.append({"tier": tier, "method": spec, "engine": member, "kind": e["kind"], "hardware": e.get("hardware", ""),
                      "notes_per_sec": e.get("notes_per_sec", float("nan")), "unit": e.get("unit", ""),
                      "usd_per_unit": e.get("usd_per_unit", float("nan")), "free_units": e.get("free_units", 0),
+                     **{k: e.get(k, 0.0) for k in deid_eval._LLM_KEYS},
                      "n_notes": n_corpus, "avg_chars": s.avg_chars,
                      "leaked_per_1m_notes": s.leaked_per_1k_notes * 1000, "decoy_damage": s.decoy_damage,
                      "cpu_node_usd_per_hour": compute["cpu_node_usd_per_hour"],

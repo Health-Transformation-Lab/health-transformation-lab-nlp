@@ -53,11 +53,21 @@ The categories follow HIPAA Safe Harbor and the 2014 i2b2/UTHealth annotation gu
 | `presidio` | Microsoft Presidio: spaCy NER and pattern recognizers, with the dental allowlist | yes (Python 3.12 + spaCy model) |
 | `azure_deid` | Azure Health Data Services de-identification service, TAG operation (27 PHI categories) | wired, tested with a fake client; needs `AZURE_DEID_ENDPOINT` |
 | `azure_language` | Azure AI Language PII detection, healthcare (PHI) domain | wired, tested with a fake client; needs `AZURE_LANGUAGE_ENDPOINT` and `_KEY` |
+| `hf_stanford` | Transformer NER trained for de-identification: StanfordAIMI/stanford-deidentifier-base (radiology reports and notes; MIT) | wired, tested with a fake pipeline; Hugging Face is blocked here, so run it on Databricks ([`06_deid_benchmark.py`](../databricks/notebooks/06_deid_benchmark.py)) |
+| `hf_obi` | Transformer NER: obi/deid_roberta_i2b2 (RoBERTa trained on the i2b2 2014 corpus; MIT) | same |
+| `llm` | An LLM asked to list every identifier verbatim (any OpenAI-compatible endpoint, e.g. a Databricks serving endpoint); values not found in the note are dropped | wired, tested with a fake reply; run on Databricks |
 | `A+B` | Ensemble: the union of the engines' spans | |
 | `+guard` | Dental guard: drops any span inside a dental term | |
 
 `python scripts/26_deid_benchmark.py --engines azure_deid+regex_v2+guard` runs the Microsoft
 service plus regex plus guard, once an Azure resource is set up.
+
+**What published comparisons say.** Transformer models trained for de-identification report
+F1 around 0.98–0.99 on the i2b2 corpora (Stanford model card, Chambon et al.). A 2025 comparison by
+John Snow Labs ranked its own Healthcare NLP first (recall 0.97), then Azure Health Data Services
+(0.92), AWS Comprehend Medical (0.85) and GPT-4o zero-shot (0.77); the authors sell one of the
+compared products, so it needs independent checking. None of these were tested on dental notes,
+where eponyms and probing readings look like PHI. That's what the challenge set's decoys test.
 
 ## Results on the challenge set (400 notes, seed 7)
 

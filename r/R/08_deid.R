@@ -4,11 +4,13 @@
 # Base R only.
 
 deid_engine_cost <- function(kind, hardware, notes_per_sec, unit, usd_per_unit, free_units,
-                             n_notes, avg_chars, cpu_usd_h, gpu_usd_h) {
+                             n_notes, avg_chars, cpu_usd_h, gpu_usd_h, llm = NULL) {
   if (kind == "local") {
     rate <- if (identical(hardware, "gpu")) gpu_usd_h else cpu_usd_h
     return(n_notes / notes_per_sec / 3600 * rate)
   }
+  if (kind == "llm") return(n_notes * ((llm$prompt_overhead_tokens + avg_chars / 4) * llm$usd_per_1m_input_tokens +
+                                       llm$output_tokens * llm$usd_per_1m_output_tokens) / 1e6)
   units <- if (unit == "mb") n_notes * avg_chars / 1e6 else n_notes * ceiling(avg_chars / 1000)
   max(units - free_units, 0) * usd_per_unit
 }
@@ -40,7 +42,11 @@ deid_cost_table <- function(ci) {
       eng <- sum(vapply(seq_len(nrow(m)), function(i) with(m[i, ],
         deid_engine_cost(kind, ifelse(is.na(hardware) | hardware == "", "cpu", hardware), notes_per_sec,
                          unit, usd_per_unit, free_units, n_notes, avg_chars,
-                         cpu_node_usd_per_hour, gpu_node_usd_per_hour)), numeric(1)))
+                         cpu_node_usd_per_hour, gpu_node_usd_per_hour,
+                         llm = list(usd_per_1m_input_tokens = usd_per_1m_input_tokens,
+                                    usd_per_1m_output_tokens = usd_per_1m_output_tokens,
+                                    prompt_overhead_tokens = prompt_overhead_tokens, output_tokens = output_tokens))),
+        numeric(1)))
       r0 <- m[1, ]
       rev <- r0$qa_sample_share * r0$n_notes * r0$minutes_per_note / 60 * r0$review_usd_per_hour
       data.frame(method = r0$method, engine_usd = eng, review_usd = rev, cost_usd = eng + rev,

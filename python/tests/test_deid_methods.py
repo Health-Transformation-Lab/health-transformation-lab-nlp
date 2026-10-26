@@ -182,3 +182,50 @@ def test_external_set_loads_spans_or_finds_listed_values(tmp_path):
     assert recs[1]["phi"] == [] and recs[2]["phi"][0]["text"] == "Bo Li"
     s = deid_eval.score_records(recs, deid.get_engine("regex_v2"))["summary"]
     assert set(s.tier) == {"external", "all"}
+
+
+# ---------------------------------------------------------------- AI engines: transformer NER and LLM
+class _FakeHFPipe:
+    """Mimics transformers' token-classification pipeline with aggregation_strategy='simple'."""
+
+    def __init__(self, ents):
+        self.ents = ents
+
+    def __call__(self, text):
+        return [dict(e) for e in self.ents]
+
+
+def test_transformer_engine_maps_i2b2_labels_and_joins_pieces():
+    t = "Pt Kwame Oyelaran seen 3/4/2024 by Dr Lindqvist"
+    ents = [{"entity_group": "U-PATIENT", "start": 3, "end": 8, "score": 0.99},          # BILOU prefixes (OBI model)
+            {"entity_group": "PATIENT", "start": 9, "end": 17, "score": 0.98},           # next word, same type
+            {"entity_group": "DATE", "start": 23, "end": 31, "score": 0.97},
+            {"entity_group": "STAFF", "start": 38, "end": 47, "score": 0.40}]            # below threshold
+    spans = deid.detect_transformer(t, pipe=_FakeHFPipe(ents), min_score=0.5)
+    assert [(t[s["start"]:s["end"]], s["type"]) for s in spans] == [("Kwame Oyelaran", "NAME"), ("3/4/2024", "DATE")]
+
+
+def test_llm_engine_locates_listed_values_and_drops_invented_ones():
+    t = "Pt Kwame Oyelaran, call 205.555.0147. Kwame prefers mornings."
+    reply = '[{"text": "Kwame Oyelaran", "type": "NAME"}, {"text": "205.555.0147", "type": "PHONE"},' \
+            ' {"text": "Kwame", "type": "NAME"}, {"text": "Jane Doe", "type": "NAME"}]'
+    spans = deid.detect_llm(t, complete=lambda system, user: reply)
+    got = {t[s["start"]:s["end"]] for s in spans}
+    assert got == {"Kwame Oyelaran", "205.555.0147", "Kwame"}            # both Kwames; Jane Doe isn't in the note
+    assert deid.LLM_DEID_SYSTEM.count("verbatim") >= 1 and "Glickman" in deid.LLM_DEID_SYSTEM
+
+
+def test_ai_engines_are_registered_and_say_what_they_need(monkeypatch):
+    for e in ("hf_stanford", "hf_obi", "llm"):
+        assert e in deid.ENGINES
+    monkeypatch.delenv("DEID_LLM_BASE_URL", raising=False)
+    with pytest.raises(RuntimeError, match="DEID_LLM_BASE_URL"):
+        deid.detect_llm("x")
+
+
+def test_llm_cost_counts_prompt_and_output_tokens():
+    cfg = {"kind": "llm", "usd_per_1m_input_tokens": 1.0, "usd_per_1m_output_tokens": 4.0,
+           "prompt_overhead_tokens": 300, "output_tokens": 100}
+    # 1,000 notes x 400 chars: (300 + 100) input tokens and 100 output tokens per note
+    assert deid_eval.engine_cost(cfg, n_notes=1000, avg_chars=400, compute={}) == pytest.approx(
+        1000 * 400 / 1e6 * 1.0 + 1000 * 100 / 1e6 * 4.0)

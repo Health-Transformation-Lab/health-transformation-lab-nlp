@@ -20,6 +20,14 @@ AND the leak gate. Two engines:
                   azure-health-deidentification azure-identity; AZURE_DEID_ENDPOINT.
   azure_language  Azure AI Language PII detection, healthcare (PHI) domain.
                   pip install azure-ai-textanalytics; AZURE_LANGUAGE_ENDPOINT, _KEY.
+  hf_stanford     transformer NER trained for clinical de-identification:
+                  StanfordAIMI/stanford-deidentifier-base (Chambon et al., JAMIA 2023; MIT).
+  hf_obi          obi/deid_roberta_i2b2 (RoBERTa on i2b2 2014; MIT). Both need the
+                  Hugging Face download (pip install -e ".[models]").
+  llm             an LLM asked to list every identifier verbatim (any OpenAI-compatible
+                  endpoint, e.g. a Databricks serving endpoint): DEID_LLM_BASE_URL,
+                  DEID_LLM_MODEL, DEID_LLM_API_KEY. Values it lists that aren't in the
+                  note are dropped (no invented identifiers).
 
 Engines combine with "+": "azure_deid+regex_v2+guard" is the union of both
 engines' spans, then the **dental guard**, which drops any span lying inside a
@@ -180,7 +188,7 @@ def _need(var: str) -> str:
     import os
     v = os.environ.get(var)
     if not v:
-        raise RuntimeError(f"{var} is not set: this engine calls an Azure service (synthetic or de-identified data only)")
+        raise RuntimeError(f"{var} is not set: this engine calls an external service (synthetic or de-identified data only)")
     return v
 
 
@@ -221,9 +229,96 @@ def detect_azure_language(text: str, client=None) -> list[dict]:
                     "type": _AZURE_LANG_TYPES.get(str(e.category), "ID")} for e in doc.entities])
 
 
+# --------------------------------------------------------------- AI: transformer NER, LLM
+_HF_TYPES = {"PATIENT": "NAME", "STAFF": "NAME", "DOCTOR": "NAME", "PERSON": "NAME", "NAME": "NAME",
+             "DATE": "DATE", "AGE": "AGE", "PHONE": "PHONE", "FAX": "PHONE", "EMAIL": "EMAIL", "URL": "URL",
+             "WEB": "URL", "LOC": "LOCATION", "LOCATION": "LOCATION", "HOSP": "LOCATION", "HOSPITAL": "LOCATION",
+             "PATORG": "LOCATION", "VENDOR": "LOCATION", "ID": "ID", "OTHERPHI": "ID"}
+_HF_MODELS = {"hf_stanford": "StanfordAIMI/stanford-deidentifier-base", "hf_obi": "obi/deid_roberta_i2b2"}
+_PIPES: dict = {}
+
+
+def _join_adjacent(text: str, spans: list[dict], max_gap: int = 1) -> list[dict]:
+    """Word pieces of one entity ('Kwame' + 'Oyelaran') come back as separate spans; join them."""
+    out: list[dict] = []
+    for s in sorted(spans, key=lambda s: s["start"]):
+        if out and s["type"] == out[-1]["type"] and 0 <= s["start"] - out[-1]["end"] <= max_gap \
+                and not text[out[-1]["end"]:s["start"]].strip():
+            out[-1]["end"] = max(out[-1]["end"], s["end"])
+        else:
+            out.append(dict(s))
+    return out
+
+
+def _hf_pipe(model: str):  # pragma: no cover - needs the Hugging Face download
+    if model not in _PIPES:
+        from transformers import pipeline
+        _PIPES[model] = pipeline("token-classification", model=model, aggregation_strategy="simple")
+    return _PIPES[model]
+
+
+def detect_transformer(text: str, model: str = _HF_MODELS["hf_stanford"], pipe=None, min_score: float = 0.5) -> list[dict]:
+    """Clinical de-identification transformer (token classification). Labels may carry BIO/BILOU prefixes."""
+    pipe = pipe or _hf_pipe(model)
+    spans = []
+    for e in pipe(text):
+        label = re.sub(r"^[BILUES]-", "", str(e.get("entity_group", e.get("entity", ""))))
+        if label in ("O", "") or float(e.get("score", 1.0)) < min_score:
+            continue
+        spans.append({"start": int(e["start"]), "end": int(e["end"]), "type": _HF_TYPES.get(label.upper(), "ID")})
+    return _merge(_join_adjacent(text, spans))
+
+
+LLM_DEID_SYSTEM = """You de-identify dental chart notes. List every piece of protected health information
+(HIPAA Safe Harbor identifiers): names of patients, relatives, clinicians and staff; dates (except the year
+alone); ages over 89; phone and fax numbers; emails; URLs; IP addresses; social security, record, health
+plan, account, licence, vehicle and device numbers; street addresses, cities and ZIP codes; employers and
+practice names. Copy each one verbatim, exactly as it appears in the note.
+Do NOT list clinical text: tooth numbers (#19), probing readings (6-5-6), CDT and ICD codes (D4341,
+K05.321), eponymous classifications and instruments (Glickman class II, Miller class I, Gracey 11/12),
+drug names, lab values, or ages under 90.
+Answer with JSON only: [{"text": "...", "type": "NAME|DATE|AGE|PHONE|EMAIL|URL|ID|LOCATION"}]"""
+LLM_DEID_PROMPT_VERSION = "llm-deid-v1"
+
+
+def _llm_complete(system: str, user: str) -> str:  # pragma: no cover - needs an endpoint
+    import json
+    import urllib.request
+    base, model, key = _need("DEID_LLM_BASE_URL").rstrip("/"), _need("DEID_LLM_MODEL"), _need("DEID_LLM_API_KEY")
+    body = json.dumps({"model": model, "temperature": 0, "max_tokens": 800,
+                       "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}).encode()
+    req = urllib.request.Request(f"{base}/chat/completions", data=body, method="POST",
+                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return json.loads(r.read())["choices"][0]["message"]["content"]
+
+
+def detect_llm(text: str, complete=None) -> list[dict]:
+    """LLM lists identifiers verbatim; each is located in the note (every occurrence). Values not
+    found in the note are dropped, so the model can't add identifiers that aren't there."""
+    import json
+    if complete is None:
+        _need("DEID_LLM_BASE_URL")
+        complete = _llm_complete
+    raw = complete(LLM_DEID_SYSTEM, f"Note:\n<<<\n{text}\n>>>")
+    s = raw.strip()
+    items = json.loads(s[s.find("["):s.rfind("]") + 1]) if "[" in s else []
+    spans = []
+    for it in items:
+        val = str(it.get("text", "")).strip()
+        j = text.find(val) if val else -1
+        while j >= 0:
+            spans.append({"start": j, "end": j + len(val), "type": str(it.get("type", "ID")).upper()})
+            j = text.find(val, j + len(val))
+    return _merge(spans)
+
+
 ENGINES = {"regex": detect_regex, "regex_v2": detect_regex_v2, "presidio": detect_presidio,
-           "azure_deid": detect_azure_deid, "azure_language": detect_azure_language}
-CLOUD_ENGINES = {"azure_deid", "azure_language"}
+           "azure_deid": detect_azure_deid, "azure_language": detect_azure_language,
+           "hf_stanford": lambda text: detect_transformer(text, _HF_MODELS["hf_stanford"]),
+           "hf_obi": lambda text: detect_transformer(text, _HF_MODELS["hf_obi"]),
+           "llm": detect_llm}
+CLOUD_ENGINES = {"azure_deid", "azure_language", "llm"}
 
 
 def get_engine(spec: str):
