@@ -12,8 +12,8 @@ Writes:
   data/deid/cost_inputs.csv           what the cost model uses (R recomputes from this: parity)
   data/deid/cost_effectiveness.csv    cost per corpus, leaks per 1M notes, frontier, ICER
 
-  --external path.jsonl adds another labeled set (e.g. ASQ-PHI) as tier "external"; price it with
-  --tiers all,unseen,external.
+  --external path adds another labeled set as tier "external": JSONL/JSON, or ASQ-PHI's own
+  synthetic_clinical_queries.txt as downloaded. Price it with --tiers all,unseen,external.
 
 An engine that can't run here (package missing, no Azure endpoint) is listed as not run, with
 the reason; nothing is estimated for it. Service prices in costs.yaml are ILLUSTRATIVE until
@@ -82,7 +82,8 @@ for spec in a.engines.split(","):
     print(f"{spec}: entity recall {s.entity_recall:.3f}, decoy damage {s.decoy_damage:.3f}")
 
 scores = pd.concat(scores)[["method", "tier", "n_notes", "n_phi", "entity_recall", "char_recall",
-                            "char_precision", "decoy_damage", "leaked_per_1k_notes", "avg_chars"]]
+                            "char_precision", "decoy_damage", "n_hard_negatives", "hard_negative_damage",
+                            "leaked_per_1k_notes", "avg_chars"]]
 scores.to_csv(DEID_DIR / "scores.csv", index=False)
 pd.concat(cats)[["method", "tier", "category", "n", "n_leaked", "recall"]].to_csv(DEID_DIR / "by_category.csv",
                                                                                index=False)

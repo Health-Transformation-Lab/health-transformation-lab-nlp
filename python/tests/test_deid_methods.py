@@ -264,3 +264,29 @@ def test_i2b2_2014_loader_reads_xml_tags(tmp_path):
     recs = load_i2b2_2014(tmp_path)
     assert len(recs) == 1 and recs[0]["tier"] == "i2b2_2014"
     assert [(p["text"], p["type"]) for p in recs[0]["phi"]] == [("2090-01-02", "DATE"), ("Bo Li", "PATIENT")]
+
+
+def test_external_set_reads_the_asq_phi_text_format(tmp_path):
+    """ASQ-PHI ships as delimited text: ===QUERY=== line, ===PHI_TAGS===, one JSON tag per line."""
+    from dental_omop_nlp.phi_challenge import load_external
+    f = tmp_path / "queries.txt"
+    f.write_text('===QUERY===\nDose advice for Ana Ruiz, seen at Oak Clinic 3/4/2024?\n===PHI_TAGS===\n'
+                 '{"identifier_type": "NAME", "value": "Ana Ruiz"}\n'
+                 '{"identifier_type": "GEOGRAPHIC_LOCATION", "value": "Oak Clinic"}\n'
+                 '{"identifier_type": "DATE", "value": "3/4/2024"}\n\n'
+                 '===QUERY===\nFirst-line therapy for stage III periodontitis in a 50-year-old?\n===PHI_TAGS===\n\n')
+    recs = load_external(f)
+    assert len(recs) == 2 and recs[0]["tier"] == "external"
+    assert [(p["text"], p["type"]) for p in recs[0]["phi"]] == [
+        ("Ana Ruiz", "NAME"), ("Oak Clinic", "GEOGRAPHIC_LOCATION"), ("3/4/2024", "DATE")]
+    assert recs[1]["phi"] == [] and recs[1]["text"].startswith("First-line")
+
+
+def test_hard_negative_damage_counts_phi_free_notes_with_anything_removed():
+    recs = [{"note_id": 1, "tier": "external", "text": "Stage III in a 50-year-old", "phi": [], "decoys": []},
+            {"note_id": 2, "tier": "external", "text": "Plaque control advice", "phi": [], "decoys": []},
+            {"note_id": 3, "tier": "external", "text": "Pt Bo Li", "decoys": [],
+             "phi": [{"start": 3, "end": 8, "text": "Bo Li", "type": "NAME"}]}]
+    s = deid_eval.score_records(recs, lambda t: [{"start": 0, "end": 5, "type": "NAME"}] if "Stage" in t else [])
+    ext = s["summary"].set_index("tier").loc["external"]
+    assert ext.n_hard_negatives == 2 and ext.hard_negative_damage == 0.5
