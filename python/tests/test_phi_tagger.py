@@ -158,3 +158,40 @@ def test_overlap_score_matches_one_to_one_so_fragments_do_not_count_twice():
     pred = [["B-Date", "B-Date", "B-Date", "B-Date"]]
     s = phi_tagger.score(gold, pred, overlap=True).set_index("type")
     assert s.loc["Date", "recall"] == 1.0 and s.loc["Date", "precision"] == 0.25
+
+
+# ---------------------------------------------------------------- the course's CoNLL files
+COURSE = """-DOCSTART- -X- -X- O
+
+A DT O
+48 CD B-Age
+- : I-Age
+year NN I-Age
+man NN B-Sex
+seen VBN O
+in IN O
+April NNP B-Date
+2005. CD O
+Fever NN O
+. . O
+
+-DOCSTART- -X- -X- O
+
+Two CD B-Date
+weeks NNS I-Date
+later RB I-Date
+"""
+
+
+def test_read_conll_reads_word_pos_tag_lines_by_document(tmp_path):
+    p = tmp_path / "test.txt"
+    p.write_text(COURSE)
+    docs = phi_tagger.read_conll(p)
+    assert len(docs) == 2 and docs[0]["note_id"] == "test_000"
+    assert docs[0]["words"][:4] == ["A", "48", "-", "year"]
+    assert phi_tagger.entities(docs[0]["tags"]) == [("Age", 1, 4), ("Sex", 4, 5), ("Date", 7, 8)]
+    d = docs[0]
+    for w, a, b in d["spans"]:
+        assert d["text"][a:b] == w
+    assert d["sents"] == [(0, 9), (9, 11)]                     # a word ending in "." ends a sentence
+    assert phi_tagger.entities(docs[1]["tags"]) == [("Date", 0, 3)]
