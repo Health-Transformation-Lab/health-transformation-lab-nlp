@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-26
 
-**Status**: in progress
+**Status**: implemented; four Longformer runs on CPU, final system test weighted F1 0.77 (model alone 0.80)
 
 **Input**: a course exercise on de-identification as sequence classification (named entity recognition)
 over MACCROBAT: filter the annotations to AGE, SEX and DATE, split notes 80:20, write BIO files,
