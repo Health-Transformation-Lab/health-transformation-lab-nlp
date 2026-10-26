@@ -12,6 +12,9 @@ Writes:
   data/deid/cost_inputs.csv           what the cost model uses (R recomputes from this: parity)
   data/deid/cost_effectiveness.csv    cost per corpus, leaks per 1M notes, frontier, ICER
 
+  --external path.jsonl adds another labeled set (e.g. ASQ-PHI) as tier "external"; price it with
+  --tiers all,unseen,external.
+
 An engine that can't run here (package missing, no Azure endpoint) is listed as not run, with
 the reason; nothing is estimated for it. Service prices in costs.yaml are ILLUSTRATIVE until
 filled from the vendor's pricing page.
@@ -37,11 +40,16 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--engines", default=",".join(DEFAULT))
 ap.add_argument("--n-notes", type=int, default=400)
 ap.add_argument("--seed", type=int, default=7)
+ap.add_argument("--external", default=None,
+                help="another labeled PHI set (JSONL/JSON, e.g. ASQ-PHI) scored as tier 'external'")
 ap.add_argument("--tiers", default="all,unseen",
                 help="tiers priced: all (the mix) and unseen (held out from regex_v2's design)")
 a = ap.parse_args()
 
 ch = build_challenge(a.n_notes, a.seed)
+if a.external:
+    from dental_omop_nlp.phi_challenge import load_external
+    ch += load_external(a.external)
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 DEID_DIR.mkdir(parents=True, exist_ok=True)
 with open(RAW_DIR / "deid_challenge.jsonl", "w") as f:

@@ -163,3 +163,22 @@ def test_frontier_prefers_less_dental_damage_at_a_tie():
                       "leaked_per_1m_notes": [100.0, 100.0], "decoy_damage": [0.4, 0.05]})
     f = deid_eval.deid_frontier(t).set_index("method")
     assert f.loc["plain", "dominated"] and not f.loc["guarded", "dominated"]
+
+
+# ---------------------------------------------------------------- external test sets (spec 007 T009)
+def test_external_set_loads_spans_or_finds_listed_values(tmp_path):
+    import json
+
+    from dental_omop_nlp.phi_challenge import load_external
+    f = tmp_path / "ext.jsonl"
+    rows = [{"query": "find notes for Ana Ruiz seen 3/4/2024", "phi": [{"value": "Ana Ruiz", "type": "NAME"},
+                                                                       {"value": "3/4/2024", "type": "DATE"}]},
+            {"query": "patients with stage III periodontitis", "phi": []},                      # hard negative
+            {"text": "Pt Bo Li", "phi": [{"start": 3, "end": 8, "type": "NAME"}]}]
+    f.write_text("\n".join(json.dumps(r) for r in rows))
+    recs = load_external(f)
+    assert [r["tier"] for r in recs] == ["external"] * 3
+    assert recs[0]["phi"][0] == {"start": 15, "end": 23, "text": "Ana Ruiz", "type": "NAME"}
+    assert recs[1]["phi"] == [] and recs[2]["phi"][0]["text"] == "Bo Li"
+    s = deid_eval.score_records(recs, deid.get_engine("regex_v2"))["summary"]
+    assert set(s.tier) == {"external", "all"}

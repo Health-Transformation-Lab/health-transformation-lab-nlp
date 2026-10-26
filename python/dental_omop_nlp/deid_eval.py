@@ -49,8 +49,9 @@ def score_records(records: list[dict], detect) -> dict:
                 "decoy_damage": d.n_decoys_damaged.sum() / max(d.n_decoys.sum(), 1),
                 "leaked_per_1k_notes": 1000 * d.n_leaked.sum() / max(len(d), 1),
                 "avg_chars": float(d.chars.mean()) if len(d) else 0.0}
+    own = per[per.tier != "external"]          # "all" = the challenge set's own tiers; external reported apart
     summary = pd.DataFrame([summarize(per[per.tier == t], t) for t in sorted(per.tier.unique())]
-                           + [summarize(per, "all")])
+                           + [summarize(own if len(own) else per, "all")])
     cats = pd.DataFrame(cat_rows)
     by_cat = (cats.groupby(["tier", "category"]).agg(n=("leaked", "size"), n_leaked=("leaked", "sum"))
               .reset_index().assign(recall=lambda x: 1 - x.n_leaked / x.n)) if len(cats) else cats

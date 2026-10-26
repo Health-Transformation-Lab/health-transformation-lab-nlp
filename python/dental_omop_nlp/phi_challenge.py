@@ -199,3 +199,38 @@ def build_challenge(n_notes: int = 400, seed: int = 7, hard_share: float = 0.35,
     rng.shuffle(tiers)
     make = {"easy": _easy, "hard": _hard, "unseen": _unseen}
     return [make[t](rng, i) for i, t in enumerate(tiers)]
+
+
+def load_external(path, text_keys=("text", "query", "note"), tier: str = "external") -> list[dict]:
+    """Load another labeled PHI set (e.g. ASQ-PHI, MIT) into the challenge format.
+
+    JSONL or JSON list. Each record has its text under one of text_keys and a list of PHI under
+    "phi" (or "entities" / "labels"), each either {start, end, type} or {value | text, type}; a
+    value without offsets is located in the text (every occurrence). Records with no PHI are kept:
+    they're hard negatives, and anything an engine removes from them is over-redaction.
+    Confirm the field names against the dataset's README when it's attached."""
+    import json
+    from pathlib import Path
+    raw = Path(path).read_text()
+    data = json.loads(raw) if raw.lstrip().startswith("[") else [json.loads(x) for x in raw.splitlines() if x.strip()]
+    out = []
+    for i, r in enumerate(data):
+        text = next((r[k] for k in text_keys if k in r), None)
+        if text is None:
+            raise KeyError(f"record {i}: no text field among {text_keys}")
+        ents = r.get("phi", r.get("entities", r.get("labels", []))) or []
+        spans = []
+        for e in ents:
+            kind = str(e.get("type", e.get("label", "PHI")))
+            if "start" in e and "end" in e:
+                spans.append({"start": int(e["start"]), "end": int(e["end"]),
+                              "text": text[int(e["start"]):int(e["end"])], "type": kind})
+                continue
+            val = str(e.get("value", e.get("text", "")))
+            j = text.find(val) if val else -1
+            while j >= 0:
+                spans.append({"start": j, "end": j + len(val), "text": val, "type": kind})
+                j = text.find(val, j + len(val))
+        out.append({"note_id": r.get("id", i), "tier": tier, "text": text,
+                    "phi": sorted(spans, key=lambda s: s["start"]), "decoys": []})
+    return out

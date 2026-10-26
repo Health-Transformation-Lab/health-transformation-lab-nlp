@@ -39,7 +39,7 @@ The categories follow HIPAA Safe Harbor and the 2014 i2b2/UTHealth annotation gu
 |---|---|---|---|
 | HHS Safe Harbor guidance | The 18 identifiers that must be removed | yes | Category list |
 | 2014 i2b2/UTHealth (n2c2) | Standard clinical de-id benchmark and annotation guidelines | guidelines yes; corpus needs a data use agreement | Category scheme used; corpus not used |
-| ASQ-PHI (2025) | 1,051 fully synthetic clinical search queries, PHI tagged, with hard negatives | yes, MIT | Good second test set; queries, not notes |
+| ASQ-PHI (2025) | 1,051 fully synthetic clinical search queries, PHI tagged, with hard negatives | yes, MIT | Second test set: `26_deid_benchmark.py --external asq_phi.jsonl` (download blocked here; attach it) |
 | SHIELD (Stanford) | 1,381 real notes with surrogate PHI, adjudicated spans | access by request | Real-note shapes, if access is granted |
 | presidio-evaluator | Fake-PII sentence generator from templates, detector evaluation | yes, MIT | Another way to generate labeled fake PHI |
 | John Snow Labs | Clinical de-id pipelines in its licensed Healthcare NLP; public speed benchmarks on Databricks | the de-id models are licensed (trial and academic programs exist); no free test set found | Another engine to compare, if licensed |
