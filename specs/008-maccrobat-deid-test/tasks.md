@@ -5,5 +5,6 @@
 - [x] T003 [US2] tests then `maccrobat.role` and `maccrobat.load_bio`: Safe Harbor date and age rule, clinical types as decoys, duplicates collapsed
 - [x] T004 [US3] tests then `deid_eval.damage_by_type`
 - [x] T005 `scripts/30_maccrobat_deid.py` (`--download` fetches the pinned file into data/raw/); run the local engines; docs/deidentification.md and docs/data_sources.md
-- [ ] T006 Run the transformer engines (hf_stanford, hf_obi) and Presidio (needs torch: the PyTorch CPU index, download.pytorch.org, was blocked here)
-- [ ] T007 Read the original brat files from figshare (exact spacing) when that host is reachable
+- [x] T006a Presidio (+guard, +regex_v2+guard)
+- [ ] T006 Run the transformer engines (hf_stanford, hf_obi) on CPU
+- [x] T007 `maccrobat.load_brat`: the original figshare release (exact text and offsets, overlapping entities); default source of the script

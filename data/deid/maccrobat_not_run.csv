@@ -1,6 +1,1 @@
 method,reason
-presidio+regex_v2+guard,ModuleNotFoundError: No module named 'presidio_analyzer'
-hf_stanford,NameError: name 'torch' is not defined
-hf_stanford+regex_v2+guard,NameError: name 'torch' is not defined
-hf_obi,NameError: name 'torch' is not defined
-hf_obi+regex_v2+guard,NameError: name 'torch' is not defined

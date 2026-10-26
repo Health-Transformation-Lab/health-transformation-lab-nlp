@@ -31,7 +31,7 @@ fairer test, and real notes are the real one.
 
 | Dataset | What it has | Access | Used for |
 |---------|-------------|--------|----------|
-| **MACCROBAT** (Caufield 2019, [figshare](https://doi.org/10.6084/m9.figshare.9764942.v2); BIO mirror [`ktgiahieu/maccrobat2018_2020`](https://huggingface.co/datasets/ktgiahieu/maccrobat2018_2020)) | 200 clinical case reports from PubMed Central, edited to the case details, with hand-annotated entities (41 types: symptoms, diseases, procedures, drugs, lab values, dates, ages ...). The mirror holds the 2018 and 2020 releases of the same 200 | CC BY 4.0; downloaded to `data/raw/` by `scripts/30_maccrobat_deid.py --download` | De-identification test pass on real prose: date recall and clinical over-redaction ([deidentification.md](deidentification.md#results-on-maccrobat-200-real-case-reports-external-spec-008), spec 008). Not dental, not chart notes |
+| **MACCROBAT** (Caufield 2019, [figshare](https://doi.org/10.6084/m9.figshare.9764942.v2), MACCROBAT2020.zip; BIO mirror [`ktgiahieu/maccrobat2018_2020`](https://huggingface.co/datasets/ktgiahieu/maccrobat2018_2020)) | 200 clinical case reports from PubMed Central, edited to the case details, with hand-annotated entities (41 types: symptoms, diseases, procedures, drugs, lab values, dates, ages ...). The mirror holds the 2018 and 2020 releases of the same 200 | CC BY 4.0; downloaded to `data/raw/` by `scripts/30_maccrobat_deid.py --download` | De-identification test pass on real prose (original brat release by default): date recall and clinical over-redaction ([deidentification.md](deidentification.md#results-on-maccrobat-200-real-case-reports-external-spec-008), spec 008). Not dental, not chart notes |
 
 ## Not usable for notes
 

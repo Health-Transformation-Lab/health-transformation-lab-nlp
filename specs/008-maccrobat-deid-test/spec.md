@@ -45,6 +45,10 @@ Tokens are re-joined with approximate spacing (no space before closing punctuati
 of spec 007 (`phi`, `decoys`, plus `entities` with a `role` of `phi`, `clinical` or `other`).
 Duplicate documents (the mirror holds the 2018 and 2020 releases of the same 200) keep the last copy.
 
+### US2b - Original release (P1)
+`maccrobat.load_brat(path)` reads the figshare zip (or its folder): `NNN.txt` with `NNN.ann` brat
+standoff. Exact text and offsets; each fragment of a split entity is its own span. Default source.
+
 ### US3 - Scores (P1)
 `deid_eval.score_records` scores the records unchanged (recall on the derived PHI; decoy damage =
 share of clinical entities with any character removed). `deid_eval.damage_by_type` adds, per
@@ -55,8 +59,7 @@ entity type, the share of entities touched. `scripts/30_maccrobat_deid.py` write
 - The PHI subset is a rule over MACCROBAT's labels, not an annotator's PHI labels; it is small
   (calendar dates and few ages ≥ 90) and has no names, phones or addresses at all.
 - Case reports are not chart notes: journal prose, already de-identified by the publisher.
-- Spacing is reconstructed from tokens, so regex shapes that depend on it ("68-year-old") are
-  approximated.
+- With `--source bio`, spacing is reconstructed from tokens and overlapping entities are lost.
 - Python only: de-identification scoring is not part of the R parity contract (spec 007 keeps
   only the cost model in R).
 

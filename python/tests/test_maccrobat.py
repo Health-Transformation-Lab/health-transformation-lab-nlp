@@ -107,3 +107,27 @@ def test_damage_by_type_counts_entities_touched_per_type(tmp_path):
     assert t.loc[("phi", "Date"), "touched"] == 0.0 and t.loc[("other", "Date"), "touched"] == 1.0
     assert t.loc[("other", "Age"), "n_touched"] == 1 and t.loc[("clinical", "Sign_symptom"), "touched"] == 0.0
     assert set(t.columns) >= {"n", "n_touched", "touched", "chars_removed"}
+
+
+# ---------------------------------------------------------------- T007 original brat files
+TXT = "A 93-year-old woman had a cough since June 2014.\nShe took codeine."
+ANN = ("T1\tAge 2 13\t93-year-old\nT2\tSex 14 19\twoman\nT3\tSign_symptom 26 31\tcough\nE1\tSign_symptom:T3 \n"
+       "T4\tDate 32 48\tsince June 2014\nT5\tMedication 58 65\tcodeine\nR1\tMODIFY Arg1:T3 Arg2:E1\t\n"
+       "T6\tBiological_structure 2 4;14 19\t93 woman\n")
+
+
+def test_load_brat_reads_exact_offsets_from_a_folder_or_zip(tmp_path):
+    import zipfile
+    (tmp_path / "d").mkdir()
+    (tmp_path / "d" / "111.txt").write_text(TXT)
+    (tmp_path / "d" / "111.ann").write_text(ANN)
+    with zipfile.ZipFile(tmp_path / "m.zip", "w") as z:
+        z.writestr("111.txt", TXT)
+        z.writestr("111.ann", ANN)
+    for src in (tmp_path / "d", tmp_path / "m.zip"):
+        [r] = maccrobat.load_brat(src)
+        assert r["note_id"] == "111" and r["text"] == TXT and r["tier"] == "maccrobat"
+        assert [s["text"] for s in r["phi"]] == ["93", "June 2014"]          # trimmed to the identifying part
+        assert [s["text"] for s in r["decoys"]] == ["93", "woman", "cough", "codeine"]   # fragments kept apart
+        for s in r["entities"]:
+            assert TXT[s["start"]:s["end"]] == s["text"]

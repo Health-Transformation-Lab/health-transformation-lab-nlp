@@ -18,7 +18,9 @@ import json
 import re
 from pathlib import Path
 
-# Hugging Face mirror (BIO), pinned; the original brat files are on figshare.
+# The original release (brat standoff, exact text) on figshare: MACCROBAT2020.zip, file 21489405.
+FIGSHARE_URL = "https://ndownloader.figshare.com/files/21489405"
+# Hugging Face mirror (BIO tokens; drops overlapping entities and the original spacing), pinned.
 HF_REPO = "ktgiahieu/maccrobat2018_2020"
 HF_REVISION = "9a14415289dea0e603687b14d4581a81ecdfe9c9"
 HF_URL = f"https://huggingface.co/datasets/{HF_REPO}/resolve/{HF_REVISION}/data.jsonl"
@@ -79,6 +81,13 @@ def _core(span: dict) -> dict:
     return span | {"start": span["start"] + a, "end": span["start"] + b, "text": span["text"][a:b]}
 
 
+def _record(note_id, tier: str, text: str, spans: list[dict]) -> dict:
+    ents = [s | {"role": role(s["type"], s["text"])} for s in sorted(spans, key=lambda s: s["start"])]
+    return {"note_id": note_id, "tier": tier, "text": text, "entities": ents,
+            "phi": [_core(s) for s in ents if s["role"] == "phi"],
+            "decoys": [s for s in ents if s["role"] == "clinical"]}
+
+
 def load_bio(path, tier: str = "maccrobat") -> list[dict]:
     """JSONL rows {"tokens", "tags"} -> challenge records (spec 007 format) plus `entities` with a role.
     Rows with the same tokens are copies (the mirror holds the 2018 and 2020 releases): the last one wins."""
@@ -87,11 +96,37 @@ def load_bio(path, tier: str = "maccrobat") -> list[dict]:
         if line.strip():
             r = json.loads(line)
             docs[tuple(r["tokens"])] = r["tags"]
+    return [_record(f"{tier}_{i:03d}", tier, *bio_spans(list(tokens), tags))
+            for i, (tokens, tags) in enumerate(docs.items())]
+
+
+def _brat_spans(text: str, ann: str) -> list[dict]:
+    """brat standoff "T" lines (type, start end[;start end], text); each fragment of a split entity
+    becomes its own span. Events and relations are skipped."""
+    spans = []
+    for line in ann.splitlines():
+        if not line.startswith("T"):
+            continue
+        kind, _, offsets = line.split("\t")[1].partition(" ")
+        for frag in offsets.split(";"):
+            a, b = (int(x) for x in frag.split())
+            spans.append({"start": a, "end": b, "type": kind, "text": text[a:b]})
+    return spans
+
+
+def load_brat(path, tier: str = "maccrobat") -> list[dict]:
+    """The original release (figshare zip, or the folder it unpacks to): NNN.txt with NNN.ann.
+    Exact text and offsets, unlike the BIO mirror."""
+    import zipfile
+    path = Path(path)
+    if path.is_dir():
+        files = {p.name: p.read_text(encoding="utf-8") for p in path.rglob("*") if p.suffix in (".txt", ".ann")}
+    else:
+        with zipfile.ZipFile(path) as z:
+            files = {Path(n).name: z.read(n).decode("utf-8") for n in z.namelist() if n.endswith((".txt", ".ann"))}
     out = []
-    for i, (tokens, tags) in enumerate(docs.items()):
-        text, spans = bio_spans(list(tokens), tags)
-        ents = [s | {"role": role(s["type"], s["text"])} for s in spans]
-        out.append({"note_id": f"{tier}_{i:03d}", "tier": tier, "text": text, "entities": ents,
-                    "phi": [_core(s) for s in ents if s["role"] == "phi"],
-                    "decoys": [s for s in ents if s["role"] == "clinical"]})
+    for name in sorted(files):
+        if name.endswith(".txt") and name[:-4] + ".ann" in files:
+            text = files[name]
+            out.append(_record(name[:-4], tier, text, _brat_spans(text, files[name[:-4] + ".ann"])))
     return out

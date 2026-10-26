@@ -240,44 +240,47 @@ dental notes.
 ## Results on MACCROBAT (200 real case reports, external; spec 008)
 
 [MACCROBAT](https://doi.org/10.6084/m9.figshare.9764942.v2) (Caufield 2019, CC BY 4.0) is 200 clinical
-case reports from PubMed Central, edited to the case details and annotated by hand. It is read here
-from its BIO labels (B = beginning, I = inside, O = outside an entity; Hugging Face mirror
-`ktgiahieu/maccrobat2018_2020`, pinned). It is the first **real** clinical prose these engines have
-seen, written by people other than the note generator. It was not built for PHI and has no names or
-contact details, so it checks two things:
+case reports from PubMed Central, edited to the case details and annotated by hand. It is the first
+**real** clinical prose these engines have seen, written by people other than the note generator.
+The original release (brat files: text plus character offsets) is read by default; the same labels
+are also published as BIO tags (B = beginning, I = inside, O = outside an entity; Hugging Face mirror
+`ktgiahieu/maccrobat2018_2020`, `--source bio`). BIO can't hold overlapping entities, so the mirror has
+about half as many clinical entities, and its spacing is rebuilt from tokens.
+
+It was not built for PHI and has no names or contact details, so it checks two things:
 
 - **PHI recall** on a subset derived by rule from its `Date` and `Age` labels (HIPAA Safe Harbor):
-  83 dates with a month or day ("June 2013", "July 29, 2015"). No age is 90 or over.
-- **Clinical damage**: share of 11,414 clinical entities (symptoms, diseases, procedures, drugs,
+  105 dates with a month or day ("June 2013", "July 29, 2015"). No age is 90 or over.
+- **Clinical damage**: share of 22,272 clinical entities (symptoms, diseases, procedures, drugs,
   doses, lab values, anatomy ...) with any character removed. This is over-redaction on real text.
 
 `python python/scripts/30_maccrobat_deid.py --download` (text goes to `data/raw/`, never committed;
-scores in `data/deid/maccrobat_scores.csv`, `maccrobat_by_type.csv`). Run 2026-10-26, local engines only:
+scores in `data/deid/maccrobat_scores.csv`, `maccrobat_by_type.csv`). Run 2026-10-26 on CPU:
 
 | Engine | PHI date recall | Clinical damage |
 |---|---|---|
-| regex | 0.20 | 0.004 |
-| regex+guard | 0.20 | 0.004 |
-| regex_v2 | 0.23 | 0.004 |
-| regex_v2+guard | 0.23 | 0.004 |
-
-Not run here: Presidio and the transformer engines (packages not installed; the PyTorch CPU index
-is blocked in this environment).
+| regex / regex+guard | 0.22 | 0.004 |
+| regex_v2 / regex_v2+guard | 0.27 | 0.004 |
+| presidio / presidio+guard | 0.97 | 0.034 |
+| presidio+regex_v2+guard | 0.99 | 0.036 |
 
 **What it shows.**
-- **Month-year dates leak.** Both regex engines catch full dates ("July 29, 2015", "14/9/2005") but
-  none of the month-year dates ("January 2014", "in November 2014"), the most common form in these
-  reports. The synthetic notes always write full dates, so the challenge set couldn't show this.
+- **Month-year dates leak through the regex engines.** They catch full dates ("July 29, 2015",
+  "14/9/2005") but not month-year dates ("January 2014", "in November 2014"), the most common form in
+  these reports. The synthetic notes always write full dates, so the challenge set couldn't show this.
   The fix (a month-year shape in `regex_v2`) should be written and then checked on a set it wasn't
   tuned on, not on this one.
-- **Clinical damage is low** (0.4%). What is removed is mostly Title Case terms read as names
-  ("Glasgow Coma Scale", "Computed Tomography") and slash triplets read as dates (pressures such as
-  "72/34/47 mmHg"). Of the non-PHI types, place names ("Emergency Department", 12% touched) and
-  ethnicity (10%) are removed most.
+- **Presidio finds the dates but costs clinical text** (3.4%, about 9 times the regex engines):
+  frequencies read as dates ("daily", "weekly"), units and anatomy codes read as IDs ("m2" in mg/m2,
+  vertebrae T1/T2, ECG leads V1–V4), eponyms read as names (Gaucher, Crohn, Bowen, Ehlers), "OCT" and
+  visual acuity "6/18" as dates, "p.o." as a location. The dental guard doesn't cover these medical
+  terms. It also removes every age and most relative dates, which aren't PHI but carry the timeline.
+- **Regex damage is low** (0.4%): Title Case terms read as names ("Glasgow Coma Scale") and slash
+  triplets read as dates (pressures such as "72/34/47 mmHg").
 
-**Limits.** The PHI subset is a rule over MACCROBAT's labels, not PHI annotation, and is small (83
+**Limits.** The PHI subset is a rule over MACCROBAT's labels, not PHI annotation, and is small (105
 dates). Case reports are journal prose, already de-identified by the publisher, not chart notes.
-Spacing is rebuilt from the BIO tokens, so it is approximate. Scoring is Python only, as for spec 007.
+Scoring is Python only, as for spec 007.
 
 ## Combining engines: bigger unions and routing
 

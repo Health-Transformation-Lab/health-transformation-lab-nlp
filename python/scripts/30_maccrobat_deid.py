@@ -1,9 +1,13 @@
 """De-identification test pass on MACCROBAT, real published case reports with BIO labels (spec 008).
 
-    python scripts/30_maccrobat_deid.py --download          # fetch the pinned BIO file into data/raw/
+    python scripts/30_maccrobat_deid.py --download          # fetch the original release (figshare) into data/raw/
+    python scripts/30_maccrobat_deid.py --source bio --download   # or the BIO mirror on Hugging Face
     python scripts/30_maccrobat_deid.py --engines regex,regex_v2+guard,hf_stanford+regex_v2+guard
 
-Scores, per engine (deid_eval.score_records on the records from maccrobat.load_bio):
+The original brat files are the default: exact text and offsets, and overlapping entities that BIO
+labels can't hold (about twice as many clinical entities as the BIO mirror).
+
+Scores, per engine (deid_eval.score_records on the records from maccrobat.load_brat / load_bio):
   entity_recall   share of derived PHI (dates with a month or day, ages >= 90) fully removed
   decoy_damage    share of clinical entities (symptoms, drugs, procedures ...) with any character removed
   char_precision  share of removed characters that were derived PHI
@@ -26,17 +30,18 @@ from dental_omop_nlp.paths import DEID_DIR, RAW_DIR
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio+regex_v2+guard",
            "hf_stanford", "hf_stanford+regex_v2+guard", "hf_obi", "hf_obi+regex_v2+guard"]
 ap = argparse.ArgumentParser()
-ap.add_argument("--path", default=str(RAW_DIR / "maccrobat" / "maccrobat_bio.jsonl"))
-ap.add_argument("--download", action="store_true", help=f"fetch {maccrobat.HF_URL}")
+ap.add_argument("--source", choices=["brat", "bio"], default="brat")
+ap.add_argument("--path", default=None, help="the zip or folder (brat), or the JSONL (bio)")
+ap.add_argument("--download", action="store_true", help=f"fetch {maccrobat.FIGSHARE_URL} or {maccrobat.HF_URL}")
 ap.add_argument("--engines", default=",".join(DEFAULT))
 a = ap.parse_args()
 
+default = RAW_DIR / "maccrobat" / ("MACCROBAT2020.zip" if a.source == "brat" else "maccrobat_bio.jsonl")
+a.path = a.path or str(default)
 if a.download:
-    dest = RAW_DIR / "maccrobat" / "maccrobat_bio.jsonl"
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    urllib.request.urlretrieve(maccrobat.HF_URL, dest)
-    a.path = str(dest)
-recs = maccrobat.load_bio(a.path)
+    default.parent.mkdir(parents=True, exist_ok=True)
+    urllib.request.urlretrieve(maccrobat.FIGSHARE_URL if a.source == "brat" else maccrobat.HF_URL, a.path)
+recs = (maccrobat.load_brat if a.source == "brat" else maccrobat.load_bio)(a.path)
 n_ent = pd.Series([e["role"] for r in recs for e in r["entities"]]).value_counts()
 print(f"{len(recs)} documents; entities by role: {n_ent.to_dict()}")
 
