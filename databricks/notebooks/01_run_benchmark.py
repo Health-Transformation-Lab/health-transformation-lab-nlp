@@ -35,6 +35,7 @@ dbutils.widgets.text("schema", "dental")
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
 dbutils.widgets.text("experiment_id", "")   # set per target by the bundle (resources/jobs.yml)
+dbutils.widgets.dropdown("train_encoder", "true", ["true", "false"])   # off in dev (databricks.yml)
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
@@ -106,8 +107,10 @@ results = [run(r) for r in ["rules_baseline", "structured_baseline", "tfidf_logr
 
 # COMMAND ----------
 
-# One encoder rung. CPU, so keep it small: ~600 notes x 2 epochs x 192 tokens is a few minutes.
-results.append(run("distilbert-base", epochs=2, max_len=192, batch_size=16))
+# One encoder rung, small for CPU (~600 notes x 2 epochs x 192 tokens). On serverless CPU this took
+# over 16 minutes, so the bundle turns it off in dev and on in uat and prod.
+if dbutils.widgets.get("train_encoder") == "true":
+    results.append(run("distilbert-base", epochs=2, max_len=192, batch_size=16))
 
 # COMMAND ----------
 

@@ -107,6 +107,16 @@ def test_study_benchmark_passes_experiment_id_not_name():
     assert "experiment" not in params
 
 
+def test_encoder_training_is_off_in_dev_and_on_in_uat_and_prod():
+    """DistilBERT on serverless CPU took over 16 minutes in dev; the baselines take about 3."""
+    root, jobs = _load()
+    params = jobs["study_benchmark"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert params["train_encoder"] == "${var.train_encoder}"
+    assert root["variables"]["train_encoder"]["default"] == "false"
+    for env in ("uat", "prod"):
+        assert root["targets"][env]["variables"]["train_encoder"] == "true"
+
+
 def test_judge_monitoring_job_only_in_uat_and_prod():
     """Production monitoring scores live traces, so it exists where there is live traffic."""
     root, jobs = _load()

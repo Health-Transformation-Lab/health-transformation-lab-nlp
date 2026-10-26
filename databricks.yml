@@ -27,6 +27,9 @@ variables:
   n_people:
     description: Synthetic people to generate in the benchmark job
     default: "300"
+  train_encoder:
+    description: Train the DistilBERT rung in the benchmark job (16+ min on serverless CPU; baselines take ~3)
+    default: "false"
   judge_endpoint:
     description: Model Serving endpoint for the LLM judge (approved for de-identified data)
     default: none
@@ -92,6 +95,7 @@ targets:
       schema: dental
       n_people: "1500"
       lakebase_instance: dental-uat
+      train_encoder: "true"
       lakebase_schema: cdm
     permissions:
       - group_name: ${var.users_group}
@@ -149,6 +153,7 @@ targets:
       catalog: dental_prod
       schema: dental
       lakebase_instance: dental-prod
+      train_encoder: "true"
       lakebase_schema: cdm
       n_people: "1500"
       reader_limit: "0"
