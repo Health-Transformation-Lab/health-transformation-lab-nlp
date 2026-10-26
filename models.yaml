@@ -81,6 +81,29 @@ models:
     paper: "SciBERT: A Pretrained Language Model for Scientific Text"
     paper_url: https://arxiv.org/abs/1903.10676
 
+  # ---- clinical encoders added after the sheet (2026-10-26), to fill the clinical rung ----
+  - id: bio-clinicalbert
+    hf: emilyalsentzer/Bio_ClinicalBERT
+    org: MIT / Alsentzer et al.
+    year: 2019
+    domain: clinical
+    role: classifier
+    max_len: 512
+    paper: "Publicly Available Clinical BERT Embeddings"
+    paper_url: https://arxiv.org/abs/1904.03323
+    note: BioBERT further pre-trained on MIMIC-III notes. MIT licence.
+
+  - id: gatortron-base
+    hf: UFNLP/gatortron-base
+    org: University of Florida / NVIDIA
+    year: 2022
+    domain: clinical
+    role: classifier
+    max_len: 512
+    paper: "A large language model for electronic health records (GatorTron)"
+    paper_url: https://doi.org/10.1038/s41746-022-00742-2
+    note: Megatron-BERT, 345M parameters, pre-trained on 82B words of de-identified clinical notes. Apache-2.0.
+
   - id: biomedbert
     hf: microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext
     org: Microsoft
