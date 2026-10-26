@@ -2,6 +2,7 @@
 
     python scripts/33_maccrobat_phi_tagger.py                          # Longformer, default settings
     python scripts/33_maccrobat_phi_tagger.py --lr 5e-5 --epochs 6 --tag lr5e-5_e6
+    python scripts/33_maccrobat_phi_tagger.py --conll-dir ../data/external/maccrobat/course --tag course_lr5e-5_e3 --lr 5e-5
 
 Notes are split 80:20 (seeded) into train and test; 20 training notes are held out as a validation
 set, so settings and regex sets are chosen on validation and the test set is read once at the end.
