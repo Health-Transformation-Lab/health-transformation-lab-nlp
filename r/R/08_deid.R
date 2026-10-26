@@ -3,17 +3,33 @@
 # written by python/scripts/26_deid_benchmark.py; must reproduce cost_effectiveness.csv.
 # Base R only.
 
+# "1000000:0.0014;inf:0.00025" -> volume tiers (upper bound in units, USD per unit); "" -> none
+deid_parse_tiers <- function(s) {
+  if (is.null(s) || is.na(s) || !nzchar(s)) return(NULL)
+  parts <- strsplit(strsplit(s, ";", fixed = TRUE)[[1]], ":", fixed = TRUE)
+  data.frame(hi = vapply(parts, function(x) if (x[1] == "inf") Inf else as.numeric(x[1]), numeric(1)),
+             usd = vapply(parts, function(x) as.numeric(x[2]), numeric(1)))
+}
+
 deid_engine_cost <- function(kind, hardware, notes_per_sec, unit, usd_per_unit, free_units,
-                             n_notes, avg_chars, cpu_usd_h, gpu_usd_h, llm = NULL) {
+                             n_notes, avg_chars, cpu_usd_h, gpu_usd_h, llm = NULL, tiers = "") {
   if (kind == "local") {
     rate <- if (identical(hardware, "gpu")) gpu_usd_h else cpu_usd_h
     return(n_notes / notes_per_sec / 3600 * rate)
   }
-  if (kind == "llm") return(n_notes * ((llm$prompt_overhead_tokens + avg_chars / 4) * llm$usd_per_1m_input_tokens +
-                                       llm$output_tokens * llm$usd_per_1m_output_tokens) / 1e6)
+  if (kind == "llm") {
+    echo <- if (is.null(llm$output_echoes_note) || is.na(llm$output_echoes_note)) 0 else llm$output_echoes_note
+    tout <- llm$output_tokens + if (echo != 0) avg_chars / 4 else 0     # e.g. ai_mask returns the whole note
+    return(n_notes * ((llm$prompt_overhead_tokens + avg_chars / 4) * llm$usd_per_1m_input_tokens +
+                      tout * llm$usd_per_1m_output_tokens) / 1e6)
+  }
   units <- if (unit == "mb") n_notes * avg_chars / 1e6 else
     if (unit == "record_100_chars") n_notes * ceiling(avg_chars / 100) else n_notes * ceiling(avg_chars / 1000)
-  max(units - free_units, 0) * usd_per_unit
+  units <- max(units - free_units, 0)
+  tt <- deid_parse_tiers(tiers)
+  if (is.null(tt)) return(units * usd_per_unit)
+  lo <- c(0, head(tt$hi, -1))
+  sum(pmax(pmin(units, tt$hi) - lo, 0) * tt$usd)
 }
 
 deid_frontier <- function(t) {
@@ -46,7 +62,9 @@ deid_cost_table <- function(ci) {
                          cpu_node_usd_per_hour, gpu_node_usd_per_hour,
                          llm = list(usd_per_1m_input_tokens = usd_per_1m_input_tokens,
                                     usd_per_1m_output_tokens = usd_per_1m_output_tokens,
-                                    prompt_overhead_tokens = prompt_overhead_tokens, output_tokens = output_tokens))),
+                                    prompt_overhead_tokens = prompt_overhead_tokens, output_tokens = output_tokens,
+                                    output_echoes_note = if (exists("output_echoes_note")) output_echoes_note else 0),
+                         tiers = if (exists("tiers")) tiers else "")),
         numeric(1)))
       r0 <- m[1, ]
       rev <- r0$qa_sample_share * r0$n_notes * r0$minutes_per_note / 60 * r0$review_usd_per_hour

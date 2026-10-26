@@ -16,6 +16,7 @@ frontier, ICER = extra USD per leaked identifier avoided. R twin: r/R/08_deid.R 
 
 from __future__ import annotations
 
+import re
 import time
 
 import numpy as np
@@ -26,17 +27,33 @@ def _chars(spans) -> set[int]:
     return {i for s in spans for i in range(s["start"], s["end"])}
 
 
+_TOKEN = re.compile(r"\w+|[^\w\s]")
+CHALLENGE_TIERS = ("easy", "hard", "unseen")
+
+
+def _token_counts(text: str, gold: list[dict], found: list[dict]) -> tuple[int, int, int]:
+    """John Snow Labs' word-level rule: a token is PHI if it starts inside a span. (gold, predicted, both)."""
+    starts = [m.start() for m in _TOKEN.finditer(text)]
+
+    def inside(spans):
+        return {i for i in starts if any(s["start"] <= i < s["end"] for s in spans)}
+    g, f = inside(gold), inside(found)
+    return len(g), len(f), len(g & f)
+
+
 def score_records(records: list[dict], detect) -> dict:
     rows, cat_rows = [], []
     for r in records:
         found = detect(r["text"])
         red = _chars(found)
         phi = _chars(r["phi"])
+        tok_gold, tok_pred, tok_tp = _token_counts(r["text"], r["phi"], found)
         leaked = [p for p in r["phi"] if not set(range(p["start"], p["end"])) <= red]
         damaged = [d for d in r["decoys"] if set(range(d["start"], d["end"])) & red]
         rows.append({"note_id": r["note_id"], "tier": r["tier"], "n_phi": len(r["phi"]), "n_leaked": len(leaked),
                      "phi_chars": len(phi), "phi_chars_removed": len(phi & red), "removed_chars": len(red),
-                     "n_decoys": len(r["decoys"]), "n_decoys_damaged": len(damaged), "chars": len(r["text"])})
+                     "n_decoys": len(r["decoys"]), "n_decoys_damaged": len(damaged), "chars": len(r["text"]),
+                     "tok_gold": tok_gold, "tok_pred": tok_pred, "tok_tp": tok_tp})
         for p in r["phi"]:
             cat_rows.append({"tier": r["tier"], "category": p["type"], "leaked": p in leaked})
     per = pd.DataFrame(rows)
@@ -50,14 +67,41 @@ def score_records(records: list[dict], detect) -> dict:
                 "n_hard_negatives": int((d.n_phi == 0).sum()),       # notes with no PHI at all
                 "hard_negative_damage": ((d.n_phi == 0) & (d.removed_chars > 0)).sum() / max((d.n_phi == 0).sum(), 1),
                 "leaked_per_1k_notes": 1000 * d.n_leaked.sum() / max(len(d), 1),
+                "token_precision": d.tok_tp.sum() / d.tok_pred.sum() if d.tok_pred.sum() else 1.0,
+                "token_recall": d.tok_tp.sum() / max(d.tok_gold.sum(), 1),
+                "token_f1": 2 * d.tok_tp.sum() / max(d.tok_gold.sum() + d.tok_pred.sum(), 1),
                 "avg_chars": float(d.chars.mean()) if len(d) else 0.0}
-    own = per[per.tier != "external"]          # "all" = the challenge set's own tiers; external reported apart
+    own = per[per.tier.isin(CHALLENGE_TIERS)]  # "all" = the challenge set's own tiers; other sets reported apart
     summary = pd.DataFrame([summarize(per[per.tier == t], t) for t in sorted(per.tier.unique())]
                            + [summarize(own if len(own) else per, "all")])
     cats = pd.DataFrame(cat_rows)
     by_cat = (cats.groupby(["tier", "category"]).agg(n=("leaked", "size"), n_leaked=("leaked", "sum"))
               .reset_index().assign(recall=lambda x: 1 - x.n_leaked / x.n)) if len(cats) else cats
     return {"summary": summary, "by_category": by_cat, "per_note": per}
+
+
+def choose_routes(records: list[dict], engines: dict, min_precision: float = 0.8,
+                  guard: bool = True) -> tuple[dict, pd.DataFrame]:
+    """Route each identifier type to the engines that report it precisely. For every (engine, type
+    the engine reports), precision = share of its flagged characters that are PHI, after the dental
+    guard. Pairs at or above min_precision are kept. Choose on training tiers only (easy, hard) and
+    score on held-out ones, or the routes are graded on the notes that picked them."""
+    from .deid import dental_guard
+    hit: dict = {}
+    for r in records:
+        phi = _chars(r["phi"])
+        for name, fn in engines.items():
+            spans = fn(r["text"])
+            for s in (dental_guard(r["text"], spans) if guard else spans):
+                c = set(range(s["start"], s["end"]))
+                h = hit.setdefault((name, s["type"]), [0, 0])
+                h[0] += len(c & phi)
+                h[1] += len(c)
+    table = pd.DataFrame([{"engine": e, "type": t, "chars": n, "precision": k / n if n else 0.0}
+                          for (e, t), (k, n) in hit.items()])
+    table["kept"] = table.precision >= min_precision
+    routes = {e: set(g.type[g.kept]) for e, g in table.groupby("engine")}
+    return {e: t for e, t in routes.items() if t}, table.sort_values(["engine", "type"]).reset_index(drop=True)
 
 
 def measure_throughput(records: list[dict], detect, min_seconds: float = 0.5) -> float:
@@ -84,10 +128,22 @@ def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> flo
             units = n_notes * np.ceil(avg_chars / 100)
         else:
             raise ValueError(f"unknown unit {cfg['unit']}")
-        return max(units - cfg.get("free_units", 0), 0) * cfg["usd_per_unit"]
+        units = max(units - cfg.get("free_units", 0), 0)
+        tiers = cfg.get("tiers")
+        if isinstance(tiers, str):
+            tiers = parse_tiers(tiers)
+        if not tiers:
+            return units * cfg["usd_per_unit"]
+        cost, lo = 0.0, 0.0                                       # volume tiers: [[upper units, USD], ...]
+        for hi, usd in tiers:
+            hi = float("inf") if hi is None else hi
+            cost += max(min(units, hi) - lo, 0) * usd
+            lo = hi
+        return cost
     if cfg["kind"] == "llm":                                      # ~4 characters per token
         tin = cfg["prompt_overhead_tokens"] + avg_chars / 4
-        return n_notes * (tin * cfg["usd_per_1m_input_tokens"] + cfg["output_tokens"] * cfg["usd_per_1m_output_tokens"]) / 1e6
+        tout = cfg["output_tokens"] + (avg_chars / 4 if cfg.get("output_echoes_note") else 0)  # e.g. ai_mask
+        return n_notes * (tin * cfg["usd_per_1m_input_tokens"] + tout * cfg["usd_per_1m_output_tokens"]) / 1e6
     raise ValueError(f"unknown kind {cfg['kind']}")
 
 
@@ -123,7 +179,19 @@ def deid_frontier(t: pd.DataFrame) -> pd.DataFrame:
     return t
 
 
-_LLM_KEYS = ("usd_per_1m_input_tokens", "usd_per_1m_output_tokens", "prompt_overhead_tokens", "output_tokens")
+_LLM_KEYS = ("usd_per_1m_input_tokens", "usd_per_1m_output_tokens", "prompt_overhead_tokens", "output_tokens",
+             "output_echoes_note")
+
+
+def format_tiers(tiers) -> str:
+    """[[1e6, 0.0014], [None, 0.00025]] -> '1000000:0.0014;inf:0.00025' (cost_inputs.csv; R parses it)."""
+    return ";".join(f"{'inf' if hi is None else int(hi)}:{usd!r}" for hi, usd in tiers or [])
+
+
+def parse_tiers(s) -> list:
+    if not isinstance(s, str) or not s:
+        return []
+    return [[None if hi == "inf" else int(hi), float(usd)] for hi, usd in (t.split(":") for t in s.split(";"))]
 
 
 def cost_table(ci: pd.DataFrame) -> pd.DataFrame:
@@ -137,6 +205,7 @@ def cost_table(ci: pd.DataFrame) -> pd.DataFrame:
         compute = {"cpu_node_usd_per_hour": r0.cpu_node_usd_per_hour, "gpu_node_usd_per_hour": r0.gpu_node_usd_per_hour}
         eng = sum(engine_cost({"kind": r.kind, "hardware": r.hardware or "cpu", "notes_per_sec": r.notes_per_sec,
                                "unit": r.unit, "usd_per_unit": r.usd_per_unit, "free_units": r.free_units,
+                               "tiers": getattr(r, "tiers", ""),
                                **{k: getattr(r, k, 0.0) for k in _LLM_KEYS}},
                               int(r.n_notes), float(r.avg_chars), compute) for r in g.itertuples())
         rev = review_cost(int(r0.n_notes), {"qa_sample_share": r0.qa_sample_share,

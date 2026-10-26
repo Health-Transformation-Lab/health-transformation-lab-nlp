@@ -39,6 +39,10 @@ algorithm_design,L1,134,0.6716417910447762
 algorithm_design,L2,31,0.8064516129032258
 algorithm_design,L3,60,0.7166666666666667
 algorithm_design,macro,225,0.7315866902048896
+ai:distilbert-base,L1,134,0.8432835820895522
+ai:distilbert-base,L2,31,0.6451612903225806
+ai:distilbert-base,L3,60,0.6666666666666666
+ai:distilbert-base,macro,225,0.7183705130262665
 ai:fusion_tfidf_rad,L1,134,0.8582089552238806
 ai:fusion_tfidf_rad,L2,31,0.7096774193548387
 ai:fusion_tfidf_rad,L3,60,0.7166666666666667

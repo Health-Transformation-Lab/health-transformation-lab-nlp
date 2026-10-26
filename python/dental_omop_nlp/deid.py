@@ -285,15 +285,32 @@ def _hf_pipe(model: str):  # pragma: no cover - needs the Hugging Face download
     return _PIPES[model]
 
 
-def detect_transformer(text: str, model: str = _HF_MODELS["hf_stanford"], pipe=None, min_score: float = 0.5) -> list[dict]:
-    """Clinical de-identification transformer (token classification). Labels may carry BIO/BILOU prefixes."""
+def _windows(text: str, size: int) -> list[tuple[int, str]]:
+    """Split at a newline or space before `size` characters: (offset, piece) pairs."""
+    out, pos = [], 0
+    while pos < len(text):
+        end = len(text) if len(text) - pos <= size else max(text.rfind("\n", pos, pos + size),
+                                                              text.rfind(" ", pos, pos + size))
+        end = pos + size if end <= pos else end
+        out.append((pos, text[pos:end]))
+        pos = end
+    return out
+
+
+def detect_transformer(text: str, model: str = _HF_MODELS["hf_stanford"], pipe=None, min_score: float = 0.5,
+                       window_chars: int = 1200) -> list[dict]:
+    """Clinical de-identification transformer (token classification). Labels may carry BIO/BILOU prefixes.
+    The models read 512 word pieces (~2,000+ characters) and silently drop the rest, so longer notes
+    are read in windows of window_chars, split at whitespace, and offsets mapped back."""
     pipe = pipe or _hf_pipe(model)
     spans = []
-    for e in pipe(text):
-        label = re.sub(r"^[BILUES]-", "", str(e.get("entity_group", e.get("entity", ""))))
-        if label in ("O", "") or float(e.get("score", 1.0)) < min_score:
-            continue
-        spans.append({"start": int(e["start"]), "end": int(e["end"]), "type": _HF_TYPES.get(label.upper(), "ID")})
+    for off, piece in _windows(text, window_chars):
+        for e in pipe(piece):
+            label = re.sub(r"^[BILUES]-", "", str(e.get("entity_group", e.get("entity", ""))))
+            if label in ("O", "") or float(e.get("score", 1.0)) < min_score:
+                continue
+            spans.append({"start": off + int(e["start"]), "end": off + int(e["end"]),
+                          "type": _HF_TYPES.get(label.upper(), "ID")})
     return _merge(_join_adjacent(text, spans))
 
 
@@ -458,6 +475,18 @@ def get_engine(spec: str):
         spans = _merge([s for f in fns for s in f(text)])
         return dental_guard(text, spans) if guard else spans
     detect.__name__ = spec
+    return detect
+
+
+def routed_engine(routes: dict, engines: dict | None = None, guard: bool = True):
+    """Union of each engine's spans of only its routed types (deid_eval.choose_routes), then the
+    dental guard. Types are filtered per engine before spans merge, since merging keeps one type."""
+    engines = engines or ENGINES
+
+    def detect(text: str) -> list[dict]:
+        spans = _merge([s for name, kinds in routes.items() for s in engines[name](text) if s["type"] in kinds])
+        return dental_guard(text, spans) if guard else spans
+    detect.__name__ = "routed" + ("+guard" if guard else "")
     return detect
 
 
