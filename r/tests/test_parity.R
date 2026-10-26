@@ -105,6 +105,15 @@ if (file.exists("data/deid/cost_inputs.csv") && file.exists("data/deid/cost_effe
               all(m$dominated.r == as.logical(m$dominated.p))))
   stopifnot(d < 1e-6, same_na, all(m$dominated.r == as.logical(m$dominated.p)))
 } else cat("de-id CE: skipped (run python/scripts/26_deid_benchmark.py first)\n")
+# 9b. Licensed engines (John Snow Labs) never reach cost_inputs.csv without a licence, so check the
+# R twin directly against Python's deid_eval.engine_cost on the vendor's example (1M notes x 5,250 chars).
+source("r/R/08_deid.R")
+lic <- list(chars_per_sec = 6392.7, node_usd_per_hour = 1.2, license_usd_per_month = 7000, hours_per_month = 744)
+lic_cost <- function(pr) deid_engine_cost("licensed", "cpu", NA, "", NA, 0, 1e6, 5250, 1, 4,
+                                          lic = c(lic, list(prorate_license = pr)))
+stopifnot(abs(lic_cost(1) - 2420.085118369502) < 1e-6, abs(lic_cost(0) - 7273.749745803808) < 1e-6,
+          abs(lic_cost(NA) - 7273.749745803808) < 1e-6)
+cat("de-id licensed cost: R == Python (prorated, whole month, missing)\n")
 
 # 10. Spec 005 twins: evidence-order search, data quality, progression (R 09_spec005.R).
 sp <- "data/review/simulated_reliability_5cat/phenotype_orders_split.csv"

@@ -19,7 +19,8 @@ deid_engine_cost <- function(kind, hardware, notes_per_sec, unit, usd_per_unit, 
   }
   if (kind == "licensed") {                                          # licence + the node it runs on
     hours <- n_notes * avg_chars / lic$chars_per_sec / 3600
-    months <- if (lic$prorate_license != 0) hours / lic$hours_per_month else ceiling(hours / lic$hours_per_month)
+    pr <- lic$prorate_license; if (is.null(pr) || is.na(pr)) pr <- 0     # missing or NaN = whole months (as Python)
+    months <- if (pr != 0) hours / lic$hours_per_month else ceiling(hours / lic$hours_per_month)
     return(hours * lic$node_usd_per_hour + months * lic$license_usd_per_month)
   }
   if (kind == "llm") {

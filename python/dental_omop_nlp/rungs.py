@@ -120,12 +120,20 @@ def tfidf_logreg():
 
 # ---------------------------------------------------------------- transformers
 def _last_checkpoint(out_dir) -> str | None:
-    """Highest-step checkpoint-N folder in out_dir, or None."""
+    """Highest-step complete checkpoint-N folder in out_dir (has trainer_state.json), or None."""
     from pathlib import Path
     d = Path(out_dir)
-    steps = [int(c.name.split("-")[1]) for c in d.glob("checkpoint-*") if c.name.split("-")[1].isdigit()] \
-        if d.is_dir() else []
+    steps = [int(c.name.split("-")[1]) for c in d.glob("checkpoint-*")
+             if c.name.split("-")[1].isdigit() and (c / "trainer_state.json").exists()] if d.is_dir() else []
     return str(d / f"checkpoint-{max(steps)}") if steps else None
+
+
+def _clear_checkpoints(out_dir) -> None:
+    """Drop checkpoints once a run finishes, so only an interrupted run is ever resumed."""
+    import shutil
+    from pathlib import Path
+    for c in Path(out_dir).glob("checkpoint-*"):
+        shutil.rmtree(c, ignore_errors=True)
 
 
 class HFEncoder:
@@ -162,6 +170,7 @@ class HFEncoder:
                                  report_to=[], seed=42)
         self.trainer = Trainer(model=self.model, args=args, train_dataset=self._ds(train))
         self.trainer.train(resume_from_checkpoint=_last_checkpoint(args.output_dir))   # resume after a restart
+        _clear_checkpoints(args.output_dir)
         return self
 
     def predict(self, test):

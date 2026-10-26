@@ -142,7 +142,9 @@ def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> flo
         return cost
     if cfg["kind"] == "licensed":                                 # licence + the node it runs on
         hours = n_notes * avg_chars / cfg["chars_per_sec"] / 3600
-        months = hours / cfg["hours_per_month"] if cfg.get("prorate_license") else np.ceil(hours / cfg["hours_per_month"])
+        pr = cfg.get("prorate_license", 0)
+        prorate = pr == pr and bool(pr)                            # missing or NaN = buy whole months (as R)
+        months = hours / cfg["hours_per_month"] if prorate else np.ceil(hours / cfg["hours_per_month"])
         return hours * cfg["node_usd_per_hour"] + months * cfg["license_usd_per_month"]
     if cfg["kind"] == "llm":                                      # ~4 characters per token
         tin = cfg["prompt_overhead_tokens"] + avg_chars / 4

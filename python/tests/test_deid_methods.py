@@ -459,3 +459,5 @@ def test_licensed_engine_reproduces_the_vendor_example():
     assert deid_eval.engine_cost(cfg, 1_000_000, 5250, {}) == pytest.approx(2418, abs=5)
     whole_month = dict(cfg, prorate_license=0)            # a licence bought for the month
     assert deid_eval.engine_cost(whole_month, 1_000_000, 5250, {}) == pytest.approx(273.7 + 7000, abs=1)
+    missing = dict(cfg, prorate_license=float("nan"))       # a blank CSV cell: whole months, as R does
+    assert deid_eval.engine_cost(missing, 1_000_000, 5250, {}) == pytest.approx(273.7 + 7000, abs=1)

@@ -20,3 +20,4 @@
 - [ ] T016 Run `ai_mask` (+regex_v2+guard) on the challenge set and ASQ-PHI in a Databricks workspace; fill its token price
 - [x] T017 Amazon Comprehend Medical engine (`aws_comprehend`, DetectPHI) tested with a fake client; per-100-character billing in Python and R
 - [ ] T018 Run `aws_comprehend` (+regex_v2+guard) on the challenge set and ASQ-PHI with an AWS account; confirm the DetectPHI price on the AWS pricing page
+- [x] T019 Cost model: volume price tiers, LLM output that echoes the note, and a licensed kind (licence + node hours; John Snow Labs from the vendor's own example), in Python and R; service prices from vendor sources
