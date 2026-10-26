@@ -55,3 +55,11 @@ def test_workflows_read_host_and_client_id_as_variables(wf):
     assert "${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}" in text
     assert "${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}" in text
     assert "${{ secrets.DATABRICKS_CLIENT_SECRET }}" in text
+
+
+@pytest.mark.parametrize("wf", ["ci.yml", "deploy.yml"])
+def test_databricks_steps_wait_for_the_client_secret(wf):
+    """A host alone (set before the principal exists) must skip, not fail on sign-in."""
+    text = (ROOT / ".github" / "workflows" / wf).read_text()
+    assert "env.DATABRICKS_HOST != ''" not in text and "env.DATABRICKS_HOST == ''" not in text
+    assert "env.DATABRICKS_CLIENT_SECRET != ''" in text
