@@ -80,6 +80,8 @@ def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> flo
             units = n_notes * avg_chars / 1e6                       # ~1 byte per character (ASCII notes)
         elif cfg["unit"] == "record_1k_chars":
             units = n_notes * np.ceil(avg_chars / 1000)
+        elif cfg["unit"] == "record_100_chars":                  # Comprehend Medical: 1-unit minimum per request
+            units = n_notes * np.ceil(avg_chars / 100)
         else:
             raise ValueError(f"unknown unit {cfg['unit']}")
         return max(units - cfg.get("free_units", 0), 0) * cfg["usd_per_unit"]

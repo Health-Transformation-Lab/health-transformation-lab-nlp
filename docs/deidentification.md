@@ -61,6 +61,7 @@ The categories follow HIPAA Safe Harbor and the 2014 i2b2/UTHealth annotation gu
 | `azure_deid` | Managed Azure Health Data Services de-identification (27 PHI categories): no model to host, vendor-maintained | wired, tested with a fake client; needs `AZURE_DEID_ENDPOINT` |
 | `azure_language` | Azure AI Language PII detection, healthcare (PHI) domain: a second managed option | wired, tested with a fake client; needs `AZURE_LANGUAGE_ENDPOINT` and `_KEY` |
 | `llm` | An LLM lists every identifier verbatim; reads context like a person and follows written instructions (e.g. "keep Glickman"). Values not found in the note are dropped | wired, tested with a fake reply; needs an endpoint (Databricks serving) |
+| `aws_comprehend` | Amazon Comprehend Medical DetectPHI: AWS's managed PHI detection; the engine the ASQ-PHI paper used as its baseline, so running it here checks that paper's result on our notes | wired, tested with a fake client; needs AWS credentials and `AWS_REGION` (`pip install boto3`) |
 | `ai_mask` | Databricks' built-in SQL function [`ai_mask`](https://docs.databricks.com/aws/sql/language-manual/functions/ai_mask) (Public Preview): a Databricks-hosted LLM masks the listed entity types. De-identification in the warehouse with one line of SQL and no model or prompt to maintain. Returns masked text, so spans are recovered by aligning it with the original | wired, tested with a fake reply; needs a Databricks SQL warehouse (`DATABRICKS_HOST`, `_TOKEN`, `_WAREHOUSE_ID`) |
 | `jsl` | John Snow Labs Healthcare NLP `clinical_deidentification` pipeline: a commercial clinical pipeline with Spark scale-out | wired, tested with a fake pipeline; needs a licence (free academic; trial through their Databricks installer) and Spark |
 | `A+B` | Ensemble, the union of the engines' spans: each engine covers the other's gaps | |
@@ -185,7 +186,8 @@ What it adds to the picture:
 - **Still leaking:** about 4% of identifiers, mostly unique identifiers (0.43 recall) and some
   locations (`data/deid/by_category.csv`, tier `external`).
 
-The Comprehend Medical row is the paper's number, not a run here. Our recall is strict (an identifier
+The Comprehend Medical row is the paper's number, not a run here; the `aws_comprehend` engine
+reproduces it, and scores the dental challenge set, once an AWS account is attached. Our recall is strict (an identifier
 counts as removed only if every character is), so it can be lower than a looser match would give.
 One ASQ-PHI tag's value doesn't appear verbatim in its query and can't be scored; two values appear
 twice and count twice (2,975 scored spans).

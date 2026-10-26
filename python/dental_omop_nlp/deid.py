@@ -20,6 +20,8 @@ AND the leak gate. Two engines:
                   azure-health-deidentification azure-identity; AZURE_DEID_ENDPOINT.
   azure_language  Azure AI Language PII detection, healthcare (PHI) domain.
                   pip install azure-ai-textanalytics; AZURE_LANGUAGE_ENDPOINT, _KEY.
+  aws_comprehend  Amazon Comprehend Medical DetectPHI. pip install boto3; AWS credentials
+                  and AWS_REGION.
   hf_stanford     transformer NER trained for clinical de-identification:
                   StanfordAIMI/stanford-deidentifier-base (Chambon et al., JAMIA 2023; MIT).
   hf_obi          obi/deid_roberta_i2b2 (RoBERTa on i2b2 2014; MIT). Both need the
@@ -234,6 +236,27 @@ def detect_azure_language(text: str, client=None) -> list[dict]:
                     "type": _AZURE_LANG_TYPES.get(str(e.category), "ID")} for e in doc.entities])
 
 
+_AWS_TYPES = {"NAME": "NAME", "DATE": "DATE", "AGE": "AGE", "CONTACT_POINT": "PHONE", "EMAIL": "EMAIL",
+              "URL": "URL", "ADDRESS": "LOCATION", "ID": "ID", "PROFESSION": "PROFESSION"}
+
+
+def _aws_comprehend_client():  # pragma: no cover - needs an AWS account
+    if "aws" not in _CLIENTS:
+        region = _need("AWS_REGION")
+        import boto3
+        _CLIENTS["aws"] = boto3.client("comprehendmedical", region_name=region)
+    return _CLIENTS["aws"]
+
+
+def detect_aws_comprehend(text: str, client=None, min_score: float = 0.5) -> list[dict]:
+    """Amazon Comprehend Medical DetectPHI. min_score 0.5 is the middle threshold the ASQ-PHI paper
+    reports. Its AGE and PROFESSION types are kept: that's what the service returns."""
+    client = client or _aws_comprehend_client()
+    ents = client.detect_phi(Text=text)["Entities"]
+    return _merge([{"start": e["BeginOffset"], "end": e["EndOffset"], "type": _AWS_TYPES.get(e["Type"], "ID")}
+                   for e in ents if e.get("Score", 1.0) >= min_score])
+
+
 # --------------------------------------------------------------- AI: transformer NER, LLM
 _HF_TYPES = {"PATIENT": "NAME", "STAFF": "NAME", "DOCTOR": "NAME", "PERSON": "NAME", "NAME": "NAME",
              "DATE": "DATE", "AGE": "AGE", "PHONE": "PHONE", "FAX": "PHONE", "EMAIL": "EMAIL", "URL": "URL",
@@ -417,8 +440,8 @@ ENGINES = {"regex": detect_regex, "regex_v2": detect_regex_v2, "presidio": detec
            "azure_deid": detect_azure_deid, "azure_language": detect_azure_language,
            "hf_stanford": lambda text: detect_transformer(text, _HF_MODELS["hf_stanford"]),
            "hf_obi": lambda text: detect_transformer(text, _HF_MODELS["hf_obi"]),
-           "llm": detect_llm, "jsl": detect_jsl, "ai_mask": detect_ai_mask}
-CLOUD_ENGINES = {"azure_deid", "azure_language", "llm", "jsl", "ai_mask"}
+           "llm": detect_llm, "jsl": detect_jsl, "ai_mask": detect_ai_mask, "aws_comprehend": detect_aws_comprehend}
+CLOUD_ENGINES = {"azure_deid", "azure_language", "llm", "jsl", "ai_mask", "aws_comprehend"}
 
 
 def get_engine(spec: str):

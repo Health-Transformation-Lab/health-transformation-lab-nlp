@@ -18,3 +18,5 @@
 - [ ] T014 Get a John Snow Labs licence (academic or trial) and n2c2 2014 access; run every engine on both
 - [x] T015 Databricks `ai_mask` engine: spans recovered from the masked text, tested with a fake reply; notebook widget for a SQL warehouse; token cost ILLUSTRATIVE
 - [ ] T016 Run `ai_mask` (+regex_v2+guard) on the challenge set and ASQ-PHI in a Databricks workspace; fill its token price
+- [x] T017 Amazon Comprehend Medical engine (`aws_comprehend`, DetectPHI) tested with a fake client; per-100-character billing in Python and R
+- [ ] T018 Run `aws_comprehend` (+regex_v2+guard) on the challenge set and ASQ-PHI with an AWS account; confirm the DetectPHI price on the AWS pricing page

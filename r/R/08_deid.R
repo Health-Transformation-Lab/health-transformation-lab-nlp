@@ -11,7 +11,8 @@ deid_engine_cost <- function(kind, hardware, notes_per_sec, unit, usd_per_unit, 
   }
   if (kind == "llm") return(n_notes * ((llm$prompt_overhead_tokens + avg_chars / 4) * llm$usd_per_1m_input_tokens +
                                        llm$output_tokens * llm$usd_per_1m_output_tokens) / 1e6)
-  units <- if (unit == "mb") n_notes * avg_chars / 1e6 else n_notes * ceiling(avg_chars / 1000)
+  units <- if (unit == "mb") n_notes * avg_chars / 1e6 else
+    if (unit == "record_100_chars") n_notes * ceiling(avg_chars / 100) else n_notes * ceiling(avg_chars / 1000)
   max(units - free_units, 0) * usd_per_unit
 }
 

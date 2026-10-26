@@ -117,6 +117,34 @@ def test_cloud_engine_without_endpoint_says_so(monkeypatch):
         deid.detect_azure_deid("x")
 
 
+class _FakeComprehendMedical:
+    def detect_phi(self, Text):
+        i, j = Text.index("Kwame"), Text.index("205.555.0147")
+        return {"Entities": [{"BeginOffset": i, "EndOffset": i + 5, "Type": "NAME", "Score": 0.99},
+                             {"BeginOffset": j, "EndOffset": j + 12, "Type": "CONTACT_POINT", "Score": 0.97},
+                             {"BeginOffset": 0, "EndOffset": 2, "Type": "PROFESSION", "Score": 0.30}]}
+
+
+def test_aws_comprehend_parses_phi_entities_above_threshold():
+    t = "Pt Kwame, call 205.555.0147"
+    spans = deid.detect_aws_comprehend(t, client=_FakeComprehendMedical(), min_score=0.5)
+    assert spans == [{"start": 3, "end": 8, "type": "NAME"}, {"start": 15, "end": 27, "type": "PHONE"}]
+
+
+def test_aws_comprehend_is_registered_and_says_what_it_needs(monkeypatch):
+    assert "aws_comprehend" in deid.ENGINES and "aws_comprehend" in deid.CLOUD_ENGINES
+    monkeypatch.delenv("AWS_REGION", raising=False)
+    with pytest.raises(RuntimeError, match="AWS_REGION"):
+        deid.detect_aws_comprehend("x")
+
+
+def test_service_billed_per_100_characters_with_a_one_unit_minimum():
+    cfg = {"kind": "service", "unit": "record_100_chars", "usd_per_unit": 0.001, "free_units": 0}
+    # 1,000 notes of 250 chars = 3 units each; 1,000 notes of 40 chars = 1 unit each (minimum)
+    assert deid_eval.engine_cost(cfg, 1000, 250, {}) == pytest.approx(3.0)
+    assert deid_eval.engine_cost(cfg, 1000, 40, {}) == pytest.approx(1.0)
+
+
 # ---------------------------------------------------------------- US3 scores
 def test_scores_on_a_hand_made_case():
     rec = {"note_id": 1, "tier": "hard", "text": "Pt Ana Ruiz, #3 MB",

@@ -3,6 +3,7 @@
     python scripts/26_deid_benchmark.py                       # every engine that can run here
     python scripts/26_deid_benchmark.py --engines regex,regex_v2+guard,presidio+regex_v2+guard
     AZURE_DEID_ENDPOINT=... python scripts/26_deid_benchmark.py --engines azure_deid+regex_v2+guard
+    AWS_REGION=us-east-1 python scripts/26_deid_benchmark.py --engines aws_comprehend,aws_comprehend+regex_v2+guard
 
 Writes:
   data/raw/deid_challenge.jsonl       the labeled notes (fake PHI; never committed)
@@ -35,8 +36,9 @@ logging.getLogger("tldextract").setLevel(logging.CRITICAL)   # Presidio's URL re
 
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
            "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
-           "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "ai_mask", "ai_mask+regex_v2+guard", "azure_deid",
-           "azure_deid+regex_v2+guard", "azure_language", "azure_language+regex_v2+guard"]
+           "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "ai_mask", "ai_mask+regex_v2+guard",
+           "azure_deid", "azure_deid+regex_v2+guard", "azure_language", "azure_language+regex_v2+guard",
+           "aws_comprehend", "aws_comprehend+regex_v2+guard"]
 ap = argparse.ArgumentParser()
 ap.add_argument("--engines", default=",".join(DEFAULT))
 ap.add_argument("--n-notes", type=int, default=400)

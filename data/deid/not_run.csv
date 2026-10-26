@@ -7,3 +7,5 @@ azure_language,RuntimeError: AZURE_LANGUAGE_ENDPOINT is not set: this engine cal
 azure_language+regex_v2+guard,RuntimeError: AZURE_LANGUAGE_ENDPOINT is not set: this engine calls an external service (synthetic or de-identified data only)
 ai_mask,RuntimeError: DATABRICKS_WAREHOUSE_ID is not set: this engine calls an external service (synthetic or de-identified data only)
 ai_mask+regex_v2+guard,RuntimeError: DATABRICKS_WAREHOUSE_ID is not set: this engine calls an external service (synthetic or de-identified data only)
+aws_comprehend,RuntimeError: AWS_REGION is not set: this engine calls an external service (synthetic or de-identified data only)
+aws_comprehend+regex_v2+guard,RuntimeError: AWS_REGION is not set: this engine calls an external service (synthetic or de-identified data only)
