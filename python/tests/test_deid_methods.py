@@ -461,3 +461,9 @@ def test_licensed_engine_reproduces_the_vendor_example():
     assert deid_eval.engine_cost(whole_month, 1_000_000, 5250, {}) == pytest.approx(273.7 + 7000, abs=1)
     missing = dict(cfg, prorate_license=float("nan"))       # a blank CSV cell: whole months, as R does
     assert deid_eval.engine_cost(missing, 1_000_000, 5250, {}) == pytest.approx(273.7 + 7000, abs=1)
+
+
+def test_redact_never_re_emits_text_inside_an_outer_span():
+    from dental_omop_nlp.deid import redact
+    text = "abcdefghij"
+    assert redact(text, [{"start": 2, "end": 8, "type": "A"}, {"start": 4, "end": 6, "type": "B"}]) == "ab[A]ij"
