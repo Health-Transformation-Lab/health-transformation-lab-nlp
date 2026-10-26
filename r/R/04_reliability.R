@@ -142,7 +142,7 @@ agreement_vs_humans <- function(wide, compare, n_boot = 500, seed = 0, margin = 
   for (j in seq_along(al)) {
     p <- vs_h(al[[j]], wide)
     ci <- if (n_boot) unname(quantile(boots[, j], c(0.025, 0.975), na.rm = TRUE, type = 7)) else c(NA, NA)
-    v <- if (ci[1] > -margin) "non-inferior" else if (ci[2] < -margin) "inferior" else "inconclusive"
+    v <- if (!n_boot || is.na(ci[1])) NA else if (ci[1] > -margin) "non-inferior" else if (ci[2] < -margin) "inferior" else "inconclusive"
     rows[[length(rows) + 1]] <- data.frame(rater = names(al)[j], kind = "method", mean_kappa_vs_humans = p,
       diff_vs_human_bar = p - pb, ci_low = ci[1], ci_high = ci[2], margin = margin, verdict = v)
   }

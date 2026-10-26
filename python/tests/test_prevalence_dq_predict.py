@@ -73,3 +73,26 @@ def test_progression_model_learns_risk_factors():
     assert res["auroc"] > 0.65 and res["auroc_ci_low"] < res["auroc"] < res["auroc_ci_high"]
     imp = res["importance"].set_index("feature")
     assert imp.loc["smoker_10plus", "importance"] > 0
+
+
+def test_progression_model_is_unpenalized_and_returns_test_predictions():
+    """Plain (unpenalized) logistic regression, so R's glm() gives the same model (parity)."""
+    from dental_omop_nlp.prediction import FEATURES, train_eval
+    rng = np.random.default_rng(1)
+    n = 400
+    pairs = pd.DataFrame({f: rng.normal(size=n) for f in FEATURES})
+    pairs["person_id"] = np.arange(n) // 2
+    pairs["visit_id"] = np.arange(n)
+    pairs["y_progress"] = (pairs["max_cal_mm"] + rng.normal(size=n) > 0.5).astype(int)
+    res = train_eval(pairs, seed=0, n_boot=10)
+    tp = res["test_predictions"]
+    assert {"visit_id", "person_id", "p"} <= set(tp.columns) and len(tp) == res["n_pairs_test"]
+    assert set(tp["person_id"]).isdisjoint(set(pairs.loc[~pairs.visit_id.isin(tp.visit_id), "person_id"]))
+    tr = pairs[~pairs.visit_id.isin(tp.visit_id)]          # reference: Newton-Raphson, no penalty (= R glm)
+    X = np.column_stack([np.ones(len(tr)), tr[FEATURES].to_numpy()])
+    y, beta = tr["y_progress"].to_numpy(), np.zeros(X.shape[1])
+    for _ in range(50):
+        mu = 1 / (1 + np.exp(-X @ beta))
+        beta += np.linalg.solve(X.T @ (X * (mu * (1 - mu))[:, None]), X.T @ (y - mu))
+    Xt = np.column_stack([np.ones(len(tp)), pairs.set_index("visit_id").loc[tp.visit_id, FEATURES].to_numpy()])
+    assert np.allclose(tp["p"].to_numpy(), 1 / (1 + np.exp(-Xt @ beta)), atol=1e-4)

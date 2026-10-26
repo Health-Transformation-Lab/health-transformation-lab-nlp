@@ -121,6 +121,14 @@ def coverage(df: pd.DataFrame, methods: list[str] = METHODS) -> pd.Series:
     return pd.Series({m: float((df[m] != UNKNOWN).mean()) for m in methods})
 
 
+def split_halves(ids, seed: int) -> tuple[set, set]:
+    """Seeded random halves of the review charts: (select, holdout). Written to
+    phenotype_orders_split.csv so the R twin scores the same halves."""
+    ids = np.array(sorted(ids))
+    np.random.default_rng(seed).shuffle(ids)
+    return {int(i) for i in ids[: len(ids) // 2]}, {int(i) for i in ids[len(ids) // 2:]}
+
+
 def score_orders(key: pd.DataFrame, reviewer_wide: pd.DataFrame, n_boot: int = 200, seed: int = 0,
                  five: bool = True, margin: float = 0.05) -> pd.DataFrame:
     """Score every ordering of the four source groups (spec 005).
@@ -131,10 +139,8 @@ def score_orders(key: pd.DataFrame, reviewer_wide: pd.DataFrame, n_boot: int = 2
     the charts that chose it. key: review_key indexed by visit_id;
     reviewer_wide: visits x reviewers."""
     from .reliability import agreement_vs_humans, consensus  # local: avoid import cycle
-    rng = np.random.default_rng(seed)
     ids = np.array(sorted(set(key.index) & set(reviewer_wide.index)))
-    rng.shuffle(ids)
-    sel, hold = set(ids[: len(ids) // 2]), set(ids[len(ids) // 2:])
+    sel, hold = split_halves(ids, seed)
     f = collapse5 if five else (lambda s: s)
     wide = reviewer_wide.apply(f)
     cons = f(consensus(reviewer_wide))

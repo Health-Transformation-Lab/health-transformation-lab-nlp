@@ -36,7 +36,7 @@ needs confirming.
 |---|---|---|---|---|---|
 | C1 | Data trustworthiness wasn't assessed as such | Conformance, completeness and plausibility checks overall and per clinic, using OHDSI Data Quality Dashboard terms (`20_data_quality.py`) | Agree thresholds (5% failing used here) and which checks matter | data engineering | Done, confirm |
 | C2 | Dry run: temporal checks catch **33%** of the injected charting errors (0.2% false flags) | Decimal slips are caught; another patient's chart often isn't | Add cross-source checks (chart vs note vs codes at the same visit) | data engineering | Open |
-| C3 | Data quality and order search are Python only | Constitution expects R twins for reported numbers | Add R twins or agree they're data-engineering-only | data science | Open |
+| C3 | Data quality, order search and prediction were Python only | R twins in `r/R/09_spec005.R`: all 24 orders, every data-quality check and both progression models match Python (parity section 10). The halves and test people are shared files, so bootstrap CIs and permutation importance still differ slightly by RNG | Confirm approximate CIs are acceptable | data science | Done, confirm |
 
 ## Prediction
 

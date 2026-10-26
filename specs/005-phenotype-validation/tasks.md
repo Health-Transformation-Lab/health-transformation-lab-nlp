@@ -10,5 +10,5 @@
 - [x] T008 [US4] tests + dq.py + 20_data_quality.py
 - [x] T009 [US5] tests + prediction.py + 21_predict_progression.py
 - [x] T010 Rebuild data, parity, docs
-- [ ] T011 R twins for order search, DQ, prediction (action item C3)
+- [x] T011 R twins for order search, DQ, prediction (action item C3): `r/R/09_spec005.R`; parity section 10
 - [ ] T012 Real-data definitions: clinic, outcome horizon, comparable external studies

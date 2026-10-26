@@ -160,7 +160,7 @@ chart (the study design's order). Four groups can be ordered 24 ways. Each order
 one that agrees best with the reviewers is picked on half the charts, and its agreement is then
 measured on the other half, so the pick isn't graded on the charts that chose it.
 
-- Code: `phenotype.collapse5`, `score_orders`; [`scripts/18_phenotype_order.py`](../python/scripts/18_phenotype_order.py).
+- Code: `phenotype.collapse5`, `score_orders`; [`scripts/18_phenotype_order.py`](../python/scripts/18_phenotype_order.py); R [`09_spec005.R`](../r/R/09_spec005.R) (`score_orders_r`).
 - Output: `data/review/[simulated_]reliability_5cat/` (`agreement_vs_humans.csv`, `phenotype_orders.csv`).
 
 ## 10. Over time: plausibility and data quality
@@ -181,7 +181,7 @@ checks caught a third of them, while flagging only 0.2% of clean records. The st
 phenotype dropped a stage at 24% of follow-up visits (action item B2), because forms and codes
 vary visit to visit.
 
-- Code: [`plausibility.py`](../python/dental_omop_nlp/plausibility.py), [`dq.py`](../python/dental_omop_nlp/dq.py); [`scripts/20_data_quality.py`](../python/scripts/20_data_quality.py); R [`r/R/06_validation.R`](../r/R/06_validation.R).
+- Code: [`plausibility.py`](../python/dental_omop_nlp/plausibility.py), [`dq.py`](../python/dental_omop_nlp/dq.py); [`scripts/20_data_quality.py`](../python/scripts/20_data_quality.py); R [`r/R/06_validation.R`](../r/R/06_validation.R), [`09_spec005.R`](../r/R/09_spec005.R) (`run_checks_r`).
 - Output: `data/datasets/data_quality/` (`dq_overall.csv`, `dq_by_clinic.csv`, `temporal_by_method.csv`, `injected_error_recall.csv`).
 
 ## 11. Clinic prevalence
@@ -228,7 +228,7 @@ AUROC 0.70 (95% CI 0.66–0.74). Today's stage matters most (people already at a
 have less room to move up), then attachment loss and prior treatment. Smoking and diabetes
 barely register, because the synthetic histories are too short for them to show (action item D3).
 
-- Code: [`prediction.py`](../python/dental_omop_nlp/prediction.py); [`scripts/21_predict_progression.py`](../python/scripts/21_predict_progression.py).
+- Code: [`prediction.py`](../python/dental_omop_nlp/prediction.py); [`scripts/21_predict_progression.py`](../python/scripts/21_predict_progression.py); R [`09_spec005.R`](../r/R/09_spec005.R) (same model; parity-tested).
 - Output: `data/datasets/prediction/`.
 
 ## 13. Site-level charts, both classifications

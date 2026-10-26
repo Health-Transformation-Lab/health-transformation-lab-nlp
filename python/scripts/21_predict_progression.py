@@ -29,7 +29,9 @@ res = train_eval(pairs, seed=a.seed)
 out = DATASETS_DIR / "prediction"
 out.mkdir(exist_ok=True)
 res["importance"].to_csv(out / f"importance_{a.outcome}.csv", index=False)
-summary = {k: v for k, v in res.items() if k != "importance"} | {"outcome": a.outcome}
+pairs.to_csv(out / f"pairs_{a.outcome}.csv", index=False)                       # for the R twin (parity)
+res["test_predictions"].to_csv(out / f"test_predictions_{a.outcome}.csv", index=False)
+summary = {k: v for k, v in res.items() if k not in ("importance", "test_predictions")} | {"outcome": a.outcome}
 pd.DataFrame([summary]).to_csv(out / f"summary_{a.outcome}.csv", index=False)
 
 print(f"SYNTHETIC: outcome = progression of {a.outcome} at the next visit")

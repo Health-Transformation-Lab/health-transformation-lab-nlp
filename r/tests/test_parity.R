@@ -106,6 +106,53 @@ if (file.exists("data/deid/cost_inputs.csv") && file.exists("data/deid/cost_effe
   stopifnot(d < 1e-6, same_na, all(m$dominated.r == as.logical(m$dominated.p)))
 } else cat("de-id CE: skipped (run python/scripts/26_deid_benchmark.py first)\n")
 
+# 10. Spec 005 twins: evidence-order search, data quality, progression (R 09_spec005.R).
+sp <- "data/review/simulated_reliability_5cat/phenotype_orders_split.csv"
+if (file.exists(sp) && file.exists("data/review/simulated_reviewer_labels.csv") &&
+    file.exists("data/datasets/prediction/pairs_algorithm_design.csv")) {
+  source("r/R/09_spec005.R")
+  # order search: every point estimate for all 24 orders, and the same order selected
+  labels <- read.csv("data/review/simulated_reviewer_labels.csv", stringsAsFactors = FALSE)
+  key <- read.csv("data/datasets/answer_key/review_key.csv", stringsAsFactors = FALSE)
+  w <- reshape(labels[, c("visit_id", "reviewer", "status")], idvar = "visit_id", timevar = "reviewer", direction = "wide")
+  rownames(w) <- w$visit_id; w$visit_id <- NULL; names(w) <- sub("^status\\.", "", names(w))
+  r_o <- score_orders_r(key, w, read.csv(sp))
+  py_o <- read.csv("data/review/simulated_reliability_5cat/phenotype_orders.csv", stringsAsFactors = FALSE)
+  m <- merge(r_o, py_o, by = "order", suffixes = c(".r", ".p"))
+  num <- c("select_n", "select_coverage", "select_pct_agree", "select_kappa", "holdout_n", "holdout_coverage",
+           "holdout_pct_agree", "holdout_kappa", "holdout_diff_vs_human_bar")
+  d <- max(sapply(num, function(k) max(abs(m[[paste0(k, ".r")]] - m[[paste0(k, ".p")]]), na.rm = TRUE)))
+  same_pick <- r_o$order[r_o$selected] == py_o$order[as.logical(py_o$selected)]
+  cat(sprintf("orders:       %d orders, max |R - Python| = %.2e; same order selected: %s\n", nrow(m), d, same_pick))
+  stopifnot(nrow(m) == 24, d < 1e-9, same_pick)
+  # data quality: every check, overall
+  v <- read.csv("data/datasets/visits_structured.csv", stringsAsFactors = FALSE)
+  r_dq <- run_checks_r(v, "2026-10-25")
+  py_dq <- read.csv("data/datasets/data_quality/dq_overall.csv", stringsAsFactors = FALSE)
+  m <- merge(r_dq, py_dq, by = "check", suffixes = c(".r", ".p"))
+  ok <- all(m$n_checked.r == m$n_checked.p, m$n_fail.r == m$n_fail.p, m$status.r == m$status.p)
+  cat(sprintf("data quality: %d / %d checks identical\n", sum(m$n_fail.r == m$n_fail.p), nrow(py_dq)))
+  stopifnot(nrow(m) == nrow(py_dq), ok)
+  # progression: same pairs, same model (glm = unpenalized logistic), same test predictions and AUROC
+  for (outcome in c("algorithm_design", "truth_status")) {
+    vv <- v
+    if (outcome == "truth_status") vv <- merge(v, read.csv("data/datasets/answer_key/visits_truth.csv",
+                                                           stringsAsFactors = FALSE)[, c("visit_id", "truth_status")])
+    pr <- make_pairs_r(vv, outcome)
+    pp <- read.csv(sprintf("data/datasets/prediction/pairs_%s.csv", outcome))
+    pr <- pr[order(pr$visit_id), ]; pp <- pp[order(pp$visit_id), ]
+    dp <- max(abs(as.matrix(pr[PRED_FEATURES]) - as.matrix(pp[PRED_FEATURES])))
+    tp <- read.csv(sprintf("data/datasets/prediction/test_predictions_%s.csv", outcome))
+    fr <- fit_progression_r(pp, tp$visit_id)
+    mm <- merge(fr$test, tp, by = "visit_id")
+    py_auc <- read.csv(sprintf("data/datasets/prediction/summary_%s.csv", outcome))$auroc
+    cat(sprintf("progression (%s): %d pairs (features max diff %.1e); test p max diff %.1e; AUROC R %.6f vs Python %.6f\n",
+                outcome, nrow(pr), dp, max(abs(mm$p.x - mm$p.y)), fr$auroc, py_auc))
+    stopifnot(nrow(pr) == nrow(pp), all(pr$visit_id == pp$visit_id), dp < 1e-9,
+              max(abs(mm$p.x - mm$p.y)) < 1e-4, abs(fr$auroc - py_auc) < 1e-4)
+  }
+} else cat("spec 005 twins: skipped (run python scripts 18 --simulated and 21 first)\n")
+
 cat("parity OK (all sections)\n")
 
 # 5. Cost-effectiveness: point estimates, costs, dominance and ICER match Python.

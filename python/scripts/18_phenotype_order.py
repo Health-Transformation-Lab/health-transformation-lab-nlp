@@ -17,7 +17,7 @@ import argparse
 import pandas as pd
 
 from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
-from dental_omop_nlp.phenotype import score_orders
+from dental_omop_nlp.phenotype import score_orders, split_halves
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--simulated", action="store_true")
@@ -34,6 +34,9 @@ t = score_orders(key, wide, n_boot=a.n_boot, seed=a.seed, five=not a.six)
 out = REVIEW_DIR / f"{prefix}reliability_5cat"
 out.mkdir(parents=True, exist_ok=True)
 t.to_csv(out / "phenotype_orders.csv", index=False)
+sel, hold = split_halves(sorted(set(key.index) & set(wide.index)), a.seed)   # same halves; for the R twin
+pd.DataFrame({"visit_id": sorted(sel | hold), "half": ["select" if i in sel else "holdout" for i in sorted(sel | hold)]}) \
+    .to_csv(out / "phenotype_orders_split.csv", index=False)
 
 if a.simulated:
     print("*** SIMULATED REVIEWERS: pipeline dry run, not a result ***")

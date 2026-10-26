@@ -4,7 +4,8 @@ Unit: a pair of consecutive visits of one person where both have a known
 phenotype. Outcome: the next visit's phenotype is a higher category (onset of
 periodontitis or a higher stage). Features come from the current visit only.
 
-Model: standardized logistic regression; people split 70/30 by seed so no
+Model: standardized, unpenalized logistic regression (same model as R's glm, parity-tested);
+people split 70/30 by seed so no
 person is in both. Reported: AUROC on held-out pairs with a bootstrap 95% CI,
 and permutation importance (drop in AUROC when a feature is shuffled).
 
@@ -50,13 +51,22 @@ def make_pairs(visits: pd.DataFrame, status_col: str) -> pd.DataFrame:
     return v[["visit_id", "person_id", *FEATURES, "y_progress"]].reset_index(drop=True)
 
 
+def _unpenalized_logit() -> LogisticRegression:
+    """No penalty: scikit-learn >= 1.8 spells it C=inf (penalty=None is deprecated there)."""
+    import sklearn
+    major, minor = (int(x) for x in sklearn.__version__.split(".")[:2])
+    if (major, minor) >= (1, 8):
+        return LogisticRegression(C=np.inf, solver="newton-cholesky", tol=1e-10, max_iter=500)
+    return LogisticRegression(penalty=None, solver="newton-cholesky", tol=1e-10, max_iter=500)
+
+
 def train_eval(pairs: pd.DataFrame, seed: int = 0, n_boot: int = 500, test_share: float = 0.3) -> dict:
     rng = np.random.default_rng(seed)
     people = pairs["person_id"].unique()
     test_people = set(rng.choice(people, size=int(len(people) * test_share), replace=False))
     te = pairs["person_id"].isin(test_people)
     X, y = pairs[FEATURES], pairs["y_progress"]
-    m = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000)).fit(X[~te], y[~te])
+    m = make_pipeline(StandardScaler(), _unpenalized_logit()).fit(X[~te], y[~te])
     p = m.predict_proba(X[te])[:, 1]
     yt = y[te].to_numpy()
     auc = roc_auc_score(yt, p)
@@ -71,4 +81,6 @@ def train_eval(pairs: pd.DataFrame, seed: int = 0, n_boot: int = 500, test_share
     imp = pd.DataFrame({"feature": FEATURES, "importance": pi.importances_mean, "importance_sd": pi.importances_std,
                         "std_coef": coef}).sort_values("importance", ascending=False).reset_index(drop=True)
     return {"n_pairs_train": int((~te).sum()), "n_pairs_test": int(te.sum()), "progress_rate": float(y.mean()),
-            "auroc": float(auc), "auroc_ci_low": float(lo), "auroc_ci_high": float(hi), "importance": imp}
+            "auroc": float(auc), "auroc_ci_low": float(lo), "auroc_ci_high": float(hi), "importance": imp,
+            "test_predictions": pd.DataFrame({"visit_id": pairs.loc[te, "visit_id"].to_numpy(),
+                                              "person_id": pairs.loc[te, "person_id"].to_numpy(), "p": p})}

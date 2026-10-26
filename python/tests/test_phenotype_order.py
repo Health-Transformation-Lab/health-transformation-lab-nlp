@@ -50,3 +50,11 @@ def test_score_orders_selects_on_one_half_and_reports_the_other():
     best = t[t["selected"]].iloc[0]
     assert not best["order"].startswith("dx_code")
     assert t["select_kappa"].max() == best["select_kappa"]
+
+
+def test_split_is_exposed_so_r_can_reuse_it():
+    from dental_omop_nlp.phenotype import split_halves
+    ids = list(range(10, 50))
+    sel, hold = split_halves(ids, seed=4)
+    assert sel | hold == set(ids) and not sel & hold and len(sel) == 20
+    assert split_halves(ids, seed=4) == (sel, hold)
