@@ -192,6 +192,51 @@ counts as removed only if every character is), so it can be lower than a looser 
 One ASQ-PHI tag's value doesn't appear verbatim in its query and can't be scored; two values appear
 twice and count twice (2,975 scored spans).
 
+## Results on John Snow Labs' 48-note benchmark (jsl48)
+
+John Snow Labs published the labeled set behind its de-identification comparison
+([spark-nlp-workshop](https://github.com/JohnSnowLabs/spark-nlp-workshop/tree/master/tutorials/academic/DeIdentification_Benchmarks_Text2Story2025),
+[arXiv 2503.20794](https://arxiv.org/abs/2503.20794)): 48 clinical notes (about 5,200 characters each),
+1,479 labeled identifiers in six types. Scoring it puts our free engines next to their published
+numbers. **Token F1** is their word-level score: a word is PHI if it starts inside a labeled span;
+precision, recall and F1 on the PHI class.
+
+| Engine | Token precision | Token recall | **Token F1** | Our entity recall |
+|---|---|---|---|---|
+| regex_v2 | 0.66 | 0.65 | 0.65 | 0.53 |
+| presidio | 0.60 | 0.73 | 0.66 | 0.68 |
+| hf_stanford | 0.81 | 0.93 | **0.87** | 0.89 |
+| hf_obi | 0.95 | 0.91 | **0.93** | 0.75 |
+| hf_stanford+regex_v2+guard | 0.63 | 0.93 | 0.75 | 0.92 |
+| hf_stanford+hf_obi+regex_v2+guard | 0.63 | 0.96 | 0.76 | 0.94 |
+| routed+guard | 0.51 | **0.98** | 0.67 | **0.97** |
+| *Published (their paper): John Snow Labs / Azure / AWS / GPT-4o* | | | *0.96 / 0.91 / 0.83 / 0.79* | |
+
+What it adds, and how far to trust it:
+
+- **The free clinical models hold up on long medical notes.** hf_obi's token F1 (0.93) sits
+  between Azure's and John Snow Labs' published scores; hf_stanford (0.87) beats AWS and GPT-4o.
+- **But they may have seen these notes.** The notes look like i2b2 discharge summaries (header
+  layout, space-split punctuation). hf_obi was trained on i2b2 2014 and hf_stanford partly on
+  i2b2, so their scores here may be inflated. The vendor's own labels and notes, too: an
+  independent set would be needed to confirm any ranking.
+- **Our dental add-ons cost precision on medical notes.** regex_v2 was written for dental notes and
+  over-flags discharge-summary text (precision falls from 0.81 to 0.63 when added to hf_stanford),
+  and the dental guard protects shapes like `2-5-94` that look like probing readings, so it drops a
+  few real dates (0.99 to 0.95). Both are for dental notes; on general medical text, a transformer
+  alone scores better.
+- **Ages differ by definition.** The set labels every age; Safe Harbor only requires ages over 89,
+  which is what our engines target, so AGE recall is near 0 (47 of 1,479 identifiers).
+- **Long notes needed a fix.** These notes are longer than the transformers read at once; they're
+  now read in windows (`detect_transformer`). Without that, hf_stanford stopped after about 2,300
+  characters.
+
+The file isn't in this repo: real clinical text (even with replacement identifiers) breaks the
+synthetic-only rule, and the i2b2 notes are normally under a data use agreement. To reproduce, put
+`deidentification_benchmark_ground_truth_48_doc.csv` in `data/raw/` and run
+`26_deid_benchmark.py --jsl48 data/raw/<file>`. It isn't priced: throughput was measured on short
+dental notes.
+
 ## Combining engines: bigger unions and routing
 
 The `+` ensembles above are plain unions: anything any engine flags is removed. Two other ways to
