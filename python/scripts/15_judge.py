@@ -60,7 +60,7 @@ for f in sorted(glob.glob(str(DATASETS_DIR / "ai_predictions_*.csv"))):
             continue
         gold_rows.append({"method": m, "visit_id": vid, "pred": pred, "truth": c, "note": key.loc[vid, "note_text"]})
 # Calibration needs plenty of WRONG predictions to pin down specificity; good models
-# rarely give them. The single-source readers (exam form, codes) are wrong often,
+# rarely give them. The single-evidence-type readers (exam form, codes) are wrong often,
 # so their readings on the same charts are added as calibration-only pairs.
 for m in ["exam_form", "proc_codes_completed", "proc_dx_completed"]:
     for vid, pred in key[m].items():

@@ -28,7 +28,7 @@ substantial, above 0.80 almost perfect. A convention, not a law.
 
 | Kind | When | Where in the code |
 |------|------|-------------------|
-| **Cohen's kappa** | Two raters: a reviewer vs the AI model, one source vs another (e.g. notes vs probing chart), the judge vs human verdicts | `phenotype.cohen_kappa` |
+| **Cohen's kappa** | Two raters: a reviewer vs the AI model, one evidence type vs another (e.g. notes vs probing chart), the judge vs human verdicts | `phenotype.cohen_kappa` |
 | **Fleiss' kappa** | Many reviewers staging the same charts (quantitative validation) | `reliability.fleiss_kappa` |
 | **Weighted kappa** | Ordered categories (healthy → gingivitis → stage I–IV): calling stage III "stage II" is a small miss, calling it "healthy" a big one. Quadratic weights penalize by the square of the distance | `reliability.weighted_kappa` |
 

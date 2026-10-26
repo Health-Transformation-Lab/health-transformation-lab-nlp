@@ -1,0 +1,26 @@
+<!--
+  Label Studio labeling config: de-identification QA (spec 008).
+
+  One task = one DE-IDENTIFIED note ([PATIENT], [DATE] ... are the engine's tags). Find anything
+  that could still identify the patient. Highlights pre-filled as LEAK come from the residual scan;
+  keep them only if they really are identifiers. Field names map to dental_omop_nlp/deid_review.py
+  (choices "leak", "over_redaction"; labels "leaks" on "text"); change one, change the other.
+-->
+<View>
+  <Header value="De-identified note $note_id (engine: $engine)"/>
+  <Labels name="leaks" toName="text" showInline="true">
+    <Label value="LEAK" background="#dc2626"/>
+  </Labels>
+  <Text name="text" value="$text" granularity="symbol"/>
+  <Header value="Does any identifier remain? Highlight each one as LEAK."/>
+  <Choices name="leak" toName="text" choice="single" showInline="true" required="true">
+    <Choice value="yes"/>
+    <Choice value="no"/>
+  </Choices>
+  <Header value="Did redaction remove clinical meaning (a tooth number, code, measurement, eponym)?"/>
+  <Choices name="over_redaction" toName="text" choice="single" showInline="true" required="true">
+    <Choice value="yes"/>
+    <Choice value="no"/>
+  </Choices>
+  <TextArea name="comment" toName="text" placeholder="Optional: what leaked or what was lost" maxSubmissions="1"/>
+</View>

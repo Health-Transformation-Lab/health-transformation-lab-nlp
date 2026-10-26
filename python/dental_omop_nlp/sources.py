@@ -1,7 +1,7 @@
-"""The seven evidence sources per visit, and a rule that reads each one.
+"""The seven evidence types per visit, and a rule that reads each one.
 
 The study compares methods for phenotyping periodontal status from a dental
-EHR. Each visit has up to seven sources of evidence (chart note, exam form, procedure codes completed
+EHR. Each visit has up to seven evidence types (chart note, exam form, procedure codes completed
 and planned, procedure diagnosis codes completed and planned, probing chart), and they disagree:
 
     1 chart notes                 free text (clinical_notes.py)
@@ -12,10 +12,10 @@ and planned, procedure diagnosis codes completed and planned, probing chart), an
     6 procedure diagnosis, planned     ICD-10-CM codes attached to planned procedures
     7 probing chart               CAL, RBL, tooth loss due to perio (labels.py)
 
-This module generates sources 2-6 from the visit's true status with the kinds
+This module generates evidence types 2-6 from the visit's true status with the kinds
 of noise real EDRs have (planned != completed because patients decline;
-diagnosis codes drift toward "moderate"; forms copied forward; sources
-missing), and gives a reader for each that returns what that source alone
+diagnosis codes drift toward "moderate"; forms copied forward; evidence
+missing), and gives a reader for each that returns what that evidence type alone
 says about status. `phenotype.py` combines them.
 
 Codes used:
@@ -35,7 +35,7 @@ import random
 from .labels import Status
 
 STATUSES = [s.value for s in Status]
-UNKNOWN = "unknown"   # a source that is missing or says nothing about status
+UNKNOWN = "unknown"   # evidence that is missing or says nothing about status
 
 # ------------------------------------------------------------------ generate
 _PSR = {Status.HEALTHY: 0, Status.GINGIVITIS: 1, Status.P1: 3, Status.P2: 3, Status.P3: 4, Status.P4: 4}
@@ -77,7 +77,7 @@ def _drift(status: Status, rng: random.Random, p: float) -> Status:
 
 
 def generate_sources(status: Status, extent: str, rng: random.Random) -> dict:
-    """Sources 2-6 for one visit. Values are strings; '' means missing."""
+    """Evidence types 2-6 for one visit. Values are strings; '' means missing."""
     s = {}
     # 2 exam form: PSR max sextant + a perio-status checkbox that is sometimes stale
     if rng.random() < 0.85:

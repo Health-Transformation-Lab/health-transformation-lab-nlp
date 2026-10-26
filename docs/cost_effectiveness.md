@@ -34,7 +34,7 @@ flowchart LR
    [dentbench_methods.md](dentbench_methods.md)). On the 240 reviewed charts we know whether
    each method's prediction matched the reviewers. The judge judges the same
    pairs, which gives its sensitivity and specificity. Good models are rarely
-   wrong, so the readings from single sources (exam form, procedure codes) on
+   wrong, so the readings from single evidence types (exam form, procedure codes) on
    the same charts are added as calibration-only pairs to get enough wrong
    answers to measure specificity.
 2. **Judge a sample, not the corpus.** Judging all million notes costs at

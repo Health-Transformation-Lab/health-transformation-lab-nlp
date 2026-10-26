@@ -19,15 +19,15 @@ and bone), with a **stage** I–IV (how severe), **grade** A–C (how fast) and 
 [in plain words](docs/staging_grading.md#in-plain-words). Dental records rarely hold a
 reliable assigned diagnosis, so the phenotype has to be derived from the evidence below.
 
-**Diagnostic evidence for each visit:** seven parts of the dental record that each suggest a
+**Evidence types per visit:** seven parts of the dental record that each suggest a
 periodontal status. They often disagree:
 
-| # | Diagnostic evidence | What it is | Phenotype order |
+| # | Evidence type | What it is | Phenotype order |
 |---|---|---|---|
 | 1 | Chart note | Free text the clinician writes | 3rd |
 | 2 | Exam form | Structured fields, e.g. PSR score, perio status | 1st |
-| 3–4 | Procedure diagnoses, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
-| 5–6 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
+| 3–4 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
+| 5–6 | Procedure diagnosis codes, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
 | 7 | Probing chart | Attachment loss, bone loss, teeth lost | 4th |
 
 When the evidence disagrees, the phenotype uses the first one in this order that gives a status.
@@ -104,6 +104,8 @@ Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5
 - letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
   clearly better than the rules (difference CI excludes 0);
 - they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
+- class-weighted training (`--class-weight sqrt`) only lifts ModernBERT base's stage IV recall from 7% to 21%
+  (accuracy 84%); with 7 training examples, the rules-decide hybrid stays far better.
 
 The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
 
@@ -128,4 +130,4 @@ Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol]
 | Dental vs medical data in OMOP; synthetic notes, review set, public datasets | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md), [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
 | MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
 | Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
-| De-identification methods and cost; financial trade-offs; radiographs; MedGemma | [deidentification.md](docs/deidentification.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
+| De-identification methods and cost, human review in Label Studio; financial trade-offs; radiographs; MedGemma | [deidentification.md](docs/deidentification.md), [deid_review_protocol.md](docs/deid_review_protocol.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |

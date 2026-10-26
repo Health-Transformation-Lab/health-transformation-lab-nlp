@@ -410,6 +410,15 @@ change them. The local engines' node price ($1/hour) is still ILLUSTRATIVE.
 
 Python and R compute the same frontier from `cost_inputs.csv` (parity test).
 
+## Human review in Label Studio (spec 008)
+
+Two projects turn the human review sample into data. **Gold**: annotators mark every identifier in
+the original note (pre-filled by an engine; a fifth of notes without, to measure anchoring), and
+engines are scored against their consensus, which is how an engine gets scored on real notes. **QA**:
+reviewers read the chosen engine's output and say whether anything still identifies, giving the leak
+rate with a 95% interval. Set-up: [labelstudio/README.md](../labelstudio/README.md#de-identification-review-projects-spec-008);
+protocol: [deid_review_protocol.md](deid_review_protocol.md). Only simulated annotators have run so far.
+
 ## Limits
 
 - The challenge set is still written by one person. The unseen tier is held out from regex v2,

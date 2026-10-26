@@ -78,10 +78,10 @@ Localized (< 30% of teeth involved), generalized (≥ 30%), or molar/incisor pat
 
 | Worksheet item | In `labels.py` / `labels.R` | In the synthetic data |
 |---|---|---|
-| CAL first, RBL only if CAL missing | yes (`max_cal_mm=None` / `NA`) | CAL always charted in the truth; notes and sources can lack it |
+| CAL first, RBL only if CAL missing | yes (`max_cal_mm=None` / `NA`) | CAL always charted in the truth; notes and other evidence can lack it |
 | Tooth loss due to perio | yes | yes |
 | PD complexity (> 4, ≥ 6 mm) | yes | yes |
-| Vertical defect, furcation, mobility, remaining teeth, complex rehabilitation | yes, optional fields | not generated yet (radiograph AI simulates vertical defects and furcation as its own source) |
+| Vertical defect, furcation, mobility, remaining teeth, complex rehabilitation | yes, optional fields | not generated yet (radiograph AI simulates vertical defects and furcation as its own evidence type) |
 | Moderate / severe ridge defect, masticatory dysfunction, bite collapse | via `complex_rehab` (stage IV) only | no |
 | Grade: start at B | yes (no RBL → B) | RBL always present |
 | Grade: direct 5-year evidence | yes (`loss_5yr_mm`) | not generated (visits are drawn independently) |

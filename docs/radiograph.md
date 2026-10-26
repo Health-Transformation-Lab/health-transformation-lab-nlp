@@ -44,7 +44,7 @@ to explain why radiograph-derived data is a natural thing to explore.
 |-------|--------------|
 | `radiograph.py` | Simulates generic radiograph AI output per visit (per-tooth CEJ-crest mm, % RBL, vertical defects, furcation, calculus, missing teeth). Error rates are planning assumptions |
 | Reader | Bone loss as a **lower bound** on stage: II or III only; never stage IV (cause of tooth loss isn't visible), never health vs gingivitis |
-| Eighth source | Compared with the other seven in method agreement and reviewer reliability; shown to reviewers in Label Studio |
+| Eighth evidence type | Compared with the other seven in method agreement and reviewer reliability; shown to reviewers in Label Studio |
 | Rule-based algorithm v0.1 | When the probing chart is missing, raises the stage if the radiograph shows more bone loss |
 | `fusion_tfidf_rad` | Note text plus radiograph features in one model |
 
@@ -58,7 +58,7 @@ be mapped to it through a small adapter.
 | Agreement with reviewer consensus (review charts) | 0.86 | 0.92 |
 | Unsafe error rate (S1+S2) | 0.135 | 0.058 |
 
-- The radiograph alone is a weak source: it gives a status at 36% of visits
+- The radiograph alone is weak evidence: it gives a status at 36% of visits
   (no image, or no measurable bone loss) and agrees with reviewers 63% of the
   time when it does. It helps as an *input*, not as a standalone answer.
 - The rule-based algorithm barely changes (it already trusts the probing
