@@ -122,7 +122,7 @@ What a BERT model is, in plain words: [bert.md](bert.md).
 - Code: [`rungs.py`](../python/dental_omop_nlp/rungs.py) `make_rung`; [`models.yaml`](../models.yaml) (Hugging Face ids, papers);
   [`llm_reader.py`](../python/dental_omop_nlp/llm_reader.py); [`scripts/11_ai_predict.py`](../python/scripts/11_ai_predict.py).
 - Output: `data/datasets/ai_predictions_<rung>.csv` (LLMs also `llm_details_<rung>.csv`).
-- Status: baselines, DistilBERT (79% correct on the synthetic review charts), BiomedBERT (77%) and BioClinical ModernBERT base (80%) run; both miss every stage IV chart (7 training examples); the other BERT models are queued; MedGemma needs a GPU.
+- Status: baselines and four encoders run (correct on the synthetic review charts: BERT base 81%, BioClinical ModernBERT base 80%, DistilBERT 79%, BiomedBERT 77%); all miss every stage IV chart (7 training examples); the other BERT models are queued; MedGemma needs a GPU.
 
 ## 7. Reviewers stage charts
 
