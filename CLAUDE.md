@@ -74,3 +74,12 @@ needed to use them. To refresh them to a newer Spec Kit:
 - Seeds: every generator and sampler takes one; defaults are fixed.
 - Paths: use `dental_omop_nlp.paths`, never hard-code `data/`.
 - Names: simulated files `simulated_*`, simulated methods `sim:<name>`, calibration-only methods `calib:<name>`.
+- Secrets and tokens: whenever you tell the user to create one, give the exact scope(s)
+  to select, a short lifetime, and where it goes. Never ask for it in chat. For this repo:
+
+  | Credential | Where it's made | Scope | Goes to |
+  |---|---|---|---|
+  | `dental-omop-ci` OAuth secret | Databricks → Settings → Identity and access → Service principals → Secrets | `all-apis` (bundle deploy touches jobs, workspace files, Unity Catalog, MLflow, SQL) | GitHub environment secret `DATABRICKS_CLIENT_SECRET` |
+  | Workspace personal access token (admin setup only) | Databricks → Settings → Developer → Access tokens | `all-apis`, 1 day; revoke after | cloud environment variable `DATABRICKS_TOKEN` |
+  | `gh` login for `gh secret set` / `gh variable set` | `gh auth login` | `repo` (classic), or fine-grained: this repo, Secrets, Variables and Environments read and write | your laptop only |
+  | Hugging Face token for MedGemma | huggingface.co → Settings → Access tokens | Read | Databricks secret scope `dental`, key `hf_token` |

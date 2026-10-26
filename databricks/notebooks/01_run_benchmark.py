@@ -34,7 +34,7 @@ dbutils.widgets.text("catalog", "workspace")
 dbutils.widgets.text("schema", "dental")
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
-dbutils.widgets.text("experiment", "")   # set per target by the bundle (resources/mlops.yml)
+dbutils.widgets.text("experiment_id", "")   # set per target by the bundle (resources/jobs.yml)
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
@@ -87,8 +87,10 @@ from dental_omop_nlp.registry import load_registry
 from dental_omop_nlp.rungs import make_rung
 
 reg = load_registry()
-mlflow.set_experiment(dbutils.widgets.get("experiment")
-                      or f"/Users/{spark.sql('select current_user()').first()[0]}/dental-omop-nlp")
+if dbutils.widgets.get("experiment_id"):
+    mlflow.set_experiment(experiment_id=dbutils.widgets.get("experiment_id"))
+else:
+    mlflow.set_experiment(f"/Users/{spark.sql('select current_user()').first()[0]}/dental-omop-nlp")
 
 def run(rung_id, **kw):
     with mlflow.start_run(run_name=rung_id):
@@ -119,25 +121,26 @@ display(all_res[all_res["class"] == ""].pivot(index="model_id", columns="metric"
 # MAGIC %md ## 5. Optional: LLM challenger
 # MAGIC Zero-shot on the test notes via a Foundation Model endpoint. Check the endpoint name under
 # MAGIC *Serving* in your workspace; pay-per-token endpoints vary by region and over time.
+# MAGIC Skipped unless `llm_endpoint` is set (e.g. `databricks-meta-llama-3-3-70b-instruct`).
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC CREATE OR REPLACE TEMP VIEW llm_preds AS
-# MAGIC SELECT note_id, label,
-# MAGIC   ai_query(
-# MAGIC     'databricks-meta-llama-3-3-70b-instruct',
-# MAGIC     CONCAT('Classify the periodontal status in this dental SOAP note. Answer with exactly one of: ',
-# MAGIC            'healthy, gingivitis, periodontitis_stage_1, periodontitis_stage_2, periodontitis_stage_3, periodontitis_stage_4.\n\n',
-# MAGIC            note_text),
-# MAGIC     failOnError => false
-# MAGIC   ).result AS pred
-# MAGIC FROM <catalog>.<schema>.labeled_notes  -- e.g. workspace.dental_dev
-# MAGIC WHERE split = 'test';
-# MAGIC SELECT * FROM llm_preds LIMIT 10;
-
-# COMMAND ----------
-
-llm = spark.table("llm_preds").toPandas()
-llm["pred"] = llm["pred"].fillna("").str.strip().str.lower()
-display(score(llm["label"], llm["pred"], None, model_id="llm_challenger"))
+dbutils.widgets.text("llm_endpoint", "none")
+llm_endpoint = dbutils.widgets.get("llm_endpoint")
+if llm_endpoint not in ("", "none"):
+    import re
+    if not re.fullmatch(r"[\w.-]+", llm_endpoint):
+        raise ValueError(f"llm_endpoint is not a serving endpoint name: {llm_endpoint!r}")
+    llm = spark.sql(f"""
+        SELECT note_id, label,
+          ai_query(
+            '{llm_endpoint}',
+            CONCAT('Classify the periodontal status in this dental SOAP note. Answer with exactly one of: ',
+                   'healthy, gingivitis, periodontitis_stage_1, periodontitis_stage_2, periodontitis_stage_3, periodontitis_stage_4.\\n\\n',
+                   note_text),
+            failOnError => false
+          ).result AS pred
+        FROM {catalog}.{schema}.labeled_notes
+        WHERE split = 'test'""").toPandas()
+    llm["pred"] = llm["pred"].fillna("").str.strip().str.lower()
+    display(score(llm["label"], llm["pred"], None, model_id="llm_challenger"))

@@ -54,12 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     env:
-      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST || vars.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID || vars.DATABRICKS_CLIENT_ID }}
       DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@v4
-      - uses: databricks/setup-cli@v0.270.0
+      - uses: databricks/setup-cli@v0.297.2
       - name: bundle validate (all targets)
         if: env.DATABRICKS_HOST != ''
         run: for t in dev uat prod; do databricks bundle validate -t $t; done
