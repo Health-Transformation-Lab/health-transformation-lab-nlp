@@ -23,7 +23,7 @@ Pictures of the same: [medallion architecture](../diagrams/d0_medallion_architec
 | 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Diagnostic evidence](../README.md#dental-omop-nlp) |
 | 4 | [Compare the evidence](#4-compare-the-evidence) | (inside step 1) | [Study process](process.md) |
 | 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#dental-omop-nlp) |
-| 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated) |
+| 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml) |
 | 7 | [Reviewers stage charts](#7-reviewers-stage-charts) | Label Studio, then `12_import_review.py` | [How results are measured](../README.md#how-results-are-measured) |
 | 8 | [Reliability and the acceptance test](#8-reliability-and-the-acceptance-test) | `python scripts/13_reliability.py` | [How results are measured](../README.md#how-results-are-measured) |
 | 9 | [Five categories and evidence order](#9-five-categories-and-evidence-order) | `python scripts/18_phenotype_order.py` | [Action items](../README.md#action-items) |
@@ -165,17 +165,40 @@ measured on the other half, so the pick isn't graded on the charts that chose it
 
 ## 10. Over time: plausibility and data quality
 
-Conformance, completeness and plausibility checks (OHDSI Data Quality Dashboard
-terms), including temporal checks: CAL or bone loss dropping, teeth regained,
-periodontitis "resolving", stage dropping.
+**In plain words:** before trusting any number, check the data makes sense.
+
+- **Does each value make sense?** Probing depths, attachment loss and bleeding % within possible
+  ranges ("conformance"); required fields filled in ("completeness"); values that fit together
+  ("plausibility"). These are the categories OHDSI's Data Quality Dashboard uses. Checked overall
+  and per clinic, since one clinic with sloppy charting can skew everything.
+- **Does each patient's history make sense?** Some changes can't happen between visits:
+  attachment or bone lost to periodontitis doesn't grow back, extracted teeth don't return, and
+  periodontitis doesn't turn back into healthy (once diagnosed, it's managed, not cured). If a
+  later visit shows one of these, a record is probably wrong, or the phenotype misread it.
+
+**Simulated dry run (not a result):** 2% recording errors were injected on purpose; the history
+checks caught a third of them, while flagging only 0.2% of clean records. The study design's
+phenotype dropped a stage at 24% of follow-up visits (action item B2), because forms and codes
+vary visit to visit.
 
 - Code: [`plausibility.py`](../python/dental_omop_nlp/plausibility.py), [`dq.py`](../python/dental_omop_nlp/dq.py); [`scripts/20_data_quality.py`](../python/scripts/20_data_quality.py); R [`r/R/06_validation.R`](../r/R/06_validation.R).
 - Output: `data/datasets/data_quality/` (`dq_overall.csv`, `dq_by_clinic.csv`, `temporal_by_method.csv`, `injected_error_recall.csv`).
 
 ## 11. Clinic prevalence
 
-Person-level (latest visit with a known status) prevalence of periodontitis and
-stage III–IV per clinic, with Wilson 95% intervals, compared with NHANES 2009–2014.
+**In plain words:** what share of each clinic's patients have periodontitis, and severe
+(stage III–IV) periodontitis? Each patient counts once, using their latest visit with a known
+status. Every share has a 95% confidence interval (Wilson method). A clinic far outside the
+others, or far from national figures, is worth a look: its patients differ, or its records do.
+
+National figures for comparison: NHANES 2009–2014, 42.2% of US adults 30+ with periodontitis,
+7.8% severe. They use the CDC/AAP definitions, not the 2017 stages, so they're a sanity check,
+not a target.
+
+**Simulated dry run (not a result):** 56% with periodontitis overall (52% in the generator's
+truth), clinics ranging from 50% to 65%. That's above NHANES's 42% mostly because the 2017
+system counts mild stage I cases that the CDC/AAP definitions call "no periodontitis"
+(step 13 compares the two on the same charts).
 
 - Code: [`prevalence.py`](../python/dental_omop_nlp/prevalence.py); [`scripts/19_prevalence.py`](../python/scripts/19_prevalence.py); R `06_validation.R`.
 - Output: `data/datasets/prevalence/`.

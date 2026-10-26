@@ -9,6 +9,34 @@ cases from published case reports. Its task differs from ours (answering
 dental questions vs. reading a chart note), and its data are restricted, so we
 reuse **methods, not data**.
 
+
+## In plain words
+
+**How can a diagnosis be unsafe?** The label itself doesn't hurt anyone; what's done because of it
+can. Every wrong label is graded by what would happen if a dentist acted on it:
+
+| Mistake | Example | What could happen | Grade |
+|---|---|---|---|
+| Right, or a near miss with the same care | stage II called stage I; healthy called gingivitis | Same treatment either way | S0, safe |
+| Disease missed, mild | stage I–II called gingivitis | Treatment delayed; still reversible in practice | S1, reversible harm |
+| Disease missed, severe | stage III–IV called healthy or gingivitis | No referral or deep cleaning while bone keeps being lost; teeth can be lost | **S2, irreversible harm** |
+| Disease that isn't there | healthy called periodontitis | Needless deep cleaning (scaling and root planing) or referral | S1 |
+| Severe disease under-staged | stage III called stage II | Misses the surgical or specialist pathway | S1 |
+| Over-staged by two or more | stage I called stage III | Overtreatment | S1 |
+
+**Unsafe rate** = share of charts with an S1 or S2 mistake. Two methods with the same agreement
+can differ a lot here, depending on *which* mistakes they make. This grid is a draft, pending a
+periodontist's sign-off.
+
+**Results by difficulty.** Some charts are easy: the diagnosis is written in 2017 terms and
+matches the measurements (level 1). Some need translating old terms or ignoring text copied from
+an earlier visit (level 2). The hardest have no written diagnosis, or one that contradicts the
+chart (level 3). Agreement is reported per level, so a method that only handles easy charts
+doesn't look better than it is.
+
+Both ideas come from GlobalDentBench (a dental AI benchmark, arXiv 2605.24636), which grades AI
+answers to dental questions the same way.
+
 ## What we reused
 
 | GlobalDentBench | Here | Where |

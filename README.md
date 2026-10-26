@@ -53,9 +53,9 @@ step, with links to the code; the Databricks notebook
 | 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
 | 5 | Periodontists label the same 240 charts, each on their own, in a labeling tool (Label Studio) | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
 | 6 | Does the AI agree with the periodontists as often as they agree with each other? Also: which order of checking the evidence agrees best | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
-| 7 | Over time and at scale: plausibility, data quality, clinic prevalence, progression | [10–12](docs/code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
-| 8 | Site-level charts, both classifications, three OMOP storage designs, Lakebase | [13–15](docs/code_walkthrough.md#13-site-level-charts-both-classifications) |
-| 9 | 1M+ notes: LLM judge and cost; deploy to dev, UAT, prod | [16–18](docs/code_walkthrough.md#16-llm-judge-and-cost-at-1m-notes) |
+| 7 | Over time: catch impossible changes and bad data; compare clinics; predict who gets worse | [10–12](docs/code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
+| 8 | Tooth-by-tooth measurements; both classifications; three ways to store them in OMOP | [13–15](docs/code_walkthrough.md#13-site-level-charts-both-classifications) |
+| 9 | Scale to 1M+ notes: an AI judge spot-checks answers; costs; deploy to dev, test, production | [16–18](docs/code_walkthrough.md#16-llm-judge-and-cost-at-1m-notes) |
 
 Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[dev]" && cd .. && python/scripts/make_parity_inputs.sh`; tests: `pytest -q python/tests`, `Rscript r/tests/test_parity.R`.
 
@@ -72,11 +72,10 @@ Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[de
 - **Kappa** is agreement beyond chance. **95% confidence intervals** (bootstrap over
   charts) give the range the true value plausibly falls in; overlapping intervals mean two
   methods can't be called different. [statistics](docs/statistics.md)
-- **Unsafe rate** and **results by difficulty**, after [GlobalDentBench](docs/dentbench_methods.md).
+- **Unsafe mistakes:** labels that could harm a patient if acted on, e.g. missed stage III–IV (tooth
+  loss). Results also split by how hard the chart is ([details](docs/dentbench_methods.md#in-plain-words)).
 
-## Models evaluated
-
-The 12 models from the evaluation sheet (also in `models.yaml`):
+## Models evaluated (the 12 from the evaluation sheet; `models.yaml`)
 
 | Model · paper · domain, role | Model · paper · domain, role |
 |---|---|
@@ -101,8 +100,8 @@ Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol]
 | Topic | |
 |---|---|
 | **Diagrams**: [medallion architecture](diagrams/d0_medallion_architecture.png), study process, platform, ERD, site storage, MLOps, flows | [diagrams/](diagrams/README.md) |
-| Site-level data in OMOP: 32 teeth × 6 sites, derived measures, 2017 AAP/EFP **and 2012 CDC/AAP**, three storage designs on Postgres/Lakebase, concept mapping, Atlas feasibility | [site_level_omop.md](docs/site_level_omop.md) |
-| Integrated phenotype (five categories, evidence order), patients over time, clinic prevalence, data quality, prediction | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
+| Tooth-by-tooth data in OMOP; 2017 AAP/EFP **and 2012 CDC/AAP**; storage designs on Postgres/Lakebase | [site_level_omop.md](docs/site_level_omop.md) |
+| Study design vs this repo; open decisions | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
 | Dental vs medical data in OMOP; synthetic notes, review set, public datasets | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md), [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
 | MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
 | Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
