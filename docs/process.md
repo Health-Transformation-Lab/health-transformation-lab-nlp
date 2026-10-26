@@ -73,7 +73,7 @@ How it's computed here (`reliability.agreement_vs_humans`, R twin in `04_reliabi
 
 1. **Human bar:** mean Cohen's kappa over every pair of reviewers. Each reviewer
    also gets their own mean kappa against the others, to show the human spread.
-2. **Each method** (AI model, rule-based algorithm, each source): mean kappa
+2. **Each method** (AI model, rule-based algorithm, each evidence type): mean kappa
    against every reviewer.
 3. **Difference** = method − human bar, with a 95% paired bootstrap CI over charts.
 4. **Verdict** against a non-inferiority margin fixed before looking (default
@@ -88,7 +88,7 @@ humans, because each reviewer helped make the consensus. Output:
 
 | Step | Repo | Output |
 |---|---|---|
-| Integrated phenotype, five categories, study-design source order | `phenotype.RULES_DESIGN`, `collapse5`; `algorithm_design` column | `review_key.csv`, `visits_structured.csv` |
+| Integrated phenotype, five categories, study-design evidence order | `phenotype.RULES_DESIGN`, `collapse5`; `algorithm_design` column | `review_key.csv`, `visits_structured.csv` |
 | Can the order change? Score all 24 orders, chosen on half the charts, reported on the other half | `scripts/18_phenotype_order.py` | `reliability_5cat/phenotype_orders.csv` |
 | Reliability and acceptance test on five categories | `scripts/13_reliability.py` (Py + R) | `reliability_5cat/` |
 | Patients over time; temporal plausibility | `synthetic.draw_history`, `plausibility.py` (Py + R) | `data_quality/` |

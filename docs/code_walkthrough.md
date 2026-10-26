@@ -20,13 +20,13 @@ Pictures of the same: [medallion architecture](../diagrams/d0_medallion_architec
 |---|---|---|---|
 | 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Sources](../README.md#dental-omop-nlp) |
 | 2 | [De-identify and gate](#2-de-identify-and-gate) | (inside step 1) | [Ground rules](../README.md#ground-rules) |
-| 3 | [Read each source](#3-read-each-source) | (inside step 1) | [Sources](../README.md#dental-omop-nlp) |
-| 4 | [Compare the sources](#4-compare-the-sources) | (inside step 1) | [Study process](process.md) |
+| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Diagnostic evidence](../README.md#dental-omop-nlp) |
+| 4 | [Compare the evidence](#4-compare-the-evidence) | (inside step 1) | [Study process](process.md) |
 | 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#dental-omop-nlp) |
 | 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated) |
 | 7 | [Reviewers stage charts](#7-reviewers-stage-charts) | Label Studio, then `12_import_review.py` | [How results are measured](../README.md#how-results-are-measured) |
 | 8 | [Reliability and the acceptance test](#8-reliability-and-the-acceptance-test) | `python scripts/13_reliability.py` | [How results are measured](../README.md#how-results-are-measured) |
-| 9 | [Five categories and source order](#9-five-categories-and-source-order) | `python scripts/18_phenotype_order.py` | [Action items](../README.md#action-items) |
+| 9 | [Five categories and evidence order](#9-five-categories-and-evidence-order) | `python scripts/18_phenotype_order.py` | [Action items](../README.md#action-items) |
 | 10 | [Over time: plausibility and data quality](#10-over-time-plausibility-and-data-quality) | `python scripts/20_data_quality.py` | [Action items](../README.md#action-items) |
 | 11 | [Clinic prevalence](#11-clinic-prevalence) | `python scripts/19_prevalence.py` | [Action items](../README.md#action-items) |
 | 12 | [Predict progression](#12-predict-progression) | `python scripts/21_predict_progression.py` | [Action items](../README.md#action-items) |
@@ -68,18 +68,18 @@ residual scan flags anything PHI-shaped.
 - Output: `data/datasets/deid_report.csv`. Raw notes with fake PHI stay in `data/raw/` (gitignored).
 - Check: recall 1.0, nothing blocked, over-redaction 0 in `build_summary.json`.
 
-## 3. Read each source
+## 3. Read the diagnostic evidence
 
-One status per source per visit, or `unknown` when it's silent.
+One status per type of diagnostic evidence per visit, or `unknown` when it's silent.
 
 - Code: [`note_reader.py`](../python/dental_omop_nlp/note_reader.py) (stated diagnosis in any scheme, else findings; copy-forward ignored);
   `sources.READERS` (exam form, CDT completed/planned, ICD-10 completed/planned); probing chart staged from the **recorded** chart;
   `radiograph.read_radiograph` (stage II–III lower bound only).
-- Output: one column per source in `answer_key/review_key.csv` and `visits_structured.csv`.
+- Output: one column per evidence type in `answer_key/review_key.csv` and `visits_structured.csv`.
 
-## 4. Compare the sources
+## 4. Compare the evidence
 
-Pairwise agreement and kappa between sources, and how often each says anything.
+Pairwise agreement and kappa between evidence types, and how often each says anything.
 This is the input to the qualitative review.
 
 - Code: [`phenotype.py`](../python/dental_omop_nlp/phenotype.py) `agreement_matrix`, `coverage`.
@@ -116,7 +116,7 @@ and stages every chart independently, following the protocol.
 
 ## 8. Reliability and the acceptance test
 
-Fleiss' kappa across reviewers; each source, the phenotype and each AI model
+Fleiss' kappa across reviewers; each evidence type, the phenotype and each AI model
 against the reviewers; errors by clinical severity and by difficulty; and the
 **acceptance test**: does the method agree with the reviewers at least as much
 as they agree with each other ([process.md](process.md#validation-criterion-as-reliable-as-a-human-reviewer), [statistics.md](statistics.md)).
@@ -125,10 +125,10 @@ as they agree with each other ([process.md](process.md#validation-criterion-as-r
   [`scripts/13_reliability.py`](../python/scripts/13_reliability.py); R [`r/R/04_reliability.R`](../r/R/04_reliability.R).
 - Output: `data/review/[simulated_]reliability/` (`methods_vs_reviewers.csv`, `agreement_vs_humans.csv`, `by_level.csv`).
 
-## 9. Five categories and source order
+## 9. Five categories and evidence order
 
 The same report with healthy and gingivitis combined, and every ordering of the
-four source groups scored: chosen on half the charts, reported on the other half.
+four evidence groups scored: chosen on half the charts, reported on the other half.
 
 - Code: `phenotype.collapse5`, `score_orders`; [`scripts/18_phenotype_order.py`](../python/scripts/18_phenotype_order.py).
 - Output: `data/review/[simulated_]reliability_5cat/` (`agreement_vs_humans.csv`, `phenotype_orders.csv`).

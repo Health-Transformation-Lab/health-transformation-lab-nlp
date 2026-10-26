@@ -13,13 +13,13 @@
 # MAGIC |---|---|
 # MAGIC | 1 | Generate the synthetic study |
 # MAGIC | 2 | De-identify and gate |
-# MAGIC | 3 | Read each source |
-# MAGIC | 4 | Compare the sources |
+# MAGIC | 3 | Read the diagnostic evidence |
+# MAGIC | 4 | Compare the evidence |
 # MAGIC | 5 | Rule-based phenotype |
 # MAGIC | 6 | AI models read the notes |
 # MAGIC | 7 | Reviewers stage charts |
 # MAGIC | 8 | Reliability and the acceptance test |
-# MAGIC | 9 | Five categories and source order |
+# MAGIC | 9 | Five categories and evidence order |
 # MAGIC | 10 | Over time: plausibility and data quality |
 # MAGIC | 11 | Clinic prevalence |
 # MAGIC | 12 | Predict progression |
@@ -97,14 +97,14 @@ show("data/datasets/deid_report.csv", describe=True)
 
 # COMMAND ----------
 
-# DBTITLE 1,3. Read each source
-links("3", "read-each-source", "Read each source", "dental-omop-nlp", ['python/dental_omop_nlp/note_reader.py', 'python/dental_omop_nlp/sources.py', 'python/dental_omop_nlp/radiograph.py'])
+# DBTITLE 1,3. Read the diagnostic evidence
+links("3", "read-the-diagnostic-evidence", "Read the diagnostic evidence", "dental-omop-nlp", ['python/dental_omop_nlp/note_reader.py', 'python/dental_omop_nlp/sources.py', 'python/dental_omop_nlp/radiograph.py'])
 show("data/datasets/method_coverage.csv")
 
 # COMMAND ----------
 
-# DBTITLE 1,4. Compare the sources
-links("4", "compare-the-sources", "Compare the sources", "dental-omop-nlp", ['python/dental_omop_nlp/phenotype.py'])
+# DBTITLE 1,4. Compare the evidence
+links("4", "compare-the-evidence", "Compare the evidence", "dental-omop-nlp", ['python/dental_omop_nlp/phenotype.py'])
 show("data/datasets/method_agreement.csv", query="level == 'status'")
 
 # COMMAND ----------
@@ -133,8 +133,8 @@ show("data/review/simulated_reliability/agreement_vs_humans.csv")
 
 # COMMAND ----------
 
-# DBTITLE 1,9. Five categories and source order
-links("9", "five-categories-and-source-order", "Five categories and source order", "action-items", ['python/dental_omop_nlp/phenotype.py', 'python/scripts/18_phenotype_order.py'])
+# DBTITLE 1,9. Five categories and evidence order
+links("9", "five-categories-and-evidence-order", "Five categories and evidence order", "action-items", ['python/dental_omop_nlp/phenotype.py', 'python/scripts/18_phenotype_order.py'])
 show("data/review/simulated_reliability_5cat/phenotype_orders.csv", cols=["order", "is_design_order", "select_kappa", "holdout_kappa", "holdout_verdict", "selected"])
 
 # COMMAND ----------
