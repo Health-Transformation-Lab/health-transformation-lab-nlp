@@ -42,12 +42,14 @@ def test_three_targets_with_expected_modes():
         assert "/Shared/" in t[env]["workspace"]["root_path"]
 
 
-def test_each_target_writes_to_its_own_catalog_schema():
+def test_every_target_uses_the_same_catalog_and_schema():
+    # dev, uat and prod are separate workspaces, so the Unity Catalog names are the
+    # same everywhere: <catalog>.<schema> = dental_omop_perio.dental_omop_perio (gold).
     root, _ = _load()
     d = {k: v["default"] for k, v in root["variables"].items() if "default" in v}
     places = {env: (t.get("variables", {}).get("catalog", d["catalog"]),
                     t.get("variables", {}).get("schema", d["schema"])) for env, t in root["targets"].items()}
-    assert len(set(places.values())) == 3, places
+    assert set(places.values()) == {("dental_omop_perio", "dental_omop_perio")}, places
 
 
 def test_every_variable_used_is_defined():

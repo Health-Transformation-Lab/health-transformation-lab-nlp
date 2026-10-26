@@ -30,8 +30,8 @@ dbutils.library.restartPython()
 
 import os
 
-dbutils.widgets.text("catalog", "workspace")
-dbutils.widgets.text("schema", "dental")
+dbutils.widgets.text("catalog", "dental_omop_perio")
+dbutils.widgets.text("schema", "dental_omop_perio")
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
 dbutils.widgets.text("experiment", "")   # set per target by the bundle (resources/mlops.yml)
@@ -132,7 +132,7 @@ display(all_res[all_res["class"] == ""].pivot(index="model_id", columns="metric"
 # MAGIC            note_text),
 # MAGIC     failOnError => false
 # MAGIC   ).result AS pred
-# MAGIC FROM <catalog>.<schema>.labeled_notes  -- e.g. workspace.dental_dev
+# MAGIC FROM <catalog>.<schema>.labeled_notes  -- e.g. dental_omop_perio.dental_omop_perio
 # MAGIC WHERE split = 'test';
 # MAGIC SELECT * FROM llm_preds LIMIT 10;
 

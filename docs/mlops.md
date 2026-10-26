@@ -7,7 +7,7 @@
 
 | Databricks MLOps practice | In this repo | Where |
 |---|---|---|
-| Separate **dev, staging, prod** environments with clear transitions | dev / uat / prod bundle targets, each with its own catalog/schema, Lakebase instance, MLflow experiment and UC model | [`databricks.yml`](../databricks.yml), [deployment.md](deployment.md) |
+| Separate **dev, staging, prod** environments with clear transitions | dev / uat / prod bundle targets, each in its own workspace with the same catalog/schema (`dental_omop_perio.dental_omop_perio`), plus its own Lakebase instance, MLflow experiment and UC model | [`databricks.yml`](../databricks.yml), [deployment.md](deployment.md) |
 | **Deploy code, not models**; production models trained by production code | The bundle deploys notebooks and jobs; models are trained and registered by those jobs in each environment | `databricks/resources/` |
 | CI: unit tests on PR, integration in staging, release to prod | GitHub Actions: Python tests, R parity, Postgres tests, `bundle validate`; push to main deploys uat; prod on demand behind approval | [`.github/workflows/`](../.github/workflows/) |
 | **Track every run** | MLflow runs for steps 11, 13, 15, 16, 18, 21, tagged with step, git commit, dataset fingerprint and `simulated` | [`tracking.py`](../python/dental_omop_nlp/tracking.py) |
@@ -25,9 +25,9 @@
 
 ```bash
 pip install -e ".[track]"                        # MLflow >= 3.4
-python scripts/11_ai_predict.py --rung tfidf_logreg --register dental_dev.dental.perio_note_classifier
+python scripts/11_ai_predict.py --rung tfidf_logreg --register dental_omop_perio.dental_omop_perio.perio_note_classifier
 python scripts/13_reliability.py                  # acceptance test; logged to MLflow
-python scripts/24_promote_model.py --model dental_dev.dental.perio_note_classifier --version 1 --rater ai:tfidf_logreg
+python scripts/24_promote_model.py --model dental_omop_perio.dental_omop_perio.perio_note_classifier --version 1 --rater ai:tfidf_logreg
 mlflow ui --backend-store-uri sqlite:///mlruns/mlflow.db   # locally
 ```
 

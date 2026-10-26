@@ -30,8 +30,8 @@ dbutils.widgets.text("rung", "medgemma-1.5-4b-it")  # noqa: F821
 dbutils.widgets.text("limit", "40")                  # noqa: F821  start small: GPU quota
 dbutils.widgets.text("shots", "0")                   # noqa: F821
 dbutils.widgets.text("lora_train", "0")              # noqa: F821  >0: LoRA fine-tune on this many train notes first
-dbutils.widgets.text("catalog", "workspace")         # noqa: F821  set per target by databricks.yml
-dbutils.widgets.text("schema", "dental_dev")         # noqa: F821
+dbutils.widgets.text("catalog", "dental_omop_perio")         # noqa: F821  set by databricks.yml
+dbutils.widgets.text("schema", "dental_omop_perio")         # noqa: F821
 dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821

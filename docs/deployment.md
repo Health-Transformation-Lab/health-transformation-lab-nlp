@@ -16,18 +16,29 @@ variables.
 | Deployed by | you, from your laptop | CI on push to `main`, or on demand | CI on demand, after approval |
 | Runs as | you | service principal | service principal |
 | Workspace path | your home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
-| Catalog.schema | `workspace.dental_dev` | `dental_uat.dental` | `dental_prod.dental` |
+| Workspace | your dev workspace | the UAT workspace | the prod workspace |
+| Catalog.schema | `dental_omop_perio.dental_omop_perio` | same | same |
 | `n_people` | 300 | 1,500 | 1,500 |
 | MedGemma GPU job | no (run notebook 03 on serverless GPU) | yes, single-node GPU cluster | yes, all review notes |
 
-The catalog names for uat and prod are placeholders: set them to the
-catalogs your workspaces actually have.
+Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
+schema names are the same everywhere. Catalogs follow a medallion layout:
+`bronze_dental_omop_perio` (raw), `silver_dental_omop_perio` (cleaned) and
+`dental_omop_perio` (gold). The bundle writes to the gold catalog only. The
+catalog must already exist in each workspace; the jobs create the schema and
+volume, not the catalog.
+
+In dev (`mode: development`) Databricks prefixes Unity Catalog resources with
+`dev_<user short name>_` instead of `[dev <you>]`, so the registered model is
+`dental_omop_perio.dental_omop_perio.dev_<you>_perio_note_classifier`. Deployed
+from CI by the service principal, `<you>` is the principal's short name (e.g.
+`dev_dental_omop_ci_perio_note_classifier`). uat and prod have no prefix.
 
 ## Variables
 
 | Variable | Default | What it sets |
 |---|---|---|
-| `catalog`, `schema` | per target (above) | where tables and the data volume go |
+| `catalog`, `schema` | `dental_omop_perio`, `dental_omop_perio` | where tables, the data volume and the registered model go |
 | `n_people` | `300` | synthetic people in the benchmark job |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
