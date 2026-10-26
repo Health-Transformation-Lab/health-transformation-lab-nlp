@@ -18,6 +18,7 @@ variables.
 | Workspace path | your home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
 | Catalog.schema | `workspace.dental_dev` | `dental_uat.dental` | `dental_prod.dental` |
 | `n_people` | 300 | 1,500 | 1,500 |
+| DistilBERT in the benchmark job (`train_encoder`) | no (baselines only, ~3 min) | yes | yes |
 | MedGemma GPU job | no (run notebook 03 on serverless GPU) | yes, single-node GPU cluster | yes, all review notes |
 
 The catalog names for uat and prod are placeholders: set them to the
@@ -29,6 +30,7 @@ catalogs your workspaces actually have.
 |---|---|---|
 | `catalog`, `schema` | per target (above) | where tables and the data volume go |
 | `n_people` | `300` | synthetic people in the benchmark job |
+| `train_encoder` | `false` (uat/prod `true`) | train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
@@ -119,6 +121,8 @@ be the same workspace as dev: each target has its own catalog.
    Lakebase instance; the script doesn't set that up.
 
 Until those secrets exist, the workflows skip the Databricks steps and still run the tests.
+Every workflow signs in through `.github/actions/databricks-signin`, which strips spaces and
+Windows line endings from the three values first, so a pasted `\r\n` can't break sign-in.
 
 ## Checked here, and not
 
