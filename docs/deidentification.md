@@ -300,6 +300,7 @@ Engine cost to de-identify **1 million notes** in one billing month, list prices
 | Databricks `ai_mask` | token | $0.50 in / $1.50 out per 1M tokens | ~$295 | ~$166 | Databricks pricing page ($0.07/DBU × Llama 3.3 70B DBU rates) |
 | Our LLM prompt (`llm`) on the same endpoint | token | same | ~$281 | ~$249 | same |
 | Azure AI Language PII | 1,000-char record | $1.00 per 1,000 to 500K, then $0.75 | ~$875 | ~$875 | Azure retail prices API |
+| John Snow Labs Healthcare NLP | licence + node hours | $7,000/month licence (their example); list price by quote | ~$189 if the licence is charged for hours used; **~$7,000** if bought by the month | ~$70 / ~$7,000 | vendor's own example, not a list price |
 | **Amazon Comprehend Medical** | 100 chars, 1-unit minimum | $0.0014 to 1M units, $0.0005 to 2M, then $0.00025 | **~$2,650** | ~$1,900 | AWS price list API |
 
 For scale, the human review sample costs about $3,000 per 1M notes with any engine.
@@ -314,6 +315,14 @@ What drives the differences:
   own prompt isn't published, so its 150-token overhead is assumed.
 - **Pay-per-token is a floor.** Databricks rate-limits pay-per-token endpoints and points large
   workloads to provisioned throughput, billed per hour.
+
+**Checking John Snow Labs' own comparison.** Their benchmark write-up prices 1M notes of 5,250
+characters at $2,418 for Healthcare NLP (node time plus a share of a $7,000-a-month licence), against
+$13,125 for Azure de-identification and $14,525 for Comprehend Medical. With the same inputs this
+model gives $2,420 for theirs and **$14,525 for Comprehend** (identical: same volume tiers), but
+**about $260 for Azure** at today's $0.05/MB. Their Azure figure works out to $2.50/MB; either the price
+has dropped since early 2025 or they used a different rate. At today's list prices Azure
+de-identification is the cheapest paid option here, not the most expensive.
 
 Every service rate above was read from the vendor's own price source on 2026-10-26 (list price,
 US East); `costs.yaml` names each one. Contract discounts, other regions and committed-use tiers

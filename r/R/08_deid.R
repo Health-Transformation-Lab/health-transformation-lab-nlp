@@ -12,10 +12,15 @@ deid_parse_tiers <- function(s) {
 }
 
 deid_engine_cost <- function(kind, hardware, notes_per_sec, unit, usd_per_unit, free_units,
-                             n_notes, avg_chars, cpu_usd_h, gpu_usd_h, llm = NULL, tiers = "") {
+                             n_notes, avg_chars, cpu_usd_h, gpu_usd_h, llm = NULL, tiers = "", lic = NULL) {
   if (kind == "local") {
     rate <- if (identical(hardware, "gpu")) gpu_usd_h else cpu_usd_h
     return(n_notes / notes_per_sec / 3600 * rate)
+  }
+  if (kind == "licensed") {                                          # licence + the node it runs on
+    hours <- n_notes * avg_chars / lic$chars_per_sec / 3600
+    months <- if (lic$prorate_license != 0) hours / lic$hours_per_month else ceiling(hours / lic$hours_per_month)
+    return(hours * lic$node_usd_per_hour + months * lic$license_usd_per_month)
   }
   if (kind == "llm") {
     echo <- if (is.null(llm$output_echoes_note) || is.na(llm$output_echoes_note)) 0 else llm$output_echoes_note
@@ -64,7 +69,11 @@ deid_cost_table <- function(ci) {
                                     usd_per_1m_output_tokens = usd_per_1m_output_tokens,
                                     prompt_overhead_tokens = prompt_overhead_tokens, output_tokens = output_tokens,
                                     output_echoes_note = if (exists("output_echoes_note")) output_echoes_note else 0),
-                         tiers = if (exists("tiers")) tiers else "")),
+                         tiers = if (exists("tiers")) tiers else "",
+                         lic = if (exists("license_usd_per_month"))
+                           list(chars_per_sec = chars_per_sec, node_usd_per_hour = node_usd_per_hour,
+                                license_usd_per_month = license_usd_per_month, hours_per_month = hours_per_month,
+                                prorate_license = prorate_license) else NULL)),
         numeric(1)))
       r0 <- m[1, ]
       rev <- r0$qa_sample_share * r0$n_notes * r0$minutes_per_note / 60 * r0$review_usd_per_hour

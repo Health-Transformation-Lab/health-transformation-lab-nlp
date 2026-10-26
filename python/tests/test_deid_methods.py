@@ -449,3 +449,13 @@ def test_all_tier_is_the_challenge_set_only():
             for i, tier in enumerate(["easy", "external", "jsl48"])]
     s = deid_eval.score_records(recs, lambda t: [])["summary"].set_index("tier")
     assert s.loc["all"].n_notes == 1
+
+
+def test_licensed_engine_reproduces_the_vendor_example():
+    """John Snow Labs' own example: 48 notes (avg 5,247 chars) in 39.4 s on a $1.20/hour 32-CPU node; a
+    $7,000/month licence charged for the hours used. For 1M notes of 5,250 chars they report ~$2,418."""
+    cfg = {"kind": "licensed", "chars_per_sec": 48 * 5247 / 39.4, "node_usd_per_hour": 1.2,
+           "license_usd_per_month": 7000, "hours_per_month": 744, "prorate_license": 1}
+    assert deid_eval.engine_cost(cfg, 1_000_000, 5250, {}) == pytest.approx(2418, abs=5)
+    whole_month = dict(cfg, prorate_license=0)            # a licence bought for the month
+    assert deid_eval.engine_cost(whole_month, 1_000_000, 5250, {}) == pytest.approx(273.7 + 7000, abs=1)
