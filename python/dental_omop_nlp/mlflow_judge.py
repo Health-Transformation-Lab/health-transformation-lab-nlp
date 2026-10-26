@@ -16,6 +16,17 @@ aligned to reviewer labels with `judge.align(traces)` (human feedback logged
 under the judge's name): see `align_to_reviewers`.
 
 With judge=None a simulated judge scorer is used (dry runs; tagged simulated).
+
+Databricks' judge feature set, all from mlflow.genai:
+- custom judge: `make_perio_judge` (make_judge, the AAP criteria, quote gate);
+- built-in Guidelines judge: `make_guidelines_judge`, plain-language AAP rules
+  (pass/fail per chart, with a rationale);
+- deterministic scorer: `no_phi_in_note`, the de-identification residual scan on
+  the note the model read (no LLM; runs on every trace);
+- alignment to reviewers: `align_to_reviewers`;
+- production monitoring: `monitoring_plan` / `start_monitoring` register the
+  scorers on an experiment and score a sample of live traces
+  (scripts/25_judge_monitoring.py).
 """
 
 from __future__ import annotations
@@ -40,6 +51,91 @@ INSTRUCTIONS = (
 )
 
 _QUOTE = re.compile(r'QUOTE:\s*"([^"]*)"')
+
+
+GUIDELINES = [
+    ("The predicted status is one of: healthy, gingivitis, periodontitis stage I, II, III or IV, "
+     "or cannot_determine."),
+    ("When the note records interdental clinical attachment loss, the stage follows it: 1-2 mm is "
+     "stage I, 3-4 mm is stage II, 5 mm or more is stage III or IV."),
+    ("When the note reports tooth loss due to periodontitis of five or more teeth, the stage is IV; "
+     "one to four teeth means at least stage III."),
+    ("When the note reports bleeding on probing with no attachment loss and no bone loss, the status "
+     "is gingivitis, not periodontitis."),
+    ("The prediction uses only what the note states; if the note can't settle the status, the "
+     "prediction is cannot_determine."),
+]
+
+
+def make_guidelines_judge(model: str | None = None, name: str = "aap_guidelines"):
+    """Databricks/MLflow built-in Guidelines judge over the AAP rules a note can show."""
+    from mlflow.genai.scorers import Guidelines
+    return Guidelines(name=name, guidelines=GUIDELINES, model=model)
+
+
+def _no_phi_in_note(inputs):
+    from mlflow.entities import Feedback
+
+    from .deid import residual_scan
+    found = residual_scan(str(inputs.get("note", "")))
+    kinds = sorted({s["type"] for s in found})
+    return Feedback(value="no" if found else "yes",
+                    rationale=("PHI-like text: " + ", ".join(kinds)) if found else "no PHI-like text found")
+
+
+def _make_phi_scorer():
+    from mlflow.genai.scorers import scorer
+    return scorer(name="no_phi_in_note")(_no_phi_in_note)
+
+
+class _LazyPhiScorer:
+    """`no_phi_in_note` built on first use, so importing this module doesn't need mlflow."""
+
+    _s = None
+
+    def _get(self):
+        if self._s is None:
+            type(self)._s = _make_phi_scorer()
+        return self._s
+
+    def __call__(self, **kw):
+        return self._get()(**kw)
+
+    def __getattr__(self, k):
+        return getattr(self._get(), k)
+
+
+no_phi_in_note = _LazyPhiScorer()
+
+
+def monitoring_plan(model: str, sample_rate: float = 0.1) -> list[tuple[str, object, float]]:
+    """(name, scorer, sample rate) for production monitoring. LLM judges score a sample of live
+    traces (they cost tokens); the PHI scan is free and runs on every trace."""
+    if not 0 < sample_rate <= 1:
+        raise ValueError("sample_rate must be in (0, 1]")
+    return [(JUDGE_NAME, make_perio_judge(model), sample_rate),
+            ("aap_guidelines", make_guidelines_judge(model), sample_rate),
+            ("no_phi_in_note", no_phi_in_note._get(), 1.0)]
+
+
+def start_monitoring(model: str, experiment_id: str, sample_rate: float = 0.1) -> list[str]:  # pragma: no cover
+    """Register each scorer on the experiment and start it on live traces (Databricks tracking)."""
+    from mlflow.genai.scorers import ScorerSamplingConfig
+    started = []
+    for name, s, rate in monitoring_plan(model, sample_rate):
+        reg = s.register(name=name, experiment_id=experiment_id)
+        reg.start(name=name, experiment_id=experiment_id, sampling_config=ScorerSamplingConfig(sample_rate=rate))
+        started.append(name)
+    return started
+
+
+def stop_monitoring(experiment_id: str) -> list[str]:  # pragma: no cover - needs Databricks tracking
+    from mlflow.genai.scorers import list_scorers
+    stopped = []
+    for s in list_scorers(experiment_id=experiment_id):
+        s.stop(name=s.name, experiment_id=experiment_id)
+        stopped.append(s.name)
+    return stopped
 
 
 def make_perio_judge(model: str):
@@ -74,7 +170,8 @@ class MLflowJudgeAdapter:
 
 
 def evaluate_predictions(rows: pd.DataFrame, judge=None, method: str = "", simulated: bool = False,
-                         sim_sensitivity: float = 0.93, sim_specificity: float = 0.88, seed: int = 11) -> dict:
+                         sim_sensitivity: float = 0.93, sim_specificity: float = 0.88, seed: int = 11,
+                         extra_scorers: list | None = None) -> dict:
     """rows: visit_id, note, pred, and optionally truth (reviewer consensus). Logs an MLflow GenAI
     evaluation run; returns metrics, run id and the per-chart result table."""
     import random
@@ -105,6 +202,8 @@ def evaluate_predictions(rows: pd.DataFrame, judge=None, method: str = "", simul
             ok = rng.random() < (sim_sensitivity if right else sim_specificity)
             return Feedback(value=("correct" if right == ok else "incorrect"), rationale="SIMULATED judge")
         scorers.append(simulated_judge)
+    for s in extra_scorers or []:
+        scorers.append(s._get() if isinstance(s, _LazyPhiScorer) else s)
     with mlflow.start_run(run_name=f"judge:{method}") as run:
         mlflow.set_tags({"step": "15_judge", "method": method, "simulated": str(simulated or judge is None).lower(),
                          "git_commit": git_commit(), "dataset": dataset_fingerprint(), "judge": JUDGE_NAME})

@@ -30,6 +30,9 @@ variables:
   judge_endpoint:
     description: Model Serving endpoint for the LLM judge (approved for de-identified data)
     default: none
+  judge_sample_rate:
+    description: Share of live traces the LLM judges score in production monitoring (the PHI scan scores all)
+    default: "0.1"
   warehouse_name:
     description: SQL warehouse that runs the ai_query judge notebook
     default: Serverless Starter Warehouse
@@ -95,6 +98,19 @@ targets:
         level: CAN_VIEW
     resources:
       jobs:
+        judge_monitoring: &judge_monitoring_job
+          name: dental-omop-nlp LLM judge monitoring (${bundle.target})
+          tags:
+            project: dental-omop-nlp
+            data: synthetic
+          tasks:
+            - task_key: start_monitoring
+              notebook_task:
+                notebook_path: databricks/notebooks/05_judge_monitoring.py
+                base_parameters:
+                  judge_endpoint: ${var.judge_endpoint}
+                  experiment_id: ${resources.experiments.dental_experiment.id}
+                  sample_rate: ${var.judge_sample_rate}
         medgemma_reader: &medgemma_job
           name: dental-omop-nlp medgemma reader (${bundle.target})
           job_clusters:
@@ -141,4 +157,5 @@ targets:
         level: CAN_VIEW
     resources:
       jobs:
+        judge_monitoring: *judge_monitoring_job
         medgemma_reader: *medgemma_job

@@ -23,8 +23,8 @@ periodontal status. They often disagree:
 |---|---|---|---|
 | 1 | Chart note | Free text the clinician writes | 3rd |
 | 2 | Exam form | Structured fields, e.g. PSR score, perio status | 1st |
-| 3–4 | Procedure diagnoses, completed / planned | ICD-10-CM codes, e.g. K05.3x | 2nd |
-| 5–6 | Procedure codes, completed / planned | CDT codes, e.g. D4341 scaling and root planing | compared, not used |
+| 3–4 | Procedure diagnoses, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
+| 5–6 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
 | 7 | Probing chart | Attachment loss, bone loss, teeth lost | 4th |
 
 The phenotype takes the first evidence in that order that gives a status; all 24 orders are scored

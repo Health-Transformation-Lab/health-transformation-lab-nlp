@@ -84,6 +84,35 @@ Comparing a method with the reviewer **consensus** instead would be unfair to th
 humans, because each reviewer helped make the consensus. Output:
 `data/review/[simulated_]reliability/agreement_vs_humans.csv`.
 
+## Planned vs completed procedures
+
+A dental record keeps two lists of procedures for each patient, and the study reads both:
+
+| | Completed | Planned |
+|---|---|---|
+| What it is | Procedures actually performed, posted to the patient's ledger | Procedures on the **treatment plan**: what the clinician recommends next |
+| What it shows | What was done, and what a claim would be billed for | The clinician's judgment of what the patient needs |
+| Can differ because | Patients decline or defer care (cost, coverage, time), so a planned procedure may never be done | Plans can be revised, or never accepted |
+| In claims data | Yes (claims are only for completed work) | No. Only the dental EHR has it |
+
+Each procedure can carry an **ICD-10-CM diagnosis code** (e.g. K05.3x, chronic periodontitis), so
+there are four streams: CDT procedure codes completed and planned (evidence 5–6 in the README) and
+procedure diagnosis codes completed and planned (evidence 3–4).
+
+**Example.** A patient with stage III periodontitis is planned for scaling and root planing
+(D4341, diagnosis K05.3x) but declines. Completed shows only a periodontal evaluation and a
+routine cleaning (D0180, D1110). Read alone, completed suggests gingivitis at most. The plan is
+what shows the disease.
+
+**In the synthetic data** (`sources.py`): planned codes follow the patient's true status; 20% of
+patients with periodontitis decline, so their completed codes and completed diagnosis show
+routine care; diagnosis codes appear at about 70% of visits, and their severity drifts.
+
+**In the rule-based phenotype:** the diagnosis group checks completed diagnosis codes first, then
+planned. CDT procedure codes are compared with the other evidence but not used to assign a status,
+because a procedure says what was done, not the stage. Whether planned diagnoses should count the
+same as completed ones is an open decision for the study lead (action item A2).
+
 ## Integrated phenotype and validation (spec 005)
 
 | Step | Repo | Output |

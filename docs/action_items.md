@@ -63,7 +63,7 @@ needs confirming.
 |---|---|---|
 | G1 | MLflow tracking, UC registry, champion/challenger on the acceptance test, MLflow GenAI judge ([mlops.md](mlops.md)) | Done, confirm on a workspace |
 | G2 | Run the judge with a real endpoint (`--backend mlflow`) and align it to reviewer labels (MLflow ≥ 3.14) | Open |
-| G3 | Monitoring: inference tables on a serving endpoint, data profiling of predictions, alerts | Open |
+| G3 | Monitoring: judges on live traces (done: `judge_monitoring` job, uat/prod); still open: inference tables on a serving endpoint, data profiling of predictions, alerts | Partly done |
 | G4 | Retraining: scheduled, then triggered | Open |
 
 ## Free text

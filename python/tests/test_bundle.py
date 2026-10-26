@@ -86,3 +86,13 @@ def test_mlflow_experiment_and_uc_model_per_target():
         "${workspace.root_path}" in m["experiments"]["dental_experiment"]["name"]
     rm = m["registered_models"]["perio_note_classifier"]
     assert rm["catalog_name"] == "${var.catalog}" and rm["schema_name"] == "${var.schema}"
+
+
+def test_judge_monitoring_job_only_in_uat_and_prod():
+    """Production monitoring scores live traces, so it exists where there is live traffic."""
+    root, jobs = _load()
+    assert "judge_monitoring" not in jobs and "judge_monitoring" not in root["targets"]["dev"].get("resources", {}).get("jobs", {})
+    for env in ("uat", "prod"):
+        t = root["targets"][env]["resources"]["jobs"]["judge_monitoring"]["tasks"][0]["notebook_task"]
+        assert t["base_parameters"]["experiment_id"] == "${resources.experiments.dental_experiment.id}"
+        assert t["base_parameters"]["sample_rate"] == "${var.judge_sample_rate}"

@@ -103,3 +103,39 @@ def test_challenger_must_beat_current_champion(store):
     worse = good.assign(diff_vs_human_bar=0.01)
     assert promote_if_accepted(name, v1, "m", good) is True
     assert promote_if_accepted(name, v2, "m", worse) is False     # passes vs humans, but below champion
+
+
+# --- Databricks built-in judges and production monitoring ---------------------------
+
+def test_guidelines_judge_carries_the_aap_rules():
+    from mlflow.genai.scorers import Guidelines
+
+    from dental_omop_nlp.mlflow_judge import GUIDELINES, make_guidelines_judge
+    g = make_guidelines_judge("databricks:/my-endpoint")
+    assert isinstance(g, Guidelines) and g.name == "aap_guidelines"
+    text = " ".join(GUIDELINES)
+    for rule in ("attachment loss", "five or more teeth", "gingivitis", "only what the note states"):
+        assert rule in text
+
+
+def test_phi_scorer_flags_identifiers_in_the_note():
+    from dental_omop_nlp.mlflow_judge import no_phi_in_note
+    clean = no_phi_in_note(inputs={"note": NOTE})
+    leaky = no_phi_in_note(inputs={"note": NOTE + "\nCall 404-555-0123 or jane.doe@example.com"})
+    assert clean.value == "yes" and leaky.value == "no"
+
+
+def test_evaluate_runs_extra_scorers(store):
+    from dental_omop_nlp.mlflow_judge import evaluate_predictions, no_phi_in_note
+    rows = pd.DataFrame({"visit_id": [1, 2], "note": [NOTE] * 2,
+                         "pred": ["periodontitis_stage_3"] * 2, "truth": ["periodontitis_stage_3"] * 2})
+    res = evaluate_predictions(rows, judge=None, method="sim:test", simulated=True, extra_scorers=[no_phi_in_note])
+    assert any(k.startswith("no_phi_in_note") for k in res["metrics"])
+
+
+def test_monitoring_plan_samples_llm_judges_and_checks_every_trace():
+    from dental_omop_nlp.mlflow_judge import JUDGE_NAME, monitoring_plan
+    plan = {name: rate for name, _, rate in monitoring_plan("databricks:/my-endpoint", sample_rate=0.1)}
+    assert plan == {JUDGE_NAME: 0.1, "aap_guidelines": 0.1, "no_phi_in_note": 1.0}
+    with pytest.raises(ValueError):
+        monitoring_plan("databricks:/x", sample_rate=0)
