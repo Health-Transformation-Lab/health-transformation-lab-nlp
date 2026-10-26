@@ -115,6 +115,22 @@ stopifnot(abs(lic_cost(1) - 2420.085118369502) < 1e-6, abs(lic_cost(0) - 7273.74
           abs(lic_cost(NA) - 7273.749745803808) < 1e-6)
 cat("de-id licensed cost: R == Python (prorated, whole month, missing)\n")
 
+# 9c. Model ladder vs the synthetic truth (spec 002 T015): R 10_ladder.R == Python ladder_eval point estimates.
+if (file.exists("data/datasets/ladder/ladder_vs_truth.csv")) {
+  source("r/R/10_ladder.R")
+  lp <- read.csv("data/datasets/ladder/ladder_preds.csv", stringsAsFactors = FALSE, check.names = FALSE)
+  lq <- read.csv("data/datasets/ladder/ladder_proba.csv", stringsAsFactors = FALSE)
+  names(lq) <- sub("^p_", "", names(lq))
+  r <- ladder_point(lp, lq)
+  py <- read.csv("data/datasets/ladder/ladder_vs_truth.csv", stringsAsFactors = FALSE)
+  m <- merge(r, py, by = "method", suffixes = c(".r", ".p"))
+  cols <- c("accuracy", "stage4_recall", "unsafe_rate", "s2_rate", "ece")
+  d <- max(sapply(cols, function(k) { x <- abs(m[[paste0(k, ".r")]] - m[[paste0(k, ".p")]]); max(ifelse(is.na(x), 0, x)) }))
+  same_na <- all(is.na(m$ece.r) == is.na(m$ece.p))
+  cat(sprintf("ladder vs truth: %d methods, max |R - Python| = %.2e\n", nrow(m), d))
+  stopifnot(nrow(m) == nrow(py), d < 1e-9, same_na)
+} else cat("ladder vs truth: skipped (run python/scripts/28_ladder_vs_truth.py first)\n")
+
 # 10. Spec 005 twins: evidence-order search, data quality, progression (R 09_spec005.R).
 sp <- "data/review/simulated_reliability_5cat/phenotype_orders_split.csv"
 if (file.exists(sp) && file.exists("data/review/simulated_reviewer_labels.csv") &&

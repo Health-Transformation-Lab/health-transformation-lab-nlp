@@ -96,12 +96,15 @@ All 12 are BERT-type models: AI that reads text and picks a label. [What is a BE
 
 Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it),
 [27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
-**Status:** six encoders have run on CPU (3 epochs, 2026-10-26). On the 240 synthetic review charts:
-ModernBERT base 82%, BERT base 81%, BioClinical ModernBERT base 80%, DistilBERT 79%, SciBERT 79%,
-BiomedBERT 77% correct, level with the TF-IDF (77%), note-rule (79%) and fusion (81%) baselines. All
-**miss nearly every stage IV chart** (7 in 3,484 training notes; the note rules catch 97%). The two
-Longformers and two large ModernBERTs need a GPU (Databricks). Agreement with *simulated* reviewers
-(kappa 0.61-0.65) is a dry run, not a result.
+**Status:** six encoders have run on CPU (3 epochs, 2026-10-26). On the 240 synthetic review charts
+(against the generator's truth, with 95% bootstrap CIs; `28_ladder_vs_truth.py`):
+- alone they score 77-82% (ModernBERT base best), **not distinguishable** from the note rules (79%), and
+  miss nearly every stage IV chart (7 in 3,484 training notes);
+- letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
+  clearly better than the rules (difference CI excludes 0);
+- they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
+
+The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
 
 ## Action items
 

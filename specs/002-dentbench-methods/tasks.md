@@ -28,6 +28,9 @@
 - [ ] T012 Periodontist sign-off on the severity matrix (owner: dental reviewer)
 - [ ] T013 Dentist acceptance check on a sample of judge verdicts (GlobalDentBench-style), alongside kappa
 
+- [x] T015 Model ladder vs the synthetic truth (`ladder_eval.py`, `28_ladder_vs_truth.py`, R `10_ladder.R`): accuracy with paired bootstrap CIs vs note_rules, stage IV recall, unsafe/S2 rates, calibration error, and the rules-decide-stage-IV hybrid (`+rules4`)
+- [ ] T016 Class-weighted or oversampled fine-tuning for stage IV, compared with `+rules4`; 3 seeds per encoder
+
 ## Phase 6: Polish
 
 - [x] T014 `docs/references.md`; README links; rebuild; dry run; parity

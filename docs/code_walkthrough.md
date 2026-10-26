@@ -122,7 +122,8 @@ What a BERT model is, in plain words: [bert.md](bert.md).
 - Code: [`rungs.py`](../python/dental_omop_nlp/rungs.py) `make_rung`; [`models.yaml`](../models.yaml) (Hugging Face ids, papers);
   [`llm_reader.py`](../python/dental_omop_nlp/llm_reader.py); [`scripts/11_ai_predict.py`](../python/scripts/11_ai_predict.py).
 - Output: `data/datasets/ai_predictions_<rung>.csv` (LLMs also `llm_details_<rung>.csv`).
-- Status: baselines and six encoders run on CPU (correct on the synthetic review charts: ModernBERT base 82%, BERT base 81%, BioClinical ModernBERT base 80%, DistilBERT 79%, SciBERT 79%, BiomedBERT 77%); all miss nearly every stage IV chart (7 training examples); the Longformers and large ModernBERTs need a GPU; MedGemma needs a GPU.
+- Status: baselines and six encoders run on CPU: 77-82% correct on the synthetic review charts, not distinguishable from the note rules (79%); all miss nearly every stage IV chart (7 training examples). With the note rules deciding stage IV (`+rules4`) they reach 87-91%. The Longformers, large ModernBERTs and MedGemma need a GPU.
+- Compare against the truth: [`scripts/28_ladder_vs_truth.py`](../python/scripts/28_ladder_vs_truth.py) → `data/datasets/ladder/ladder_vs_truth.csv` (accuracy with bootstrap CIs, difference from note rules, stage IV recall, unsafe rate, calibration); R twin `r/R/10_ladder.R`.
 
 ## 7. Reviewers stage charts
 

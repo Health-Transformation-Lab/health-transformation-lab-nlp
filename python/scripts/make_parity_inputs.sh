@@ -10,6 +10,7 @@ python scripts/10_build_study.py
 for r in note_rules tfidf_logreg fusion_tfidf_rad; do python scripts/11_ai_predict.py --rung "$r"; done
 python scripts/12_import_review.py --simulate 4
 python scripts/13_reliability.py --simulated --n-boot 200
+python scripts/28_ladder_vs_truth.py --n-boot 200
 python scripts/19_prevalence.py
 python scripts/20_data_quality.py
 python scripts/22_build_sites.py
