@@ -1,5 +1,5 @@
-tag,model,lr,epochs,batch_size,weight_decay,warmup,max_words,seed,split_seed,train_minutes,val_f1_Age,val_f1_Date,val_f1_Sex,val_f1_weighted,test_f1_Age,test_f1_Date,test_f1_Sex,test_f1_weighted
-base_lr3e-5_e3,allenai/longformer-base-4096,3e-05,3.0,4,0.0,0.0,250,42,42,55.1,0.9756,0.4545,0.9744,0.6885,0.95,0.6856,0.9737,0.7677
-base_lr5e-5_e3,allenai/longformer-base-4096,5e-05,3.0,4,0.0,0.0,250,42,42,52.8,0.9756,0.5472,0.9744,0.7395,0.95,0.7316,0.987,0.802
-base_lr5e-5_e5_wu_wd,allenai/longformer-base-4096,5e-05,5.0,4,0.01,0.1,250,42,42,88.5,0.9756,0.5347,1.0,0.738,0.9048,0.6895,1.0,0.7674
-clinical_lr5e-5_e3,yikuan8/Clinical-Longformer,5e-05,3.0,4,0.0,0.0,250,42,42,54.1,0.9756,0.4259,1.0,0.6782,0.9383,0.7212,0.987,0.7929
+tag,data,model,lr,epochs,batch_size,weight_decay,warmup,max_words,seed,split_seed,train_minutes,val_f1_Age,val_f1_Date,val_f1_Sex,val_f1_weighted,test_f1_Age,test_f1_Date,test_f1_Sex,test_f1_weighted
+base_lr3e-5_e3,rebuilt,allenai/longformer-base-4096,3e-05,3.0,4,0.0,0.0,250,42,42,55.1,0.9756,0.4545,0.9744,0.6885,0.95,0.6856,0.9737,0.7677
+base_lr5e-5_e3,rebuilt,allenai/longformer-base-4096,5e-05,3.0,4,0.0,0.0,250,42,42,52.8,0.9756,0.5472,0.9744,0.7395,0.95,0.7316,0.987,0.802
+base_lr5e-5_e5_wu_wd,rebuilt,allenai/longformer-base-4096,5e-05,5.0,4,0.01,0.1,250,42,42,88.5,0.9756,0.5347,1.0,0.738,0.9048,0.6895,1.0,0.7674
+clinical_lr5e-5_e3,rebuilt,yikuan8/Clinical-Longformer,5e-05,3.0,4,0.0,0.0,250,42,42,54.1,0.9756,0.4259,1.0,0.6782,0.9383,0.7212,0.987,0.7929

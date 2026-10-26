@@ -52,6 +52,42 @@ def bio_docs(records: list[dict], types=TYPES) -> list[dict]:
     return out
 
 
+def read_conll(path, prefix: str | None = None) -> list[dict]:
+    """A CoNLL file as the course distributes it ("word POS tag" per line, "-DOCSTART- -X- -X- O"
+    before each note, blank lines between some sentences) -> docs like bio_docs gives. The text is the
+    words joined by spaces (the original spacing isn't in the file); a blank line or a word ending in
+    "." ends a sentence (sentences are only used to pack chunks)."""
+    from pathlib import Path
+    prefix = prefix or Path(path).stem
+    docs, cur = [], None
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        if line.startswith("-DOCSTART-"):
+            cur = {"words": [], "tags": [], "breaks": set()}
+            docs.append(cur)
+        elif not line.strip():
+            if cur and cur["words"]:
+                cur["breaks"].add(len(cur["words"]))
+        else:
+            parts = line.split()
+            cur["words"].append(parts[0])
+            cur["tags"].append(parts[-1])
+    out = []
+    for i, d in enumerate(docs):
+        spans, pos = [], 0
+        for w in d["words"]:
+            spans.append((w, pos, pos + len(w)))
+            pos += len(w) + 1
+        ends = sorted({j + 1 for j, w in enumerate(d["words"]) if w.endswith(".")} | d["breaks"] | {len(d["words"])})
+        sents, start = [], 0
+        for e in ends:
+            if e > start:
+                sents.append((start, e))
+                start = e
+        out.append({"note_id": f"{prefix}_{i:03d}", "text": " ".join(d["words"]), "spans": spans,
+                    "words": d["words"], "tags": d["tags"], "sents": sents})
+    return out
+
+
 def split_docs(ids: list[str], test_share: float = 0.2, seed: int = 42) -> tuple[list[str], list[str]]:
     ids = sorted(ids)
     random.Random(seed).shuffle(ids)
