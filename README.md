@@ -6,7 +6,8 @@
 > organization, including CareQuest. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
 
 Can periodontal status be phenotyped from a dental EHR, and can AI reading the
-chart notes match clinicians? This repo runs that study end to end on **synthetic**
+chart notes match clinicians? (**OMOP** = a common format for health records; **NLP** = software
+that reads free text: [what they are](docs/omop_and_nlp.md).) This repo runs that study end to end on **synthetic**
 data, to learn the pipeline, the reviewer workflow and the analysis.
 
 <img src="docs/img/process.png" alt="Study process" width="420">
@@ -115,6 +116,7 @@ Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol]
 
 | Topic | |
 |---|---|
+| **What OMOP and NLP are**, in plain words | [omop_and_nlp.md](docs/omop_and_nlp.md) |
 | **Diagrams**: [medallion architecture](diagrams/d0_medallion_architecture.png), study process, platform, ERD, site storage, MLOps, flows | [diagrams/](diagrams/README.md) |
 | Tooth-by-tooth data in OMOP; 2017 AAP/EFP **and 2012 CDC/AAP**; storage designs on Postgres/Lakebase | [site_level_omop.md](docs/site_level_omop.md) |
 | Study design vs this repo; open decisions | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
