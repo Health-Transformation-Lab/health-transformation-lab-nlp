@@ -124,6 +124,7 @@ What a BERT model is, in plain words: [bert.md](bert.md).
 - Output: `data/datasets/ai_predictions_<rung>.csv` (LLMs also `llm_details_<rung>.csv`).
 - Status: baselines and six encoders run on CPU: 77-82% correct on the synthetic review charts, not distinguishable from the note rules (79%); all miss nearly every stage IV chart (7 training examples). With the note rules deciding stage IV (`+rules4`) they reach 87-91%. The Longformers, large ModernBERTs and MedGemma need a GPU.
 - Compare against the truth: [`scripts/28_ladder_vs_truth.py`](../python/scripts/28_ladder_vs_truth.py) → `data/datasets/ladder/ladder_vs_truth.csv` (accuracy with bootstrap CIs, difference from note rules, stage IV recall, unsafe rate, calibration); R twin `r/R/10_ladder.R`.
+- MedGemma vs BERT: [`scripts/29_medgemma_vs_bert.py`](../python/scripts/29_medgemma_vs_bert.py) → `data/datasets/ladder/medgemma_vs_bert.csv` (each MedGemma run minus the best encoder, paired bootstrap CI; stage IV recall; gate and fallback rates; assumed corpus cost) and `..._by_difficulty.csv`. MedGemma variants keep their own files (`+lora`, `+k<shots>`, `+terse`). `--simulated` uses the placeholder reader: a dry run.
 
 ## 7. Reviewers stage charts
 

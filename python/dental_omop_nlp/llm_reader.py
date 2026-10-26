@@ -253,6 +253,13 @@ def make_backend(entry: dict, kind: str, **kw):
     raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
 
 
+def summarize_details(d: pd.DataFrame) -> dict:
+    """One run's reliability and cost inputs from its llm_details file."""
+    return {"gate_pass": d["gate_ok"].mean(), "fallback": d["fallback"].mean(),
+            "input_tokens_mean": d["input_tokens"].mean(), "output_tokens_mean": d["output_tokens"].mean(),
+            "latency_s_mean": d["latency_s"].mean()}
+
+
 # ---------------------------------------------------------------- rung
 class LLMReader:
     def __init__(self, model_id: str, backend=None, shots: int = 0, variant: str = DEFAULT_VARIANT,

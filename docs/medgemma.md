@@ -49,9 +49,11 @@ none has been run on real MedGemma weights yet (needs a GPU and accepted HAI-DEF
 | Judge rule | `15_judge.py` excludes judges of any evaluated LLM's family (`family: gemma` in `models.yaml`) |
 | Databricks | `databricks/notebooks/03_medgemma_reader.py` (Free Edition serverless GPU) |
 | Costs | `costs.yaml`: assumed GPU throughput, ILLUSTRATIVE; measure and replace |
+| Compare with BERT | `python scripts/29_medgemma_vs_bert.py [--bert modernbert-base]`: each MedGemma run minus the encoder, paired bootstrap CI, stage IV recall, by difficulty, fallback rate; R twin in `10_ladder.R`. Notebook 03 runs it after the reader (set `limit` 0, `lora_train` > 0 for the fine-tuned version) |
 
 Per-note details (gate pass, fallback, tokens, latency) go to
-`data/datasets/llm_details_<rung>.csv`. The simulated dry run's numbers come from
+`data/datasets/llm_details_<rung><tag>.csv`; the tag (`+lora`, `+k<shots>`, `+terse`) keeps
+zero-shot, few-shot and fine-tuned runs apart. The simulated dry run's numbers come from
 placeholder error rates and say nothing about MedGemma.
 
 ## Suggested order

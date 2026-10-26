@@ -46,3 +46,24 @@ def test_ladder_table_is_seeded():
     a = ladder_eval.ladder_table(truth, {"note_rules": truth, "m": pred}, n_boot=100, seed=3)
     b = ladder_eval.ladder_table(truth, {"note_rules": truth, "m": pred}, n_boot=100, seed=3)
     pd.testing.assert_frame_equal(a, b)
+
+
+def test_by_difficulty_accuracy_per_level():
+    truth = pd.Series(["healthy", "healthy", "gingivitis", S4])
+    level = pd.Series(["L1", "L1", "L3", "L3"])
+    preds = {"a": pd.Series(["healthy", "gingivitis", "gingivitis", "healthy"]), "b": truth.copy()}
+    t = ladder_eval.by_difficulty(truth, preds, level).set_index(["method", "difficulty"])
+    assert t.loc[("a", "L1"), "accuracy"] == pytest.approx(0.5) and t.loc[("a", "L1"), "n"] == 2
+    assert t.loc[("a", "L3"), "accuracy"] == pytest.approx(0.5)
+    assert t.loc[("b", "L3"), "accuracy"] == 1.0
+    assert list(t.index.get_level_values("difficulty").unique()) == ["L1", "L3"]   # sorted levels
+
+
+def test_head_to_head_uses_the_encoder_as_reference():
+    truth = pd.Series(["healthy"] * 8 + [S4] * 2)
+    bert = pd.Series(["healthy"] * 10)                       # misses both stage IV
+    llm = truth.copy()
+    t = ladder_eval.ladder_table(truth, {"bert-base": bert, "medgemma": llm}, n_boot=200, seed=0,
+                                 reference="bert-base").set_index("method")
+    assert t.loc["medgemma", "diff_vs_ref"] == pytest.approx(0.2)
+    assert t.loc["bert-base", "diff_vs_ref"] == 0.0

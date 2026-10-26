@@ -25,4 +25,5 @@
 - [ ] T016 Measure real throughput; replace assumed notes/sec in costs.yaml
 - [ ] T017 Two prompt variants: report prompt sensitivity
 - [ ] T018 LoRA fine-tune on train.csv; compare with BERT ladder and on the cost frontier
+  - [x] T018a Comparison script `29_medgemma_vs_bert.py` (paired CI vs best encoder, by difficulty, fallback, cost), tagged output files per variant, R twin; notebook 03 runs LoRA + comparison. Dry run only so far.
 - [ ] T019 27B text via a paid GPU endpoint, if 4B is promising

@@ -131,6 +131,27 @@ if (file.exists("data/datasets/ladder/ladder_vs_truth.csv")) {
   stopifnot(nrow(m) == nrow(py), d < 1e-9, same_na)
 } else cat("ladder vs truth: skipped (run python/scripts/28_ladder_vs_truth.py first)\n")
 
+# 9d. MedGemma vs BERT (spec 004 T018): same point estimates and per-difficulty accuracy.
+# Uses the real runs if present, else the simulated dry run (placeholder reader, not a result).
+for (pfx in c("", "simulated_")) {
+  f <- sprintf("data/datasets/ladder/%smedgemma_vs_bert_preds.csv", pfx)
+  if (!file.exists(f)) next
+  source("r/R/10_ladder.R")
+  gp <- read.csv(f, stringsAsFactors = FALSE, check.names = FALSE)
+  r <- ladder_point(gp, data.frame(method = character(), visit_id = integer()))
+  py <- read.csv(sprintf("data/datasets/ladder/%smedgemma_vs_bert.csv", pfx), stringsAsFactors = FALSE, check.names = FALSE)
+  m <- merge(r, py, by = "method", suffixes = c(".r", ".p"))
+  cols <- c("accuracy", "stage4_recall", "unsafe_rate", "s2_rate")
+  d <- max(sapply(cols, function(k) max(abs(m[[paste0(k, ".r")]] - m[[paste0(k, ".p")]]))))
+  rl <- by_difficulty(gp, gp$difficulty)
+  pl <- read.csv(sprintf("data/datasets/ladder/%smedgemma_vs_bert_by_difficulty.csv", pfx), stringsAsFactors = FALSE)
+  ml <- merge(rl, pl, by = c("method", "difficulty"), suffixes = c(".r", ".p"))
+  dl <- max(abs(ml$accuracy.r - ml$accuracy.p), abs(ml$n.r - ml$n.p))
+  cat(sprintf("%smedgemma vs bert: %d methods, max |R - Python| = %.2e; by difficulty %.2e\n",
+              pfx, nrow(m), d, dl))
+  stopifnot(nrow(m) == nrow(py), d < 1e-9, nrow(ml) == nrow(pl), dl < 1e-9)
+}
+
 # 10. Spec 005 twins: evidence-order search, data quality, progression (R 09_spec005.R).
 sp <- "data/review/simulated_reliability_5cat/phenotype_orders_split.csv"
 if (file.exists(sp) && file.exists("data/review/simulated_reviewer_labels.csv") &&
