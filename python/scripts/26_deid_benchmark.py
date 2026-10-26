@@ -15,6 +15,8 @@ Writes:
 
   --external path adds another labeled set as tier "external": JSONL/JSON, or ASQ-PHI's own
   synthetic_clinical_queries.txt as downloaded. Price it with --tiers all,unseen,external.
+  --jsl48 path adds John Snow Labs' benchmark CSV as tier "jsl48"; token_precision/recall/f1 are
+  scored by their word-level rule, comparable with their published PHI F1.
 
 An engine that can't run here (package missing, no Azure endpoint) is listed as not run, with
 the reason; nothing is estimated for it. Service prices in costs.yaml are ILLUSTRATIVE until
@@ -48,6 +50,8 @@ ap.add_argument("--seed", type=int, default=7)
 ap.add_argument("--external", default=None,
                 help="another labeled PHI set (JSONL/JSON, e.g. ASQ-PHI) scored as tier 'external'")
 ap.add_argument("--i2b2-2014", default=None, help="folder of the n2c2 2014 XML notes (data use agreement)")
+ap.add_argument("--jsl48", default=None,
+                help="John Snow Labs' 48-note benchmark CSV (likely i2b2 notes: keep it in data/raw/), tier 'jsl48'")
 ap.add_argument("--route-engines", default="hf_stanford,hf_obi,presidio,regex_v2",
                 help="engines 'routed+guard' may draw on; each keeps only the types it was precise on")
 ap.add_argument("--route-min-precision", type=float, default=0.8)
@@ -64,6 +68,9 @@ if a.i2b2_2014:
 if a.external:
     from dental_omop_nlp.phi_challenge import load_external
     ch += load_external(a.external)
+if a.jsl48:
+    from dental_omop_nlp.phi_challenge import load_external
+    ch += load_external(a.jsl48, tier="jsl48")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 DEID_DIR.mkdir(parents=True, exist_ok=True)
 with open(RAW_DIR / "deid_challenge.jsonl", "w") as f:
@@ -114,7 +121,7 @@ for spec in a.engines.split(","):
 
 scores = pd.concat(scores)[["method", "tier", "n_notes", "n_phi", "entity_recall", "char_recall",
                             "char_precision", "decoy_damage", "n_hard_negatives", "hard_negative_damage",
-                            "leaked_per_1k_notes", "avg_chars"]]
+                            "token_precision", "token_recall", "token_f1", "leaked_per_1k_notes", "avg_chars"]]
 scores.to_csv(DEID_DIR / "scores.csv", index=False)
 pd.concat(cats)[["method", "tier", "category", "n", "n_leaked", "recall"]].to_csv(DEID_DIR / "by_category.csv",
                                                                                index=False)

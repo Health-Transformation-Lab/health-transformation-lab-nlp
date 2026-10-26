@@ -16,6 +16,7 @@ frontier, ICER = extra USD per leaked identifier avoided. R twin: r/R/08_deid.R 
 
 from __future__ import annotations
 
+import re
 import time
 
 import numpy as np
@@ -26,17 +27,33 @@ def _chars(spans) -> set[int]:
     return {i for s in spans for i in range(s["start"], s["end"])}
 
 
+_TOKEN = re.compile(r"\w+|[^\w\s]")
+CHALLENGE_TIERS = ("easy", "hard", "unseen")
+
+
+def _token_counts(text: str, gold: list[dict], found: list[dict]) -> tuple[int, int, int]:
+    """John Snow Labs' word-level rule: a token is PHI if it starts inside a span. (gold, predicted, both)."""
+    starts = [m.start() for m in _TOKEN.finditer(text)]
+
+    def inside(spans):
+        return {i for i in starts if any(s["start"] <= i < s["end"] for s in spans)}
+    g, f = inside(gold), inside(found)
+    return len(g), len(f), len(g & f)
+
+
 def score_records(records: list[dict], detect) -> dict:
     rows, cat_rows = [], []
     for r in records:
         found = detect(r["text"])
         red = _chars(found)
         phi = _chars(r["phi"])
+        tok_gold, tok_pred, tok_tp = _token_counts(r["text"], r["phi"], found)
         leaked = [p for p in r["phi"] if not set(range(p["start"], p["end"])) <= red]
         damaged = [d for d in r["decoys"] if set(range(d["start"], d["end"])) & red]
         rows.append({"note_id": r["note_id"], "tier": r["tier"], "n_phi": len(r["phi"]), "n_leaked": len(leaked),
                      "phi_chars": len(phi), "phi_chars_removed": len(phi & red), "removed_chars": len(red),
-                     "n_decoys": len(r["decoys"]), "n_decoys_damaged": len(damaged), "chars": len(r["text"])})
+                     "n_decoys": len(r["decoys"]), "n_decoys_damaged": len(damaged), "chars": len(r["text"]),
+                     "tok_gold": tok_gold, "tok_pred": tok_pred, "tok_tp": tok_tp})
         for p in r["phi"]:
             cat_rows.append({"tier": r["tier"], "category": p["type"], "leaked": p in leaked})
     per = pd.DataFrame(rows)
@@ -50,8 +67,11 @@ def score_records(records: list[dict], detect) -> dict:
                 "n_hard_negatives": int((d.n_phi == 0).sum()),       # notes with no PHI at all
                 "hard_negative_damage": ((d.n_phi == 0) & (d.removed_chars > 0)).sum() / max((d.n_phi == 0).sum(), 1),
                 "leaked_per_1k_notes": 1000 * d.n_leaked.sum() / max(len(d), 1),
+                "token_precision": d.tok_tp.sum() / d.tok_pred.sum() if d.tok_pred.sum() else 1.0,
+                "token_recall": d.tok_tp.sum() / max(d.tok_gold.sum(), 1),
+                "token_f1": 2 * d.tok_tp.sum() / max(d.tok_gold.sum() + d.tok_pred.sum(), 1),
                 "avg_chars": float(d.chars.mean()) if len(d) else 0.0}
-    own = per[per.tier != "external"]          # "all" = the challenge set's own tiers; external reported apart
+    own = per[per.tier.isin(CHALLENGE_TIERS)]  # "all" = the challenge set's own tiers; other sets reported apart
     summary = pd.DataFrame([summarize(per[per.tier == t], t) for t in sorted(per.tier.unique())]
                            + [summarize(own if len(own) else per, "all")])
     cats = pd.DataFrame(cat_rows)

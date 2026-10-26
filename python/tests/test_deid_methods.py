@@ -392,3 +392,60 @@ def test_llm_that_returns_the_whole_note_pays_output_tokens_for_it():
            "prompt_overhead_tokens": 100, "output_tokens": 10, "output_echoes_note": 1}
     # 1,000 notes x 400 chars: input 100 + 100 tokens; output 10 + 100 tokens (the masked note)
     assert deid_eval.engine_cost(cfg, 1000, 400, {}) == pytest.approx(1000 * (200 * 1.0 + 110 * 4.0) / 1e6)
+
+
+class _TruncatingPipe:
+    """Like a 512-token model: sees only the first 200 characters; finds 'Kwame' there."""
+
+    def __init__(self):
+        self.calls = []
+
+    def __call__(self, text):
+        self.calls.append(len(text))
+        seen = text[:200]
+        i = seen.find("Kwame")
+        return [{"entity_group": "PATIENT", "start": i, "end": i + 5, "score": 0.99}] if i >= 0 else []
+
+
+def test_transformer_reads_long_notes_in_windows_and_maps_offsets_back():
+    t = ("Perio maintenance visit, no change. " * 100) + "Pt Kwame seen today."   # Kwame past 3,600 chars
+    pipe = _TruncatingPipe()
+    spans = deid.detect_transformer(t, pipe=pipe, window_chars=150)
+    assert [t[s["start"]:s["end"]] for s in spans] == ["Kwame"]
+    assert max(pipe.calls) <= 150
+
+
+def test_external_set_reads_the_jsl_benchmark_csv(tmp_path):
+    """John Snow Labs' benchmark CSV: one row per labeled chunk, the full text repeated, end exclusive."""
+    import pandas as pd
+
+    from dental_omop_nlp.phi_challenge import load_external
+    t1, t2 = "Pt Ana Ruiz seen 3/4/2024 .", "No identifiers here ."
+    pd.DataFrame([{"doc_id": 1, "text": t1, "begin": 3, "end": 11, "chunk": "Ana Ruiz", "chunk_label": "NAME"},
+                  {"doc_id": 1, "text": t1, "begin": 17, "end": 25, "chunk": "3/4/2024", "chunk_label": "DATE"},
+                  {"doc_id": 2, "text": t2, "begin": None, "end": None, "chunk": None, "chunk_label": None}]
+                 ).to_csv(tmp_path / "gt.csv", index=False)
+    recs = load_external(tmp_path / "gt.csv", tier="jsl48")
+    assert [r["tier"] for r in recs] == ["jsl48", "jsl48"]
+    assert [(p["text"], p["type"]) for p in recs[0]["phi"]] == [("Ana Ruiz", "NAME"), ("3/4/2024", "DATE")]
+    assert recs[1]["phi"] == []
+
+
+def test_token_level_phi_scores_follow_the_jsl_rule():
+    """A token is PHI if it starts inside a span (gold or predicted); precision/recall/F1 on the PHI class."""
+    t = "Pt Ana Ruiz seen 3/4/2024 ."
+    rec = {"note_id": 1, "tier": "jsl48", "text": t, "decoys": [],
+           "phi": [{"start": 3, "end": 11, "text": "Ana Ruiz", "type": "NAME"},
+                   {"start": 17, "end": 25, "text": "3/4/2024", "type": "DATE"}]}
+    # finds Ana Ruiz (2 tokens), misses the date (3/4/2024 = 5 tokens), wrongly flags 'seen'
+    s = deid_eval.score_records([rec], lambda x: [{"start": 3, "end": 16, "type": "NAME"}])["summary"]
+    row = s.set_index("tier").loc["jsl48"]
+    assert row.token_recall == pytest.approx(2 / 7) and row.token_precision == pytest.approx(2 / 3)
+
+
+def test_all_tier_is_the_challenge_set_only():
+    recs = [{"note_id": i, "tier": tier, "text": "Pt Bo Li", "decoys": [],
+             "phi": [{"start": 3, "end": 8, "text": "Bo Li", "type": "NAME"}]}
+            for i, tier in enumerate(["easy", "external", "jsl48"])]
+    s = deid_eval.score_records(recs, lambda t: [])["summary"].set_index("tier")
+    assert s.loc["all"].n_notes == 1

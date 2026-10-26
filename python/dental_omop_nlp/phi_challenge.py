@@ -212,6 +212,8 @@ def load_external(path, text_keys=("text", "query", "note"), tier: str = "extern
     one {"identifier_type", "value"} JSON per line) is read as is."""
     import json
     from pathlib import Path
+    if str(path).endswith(".csv"):
+        return _load_jsl_csv(path, tier)
     raw = Path(path).read_text()
     if raw.lstrip().startswith("===QUERY==="):
         data = _parse_asq_phi(raw)
@@ -237,6 +239,23 @@ def load_external(path, text_keys=("text", "query", "note"), tier: str = "extern
                 j = text.find(val, j + len(val))
         out.append({"note_id": r.get("id", i), "tier": tier, "text": text,
                     "phi": sorted(spans, key=lambda s: s["start"]), "decoys": []})
+    return out
+
+
+def _load_jsl_csv(path, tier: str) -> list[dict]:
+    """John Snow Labs' de-identification benchmark CSV (doc_id, text, begin, end, chunk, chunk_label;
+    one row per labeled chunk, end exclusive). Its notes look like i2b2 discharge summaries: keep the
+    file outside the repo (data/raw/)."""
+    import pandas as pd
+    df = pd.read_csv(path)
+    out = []
+    for doc_id, g in df.groupby("doc_id", sort=True):
+        text = g.text.iloc[0]
+        g = g.dropna(subset=["begin", "end"])
+        phi = [{"start": int(b), "end": int(e), "text": text[int(b):int(e)], "type": str(lab)}
+               for b, e, lab in zip(g.begin, g.end, g.chunk_label)]
+        out.append({"note_id": f"jsl-{doc_id}", "tier": tier, "text": text,
+                    "phi": sorted(phi, key=lambda x: x["start"]), "decoys": []})
     return out
 
 
