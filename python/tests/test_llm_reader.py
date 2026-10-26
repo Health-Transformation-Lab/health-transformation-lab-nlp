@@ -62,7 +62,7 @@ def test_parse_skips_medgemma_thought_block():
     draft = _ans(status="healthy")
     out = parse_answer(f"<unused94>thought\nDraft: {draft}\nNo, it is stage II.<unused95>{_ans()}", NOTE)
     assert out["gate_ok"] and out["status"] == "periodontitis_stage_2"
-    cut = parse_answer(f"<unused94>thought\nThe note says {{stage}} and then I ran out of tokens", NOTE)
+    cut = parse_answer("<unused94>thought\nThe note says {stage} and then I ran out of tokens", NOTE)
     assert not cut["gate_ok"] and "thought not closed" in cut["error"]
 
 
