@@ -45,6 +45,9 @@ judge:                         # the LLM judge itself (used on samples, not the 
 #     https://azure.microsoft.com/pricing/details/health-data-services/
 #   Azure AI Language PII: per 1,000 text records (one record = 1,000 characters)
 #     https://azure.microsoft.com/pricing/details/cognitive-services/text-analytics/
+#   Amazon Comprehend Medical DetectPHI: per unit of 100 characters, 1-unit minimum per request;
+#     85,000 units free in the first month only (not counted here)
+#     https://aws.amazon.com/comprehend/medical/pricing/
 deid:
   review:                        # human QA of a sample of de-identified notes, every engine
     qa_sample_share: 0.001       # 1 in 1,000 notes
@@ -56,8 +59,12 @@ deid:
     presidio:       {kind: local, hardware: cpu, throughput_source: measured}
     azure_deid:     {kind: service, unit: mb, usd_per_unit: 0.50, free_units: 50}                 # ILLUSTRATIVE price
     azure_language: {kind: service, unit: record_1k_chars, usd_per_unit: 0.001, free_units: 0}   # ILLUSTRATIVE price
-    hf_stanford:    {kind: local, hardware: gpu, throughput_source: measured}   # measured when run; GPU recommended
-    hf_obi:         {kind: local, hardware: gpu, throughput_source: measured}
+    aws_comprehend: {kind: service, unit: record_100_chars, usd_per_unit: 0.0014, free_units: 0}  # ILLUSTRATIVE: third-party listing, not yet checked on the AWS page
+    hf_stanford:    {kind: local, hardware: cpu, throughput_source: measured}   # measured on a 4-CPU container; a GPU is faster
+    hf_obi:         {kind: local, hardware: cpu, throughput_source: measured}
     llm:            {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
                      prompt_overhead_tokens: 250, output_tokens: 80}            # ILLUSTRATIVE (a small hosted model)
+    ai_mask:        {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
+                     prompt_overhead_tokens: 150, output_tokens: 100}           # ILLUSTRATIVE: Databricks bills ai_mask as
+                                                                                # Foundation Model API tokens; it returns the whole note
   # "+guard" adds no cost; an ensemble costs the sum of its engines.

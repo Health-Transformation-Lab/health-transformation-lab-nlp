@@ -3,6 +3,7 @@
     python scripts/26_deid_benchmark.py                       # every engine that can run here
     python scripts/26_deid_benchmark.py --engines regex,regex_v2+guard,presidio+regex_v2+guard
     AZURE_DEID_ENDPOINT=... python scripts/26_deid_benchmark.py --engines azure_deid+regex_v2+guard
+    AWS_REGION=us-east-1 python scripts/26_deid_benchmark.py --engines aws_comprehend,aws_comprehend+regex_v2+guard
 
 Writes:
   data/raw/deid_challenge.jsonl       the labeled notes (fake PHI; never committed)
@@ -12,8 +13,8 @@ Writes:
   data/deid/cost_inputs.csv           what the cost model uses (R recomputes from this: parity)
   data/deid/cost_effectiveness.csv    cost per corpus, leaks per 1M notes, frontier, ICER
 
-  --external path.jsonl adds another labeled set (e.g. ASQ-PHI) as tier "external"; price it with
-  --tiers all,unseen,external.
+  --external path adds another labeled set as tier "external": JSONL/JSON, or ASQ-PHI's own
+  synthetic_clinical_queries.txt as downloaded. Price it with --tiers all,unseen,external.
 
 An engine that can't run here (package missing, no Azure endpoint) is listed as not run, with
 the reason; nothing is estimated for it. Service prices in costs.yaml are ILLUSTRATIVE until
@@ -35,8 +36,9 @@ logging.getLogger("tldextract").setLevel(logging.CRITICAL)   # Presidio's URL re
 
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
            "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
-           "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "azure_deid",
-           "azure_deid+regex_v2+guard", "azure_language", "azure_language+regex_v2+guard"]
+           "hf_obi", "hf_obi+regex_v2+guard", "llm", "llm+regex_v2+guard", "ai_mask", "ai_mask+regex_v2+guard",
+           "azure_deid", "azure_deid+regex_v2+guard", "azure_language", "azure_language+regex_v2+guard",
+           "aws_comprehend", "aws_comprehend+regex_v2+guard"]
 ap = argparse.ArgumentParser()
 ap.add_argument("--engines", default=",".join(DEFAULT))
 ap.add_argument("--n-notes", type=int, default=400)
@@ -82,7 +84,8 @@ for spec in a.engines.split(","):
     print(f"{spec}: entity recall {s.entity_recall:.3f}, decoy damage {s.decoy_damage:.3f}")
 
 scores = pd.concat(scores)[["method", "tier", "n_notes", "n_phi", "entity_recall", "char_recall",
-                            "char_precision", "decoy_damage", "leaked_per_1k_notes", "avg_chars"]]
+                            "char_precision", "decoy_damage", "n_hard_negatives", "hard_negative_damage",
+                            "leaked_per_1k_notes", "avg_chars"]]
 scores.to_csv(DEID_DIR / "scores.csv", index=False)
 pd.concat(cats)[["method", "tier", "category", "n", "n_leaked", "recall"]].to_csv(DEID_DIR / "by_category.csv",
                                                                                index=False)

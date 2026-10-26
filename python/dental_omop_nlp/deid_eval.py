@@ -47,6 +47,8 @@ def score_records(records: list[dict], detect) -> dict:
                 "char_recall": d.phi_chars_removed.sum() / max(d.phi_chars.sum(), 1),
                 "char_precision": d.phi_chars_removed.sum() / d.removed_chars.sum() if d.removed_chars.sum() else 1.0,
                 "decoy_damage": d.n_decoys_damaged.sum() / max(d.n_decoys.sum(), 1),
+                "n_hard_negatives": int((d.n_phi == 0).sum()),       # notes with no PHI at all
+                "hard_negative_damage": ((d.n_phi == 0) & (d.removed_chars > 0)).sum() / max((d.n_phi == 0).sum(), 1),
                 "leaked_per_1k_notes": 1000 * d.n_leaked.sum() / max(len(d), 1),
                 "avg_chars": float(d.chars.mean()) if len(d) else 0.0}
     own = per[per.tier != "external"]          # "all" = the challenge set's own tiers; external reported apart
@@ -78,6 +80,8 @@ def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> flo
             units = n_notes * avg_chars / 1e6                       # ~1 byte per character (ASCII notes)
         elif cfg["unit"] == "record_1k_chars":
             units = n_notes * np.ceil(avg_chars / 1000)
+        elif cfg["unit"] == "record_100_chars":                  # Comprehend Medical: 1-unit minimum per request
+            units = n_notes * np.ceil(avg_chars / 100)
         else:
             raise ValueError(f"unknown unit {cfg['unit']}")
         return max(units - cfg.get("free_units", 0), 0) * cfg["usd_per_unit"]

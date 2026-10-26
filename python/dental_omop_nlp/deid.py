@@ -20,12 +20,17 @@ AND the leak gate. Two engines:
                   azure-health-deidentification azure-identity; AZURE_DEID_ENDPOINT.
   azure_language  Azure AI Language PII detection, healthcare (PHI) domain.
                   pip install azure-ai-textanalytics; AZURE_LANGUAGE_ENDPOINT, _KEY.
+  aws_comprehend  Amazon Comprehend Medical DetectPHI. pip install boto3; AWS credentials
+                  and AWS_REGION.
   hf_stanford     transformer NER trained for clinical de-identification:
                   StanfordAIMI/stanford-deidentifier-base (Chambon et al., JAMIA 2023; MIT).
   hf_obi          obi/deid_roberta_i2b2 (RoBERTa on i2b2 2014; MIT). Both need the
                   Hugging Face download (pip install -e ".[models]").
   jsl             John Snow Labs Healthcare NLP 'clinical_deidentification' pipeline
                   (licensed; Spark): SPARK_NLP_LICENSE, JSL_SECRET.
+  ai_mask         Databricks SQL AI Function ai_mask (Public Preview): a Databricks-hosted LLM
+                  replaces the listed entity types with [MASKED]; spans recovered from the
+                  output. DATABRICKS_HOST, DATABRICKS_TOKEN, DATABRICKS_WAREHOUSE_ID.
   llm             an LLM asked to list every identifier verbatim (any OpenAI-compatible
                   endpoint, e.g. a Databricks serving endpoint): DEID_LLM_BASE_URL,
                   DEID_LLM_MODEL, DEID_LLM_API_KEY. Values it lists that aren't in the
@@ -231,6 +236,27 @@ def detect_azure_language(text: str, client=None) -> list[dict]:
                     "type": _AZURE_LANG_TYPES.get(str(e.category), "ID")} for e in doc.entities])
 
 
+_AWS_TYPES = {"NAME": "NAME", "DATE": "DATE", "AGE": "AGE", "CONTACT_POINT": "PHONE", "EMAIL": "EMAIL",
+              "URL": "URL", "ADDRESS": "LOCATION", "ID": "ID", "PROFESSION": "PROFESSION"}
+
+
+def _aws_comprehend_client():  # pragma: no cover - needs an AWS account
+    if "aws" not in _CLIENTS:
+        region = _need("AWS_REGION")
+        import boto3
+        _CLIENTS["aws"] = boto3.client("comprehendmedical", region_name=region)
+    return _CLIENTS["aws"]
+
+
+def detect_aws_comprehend(text: str, client=None, min_score: float = 0.5) -> list[dict]:
+    """Amazon Comprehend Medical DetectPHI. min_score 0.5 is the middle threshold the ASQ-PHI paper
+    reports. Its AGE and PROFESSION types are kept: that's what the service returns."""
+    client = client or _aws_comprehend_client()
+    ents = client.detect_phi(Text=text)["Entities"]
+    return _merge([{"start": e["BeginOffset"], "end": e["EndOffset"], "type": _AWS_TYPES.get(e["Type"], "ID")}
+                   for e in ents if e.get("Score", 1.0) >= min_score])
+
+
 # --------------------------------------------------------------- AI: transformer NER, LLM
 _HF_TYPES = {"PATIENT": "NAME", "STAFF": "NAME", "DOCTOR": "NAME", "PERSON": "NAME", "NAME": "NAME",
              "DATE": "DATE", "AGE": "AGE", "PHONE": "PHONE", "FAX": "PHONE", "EMAIL": "EMAIL", "URL": "URL",
@@ -346,12 +372,76 @@ def detect_jsl(text: str, light=None) -> list[dict]:
     return _merge(spans)
 
 
+# --------------------------------------------------------------- Databricks ai_mask (SQL AI Function)
+AI_MASK_LABELS = ["person", "date", "phone", "fax", "email", "address", "location", "url", "ip address",
+                  "ssn", "medical record number", "health plan id", "account number", "license number",
+                  "vehicle id", "device id", "organization", "age over 89"]
+_MASK = "[MASKED]"
+
+
+def _ai_mask_sql(text: str, labels: list[str]) -> str:  # pragma: no cover - needs a Databricks SQL warehouse
+    """ai_mask through the SQL Statement Execution API (works from a laptop or a notebook)."""
+    import json
+    import urllib.request
+    host, token, wh = (_need("DATABRICKS_HOST").rstrip("/"), _need("DATABRICKS_TOKEN"),
+                       _need("DATABRICKS_WAREHOUSE_ID"))
+    arr = ", ".join("'" + lab.replace("'", "") + "'" for lab in labels)
+    body = json.dumps({"warehouse_id": wh, "wait_timeout": "50s", "statement": f"SELECT ai_mask(:t, array({arr}))",
+                       "parameters": [{"name": "t", "value": text, "type": "STRING"}]}).encode()
+    host = host if host.startswith("http") else f"https://{host}"
+    req = urllib.request.Request(f"{host}/api/2.0/sql/statements", data=body, method="POST",
+                                 headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=90) as r:
+        out = json.loads(r.read())
+    if out.get("status", {}).get("state") != "SUCCEEDED":
+        raise RuntimeError(f"ai_mask statement {out.get('status')}")
+    return out["result"]["data_array"][0][0]
+
+
+def detect_ai_mask(text: str, mask=None, labels: list[str] | None = None) -> list[dict]:
+    """Databricks ai_mask returns the note with entities replaced by [MASKED], not offsets. The spans
+    are recovered by locating the unmasked pieces in order; if the model changed other text too, a
+    character diff keeps only the regions it replaced with [MASKED]. Types aren't reported: 'PHI'."""
+    if mask is None:
+        _need("DATABRICKS_WAREHOUSE_ID")
+        mask = _ai_mask_sql
+    masked = mask(text, labels or AI_MASK_LABELS) or text
+    pieces = masked.split(_MASK)
+    spans, pos, ok = [], len(pieces[0]), text.startswith(pieces[0])
+    for k, nxt in enumerate(pieces[1:], 1):
+        if not ok:
+            break
+        if k == len(pieces) - 1:                                   # last piece must end the note
+            j = len(text) - len(nxt) if text.endswith(nxt) and len(text) - len(nxt) >= pos else -1
+        else:
+            j = text.find(nxt, pos)
+        ok = j >= 0
+        spans.append({"start": pos, "end": j})
+        pos = j + len(nxt)
+    if not ok:
+        import difflib
+        m = masked.replace(_MASK, "\x00")
+        spans = [{"start": i1, "end": i2}
+                 for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, text, m, autojunk=False).get_opcodes()
+                 if op == "replace" and "\x00" in m[j1:j2]]
+    out = []
+    for sp in spans:
+        a, b = sp["start"], sp["end"]
+        while a < b and text[a].isspace():
+            a += 1
+        while b > a and text[b - 1].isspace():
+            b -= 1
+        if b > a:
+            out.append({"start": a, "end": b, "type": "PHI"})
+    return _merge(out)
+
+
 ENGINES = {"regex": detect_regex, "regex_v2": detect_regex_v2, "presidio": detect_presidio,
            "azure_deid": detect_azure_deid, "azure_language": detect_azure_language,
            "hf_stanford": lambda text: detect_transformer(text, _HF_MODELS["hf_stanford"]),
            "hf_obi": lambda text: detect_transformer(text, _HF_MODELS["hf_obi"]),
-           "llm": detect_llm, "jsl": detect_jsl}
-CLOUD_ENGINES = {"azure_deid", "azure_language", "llm", "jsl"}
+           "llm": detect_llm, "jsl": detect_jsl, "ai_mask": detect_ai_mask, "aws_comprehend": detect_aws_comprehend}
+CLOUD_ENGINES = {"azure_deid", "azure_language", "llm", "jsl", "ai_mask", "aws_comprehend"}
 
 
 def get_engine(spec: str):

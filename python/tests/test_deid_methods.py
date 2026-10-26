@@ -117,6 +117,34 @@ def test_cloud_engine_without_endpoint_says_so(monkeypatch):
         deid.detect_azure_deid("x")
 
 
+class _FakeComprehendMedical:
+    def detect_phi(self, Text):
+        i, j = Text.index("Kwame"), Text.index("205.555.0147")
+        return {"Entities": [{"BeginOffset": i, "EndOffset": i + 5, "Type": "NAME", "Score": 0.99},
+                             {"BeginOffset": j, "EndOffset": j + 12, "Type": "CONTACT_POINT", "Score": 0.97},
+                             {"BeginOffset": 0, "EndOffset": 2, "Type": "PROFESSION", "Score": 0.30}]}
+
+
+def test_aws_comprehend_parses_phi_entities_above_threshold():
+    t = "Pt Kwame, call 205.555.0147"
+    spans = deid.detect_aws_comprehend(t, client=_FakeComprehendMedical(), min_score=0.5)
+    assert spans == [{"start": 3, "end": 8, "type": "NAME"}, {"start": 15, "end": 27, "type": "PHONE"}]
+
+
+def test_aws_comprehend_is_registered_and_says_what_it_needs(monkeypatch):
+    assert "aws_comprehend" in deid.ENGINES and "aws_comprehend" in deid.CLOUD_ENGINES
+    monkeypatch.delenv("AWS_REGION", raising=False)
+    with pytest.raises(RuntimeError, match="AWS_REGION"):
+        deid.detect_aws_comprehend("x")
+
+
+def test_service_billed_per_100_characters_with_a_one_unit_minimum():
+    cfg = {"kind": "service", "unit": "record_100_chars", "usd_per_unit": 0.001, "free_units": 0}
+    # 1,000 notes of 250 chars = 3 units each; 1,000 notes of 40 chars = 1 unit each (minimum)
+    assert deid_eval.engine_cost(cfg, 1000, 250, {}) == pytest.approx(3.0)
+    assert deid_eval.engine_cost(cfg, 1000, 40, {}) == pytest.approx(1.0)
+
+
 # ---------------------------------------------------------------- US3 scores
 def test_scores_on_a_hand_made_case():
     rec = {"note_id": 1, "tier": "hard", "text": "Pt Ana Ruiz, #3 MB",
@@ -264,3 +292,54 @@ def test_i2b2_2014_loader_reads_xml_tags(tmp_path):
     recs = load_i2b2_2014(tmp_path)
     assert len(recs) == 1 and recs[0]["tier"] == "i2b2_2014"
     assert [(p["text"], p["type"]) for p in recs[0]["phi"]] == [("2090-01-02", "DATE"), ("Bo Li", "PATIENT")]
+
+
+def test_external_set_reads_the_asq_phi_text_format(tmp_path):
+    """ASQ-PHI ships as delimited text: ===QUERY=== line, ===PHI_TAGS===, one JSON tag per line."""
+    from dental_omop_nlp.phi_challenge import load_external
+    f = tmp_path / "queries.txt"
+    f.write_text('===QUERY===\nDose advice for Ana Ruiz, seen at Oak Clinic 3/4/2024?\n===PHI_TAGS===\n'
+                 '{"identifier_type": "NAME", "value": "Ana Ruiz"}\n'
+                 '{"identifier_type": "GEOGRAPHIC_LOCATION", "value": "Oak Clinic"}\n'
+                 '{"identifier_type": "DATE", "value": "3/4/2024"}\n\n'
+                 '===QUERY===\nFirst-line therapy for stage III periodontitis in a 50-year-old?\n===PHI_TAGS===\n\n')
+    recs = load_external(f)
+    assert len(recs) == 2 and recs[0]["tier"] == "external"
+    assert [(p["text"], p["type"]) for p in recs[0]["phi"]] == [
+        ("Ana Ruiz", "NAME"), ("Oak Clinic", "GEOGRAPHIC_LOCATION"), ("3/4/2024", "DATE")]
+    assert recs[1]["phi"] == [] and recs[1]["text"].startswith("First-line")
+
+
+def test_hard_negative_damage_counts_phi_free_notes_with_anything_removed():
+    recs = [{"note_id": 1, "tier": "external", "text": "Stage III in a 50-year-old", "phi": [], "decoys": []},
+            {"note_id": 2, "tier": "external", "text": "Plaque control advice", "phi": [], "decoys": []},
+            {"note_id": 3, "tier": "external", "text": "Pt Bo Li", "decoys": [],
+             "phi": [{"start": 3, "end": 8, "text": "Bo Li", "type": "NAME"}]}]
+    s = deid_eval.score_records(recs, lambda t: [{"start": 0, "end": 5, "type": "NAME"}] if "Stage" in t else [])
+    ext = s["summary"].set_index("tier").loc["external"]
+    assert ext.n_hard_negatives == 2 and ext.hard_negative_damage == 0.5
+
+
+# ---------------------------------------------------------------- Databricks ai_mask
+def test_ai_mask_recovers_spans_from_masked_text():
+    t = "Pt Kwame Oyelaran seen 3/4/2024; Glickman class II on #19."
+    masked = "Pt [MASKED] seen [MASKED]; Glickman class II on #19."
+    spans = deid.detect_ai_mask(t, mask=lambda text, labels: masked)
+    assert [t[s["start"]:s["end"]] for s in spans] == ["Kwame Oyelaran", "3/4/2024"]
+    assert {s["type"] for s in spans} == {"PHI"}
+
+
+def test_ai_mask_falls_back_to_a_diff_when_the_model_also_rewrites_text():
+    t = "Pt Kwame Oyelaran seen 3/4/2024 for SRP."
+    masked = "Pt [MASKED] seen [MASKED] for scaling."           # 'SRP' rewritten: no exact piece match
+    spans = deid.detect_ai_mask(t, mask=lambda text, labels: masked)
+    got = [t[s["start"]:s["end"]] for s in spans]
+    assert "Kwame Oyelaran" in got and "3/4/2024" in got
+
+
+def test_ai_mask_is_registered_and_says_what_it_needs(monkeypatch):
+    assert "ai_mask" in deid.ENGINES and "ai_mask" in deid.CLOUD_ENGINES
+    assert "person" in deid.AI_MASK_LABELS and "date" in deid.AI_MASK_LABELS
+    monkeypatch.delenv("DATABRICKS_WAREHOUSE_ID", raising=False)
+    with pytest.raises(RuntimeError, match="DATABRICKS_WAREHOUSE_ID"):
+        deid.detect_ai_mask("x")

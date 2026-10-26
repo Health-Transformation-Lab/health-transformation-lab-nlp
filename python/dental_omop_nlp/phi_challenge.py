@@ -208,11 +208,15 @@ def load_external(path, text_keys=("text", "query", "note"), tier: str = "extern
     "phi" (or "entities" / "labels"), each either {start, end, type} or {value | text, type}; a
     value without offsets is located in the text (every occurrence). Records with no PHI are kept:
     they're hard negatives, and anything an engine removes from them is over-redaction.
-    Confirm the field names against the dataset's README when it's attached."""
+    ASQ-PHI's own release (synthetic_clinical_queries.txt: "===QUERY===" then "===PHI_TAGS===" with
+    one {"identifier_type", "value"} JSON per line) is read as is."""
     import json
     from pathlib import Path
     raw = Path(path).read_text()
-    data = json.loads(raw) if raw.lstrip().startswith("[") else [json.loads(x) for x in raw.splitlines() if x.strip()]
+    if raw.lstrip().startswith("===QUERY==="):
+        data = _parse_asq_phi(raw)
+    else:
+        data = json.loads(raw) if raw.lstrip().startswith("[") else [json.loads(x) for x in raw.splitlines() if x.strip()]
     out = []
     for i, r in enumerate(data):
         text = next((r[k] for k in text_keys if k in r), None)
@@ -233,6 +237,17 @@ def load_external(path, text_keys=("text", "query", "note"), tier: str = "extern
                 j = text.find(val, j + len(val))
         out.append({"note_id": r.get("id", i), "tier": tier, "text": text,
                     "phi": sorted(spans, key=lambda s: s["start"]), "decoys": []})
+    return out
+
+
+def _parse_asq_phi(raw: str) -> list[dict]:
+    import json
+    out = []
+    for block in raw.split("===QUERY===")[1:]:
+        query, _, tags = block.partition("===PHI_TAGS===")
+        phi = [json.loads(x) for x in tags.splitlines() if x.strip()]
+        out.append({"query": query.strip(),
+                    "phi": [{"value": t["value"], "type": t["identifier_type"]} for t in phi]})
     return out
 
 

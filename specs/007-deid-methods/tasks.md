@@ -9,9 +9,14 @@
 - [ ] T007 Run azure_deid and azure_language (+regex_v2+guard) on the challenge set (needs an Azure resource)
 - [ ] T008 Fill real service prices in costs.yaml from the pricing pages
 - [x] T009 Second test set: `load_external` + `26_deid_benchmark.py --external` (any labeled JSONL/JSON)
-- [ ] T009b Attach ASQ-PHI (Mendeley Data is blocked from the workspace), confirm its field names, score it
+- [x] T009b ASQ-PHI downloaded from Mendeley Data; `load_external` reads its release format; every local engine scored on it, with over-redaction on its hard negatives
 - [ ] T010 Pick the engine on the unseen tier; switch study.py's default; keep a human review sample on real notes
 - [x] T011 AI engines: transformer NER (hf_stanford, hf_obi) and LLM (llm) with a verbatim-only rule; LLM token cost in Python and R; Databricks notebook 06_deid_benchmark.py
-- [ ] T012 Run the AI engines on Databricks (Hugging Face and serving endpoints are blocked from this workspace) and add their rows to the results
+- [x] T012 Run the transformer engines (hf_stanford, hf_obi, alone and with regex_v2+guard) on CPU now that Hugging Face is reachable; rows merged into data/deid, docs updated
+- [ ] T012b Run the llm engine (needs a serving endpoint) and score hf_stanford+presidio / hf_stanford+hf_obi ensembles
 - [x] T013 John Snow Labs engine (`jsl`, clinical_deidentification pipeline) tested with a fake pipeline; i2b2/n2c2 2014 loader (`--i2b2-2014`)
 - [ ] T014 Get a John Snow Labs licence (academic or trial) and n2c2 2014 access; run every engine on both
+- [x] T015 Databricks `ai_mask` engine: spans recovered from the masked text, tested with a fake reply; notebook widget for a SQL warehouse; token cost ILLUSTRATIVE
+- [ ] T016 Run `ai_mask` (+regex_v2+guard) on the challenge set and ASQ-PHI in a Databricks workspace; fill its token price
+- [x] T017 Amazon Comprehend Medical engine (`aws_comprehend`, DetectPHI) tested with a fake client; per-100-character billing in Python and R
+- [ ] T018 Run `aws_comprehend` (+regex_v2+guard) on the challenge set and ASQ-PHI with an AWS account; confirm the DetectPHI price on the AWS pricing page
