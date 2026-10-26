@@ -1,0 +1,78 @@
+test_000	gold Date	second day after endovascular treatment	| injected for three days. On the second day after endovascular treatment , the patient complainted of difficulty
+test_000	gold Date	four days after treatment	| patient was discharged from our hospital four days after treatment without continuative pharmacotherapy. At two months
+test_000	gold Date	two months follow - up	| after treatment without continuative pharmacotherapy. At two months follow - up , the patient 's main complaint
+test_000	gold Date	three months follow - up	| persisted. We telephone the patient at three months follow - up and requested a vocal cord evaluation
+test_000	pred Date	second day	| injected for three days. On the second day after endovascular treatment , the patient
+test_000	pred Date	four days after	| patient was discharged from our hospital four days after treatment without continuative pharmacotherapy. At two
+test_000	pred Date	two months	| after treatment without continuative pharmacotherapy. At two months follow - up , the patient
+test_000	pred Date	three months	| persisted. We telephone the patient at three months follow - up and requested a
+test_001	gold Date	postoperative day	| postoperative course and was discharged on postoperative day 9. Two weeks later , his
+test_001	gold Date	After two cycles	| 2 per day for 14 d/cycle. After two cycles , his β- HCG level had
+test_001	gold Date	4 - year	| distant metastasis had occurred at his 4 - year postoperative follow - up .
+test_001	pred Date	day 9.	| course and was discharged on postoperative day 9. Two weeks later , his HCG
+test_001	pred Date	After two	| 2 per day for 14 d/cycle. After two cycles , his β- HCG level
+test_001	pred Date	- year	| metastasis had occurred at his 4 - year postoperative follow - up .
+test_002	pred Date	after 28 days	| IABP for 26 days , and after 28 days he was transferred back to our
+test_004	gold Age	60 s	| A woman in her 60 s was found to have screen detected
+test_004	gold Date	several months later	| patient received palliative chemotherapy and died several months later .
+test_004	pred Age	her 60 s	| A woman in her 60 s was found to have screen detected
+test_004	pred Date	several months	| patient received palliative chemotherapy and died several months later .
+test_006	gold Date	eventually	| mg daily for several months and eventually tapered to 10 mg daily. Her
+test_006	gold Date	day	| # 4 cuffless Shiley on postoperative day 5. During this time she was
+test_006	gold Date	one - month	| was discharged home. At her subsequent one - month and three - month follow -
+test_006	gold Date	three - month	| her subsequent one - month and three - month follow - up visits , she
+test_006	pred Date	day 5.	| # 4 cuffless Shiley on postoperative day 5. During this time she was transitioned
+test_007	gold Date	Three weeks	| of her urea cycle were awaited. Three weeks postdischarge , the patient was clinically
+test_007	pred Date	Three weeks postdischarge	| of her urea cycle were awaited. Three weeks postdischarge , the patient was clinically stable
+test_008	gold Date	age 5 years	| over time. Bilateral panuveitis progressed after age 5 years , and was initially treated with
+test_008	gold Date	1 year after this treatment was started	| there was an initial improvement , 1 year after this treatment was started uveitis worsened , and at age
+test_008	gold Date	age 12	| started uveitis worsened , and at age 12 years infliximab was discontinued. Adalimumab (
+test_008	pred Date	after age 5 years	| subsided over time. Bilateral panuveitis progressed after age 5 years , and was initially treated with
+test_008	pred Date	1 year after	| there was an initial improvement , 1 year after this treatment was started uveitis worsened
+test_008	pred Date	age 12 years	| started uveitis worsened , and at age 12 years infliximab was discontinued. Adalimumab ( 24
+test_009	gold Date	postoperative day	| uneventful and he was discharged on postoperative day 10. After two years of follow
+test_009	pred Date	infancy	| retardation. Genetic analysis in his early infancy showed a previously reported homozygous nonsense
+test_009	pred Date	day 10.	| and he was discharged on postoperative day 10. After two years of follow -
+test_010	gold Date	just before	| June 2007 to 8 × 109/L just before admission. Before the deterioration of thrombocytopenia
+test_010	pred Date	d 22 to	| g daily , was added on d 22 to 24. However , the response was
+test_010	pred Date	32 to 36	| 25 g daily , on d 32 to 36 , combined with a second round
+test_010	pred Date	32 to	| intravenous methylprednisolone pulse therapy on d 32 to 34. Because a moderate response was
+test_011	gold Date	day	| open but was closed on postoperative day 2. From that point , she
+test_011	gold Date	3 months	| and recovered normal pulmonary function by 3 months following discharge from the hospital .
+test_011	pred Date	day 2.	| open but was closed on postoperative day 2. From that point , she remained
+test_011	pred Date	3 months following	| and recovered normal pulmonary function by 3 months following discharge from the hospital .
+test_013	gold Date	In 2013	| In 2013 , a 50 - year -
+test_013	gold Date	7 and 11 months	| The thin chest CT was performed 7 and 11 months following apatinib administration. At the 7
+test_013	pred Date	2013	| In 2013 , a 50 - year -
+test_013	pred Date	7	| The thin chest CT was performed 7 and 11 months following apatinib administration.
+test_013	pred Date	11 months	| chest CT was performed 7 and 11 months following apatinib administration. At the 7
+test_013	pred Date	7 months after	| 6 non - measureable lesions presented 7 months after apatinib treatment. No new lesion was
+test_015	gold Date	one month	| severe cough and right chest pain one month later. Laboratory exams revealed leukocytosis (
+test_015	gold Date	after following for 12 months	| and was free from air leak after following for 12 months ( Fig.1 B ) . The
+test_015	pred Date	July	| 25 fractions ) from June to July 2014. In October 2014 , surgical
+test_015	pred Date	one month later.	| severe cough and right chest pain one month later. Laboratory exams revealed leukocytosis ( white
+test_015	pred Date	a few months ago	| the patient just received neoadjuvant chemoradiotherapy a few months ago , the flaps harvested from chest
+test_018	gold Date	one year post surgery	| ) scan performed in 2012 , one year post surgery , was unremarkable for recurrence or
+test_018	gold Date	18 months post surgery	| CT ) in June 2013 ( 18 months post surgery ) did not show any recurrence
+test_018	pred Date	one year post	| ) scan performed in 2012 , one year post surgery , was unremarkable for recurrence
+test_018	pred Date	18 months post	| CT ) in June 2013 ( 18 months post surgery ) did not show any
+test_018	pred Date	18 months	| relief. Thus far , up to 18 months post resection , our patient had
+test_018	pred Date	2011	| to the primary tumor resected in 2011 , and was concluded to be
+test_021	gold Age	age 10 years	| first diagnosed with nonischemic cardiomyopathy at age 10 years , when she presented with symptoms
+test_021	pred Date	age 10 years	| first diagnosed with nonischemic cardiomyopathy at age 10 years , when she presented with symptoms
+test_024	pred Date	12 h	| presented at the emergency department , 12 h after insertion of a high pressure
+test_025	gold Date	8 th morning after	| walked outside the car on the 8 th morning after the first earthquake. Although she walked
+test_025	pred Date	8 th morning	| walked outside the car on the 8 th morning after the first earthquake. Although she
+test_029	gold Date	since day 7 of treatment	| / Kg/j. The evolution was marked since day 7 of treatment by the desinfiltration of the plaques
+test_029	pred Date	day 7	| Kg/j. The evolution was marked since day 7 of treatment by the desinfiltration of
+test_030	pred Sex	student	| 18 - year - old college student was referred from the University Clinic
+test_035	gold Date	48 hours after the initial	| vasoactive agents. She was finally extubated 48 hours after the initial presentation. She was later discharged home
+test_035	pred Date	24 hours later	| left ventricular failure. Subsequent echocardiography done 24 hours later did not show any evidence of
+test_035	pred Date	48 hours after	| vasoactive agents. She was finally extubated 48 hours after the initial presentation. She was later
+test_037	gold Date	fifth postoperative	| discharged from the hospital on the fifth postoperative day. At 3 months follow -
+test_037	pred Date	a year ago	| medical history was unremarkable , however a year ago and soon after her third child
+test_037	pred Date	after	| however a year ago and soon after her third child delivery , she
+test_037	pred Date	fifth postoperative day.	| discharged from the hospital on the fifth postoperative day. At 3 months follow - up
+test_038	gold Date	two months	| the hospital for CHF exacerbation about two months later. He responded well to IV
+test_038	pred Date	about	| to the hospital for CHF exacerbation about two months later. He responded well
+test_038	pred Date	two months later.	| the hospital for CHF exacerbation about two months later. He responded well to IV furosemide

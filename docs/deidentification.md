@@ -365,6 +365,41 @@ trailing function words (seen on validation); use cross-validation over the 160 
 instead of one 20-note validation set. The year pattern helped on test only, so it is a
 test-informed idea: it needs a fresh split before it is used.
 
+### The same exercise on the course's own files
+
+The course's own `train.txt` / `test.txt` were later in hand (`data/external/maccrobat/course/`,
+committed unchanged). They differ from the rebuild above: 160 / 40 notes with a different test set
+(only 6 of the 40 test notes are shared), words split on spaces and hyphens but with a sentence-final
+period kept on the word ("2005."), and 6 labels (no `I-Sex`; test: 41 Age, 37 Sex, 117 Date).
+**Defect in those files:** a word that keeps its period is tagged `O` even inside an entity, so 88
+training and 16 of the 117 test dates lose their last word ("September 2005." keeps only "September").
+Same protocol: 20 of the 160 training notes held out for validation, choices made there
+(`33_maccrobat_phi_tagger.py --conll-dir`, 2026-10-26, CPU):
+
+| Run (course files) | Val weighted F1 | Val Date F1 | Test weighted F1 | Test Age / Sex / Date F1 |
+|---|---|---|---|---|
+| Longformer base, lr 3e-5, 3 epochs | 0.77 | 0.58 | 0.81 | 0.98 / 0.99 / 0.70 |
+| **Longformer base, lr 5e-5, 3 epochs (chosen)** | **0.80** | **0.63** | **0.81** | 0.96 / 0.99 / 0.70 |
+
+| Post-processing (chosen run) | Val weighted F1 | Test weighted F1 |
+|---|---|---|
+| **none (chosen: nothing raises validation)** | **0.80** | **0.81** |
+| month-year | 0.80 | 0.80 |
+| year | 0.79 | 0.79 |
+| trim function words | 0.79 | 0.77 |
+| all | 0.79 | 0.73 |
+
+- **Final system on the course files: the fine-tuned model alone, test weighted F1 0.81.** The higher
+  learning rate wins on validation in both data sets.
+- **Regex dates lose here for a different reason**: they tag sentence-final years ("2005."), which
+  the course labels drop, so a correct tag is scored as an error.
+- **Part of the remaining error is the labels.** The model often predicts the full date where the
+  file cut it ("age 13 years." against gold "age 13"); 7 of the 26 test Date boundary errors are of
+  this kind. Weighted overlap F1 is 0.94. The other errors are the same groups as on the rebuild:
+  "At the age of" edges, hours labelled `Time` upstream, and vague time ("previous years").
+- **Fix for the data, if the exercise is rerun**: tokenize the period off before assigning labels
+  (as the rebuild does), or extend a label onto a word that keeps its period.
+
 ## Combining engines: bigger unions and routing
 
 The `+` ensembles above are plain unions: anything any engine flags is removed. Two other ways to
