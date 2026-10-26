@@ -5,7 +5,7 @@ One synthetic population, split by person:
   train      every visit of the training people. De-identified note text,
              labelled by the generator. This is what the AI model learns from.
   review     ONE visit per review person (independent charts), stratified so
-             rare statuses are represented. Every source for the visit,
+             rare statuses are represented. Every evidence type for the visit,
              de-identified, packaged as Label Studio tasks. Reviewers stage
              these; nobody sees the generator's answer.
   answer key generator truth, each method's reading, the v0 algorithm. Kept

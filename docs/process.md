@@ -48,8 +48,8 @@ flowchart BT
 
 | Step | Repo | Output |
 |------|------|--------|
-| Sources per visit: chart notes, exam forms, procedure codes (completed, planned), procedure diagnosis codes (completed, planned), probing chart | `python/dental_omop_nlp/study.py` (generate), `sources.py` (codes, forms), `clinical_notes.py` (notes), `labels.py` (probing chart) | `data/datasets/answer_key/review_key.csv` |
-| Read each source | `note_reader.py` (notes), `sources.READERS` (forms, codes, diagnoses), chart staging rules in `labels.py` | one status per source per visit |
+| Evidence types per visit: chart notes, exam forms, procedure codes (completed, planned), procedure diagnosis codes (completed, planned), probing chart | `python/dental_omop_nlp/study.py` (generate), `sources.py` (codes, forms), `clinical_notes.py` (notes), `labels.py` (probing chart) | `data/datasets/answer_key/review_key.csv` |
+| Read each evidence type | `note_reader.py` (notes), `sources.READERS` (forms, codes, diagnoses), chart staging rules in `labels.py` | one status per evidence type per visit |
 | Compare each method against each other | `phenotype.agreement_matrix`, `phenotype.coverage` | `data/datasets/method_agreement.csv`, `method_coverage.csv` |
 | Qualitative review | People. Reviewers work from `method_agreement.csv` and the disagreeing charts; their findings go into `docs/labeling_protocol.md` and `RULES_V0` | rules, written down |
 | Rule-based phenotyping algorithm | `phenotype.phenotype_v0` + `RULES_V0` (placeholder hierarchy until the review sets it) | `algorithm_v0` column |
@@ -96,8 +96,8 @@ A dental record keeps two lists of procedures for each patient, and the study re
 | In claims data | Yes (claims are only for completed work) | No. Only the dental EHR has it |
 
 Each procedure can carry an **ICD-10-CM diagnosis code** (e.g. K05.3x, chronic periodontitis), so
-there are four streams: CDT procedure codes completed and planned (evidence 5–6 in the README) and
-procedure diagnosis codes completed and planned (evidence 3–4).
+there are four streams: CDT procedure codes completed and planned (evidence types 3–4 in the README) and
+procedure diagnosis codes completed and planned (evidence types 5–6).
 
 **Example.** A patient with stage III periodontitis is planned for scaling and root planing
 (D4341, diagnosis K05.3x) but declines. Completed shows only a periodontal evaluation and a

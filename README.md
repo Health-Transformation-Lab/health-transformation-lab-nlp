@@ -19,15 +19,15 @@ and bone), with a **stage** I–IV (how severe), **grade** A–C (how fast) and 
 [in plain words](docs/staging_grading.md#in-plain-words). Dental records rarely hold a
 reliable assigned diagnosis, so the phenotype has to be derived from the evidence below.
 
-**Diagnostic evidence for each visit:** seven parts of the dental record that each suggest a
+**Evidence types per visit:** seven parts of the dental record that each suggest a
 periodontal status. They often disagree:
 
-| # | Diagnostic evidence | What it is | Phenotype order |
+| # | Evidence type | What it is | Phenotype order |
 |---|---|---|---|
 | 1 | Chart note | Free text the clinician writes | 3rd |
 | 2 | Exam form | Structured fields, e.g. PSR score, perio status | 1st |
-| 3–4 | Procedure diagnoses, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
-| 5–6 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
+| 3–4 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
+| 5–6 | Procedure diagnosis codes, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
 | 7 | Probing chart | Attachment loss, bone loss, teeth lost | 4th |
 
 When the evidence disagrees, the phenotype uses the first one in this order that gives a status.

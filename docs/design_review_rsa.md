@@ -11,7 +11,7 @@ an architect's view on. Context: [process.md](process.md), [plan.md](plan.md).
 
 ## What the system does
 
-For each dental visit, seven data sources in the record (chart notes, exam forms, completed and
+For each dental visit, seven evidence types in the record (chart notes, exam forms, completed and
 planned procedure codes, completed and planned procedure diagnoses, the probing
 chart) each suggest a periodontal status. We compare them, derive a rule-based
 phenotyping algorithm, train BERT-family models on the notes, and validate all
@@ -27,7 +27,7 @@ flowchart LR
         DEID --> GATE{Leak gate<br/>+ review sample}
     end
     subgraph DEID_Z["De-identified zone"]
-        GATE -- pass --> S[silver: de-id notes<br/>+ structured sources]
+        GATE -- pass --> S[silver: de-id notes<br/>+ structured evidence]
         S --> OMOP[gold: OMOP CDM 5.4<br/>+ SITE / SITE_EVENT]
         S --> TASKS[review tasks]
         OMOP --> M[method readers +<br/>rule-based algorithm]
@@ -96,4 +96,4 @@ flowchart LR
 - Synthetic data in a public repo until internal use is approved ([ADR 0001](adr/0001-synthetic-public-two-languages.md)).
 - Model output is a flag for review in `NOTE_NLP`, never a diagnosis in `CONDITION_OCCURRENCE`.
 - Reviewers stage charts independently. Consensus is majority vote; ties are reported, not broken.
-- The AI model reads notes only. Reviewers see every source. That asymmetry is part of the comparison.
+- The AI model reads notes only. Reviewers see every evidence type. That asymmetry is part of the comparison.

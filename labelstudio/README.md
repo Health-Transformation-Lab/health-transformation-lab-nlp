@@ -54,8 +54,8 @@ plumbing. They are not results.
 |-------|------|----------|
 | `status` | single choice (6 + cannot_determine) | reliability, consensus gold |
 | `grade`, `extent` | single choice | secondary outcomes |
-| `decided_by` | multi choice of the sources (note, exam form, procedure codes and diagnoses completed/planned, probing chart, radiograph) | which sources reviewers trust → the rule-based algorithm |
-| `conflict` | yes/no | how often sources disagree, per reviewer |
+| `decided_by` | multi choice of the evidence types (note, exam form, procedure codes and diagnoses completed/planned, probing chart, radiograph) | which evidence types reviewers trust → the rule-based algorithm |
+| `conflict` | yes/no | how often evidence types disagree, per reviewer |
 | `confidence` | 1–5 rating | stratify agreement by confidence |
 | `evidence` | span labels on the note | training and scoring entity extraction |
 | `comment` | free text | qualitative review |

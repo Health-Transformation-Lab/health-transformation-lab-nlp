@@ -4,7 +4,7 @@ Grouped with the harmonized data-quality terms OHDSI's Data Quality Dashboard
 uses (Kahn et al. 2016):
 
     conformance   values in allowed ranges and formats
-    completeness  how often each source says anything
+    completeness  how often each evidence type says anything
     plausibility  believable values (atemporal) and believable change over time
                   (temporal, plausibility.py)
 

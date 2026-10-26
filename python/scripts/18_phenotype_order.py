@@ -1,4 +1,4 @@
-"""Score every ordering of the four source groups for the integrated phenotype (spec 005).
+"""Score every ordering of the four evidence groups for the integrated phenotype (spec 005).
 
     python scripts/18_phenotype_order.py --simulated     # against simulated reviewers (dry run)
     python scripts/18_phenotype_order.py                 # against real reviewer labels
