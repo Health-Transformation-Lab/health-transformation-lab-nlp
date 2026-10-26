@@ -70,8 +70,9 @@ databricks bundle run      -t dev study_benchmark
 One-time setup in GitHub → Settings → Environments:
 
 1. Create environments `dev`, `uat`, `prod`. Give `prod` required reviewers.
-2. In each, add secrets `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`,
-   `DATABRICKS_CLIENT_SECRET` (a service principal's OAuth M2M credentials), and
+2. In each, add secret `DATABRICKS_CLIENT_SECRET` and `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`
+   (secrets or variables; neither is sensitive),
+   all from a service principal's OAuth M2M credentials (secret scope `all-apis`), and
    variables `SERVICE_PRINCIPAL`, `JUDGE_ENDPOINT`, `WAREHOUSE_NAME`,
    `GPU_NODE_TYPE`, `USERS_GROUP` as needed.
 3. In each workspace: the service principal can use the catalog/schema, the

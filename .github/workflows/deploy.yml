@@ -2,7 +2,8 @@
 # prod on demand only, gated by the "prod" GitHub environment (required reviewers).
 #
 # Each GitHub environment (dev, uat, prod) holds its own secrets:
-#   DATABRICKS_HOST, DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET   (service principal, OAuth M2M)
+#   DATABRICKS_CLIENT_SECRET (service principal, OAuth M2M), and DATABRICKS_HOST,
+#   DATABRICKS_CLIENT_ID as secrets or variables (neither is sensitive)
 # and variables passed to the bundle as BUNDLE_VAR_<name>, e.g.
 #   SERVICE_PRINCIPAL, JUDGE_ENDPOINT, WAREHOUSE_NAME, GPU_NODE_TYPE, USERS_GROUP
 name: deploy
@@ -32,8 +33,8 @@ jobs:
     environment: ${{ github.event.inputs.target || 'uat' }}
     env:
       TARGET: ${{ github.event.inputs.target || 'uat' }}
-      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST || vars.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID || vars.DATABRICKS_CLIENT_ID }}
       DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
       BUNDLE_VAR_service_principal: ${{ vars.SERVICE_PRINCIPAL }}
       BUNDLE_VAR_judge_endpoint: ${{ vars.JUDGE_ENDPOINT || 'none' }}
