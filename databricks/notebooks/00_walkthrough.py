@@ -116,7 +116,7 @@ show("data/datasets/answer_key/review_key.csv", cols=["visit_id", "truth_status"
 # COMMAND ----------
 
 # DBTITLE 1,6. AI models read the notes
-links("6", "ai-models-read-the-notes", "AI models read the notes", "models-evaluated", ['python/dental_omop_nlp/rungs.py', 'models.yaml', 'python/dental_omop_nlp/llm_reader.py', 'python/scripts/11_ai_predict.py'])
+links("6", "ai-models-read-the-notes", "AI models read the notes", "models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml", ['python/dental_omop_nlp/rungs.py', 'models.yaml', 'python/dental_omop_nlp/llm_reader.py', 'python/scripts/11_ai_predict.py'])
 show("data/datasets/ai_predictions_tfidf_logreg.csv")
 
 # COMMAND ----------
