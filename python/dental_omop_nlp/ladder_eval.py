@@ -10,6 +10,9 @@ measured directly, not only as agreement with reviewers. Per method:
   unsafe_rate/s2_rate harm.py's severity matrix against the truth
   ece                 expected calibration error of the top-class probability (10 bins)
 
+`by_difficulty` splits accuracy by the note's difficulty level (L1 plain, L2, L3 hard), where an
+LLM reader and a fine-tuned encoder are most likely to differ (scripts/29_medgemma_vs_bert.py).
+
 `rules_override` is the stage IV hybrid: where the note rules say stage IV, use that; otherwise the
 model. Fine-tuned encoders saw 7 stage IV notes in training and miss nearly all of them.
 R twin: r/R/10_ladder.R (point estimates; bootstrap CIs differ by RNG).
@@ -61,4 +64,20 @@ def ladder_table(truth: pd.Series, preds: dict, proba: dict | None = None, n_boo
             row |= {"diff_vs_ref": c.mean() - ref.mean(), "diff_lo": np.quantile(d, 0.025),
                     "diff_hi": np.quantile(d, 0.975)}
         rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def missing_charts(pred: pd.Series, truth: pd.Series) -> int:
+    """Review charts a run did not score (e.g. a --limit smoke test); such a run isn't comparable."""
+    return int(pred.reindex(truth.index).isna().sum())
+
+
+def by_difficulty(truth: pd.Series, preds: dict, level: pd.Series) -> pd.DataFrame:
+    """Accuracy per method and difficulty level (long: method, difficulty, n, accuracy)."""
+    t, lv = truth.to_numpy(), level.reindex(truth.index).to_numpy()
+    rows = []
+    for m, p in preds.items():
+        ok = p.reindex(truth.index).to_numpy() == t
+        rows += [{"method": m, "difficulty": lev, "n": int((lv == lev).sum()), "accuracy": ok[lv == lev].mean()}
+                 for lev in sorted(set(lv))]
     return pd.DataFrame(rows)

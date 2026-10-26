@@ -18,9 +18,9 @@ Pictures of the same: [medallion architecture](../diagrams/d0_medallion_architec
 
 | # | Step | Command | README section |
 |---|---|---|---|
-| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Sources](../README.md#dental-omop-nlp) |
+| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Evidence types](../README.md#dental-omop-nlp) |
 | 2 | [De-identify and gate](#2-de-identify-and-gate) | (inside step 1) | [Ground rules](../README.md#ground-rules) |
-| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Diagnostic evidence](../README.md#dental-omop-nlp) |
+| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Evidence types](../README.md#dental-omop-nlp) |
 | 4 | [Compare the evidence](#4-compare-the-evidence) | (inside step 1) | [Study process](process.md) |
 | 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#dental-omop-nlp) |
 | 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml) |
@@ -124,6 +124,7 @@ What a BERT model is, in plain words: [bert.md](bert.md).
 - Output: `data/datasets/ai_predictions_<rung>.csv` (LLMs also `llm_details_<rung>.csv`).
 - Status: baselines and six encoders run on CPU: 77-82% correct on the synthetic review charts, not distinguishable from the note rules (79%); all miss nearly every stage IV chart (7 training examples). With the note rules deciding stage IV (`+rules4`) they reach 87-91%. The Longformers, large ModernBERTs and MedGemma need a GPU.
 - Compare against the truth: [`scripts/28_ladder_vs_truth.py`](../python/scripts/28_ladder_vs_truth.py) → `data/datasets/ladder/ladder_vs_truth.csv` (accuracy with bootstrap CIs, difference from note rules, stage IV recall, unsafe rate, calibration); R twin `r/R/10_ladder.R`.
+- MedGemma vs BERT: [`scripts/29_medgemma_vs_bert.py`](../python/scripts/29_medgemma_vs_bert.py) → `data/datasets/ladder/medgemma_vs_bert.csv` (each MedGemma run minus the best encoder, paired bootstrap CI; stage IV recall; gate and fallback rates; assumed corpus cost) and `..._by_difficulty.csv`. MedGemma variants keep their own files (`+lora`, `+k<shots>`, `+terse`). `--simulated` uses the placeholder reader: a dry run.
 
 ## 7. Reviewers stage charts
 

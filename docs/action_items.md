@@ -13,10 +13,10 @@ needs confirming.
 | # | Difference | What the repo does now | Action | Owner | Status |
 |---|---|---|---|---|---|
 | A1 | Study design uses **five categories** (healthy/gingivitis combined, stage I–IV); the repo labels six | Both: reviewers still label six; every reliability table is also reported on five (`reliability_5cat/`) | Agree which is the headline; keep six in Label Studio so healthy vs gingivitis isn't lost | study lead | Done, confirm |
-| A2 | **Starting source order** in the design is exam form → diagnosis code → note NLP → periodontal-chart algorithm. The repo's earlier placeholder put the chart first | Design order is now `algorithm_design` (`RULES_DESIGN`); the old order stays as `algorithm_v0` for comparison | Confirm the order and whether diagnosis codes on *planned* procedures count with completed ones | study lead | Done, confirm |
-| A3 | The design lets the order change if another source proves more accurate | `18_phenotype_order.py` scores all 24 orders: chosen on half the review charts, reported on the other half with the acceptance test | Pre-specify the selection metric (kappa vs consensus here) and margin before the real reviews | study lead | Done, confirm |
+| A2 | **Starting evidence order** in the design is exam form → diagnosis code → note NLP → periodontal-chart algorithm. The repo's earlier placeholder put the chart first | Design order is now `algorithm_design` (`RULES_DESIGN`); the old order stays as `algorithm_v0` for comparison | Confirm the order and whether diagnosis codes on *planned* procedures count with completed ones | study lead | Done, confirm |
+| A3 | The design lets the order change if another evidence type proves more accurate | `18_phenotype_order.py` scores all 24 orders: chosen on half the review charts, reported on the other half with the acceptance test | Pre-specify the selection metric (kappa vs consensus here) and margin before the real reviews | study lead | Done, confirm |
 | A4 | Dry run: design order held-out kappa **0.74** (inconclusive) vs **0.97** for chart > notes > exam form > dx code | Simulated reviewers are generated from truth and the chart is closest to truth, so chart-first wins **by construction** | Decide with real reviewer labels only | — | Open |
-| A5 | Procedure codes (CDT) are not in the design's four sources | Excluded from `algorithm_design`; still used as sources in v0 and the comparisons | Confirm they stay out of the integrated phenotype | study lead | Open |
+| A5 | Procedure codes (CDT) are not in the design's four evidence groups | Excluded from `algorithm_design`; still used as evidence in v0 and the comparisons | Confirm they stay out of the integrated phenotype | study lead | Open |
 | A6 | Radiograph AI is not in the design | Not in `algorithm_design`; v0 uses it as a lower bound when the chart is missing (spec 003) | Decide whether it enters the phenotype | study lead | Open |
 
 ## Validation over time and against external evidence
@@ -24,8 +24,8 @@ needs confirming.
 | # | Difference | What the repo does now | Action | Owner | Status |
 |---|---|---|---|---|---|
 | B1 | **Temporal plausibility** wasn't checked before; synthetic visits were independent | Patient histories: attachment/bone loss never recover; therapy lowers pockets and bleeding; checks flag CAL drops > 1.5 mm, RBL drops > 5 points, teeth regained, periodontitis "resolving", stage drops (`plausibility.py`, Py + R) | Periodontist to confirm the tolerances (probe error, RBL measurement error) | periodontist | Done, confirm |
-| B2 | Dry run: the design-order phenotype drops a stage at **24%** of follow-up visits (chart alone: 0.6%) because forms and codes vary visit to visit | Reported per method in `data_quality/temporal_by_method.csv` | Use temporal plausibility as a second criterion when choosing the source order | study lead | Open |
-| B3 | Repo assumes **the stage reached is kept** after therapy, even when pockets shrink below a complexity threshold | Truth keeps the highest stage; the probing-chart source reads each visit alone | Confirm against the classification's guidance | periodontist | Open |
+| B2 | Dry run: the design-order phenotype drops a stage at **24%** of follow-up visits (chart alone: 0.6%) because forms and codes vary visit to visit | Reported per method in `data_quality/temporal_by_method.csv` | Use temporal plausibility as a second criterion when choosing the evidence order | study lead | Open |
+| B3 | Repo assumes **the stage reached is kept** after therapy, even when pockets shrink below a complexity threshold | Truth keeps the highest stage; the probing-chart evidence reads each visit alone | Confirm against the classification's guidance | periodontist | Open |
 | B4 | Grade from **direct evidence** needs a 5-year history | Not generated (histories ≤ 3 years); grade uses % bone loss ÷ age | Decide whether real histories are long enough; otherwise document indirect grading | study lead | Open |
 | B5 | **Clinic-level prevalence**: synthetic clinics only | 8 clinics with their own case mix and charting rates; person-level prevalence with Wilson 95% CIs (`19_prevalence.py`, Py + R) | Define "clinic" in real data (location, provider group); set a minimum number of people per clinic to report | data engineering | Done, confirm |
 | B6 | **External comparison**: published figures use different case definitions | Adults 30+: synthetic design phenotype 57% (95% CI 54–60%) vs NHANES 2009–2014 42.2% any, 7.8% severe (CDC/AAP definitions). The generator's mix is a placeholder, so the gap means nothing yet | Pick directly comparable published studies (practice-based, 2017 staging); compute CDC/AAP case definitions too (spec 006, needs site-level data) | study lead | Open |
@@ -35,7 +35,7 @@ needs confirming.
 | # | Difference | What the repo does now | Action | Owner | Status |
 |---|---|---|---|---|---|
 | C1 | Data trustworthiness wasn't assessed as such | Conformance, completeness and plausibility checks overall and per clinic, using OHDSI Data Quality Dashboard terms (`20_data_quality.py`) | Agree thresholds (5% failing used here) and which checks matter | data engineering | Done, confirm |
-| C2 | Dry run: temporal checks catch **33%** of the injected charting errors (0.2% false flags) | Decimal slips are caught; another patient's chart often isn't | Add cross-source checks (chart vs note vs codes at the same visit) | data engineering | Open |
+| C2 | Dry run: temporal checks catch **33%** of the injected charting errors (0.2% false flags) | Decimal slips are caught; another patient's chart often isn't | Add cross-evidence checks (chart vs note vs codes at the same visit) | data engineering | Open |
 | C3 | Data quality, order search and prediction were Python only | R twins in `r/R/09_spec005.R`: all 24 orders, every data-quality check and both progression models match Python (parity section 10). The halves and test people are shared files, so bootstrap CIs and permutation importance still differ slightly by RNG | Confirm approximate CIs are acceptable | data science | Done, confirm |
 
 ## Prediction
@@ -43,7 +43,7 @@ needs confirming.
 | # | Difference | What the repo does now | Action | Owner | Status |
 |---|---|---|---|---|---|
 | D1 | The study design calls for predicting who gets worse; this repo had no prediction step until spec 005 added one | Predicts whether the next visit's phenotype is worse, from the current visit only (`21_predict_progression.py`; explained in [walkthrough step 12](code_walkthrough.md#12-predict-progression)) | Define the outcome (stage up? any CAL gain?) and horizon (next visit? 1, 3, 5 years?) | study lead | Done, confirm |
-| D2 | Dry run: with the phenotype as outcome, **22.6%** of visit pairs "progress" vs **7.5%** in truth; the model mostly learns phenotype noise (current stage dominates) | Reported for both outcomes | Correct for misclassification, or use outcomes only when the source is stable (B2) | data science | Open |
+| D2 | Dry run: with the phenotype as outcome, **22.6%** of visit pairs "progress" vs **7.5%** in truth; the model mostly learns phenotype noise (current stage dominates) | Reported for both outcomes | Correct for misclassification, or use outcomes only when the evidence is stable (B2) | data science | Open |
 | D3 | Even against truth, smoking and diabetes barely register: stage changes are rare over ≤ 3 years | — | Longer follow-up, or model CAL change directly; compare importance with published risk factors | data science | Open |
 
 ## Site-level OMOP (spec 006)

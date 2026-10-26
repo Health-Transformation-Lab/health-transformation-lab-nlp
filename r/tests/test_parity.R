@@ -105,6 +105,34 @@ if (file.exists("data/deid/cost_inputs.csv") && file.exists("data/deid/cost_effe
               all(m$dominated.r == as.logical(m$dominated.p))))
   stopifnot(d < 1e-6, same_na, all(m$dominated.r == as.logical(m$dominated.p)))
 } else cat("de-id CE: skipped (run python/scripts/26_deid_benchmark.py first)\n")
+# 9e. De-identification review flows (spec 008): agreement, consensus, annotator recall, and the QA
+# leak rate, sensitivity, specificity and leak-span recall, R == Python.
+for (pfx in c("", "simulated_")) {
+  f <- sprintf("data/deid/review/%sgold_spans.csv", pfx)
+  if (!file.exists(f)) next
+  source("r/R/08_deid.R")
+  rd <- function(x) read.csv(sprintf("data/deid/review/%s%s.csv", pfx, x), stringsAsFactors = FALSE)
+  gs <- read.csv(f, stringsAsFactors = FALSE)
+  ma <- merge(deid_agreement(gs), rd("gold_agreement"), by = c("annotator_a", "annotator_b"), suffixes = c(".r", ".p"))
+  da <- max(abs(ma$f1_span.r - ma$f1_span.p), abs(ma$f1_typed.r - ma$f1_typed.p), abs(ma$n_notes.r - ma$n_notes.p))
+  rc <- deid_consensus(gs); pc <- rd("gold_consensus")
+  mc <- merge(rc, pc, by = c("note_id", "start", "end"), suffixes = c(".r", ".p"))
+  ok_c <- nrow(mc) == nrow(pc) && nrow(rc) == nrow(pc) && all(mc$type.r == mc$type.p)
+  mr <- merge(deid_annotator_recall(gs, rd("generator_spans")), rd("gold_annotator_recall"),
+              by = c("annotator", "aided"), suffixes = c(".r", ".p"))
+  dr <- max(abs(mr$entity_recall.r - mr$entity_recall.p), abs(mr$n_phi.r - mr$n_phi.p))
+  ql <- rd("qa_labels"); pq <- rd("qa_summary")
+  mq <- merge(merge(deid_qa_summary(ql), deid_qa_vs_key(ql, rd("qa_key")), by = "scope"), pq,
+              by = "scope", suffixes = c(".r", ".p"))
+  cols <- c("n_notes", "leak_notes", "leak_rate", "leak_lo", "leak_hi", "over_redaction_rate",
+            "sensitivity", "specificity", "leak_span_recall")
+  dq <- max(sapply(cols, function(k) { x <- abs(mq[[paste0(k, ".r")]] - mq[[paste0(k, ".p")]]); max(ifelse(is.na(x), 0, x)) }))
+  cat(sprintf("%sdeid review: %d pairs %.2e; consensus %d spans same: %s; recall %.2e; QA %d scopes %.2e\n",
+              pfx, nrow(ma), da, nrow(pc), ok_c, dr, nrow(mq), dq))
+  stopifnot(nrow(ma) == nrow(rd("gold_agreement")), da < 1e-9, ok_c, nrow(mr) == nrow(rd("gold_annotator_recall")),
+            dr < 1e-9, nrow(mq) == nrow(pq), dq < 1e-9)
+}
+
 # 9b. Licensed engines (John Snow Labs) never reach cost_inputs.csv without a licence, so check the
 # R twin directly against Python's deid_eval.engine_cost on the vendor's example (1M notes x 5,250 chars).
 source("r/R/08_deid.R")
@@ -130,6 +158,27 @@ if (file.exists("data/datasets/ladder/ladder_vs_truth.csv")) {
   cat(sprintf("ladder vs truth: %d methods, max |R - Python| = %.2e\n", nrow(m), d))
   stopifnot(nrow(m) == nrow(py), d < 1e-9, same_na)
 } else cat("ladder vs truth: skipped (run python/scripts/28_ladder_vs_truth.py first)\n")
+
+# 9d. MedGemma vs BERT (spec 004 T018): same point estimates and per-difficulty accuracy.
+# Uses the real runs if present, else the simulated dry run (placeholder reader, not a result).
+for (pfx in c("", "simulated_")) {
+  f <- sprintf("data/datasets/ladder/%smedgemma_vs_bert_preds.csv", pfx)
+  if (!file.exists(f)) next
+  source("r/R/10_ladder.R")
+  gp <- read.csv(f, stringsAsFactors = FALSE, check.names = FALSE)
+  r <- ladder_point(gp, data.frame(method = character(), visit_id = integer()))
+  py <- read.csv(sprintf("data/datasets/ladder/%smedgemma_vs_bert.csv", pfx), stringsAsFactors = FALSE, check.names = FALSE)
+  m <- merge(r, py, by = "method", suffixes = c(".r", ".p"))
+  cols <- c("accuracy", "stage4_recall", "unsafe_rate", "s2_rate")
+  d <- max(sapply(cols, function(k) max(abs(m[[paste0(k, ".r")]] - m[[paste0(k, ".p")]]))))
+  rl <- by_difficulty(gp, gp$difficulty)
+  pl <- read.csv(sprintf("data/datasets/ladder/%smedgemma_vs_bert_by_difficulty.csv", pfx), stringsAsFactors = FALSE)
+  ml <- merge(rl, pl, by = c("method", "difficulty"), suffixes = c(".r", ".p"))
+  dl <- max(abs(ml$accuracy.r - ml$accuracy.p), abs(ml$n.r - ml$n.p))
+  cat(sprintf("%smedgemma vs bert: %d methods, max |R - Python| = %.2e; by difficulty %.2e\n",
+              pfx, nrow(m), d, dl))
+  stopifnot(nrow(m) == nrow(py), d < 1e-9, nrow(ml) == nrow(pl), dl < 1e-9)
+}
 
 # 10. Spec 005 twins: evidence-order search, data quality, progression (R 09_spec005.R).
 sp <- "data/review/simulated_reliability_5cat/phenotype_orders_split.csv"

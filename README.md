@@ -6,7 +6,8 @@
 > organization, including CareQuest. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
 
 Can periodontal status be phenotyped from a dental EHR, and can AI reading the
-chart notes match clinicians? This repo runs that study end to end on **synthetic**
+chart notes match clinicians? (**OMOP** = a common format for health records; **NLP** = software
+that reads free text: [what they are](docs/omop_and_nlp.md).) This repo runs that study end to end on **synthetic**
 data, to learn the pipeline, the reviewer workflow and the analysis.
 
 <img src="docs/img/process.png" alt="Study process" width="420">
@@ -18,15 +19,15 @@ and bone), with a **stage** I–IV (how severe), **grade** A–C (how fast) and 
 [in plain words](docs/staging_grading.md#in-plain-words). Dental records rarely hold a
 reliable assigned diagnosis, so the phenotype has to be derived from the evidence below.
 
-**Diagnostic evidence for each visit:** seven parts of the dental record that each suggest a
+**Evidence types per visit:** seven parts of the dental record that each suggest a
 periodontal status. They often disagree:
 
-| # | Diagnostic evidence | What it is | Phenotype order |
+| # | Evidence type | What it is | Phenotype order |
 |---|---|---|---|
 | 1 | Chart note | Free text the clinician writes | 3rd |
 | 2 | Exam form | Structured fields, e.g. PSR score, perio status | 1st |
-| 3–4 | Procedure diagnoses, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
-| 5–6 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
+| 3–4 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
+| 5–6 | Procedure diagnosis codes, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
 | 7 | Probing chart | Attachment loss, bone loss, teeth lost | 4th |
 
 When the evidence disagrees, the phenotype uses the first one in this order that gives a status.
@@ -103,8 +104,15 @@ Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5
 - letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
   clearly better than the rules (difference CI excludes 0);
 - they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
+- class-weighted training (`--class-weight sqrt`) only lifts ModernBERT base's stage IV recall from 7% to 21%
+  (accuracy 84%); with 7 training examples, the rules-decide hybrid stays far better.
 
 The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
+
+**MedGemma vs BERT:** `29_medgemma_vs_bert.py` scores each MedGemma run (zero-shot, few-shot, LoRA)
+against the best encoder on the same charts (paired CI, stage IV recall, by note difficulty, fallback
+rate, assumed cost). MedGemma has **not run yet** (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; a GPU helps:
+[notebook 03](databricks/notebooks/03_medgemma_reader.py)); `--simulated` is a dry run, not a result.
 
 ## Action items
 
@@ -115,10 +123,11 @@ Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol]
 
 | Topic | |
 |---|---|
+| **What OMOP and NLP are**, in plain words | [omop_and_nlp.md](docs/omop_and_nlp.md) |
 | **Diagrams**: [medallion architecture](diagrams/d0_medallion_architecture.png), study process, platform, ERD, site storage, MLOps, flows | [diagrams/](diagrams/README.md) |
 | Tooth-by-tooth data in OMOP; 2017 AAP/EFP **and 2012 CDC/AAP**; storage designs on Postgres/Lakebase | [site_level_omop.md](docs/site_level_omop.md) |
 | Study design vs this repo; open decisions | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
 | Dental vs medical data in OMOP; synthetic notes, review set, public datasets | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md), [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
 | MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
 | Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
-| De-identification methods and cost; financial trade-offs; radiographs; MedGemma | [deidentification.md](docs/deidentification.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
+| De-identification methods and cost, human review in Label Studio; financial trade-offs; radiographs; MedGemma | [deidentification.md](docs/deidentification.md), [deid_review_protocol.md](docs/deid_review_protocol.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |

@@ -35,6 +35,16 @@
 | 5 | **Radiograph extension ("extend", images)** | MedGemma wasn't trained on dental images. Options: (a) MedSigLIP image embeddings + a small classifier for bone loss; (b) fine-tune the 4B multimodal model on a public, licensed dental radiograph dataset. Output feeds the same structured radiograph schema as spec 003 | High; images and licences | Radiograph exploration |
 | 6 | **Grade from history** | Use the long context to read several visits at once and estimate progression (grade is about rate of change) | Medium | Grade reader |
 
+## Licence requirement
+
+Every MedGemma model is **gated** on Hugging Face under the
+[HAI-DEF terms of use](https://developers.google.com/health-ai-developer-foundations/terms).
+Before any run: accept the terms on the model's Hugging Face page with your own account, then make a
+read token from that account available as `HF_TOKEN` (cloud environment secret, or the Databricks
+secret scope `dental` / `hf_token` for notebook 03). Without both, the download fails with 401/403.
+The terms also govern sharing outputs and fine-tuned weights: check them before publishing a LoRA
+adapter. `models.yaml` marks these entries `gated: true` with the licence link.
+
 ## Implemented (spec 004)
 
 Uses 1 (reader), 2 (LoRA fine-tune) and 3 (judge family rule) are in the code.
@@ -48,7 +58,9 @@ L1 100% (141), L2 97% (31), L3 16% (68). Gate pass 97.9%, fallback 2.1%, ~850 to
 in and ~75 out per note, ~27 s per note on 4 CPU cores. So it reads a written
 diagnosis well and does not yet stage from the chart findings when none is
 written; L3 is where few-shot, prompt variants or the LoRA fine-tune would have to
-help. Full table: `data/datasets/ladder/ladder_vs_truth.csv`.
+help. Against the best encoder alone (`modernbert-base+cw`, 0.838) the difference is
+-0.079 (-0.154 to -0.013); on L3 the encoder gets 81%. Full tables:
+`data/datasets/ladder/ladder_vs_truth.csv` and `medgemma_vs_bert*.csv`.
 
 MedGemma 1.5 opens with a `<unused94>thought ... <unused95>` block; the hf backend
 suppresses it (it otherwise used up the 300 new tokens before the JSON) and
@@ -63,9 +75,11 @@ suppresses it (it otherwise used up the 300 new tokens before the JSON) and
 | Judge rule | `15_judge.py` excludes judges of any evaluated LLM's family (`family: gemma` in `models.yaml`) |
 | Databricks | `databricks/notebooks/03_medgemma_reader.py` (Free Edition serverless GPU) |
 | Costs | `costs.yaml`: assumed GPU throughput, ILLUSTRATIVE; measure and replace |
+| Compare with BERT | `python scripts/29_medgemma_vs_bert.py [--bert modernbert-base]`: each MedGemma run minus the encoder, paired bootstrap CI, stage IV recall, by difficulty, fallback rate; R twin in `10_ladder.R`. Notebook 03 runs it after the reader (set `limit` 0, `lora_train` > 0 for the fine-tuned version) |
 
 Per-note details (gate pass, fallback, tokens, latency) go to
-`data/datasets/llm_details_<rung>.csv`. The simulated dry run's numbers come from
+`data/datasets/llm_details_<rung><tag>.csv`; the tag (`+lora`, `+k<shots>`, `+terse`) keeps
+zero-shot, few-shot and fine-tuned runs apart. The simulated dry run's numbers come from
 placeholder error rates and say nothing about MedGemma.
 
 ## Suggested order

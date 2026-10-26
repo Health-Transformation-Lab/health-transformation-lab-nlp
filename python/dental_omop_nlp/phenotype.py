@@ -26,12 +26,12 @@ METHODS = ["notes", "exam_form", "proc_codes_completed", "proc_codes_planned",
 
 RULES_V0 = {
     "version": "v0.1-placeholder",
-    # Trust order when sources disagree. Probing chart first: it is the measured
+    # Trust order when evidence types disagree. Probing chart first: it is the measured
     # evidence the 2017 definitions are written against. Then the clinician's
     # written diagnosis, then diagnosis codes, then the form, then procedures.
     # v0.1 (spec 003): when the probing chart is missing, the radiograph AI is a
     # LOWER BOUND on stage (stage = worst criterion, RBL is one of them): if it
-    # shows more bone loss than the deciding source implies, raise to its stage.
+    # shows more bone loss than the deciding evidence type implies, raise to its stage.
     # Tested against putting it ahead of the notes, which did worse (spec 003).
     "priority": ["probing_chart", "notes", "proc_dx_completed", "proc_dx_planned",
                  "exam_form", "proc_codes_completed", "proc_codes_planned"],
@@ -39,7 +39,7 @@ RULES_V0 = {
 }
 # Spec 005: the study design's starting order for the integrated phenotype. Not
 # assumed final: scripts/18_phenotype_order.py scores every ordering of the four
-# groups so the order can change if another source proves more accurate.
+# groups so the order can change if another evidence type proves more accurate.
 DESIGN_GROUPS = {
     "exam_form": ["exam_form"],
     "dx_code": ["proc_dx_completed", "proc_dx_planned"],
@@ -131,7 +131,7 @@ def split_halves(ids, seed: int) -> tuple[set, set]:
 
 def score_orders(key: pd.DataFrame, reviewer_wide: pd.DataFrame, n_boot: int = 200, seed: int = 0,
                  five: bool = True, margin: float = 0.05) -> pd.DataFrame:
-    """Score every ordering of the four source groups (spec 005).
+    """Score every ordering of the four evidence groups (spec 005).
 
     The review charts are split in half by seed. The order is chosen on the
     'select' half (highest kappa vs reviewer consensus) and reported on the

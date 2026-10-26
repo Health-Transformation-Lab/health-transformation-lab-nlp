@@ -33,7 +33,7 @@ al., OHDSI 2025).
 |---|---|---|---|
 | Diagnosis | `CONDITION_OCCURRENCE` (ICD-10-CM → SNOMED standard) | Often has to be **inferred** from charting or notes; that's what this project studies | Model output goes to `NOTE_NLP` as a flag, **never** `CONDITION_OCCURRENCE` |
 | Procedure | `PROCEDURE_OCCURRENCE` (CPT/HCPCS standard) | CDT/HCPCS D-codes can appear in Athena as **non-standard or deprecated**, so data may sit in `procedure_source_value` / `source_concept_id` (OHDSI forum) | `PROCEDURE_OCCURRENCE` with CDT source values |
-| Planned vs done | Orders, rarely in OMOP | Treatment plans are a key signal (planned scaling and root planing implies perio) | Planned and completed kept as separate sources |
+| Planned vs done | Orders, rarely in OMOP | Treatment plans are a key signal (planned scaling and root planing implies perio) | Planned and completed kept as separate evidence types |
 | Tooth / surface / site | No native table | Proposed `SITE` / `SITE_EVENT` extension (OHDSI Dentistry Workgroup) | `omop/ddl/dental_extension.sql` |
 | Perio chart numbers | `MEASUREMENT` with LOINC | Few standard concepts for per-site perio values | `MEASUREMENT` + local concepts (`DENTAL_LOCAL`, `omop/vocab/local_concepts.csv`) |
 | Radiograph findings | `MEASUREMENT` / `OBSERVATION`, report text in `NOTE` | Per-tooth bone level needs site linkage | `MEASUREMENT` linked via `SITE_EVENT` (exploratory, spec 003) |

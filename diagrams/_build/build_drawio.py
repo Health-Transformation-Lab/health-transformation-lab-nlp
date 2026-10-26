@@ -87,13 +87,13 @@ save("d0_medallion_architecture", page_w=1860, page_h=790)
 reset()
 title("Study process: notes, exam forms, procedure codes and diagnoses, probing chart → phenotype and AI, validated against reviewers")
 srcs = [("s1", "Chart notes"), ("s2", "Exam forms"), ("s3", "Procedure codes\ncompleted"), ("s4", "Procedure codes\nplanned"),
-        ("s5", "Procedure diagnoses\ncompleted"), ("s6", "Procedure diagnoses\nplanned"), ("s7", "Probing chart\nCAL · RBL · teeth lost")]
-lane("Sources (one visit)", 40, 60, 1520)
+        ("s5", "Procedure diagnosis\ncodes, completed"), ("s6", "Procedure diagnosis\ncodes, planned"), ("s7", "Probing chart\nCAL · RBL · teeth lost")]
+lane("Evidence types (one visit)", 40, 60, 1520)
 for i, (cid, lab) in enumerate(srcs):
     box(cid, lab, 40 + i * 220, 110, 200, 60, color=BLUE, fill=BLUE_F)
 box("rad", "Radiograph AI (exploratory) · bone level per tooth", 1210, 215, 350, 34, color=GREY, fill=GREY_F)
 lane("Qualitative", 40, 270, 740)
-box("cmp", "Compare each source with every other\nagreement, kappa, coverage", 40, 320, 340, 60, color=GREEN, fill=GREEN_F)
+box("cmp", "Compare each evidence type with every other\nagreement, kappa, coverage", 40, 320, 340, 60, color=GREEN, fill=GREEN_F)
 box("qr", "Qualitative review\ntwo dental reviewers, disagreeing charts", 420, 320, 360, 60, color=GREEN, fill=GREEN_F)
 lane("Quantitative", 820, 270, 740)
 box("alg", "Rule-based phenotype\nstudy-design order: exam form > dx code > notes > chart\n(all 24 orders scored)", 820, 320, 360, 70, color=ORANGE, fill=ORANGE_F)
