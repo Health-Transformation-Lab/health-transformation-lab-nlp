@@ -110,8 +110,14 @@ TF-IDF + radiograph features), the 12-model BERT ladder, and LLM readers.
 
 ## 7. Reviewers stage charts
 
-Each reviewer gets their own Label Studio project with `review_tasks.json`
-and stages every chart independently, following the protocol.
+**In plain words:** several periodontists each read the same 240 de-identified charts and record
+the status they'd assign (healthy, gingivitis, or periodontitis with stage, grade and extent),
+plus which evidence decided it. They work separately and never see each other's answers. Their
+labels are the human benchmark the AI and the rules are checked against.
+
+**Label Studio** is a free, open-source labeling tool: it shows each chart on screen with buttons
+for the answers. Each reviewer gets their own project with `review_tasks.json` and follows the
+written protocol.
 
 - Code / config: [`labelstudio/chart_review.xml`](../labelstudio/chart_review.xml), [`labelstudio/README.md`](../labelstudio/README.md),
   [`labeling_protocol.md`](labeling_protocol.md); [`labelstudio.py`](../python/dental_omop_nlp/labelstudio.py), [`scripts/12_import_review.py`](../python/scripts/12_import_review.py).
@@ -120,7 +126,11 @@ and stages every chart independently, following the protocol.
 
 ## 8. Reliability and the acceptance test
 
-Fleiss' kappa across reviewers; each evidence type, the phenotype and each AI model
+**In plain words:** people don't agree perfectly either, so the bar for the AI isn't 100%. It's
+"agrees with the periodontists at least as often as they agree with each other". First measure
+how much the reviewers agree among themselves; then how much each method agrees with them.
+
+In detail: Fleiss' kappa across reviewers; each evidence type, the phenotype and each AI model
 against the reviewers; errors by clinical severity and by difficulty; and the
 **acceptance test**: does the method agree with the reviewers at least as much
 as they agree with each other ([process.md](process.md#validation-criterion-as-reliable-as-a-human-reviewer), [statistics.md](statistics.md)).
@@ -131,8 +141,15 @@ as they agree with each other ([process.md](process.md#validation-criterion-as-r
 
 ## 9. Five categories and evidence order
 
-The same report with healthy and gingivitis combined, and every ordering of the
-four evidence groups scored: chosen on half the charts, reported on the other half.
+**Six vs five categories.** The six labels are healthy, gingivitis and periodontitis stages I–IV.
+The study design also uses five, with healthy and gingivitis merged into one "no periodontitis"
+category. Reviewers still label six; every result is reported both ways.
+
+**Evidence order.** When the evidence disagrees, the rule-based phenotype takes the first of
+four groups that has an answer: exam form, then diagnosis codes, then the note, then the probing
+chart (the study design's order). Four groups can be ordered 24 ways. Each order is tried, the
+one that agrees best with the reviewers is picked on half the charts, and its agreement is then
+measured on the other half, so the pick isn't graded on the charts that chose it.
 
 - Code: `phenotype.collapse5`, `score_orders`; [`scripts/18_phenotype_order.py`](../python/scripts/18_phenotype_order.py).
 - Output: `data/review/[simulated_]reliability_5cat/` (`agreement_vs_humans.csv`, `phenotype_orders.csv`).

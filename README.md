@@ -35,11 +35,9 @@ against the reviewers so a better one can replace it. A radiograph AI reading ca
 **Free text:** here the chart notes are the only free text and the only AI input; real records have
 more (form and chart comments, radiograph reports, referral letters): [action items](docs/action_items.md). Details: [process.md](docs/process.md).
 
-**Two classification systems:** the 2017 AAP/EFP staging and grading, following the AAP worksheet
-([PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf)),
-for the truth, reviewers and LLMs ([staging_grading.md](docs/staging_grading.md)); and the 2012 CDC/AAP
-surveillance definitions behind national prevalence, computed from tooth- and site-level charts
-([site_level_omop.md](docs/site_level_omop.md)).
+**Classification: 2017 AAP/EFP by default**, the current clinical standard for diagnosis; truth,
+reviewers and AI all follow the AAP worksheet ([PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf), [staging_grading.md](docs/staging_grading.md)).
+The 2012 CDC/AAP surveillance definitions, behind national prevalence, are computed too ([site_level_omop.md](docs/site_level_omop.md)).
 
 ## What it does, step by step
 
@@ -53,8 +51,8 @@ step, with links to the code; the Databricks notebook
 | 2 | De-identify; a leak gate blocks any note with PHI left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
 | 3 | Read and compare the diagnostic evidence; build the rule-based phenotype | [3–5](docs/code_walkthrough.md#3-read-the-diagnostic-evidence) |
 | 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
-| 5 | Reviewers stage the same charts in Label Studio | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
-| 6 | Reliability and the acceptance test, on six and five categories; all 24 evidence orders scored | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
+| 5 | Periodontists label the same 240 charts, each on their own, in a labeling tool (Label Studio) | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
+| 6 | Does the AI agree with the periodontists as often as they agree with each other? Also: which order of checking the evidence agrees best | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
 | 7 | Over time and at scale: plausibility, data quality, clinic prevalence, progression | [10–12](docs/code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
 | 8 | Site-level charts, both classifications, three OMOP storage designs, Lakebase | [13–15](docs/code_walkthrough.md#13-site-level-charts-both-classifications) |
 | 9 | 1M+ notes: LLM judge and cost; deploy to dev, UAT, prod | [16–18](docs/code_walkthrough.md#16-llm-judge-and-cost-at-1m-notes) |
@@ -108,4 +106,4 @@ Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol]
 | Dental vs medical data in OMOP; synthetic notes, review set, public datasets | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md), [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
 | MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
 | Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
-| De-identification: labeled fake-PHI test set, regex vs Presidio vs Azure, cost-effectiveness; financial trade-offs; radiographs, MedGemma | [deidentification.md](docs/deidentification.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [cost_effectiveness.md](docs/cost_effectiveness.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
+| De-identification methods and cost; financial trade-offs; radiographs; MedGemma | [deidentification.md](docs/deidentification.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |

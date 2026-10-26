@@ -5,6 +5,8 @@
 > This page shows how to reason about the trade-offs and where the numbers come
 > from; it is not a cost estimate for any organization. See [DISCLAIMER](../DISCLAIMER.md).
 
+Methods behind the numbers: [cost_effectiveness.md](cost_effectiveness.md). De-identification costs: [deidentification.md](deidentification.md#cost-effectiveness).
+
 ## The question
 
 For a corpus of about a million notes: which method gives enough accuracy, and
