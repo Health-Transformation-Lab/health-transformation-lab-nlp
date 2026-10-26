@@ -1,4 +1,4 @@
-"""Spec 008: a de-identification test pass on MACCROBAT's BIO labels. Fixtures are invented sentences."""
+"""Spec 009: a de-identification test pass on MACCROBAT's BIO labels. Fixtures are invented sentences."""
 
 import json
 

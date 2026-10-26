@@ -1,8 +1,8 @@
-"""De-identification test pass on MACCROBAT, real published case reports with BIO labels (spec 008).
+"""De-identification test pass on MACCROBAT, real published case reports with hand-made labels (spec 009).
 
-    python scripts/30_maccrobat_deid.py --download          # fetch the original release (figshare) into data/raw/
-    python scripts/30_maccrobat_deid.py --source bio --download   # or the BIO mirror on Hugging Face
-    python scripts/30_maccrobat_deid.py --engines regex,regex_v2+guard,hf_stanford+regex_v2+guard
+    python scripts/32_maccrobat_deid.py --download          # fetch the original release (figshare) into data/raw/
+    python scripts/32_maccrobat_deid.py --source bio --download   # or the BIO mirror on Hugging Face
+    python scripts/32_maccrobat_deid.py --engines regex,regex_v2+guard,hf_stanford+regex_v2+guard
 
 The original brat files are the default: exact text and offsets, and overlapping entities that BIO
 labels can't hold (about twice as many clinical entities as the BIO mirror).

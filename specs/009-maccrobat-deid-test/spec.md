@@ -1,6 +1,6 @@
 # Feature Specification: a de-identification test pass on MACCROBAT (real published case reports, BIO labels)
 
-**Feature Branch**: `008-maccrobat-deid-test`
+**Feature Branch**: `009-maccrobat-deid-test`
 
 **Created**: 2026-10-26
 
@@ -52,7 +52,7 @@ standoff. Exact text and offsets; each fragment of a split entity is its own spa
 ### US3 - Scores (P1)
 `deid_eval.score_records` scores the records unchanged (recall on the derived PHI; decoy damage =
 share of clinical entities with any character removed). `deid_eval.damage_by_type` adds, per
-entity type, the share of entities touched. `scripts/30_maccrobat_deid.py` writes
+entity type, the share of entities touched. `scripts/32_maccrobat_deid.py` writes
 `data/deid/maccrobat_scores.csv` and `data/deid/maccrobat_by_type.csv`.
 
 ## Limits (write them next to the result)

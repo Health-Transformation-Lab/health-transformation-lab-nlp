@@ -1,4 +1,4 @@
-"""MACCROBAT case reports, read from BIO labels, as a de-identification test set (spec 008).
+"""MACCROBAT case reports (original brat files or BIO labels) as a de-identification test set (spec 009).
 
 MACCROBAT (Caufield 2019, https://doi.org/10.6084/m9.figshare.9764942.v2, CC BY 4.0) is 200 clinical
 case reports from PubMed Central with hand-annotated entities. A Hugging Face mirror publishes the
