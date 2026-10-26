@@ -13,7 +13,8 @@ verified findings only, mandatory secrets scan), with this repo's rules from `CL
    - **Secrets:** keys, tokens, passwords, credentialed URLs, `.env` content, Databricks/Azure/AWS/
      Hugging Face tokens. Any real credential is 🔴 Blocking.
    - **PHI / real data:** real notes, names, dates of service, MRNs, employer data, files that belong
-     in `data/raw/` (ASQ-PHI, the John Snow Labs CSV, i2b2/n2c2). Fake PHI from the generators is
+     in `data/raw/` (ASQ-PHI, the John Snow Labs CSV, i2b2/n2c2). Public, redistributable datasets in
+     `data/external/<name>/` with a source-and-licence README are allowed (constitution v1.2.0). Fake PHI from the generators is
      expected; anything that could be real is 🔴 Blocking.
    - **Organization claims:** text describing any organization's plan, study, finding or partnership;
      company claims without a citation (`CLAUDE.md` ground rules). 🔴 Blocking.
@@ -30,7 +31,7 @@ verified findings only, mandatory secrets scan), with this repo's rules from `CL
 | Rule | What to check |
 |---|---|
 | No secrets | Scan result above |
-| Synthetic only, no PHI | Scan result above; `data/raw/` untouched in git |
+| Synthetic only, no PHI | Scan result above; `data/raw/` untouched in git; anything real is a public, redistributable dataset in `data/external/<name>/` with a README (constitution v1.2.0) |
 | No organization claims; vendors cited | Scan result above; prices and vendor figures name a source |
 | Test first | Every behaviour change has a test that would have failed before it |
 | Python and R in parity | Changes to labels, scoring, reliability or cost-effectiveness touch both sides; `r-parity` green |

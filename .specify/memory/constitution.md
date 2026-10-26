@@ -19,6 +19,16 @@ prompt example or a log. Synthetic notes carry fake PHI at known positions,
 and nothing reaches Label Studio, a model or an LLM endpoint until it passes
 de-identification and the leak gate.
 
+**Public datasets (exception, v1.2.0).** A dataset that is already published, already
+de-identified by its publisher and licensed for redistribution (e.g. MACCROBAT, CC BY 4.0) may
+be committed under `data/external/<name>/`, unchanged or with documented derived files, next to
+a README giving source, licence, attribution and changes. It is used as external evaluation
+and training data for its own experiments: never mixed into the synthetic sets, never presented
+as this project's patient records. Being de-identified by its publisher, it is exempt from the
+leak gate above.
+Datasets under a data use agreement or a vendor's terms (i2b2/n2c2, the John Snow Labs
+benchmark) stay out of the repo.
+
 ### II. One Contract, Two Languages
 Python (data engineering) and R (data science) read and write the same files
 and produce the same numbers. Any computation that feeds a reported result
@@ -73,4 +83,4 @@ This constitution overrides other practice in the repo. Amend it by PR that
 states the change and why, bumps the version, and updates any affected spec.
 Reviewers check principle I and II on every PR.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-25
+**Version**: 1.2.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-26

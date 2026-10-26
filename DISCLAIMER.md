@@ -15,8 +15,14 @@ area would need.
   build anything.
 - **No real data.** Every record is synthetic. No patient data, no PHI, no
   internal data, no internal documents, and no vendor data or APIs are used.
+  The one exception is public data: datasets already published and
+  de-identified by others and licensed for redistribution (MACCROBAT case
+  reports, CC BY 4.0), kept in `data/external/` with their source and licence.
 - **Public information only.** Organizations and products are mentioned only
   as described in their own public sources, which are cited.
 - **No results.** Numbers in the docs come from simulated data, simulated
   reviewers and illustrative prices. They are exercises, not findings, and
   must not be cited as evidence about any product, method or population.
+  Scores measured on public datasets (MACCROBAT) are real measurements of
+  this repo's code on that dataset only, with small samples; the same
+  caution applies.
