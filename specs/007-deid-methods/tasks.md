@@ -13,3 +13,5 @@
 - [ ] T010 Pick the engine on the unseen tier; switch study.py's default; keep a human review sample on real notes
 - [x] T011 AI engines: transformer NER (hf_stanford, hf_obi) and LLM (llm) with a verbatim-only rule; LLM token cost in Python and R; Databricks notebook 06_deid_benchmark.py
 - [ ] T012 Run the AI engines on Databricks (Hugging Face and serving endpoints are blocked from this workspace) and add their rows to the results
+- [x] T013 John Snow Labs engine (`jsl`, clinical_deidentification pipeline) tested with a fake pipeline; i2b2/n2c2 2014 loader (`--i2b2-2014`)
+- [ ] T014 Get a John Snow Labs licence (academic or trial) and n2c2 2014 access; run every engine on both

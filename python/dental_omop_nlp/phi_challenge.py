@@ -234,3 +234,20 @@ def load_external(path, text_keys=("text", "query", "note"), tier: str = "extern
         out.append({"note_id": r.get("id", i), "tier": tier, "text": text,
                     "phi": sorted(spans, key=lambda s: s["start"]), "decoys": []})
     return out
+
+
+def load_i2b2_2014(folder, tier: str = "i2b2_2014") -> list[dict]:
+    """The 2014 i2b2/UTHealth (n2c2) de-identification corpus: one XML per note, text in <TEXT>,
+    PHI as <TAGS> children with start, end, text and TYPE. Needs the n2c2 data use agreement;
+    keep it outside the repo (never commit it)."""
+    import xml.etree.ElementTree as ET
+    from pathlib import Path
+    out = []
+    for f in sorted(Path(folder).glob("*.xml")):
+        root = ET.parse(f).getroot()
+        text = root.findtext("TEXT") or ""
+        phi = [{"start": int(e.get("start")), "end": int(e.get("end")), "text": e.get("text", ""),
+                "type": e.get("TYPE", e.tag)} for e in (root.find("TAGS") or [])]
+        out.append({"note_id": f.stem, "tier": tier, "text": text, "phi": sorted(phi, key=lambda s: s["start"]),
+                    "decoys": []})
+    return out

@@ -24,6 +24,8 @@ AND the leak gate. Two engines:
                   StanfordAIMI/stanford-deidentifier-base (Chambon et al., JAMIA 2023; MIT).
   hf_obi          obi/deid_roberta_i2b2 (RoBERTa on i2b2 2014; MIT). Both need the
                   Hugging Face download (pip install -e ".[models]").
+  jsl             John Snow Labs Healthcare NLP 'clinical_deidentification' pipeline
+                  (licensed; Spark): SPARK_NLP_LICENSE, JSL_SECRET.
   llm             an LLM asked to list every identifier verbatim (any OpenAI-compatible
                   endpoint, e.g. a Databricks serving endpoint): DEID_LLM_BASE_URL,
                   DEID_LLM_MODEL, DEID_LLM_API_KEY. Values it lists that aren't in the
@@ -313,12 +315,43 @@ def detect_llm(text: str, complete=None) -> list[dict]:
     return _merge(spans)
 
 
+# --------------------------------------------------------------- John Snow Labs Healthcare NLP
+_JSL: dict = {}
+
+
+def _jsl_light():  # pragma: no cover - needs a John Snow Labs licence and Spark
+    if "light" not in _JSL:
+        _need("SPARK_NLP_LICENSE")
+        import sparknlp_jsl
+        from sparknlp.base import LightPipeline
+        from sparknlp.pretrained import PretrainedPipeline
+        spark = sparknlp_jsl.start(secret=_need("JSL_SECRET"))
+        _JSL["light"] = LightPipeline(PretrainedPipeline("clinical_deidentification", "en", "clinical/models",
+                                                         spark).model)
+    return _JSL["light"]
+
+
+def detect_jsl(text: str, light=None) -> list[dict]:
+    """John Snow Labs Healthcare NLP de-identification pipeline ('clinical_deidentification').
+    Licensed; runs on Spark (e.g. Databricks). Spark NLP chunk ends are inclusive."""
+    light = light or _jsl_light()
+    out = light.fullAnnotate(text)[0]
+    chunks = out.get("ner_chunk") or out.get("ner_chunk_subentity") or []
+    spans = []
+    for c in chunks:
+        label = re.sub(r"^[BI]-", "", str(c.metadata.get("entity", "")))
+        if label in ("O", ""):
+            continue
+        spans.append({"start": int(c.begin), "end": int(c.end) + 1, "type": _HF_TYPES.get(label.upper(), "ID")})
+    return _merge(spans)
+
+
 ENGINES = {"regex": detect_regex, "regex_v2": detect_regex_v2, "presidio": detect_presidio,
            "azure_deid": detect_azure_deid, "azure_language": detect_azure_language,
            "hf_stanford": lambda text: detect_transformer(text, _HF_MODELS["hf_stanford"]),
            "hf_obi": lambda text: detect_transformer(text, _HF_MODELS["hf_obi"]),
-           "llm": detect_llm}
-CLOUD_ENGINES = {"azure_deid", "azure_language", "llm"}
+           "llm": detect_llm, "jsl": detect_jsl}
+CLOUD_ENGINES = {"azure_deid", "azure_language", "llm", "jsl"}
 
 
 def get_engine(spec: str):

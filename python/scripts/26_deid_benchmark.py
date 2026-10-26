@@ -43,11 +43,15 @@ ap.add_argument("--n-notes", type=int, default=400)
 ap.add_argument("--seed", type=int, default=7)
 ap.add_argument("--external", default=None,
                 help="another labeled PHI set (JSONL/JSON, e.g. ASQ-PHI) scored as tier 'external'")
+ap.add_argument("--i2b2-2014", default=None, help="folder of the n2c2 2014 XML notes (data use agreement)")
 ap.add_argument("--tiers", default="all,unseen",
                 help="tiers priced: all (the mix) and unseen (held out from regex_v2's design)")
 a = ap.parse_args()
 
 ch = build_challenge(a.n_notes, a.seed)
+if a.i2b2_2014:
+    from dental_omop_nlp.phi_challenge import load_i2b2_2014
+    ch += [r | {"tier": "external"} for r in load_i2b2_2014(a.i2b2_2014)]
 if a.external:
     from dental_omop_nlp.phi_challenge import load_external
     ch += load_external(a.external)

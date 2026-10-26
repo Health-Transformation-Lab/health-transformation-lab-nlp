@@ -56,6 +56,7 @@ The categories follow HIPAA Safe Harbor and the 2014 i2b2/UTHealth annotation gu
 | `hf_stanford` | Transformer NER trained for de-identification: StanfordAIMI/stanford-deidentifier-base (radiology reports and notes; MIT) | wired, tested with a fake pipeline; Hugging Face is blocked here, so run it on Databricks ([`06_deid_benchmark.py`](../databricks/notebooks/06_deid_benchmark.py)) |
 | `hf_obi` | Transformer NER: obi/deid_roberta_i2b2 (RoBERTa trained on the i2b2 2014 corpus; MIT) | same |
 | `llm` | An LLM asked to list every identifier verbatim (any OpenAI-compatible endpoint, e.g. a Databricks serving endpoint); values not found in the note are dropped | wired, tested with a fake reply; run on Databricks |
+| `jsl` | John Snow Labs Healthcare NLP, pretrained `clinical_deidentification` pipeline | wired, tested with a fake pipeline; needs a John Snow Labs licence (free academic licences; a trial through their Databricks installer) and Spark, so run it on Databricks |
 | `A+B` | Ensemble: the union of the engines' spans | |
 | `+guard` | Dental guard: drops any span inside a dental term | |
 
@@ -68,6 +69,24 @@ John Snow Labs ranked its own Healthcare NLP first (recall 0.97), then Azure Hea
 (0.92), AWS Comprehend Medical (0.85) and GPT-4o zero-shot (0.77); the authors sell one of the
 compared products, so it needs independent checking. None of these were tested on dental notes,
 where eponyms and probing readings look like PHI. That's what the challenge set's decoys test.
+
+## Standard test datasets
+
+To compare with published numbers, engines should also be scored on the standard corpora. All are
+real (de-identified) clinical text with surrogate PHI, so each needs its own access agreement and
+must stay **outside the repo**:
+
+| Dataset | What | Access | Loader |
+|---|---|---|---|
+| **i2b2/UTHealth 2014 (n2c2)** | 1,304 longitudinal notes, ~28,000 PHI spans; the main benchmark (Stanford and OBI models report on it) | n2c2 data use agreement | `--i2b2-2014 <folder>` (XML) |
+| i2b2 2006 | Discharge summaries | n2c2 data use agreement | same XML shape; untested |
+| PhysioNet *Deidentified Medical Text* | 2,434 nursing notes, the original deid gold standard | PhysioNet credentialed access (training + DUA) | `--external` after conversion |
+| SHIELD (Stanford, 2026) | 1,381 diverse notes, 10,229 adjudicated spans | by request | `--external` |
+| ASQ-PHI (2025) | 1,051 synthetic clinical queries with hard negatives | open, MIT | `--external` |
+| Text Anonymization Benchmark | 1,268 court cases (not clinical) | open source | not clinical; skip |
+
+None is dental. The challenge set's dental decoys stay the only test of over-redacting
+dental terms.
 
 ## Results on the challenge set (400 notes, seed 7)
 

@@ -171,6 +171,12 @@ Everything this repo relies on, and what it's used for.
     clinical text de-identification?* [arXiv:2503.20794](https://arxiv.org/abs/2503.20794), 2025. Authors are
     from John Snow Labs, one of the compared vendors.
 
+49. **PhysioNet.** *Deidentified Medical Text* (Neamatullah et al. 2008 gold standard), credentialed access.
+    [physionet.org](https://www.physionet.org/content/deidentifiedmedicaltext/)
+50. **John Snow Labs.** Free academic licences for Spark NLP for Healthcare (incl. de-identification).
+    [johnsnowlabs.com](https://johnsnowlabs.com/john-snow-labs-is-providing-free-academic-licenses-to-researchers-and-educators-in-artificial-intelligence);
+    Databricks integration and trial: [docs](https://docs.azure.cn/en-us/databricks/partners/ml/john-snow-labs)
+
 ## Tools
 
 16. **Spec Kit** (GitHub) — spec-driven development. [github.com/github/spec-kit](https://github.com/github/spec-kit)

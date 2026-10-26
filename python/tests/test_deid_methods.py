@@ -229,3 +229,38 @@ def test_llm_cost_counts_prompt_and_output_tokens():
     # 1,000 notes x 400 chars: (300 + 100) input tokens and 100 output tokens per note
     assert deid_eval.engine_cost(cfg, n_notes=1000, avg_chars=400, compute={}) == pytest.approx(
         1000 * 400 / 1e6 * 1.0 + 1000 * 100 / 1e6 * 4.0)
+
+
+# ---------------------------------------------------------------- John Snow Labs; i2b2/n2c2 2014 corpus
+class _Ann:
+    def __init__(self, begin, end, result, entity):
+        self.begin, self.end, self.result, self.metadata = begin, end, result, {"entity": entity}
+
+
+class _FakeLight:
+    """Mimics Spark NLP LightPipeline.fullAnnotate: chunk 'end' is INCLUSIVE."""
+
+    def fullAnnotate(self, text):  # noqa: N802 - Spark NLP's method name
+        i = text.index("Kwame")
+        return [{"ner_chunk": [_Ann(i, i + 13, "Kwame Oyelaran", "PATIENT"), _Ann(0, 1, "Pt", "O")]}]
+
+
+def test_jsl_engine_reads_chunks_with_inclusive_ends():
+    t = "Pt Kwame Oyelaran seen today"
+    assert deid.detect_jsl(t, light=_FakeLight()) == [{"start": 3, "end": 17, "type": "NAME"}]
+    assert "jsl" in deid.ENGINES and "jsl" in deid.CLOUD_ENGINES
+
+
+def test_i2b2_2014_loader_reads_xml_tags(tmp_path):
+    from dental_omop_nlp.phi_challenge import load_i2b2_2014
+    note = "Record date: 2090-01-02\\nMr. Bo Li seen at Oak Clinic."
+    text = note.replace("\\\\n", "\\n")
+    s1, s2 = text.index("2090-01-02"), text.index("Bo Li")
+    xml = (f'<?xml version="1.0" encoding="UTF-8" ?><deIdi2b2><TEXT><![CDATA[{text}]]></TEXT><TAGS>'
+           f'<DATE id="P0" start="{s1}" end="{s1 + 10}" text="2090-01-02" TYPE="DATE" comment="" />'
+           f'<NAME id="P1" start="{s2}" end="{s2 + 5}" text="Bo Li" TYPE="PATIENT" comment="" />'
+           f'</TAGS></deIdi2b2>')
+    (tmp_path / "100-01.xml").write_text(xml)
+    recs = load_i2b2_2014(tmp_path)
+    assert len(recs) == 1 and recs[0]["tier"] == "i2b2_2014"
+    assert [(p["text"], p["type"]) for p in recs[0]["phi"]] == [("2090-01-02", "DATE"), ("Bo Li", "PATIENT")]
