@@ -192,6 +192,39 @@ counts as removed only if every character is), so it can be lower than a looser 
 One ASQ-PHI tag's value doesn't appear verbatim in its query and can't be scored; two values appear
 twice and count twice (2,975 scored spans).
 
+## Combining engines: bigger unions and routing
+
+The `+` ensembles above are plain unions: anything any engine flags is removed. Two other ways to
+combine were scored on the same run:
+
+- **Bigger unions:** hf_stanford plus hf_obi (which catches the dates hf_stanford misses), or plus
+  Presidio.
+- **Routing (`routed+guard`):** for each engine and each identifier type it reports, measure how
+  often its flags were really PHI on the easy and hard tiers; keep only pairs at least 80% precise,
+  then union those. The routes were chosen before scoring and never saw the unseen tier or ASQ-PHI
+  (`data/deid/routes.csv`).
+
+| Combination | Unseen recall | ASQ-PHI recall | **ASQ-PHI over-redaction** | Decoy damage (all) | Engine $ per 1M notes |
+|---|---|---|---|---|---|
+| hf_stanford+regex_v2+guard | 0.74 | 0.96 | **0.35** | 0.02 | ~$23 |
+| hf_stanford+presidio+regex_v2+guard | 0.80 | 0.98 | 0.91 | 0.06 | ~$28 |
+| hf_stanford+hf_obi+regex_v2+guard | 0.87 | 0.98 | 0.89 | 0.02 | ~$101 |
+| routed+guard (all four engines) | **0.88** | **0.98** | 0.92 | 0.06 | ~$106 |
+
+What it shows:
+
+- **Adding a second model buys recall on unseen shapes.** hf_obi lifts unseen recall from 0.74 to
+  0.87, mostly by catching the dates hf_stanford misses.
+- **It costs over-redaction.** Every combination with hf_obi or Presidio changes about 9 in 10
+  PHI-free ASQ-PHI queries, against about 1 in 3 for hf_stanford+regex_v2+guard. Which matters more
+  depends on the use: for chart notes kept inside the study, a leak is worse than a removed word;
+  for search queries sent to an outside tool, a gutted query is useless.
+- **Routing didn't separate the engines.** On the training tiers nearly every engine-type pair was
+  over 80% precise, so routing kept almost everything (it dropped only regex_v2's location
+  guesses) and behaves like the four-engine union. Those tiers have no PHI-free notes, so they can't
+  show which engine over-redacts clean text. Routing needs training notes that include hard
+  negatives before it can learn that trade-off.
+
 ## Cost-effectiveness
 
 `data/deid/cost_effectiveness.csv`, per 1M notes, for the full mix (`all`) and the held-out tier (`unseen`):
