@@ -96,9 +96,10 @@ All 12 are BERT-type models: AI that reads text and picks a label. [What is a BE
 
 Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it),
 [27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
-**Status:** DistilBERT has run (CPU, 3 epochs, 2026-10-26): on the 240 synthetic review charts it
-labels 79% correctly, level with the TF-IDF (77%) and note-rule (79%) baselines; the rest are queued.
-Agreement with *simulated* reviewers (kappa 0.62) is a dry run, not a result.
+**Status:** DistilBERT and BiomedBERT have run (CPU, 3 epochs, 2026-10-26): on the 240 synthetic review
+charts they label 79% and 77% correctly, level with the TF-IDF (77%) and note-rule (79%) baselines, and
+**miss every stage IV chart** (7 in 3,484 training notes; the note rules catch 97%). The rest are queued.
+Agreement with *simulated* reviewers (kappa 0.61-0.62) is a dry run, not a result.
 
 ## Action items
 
