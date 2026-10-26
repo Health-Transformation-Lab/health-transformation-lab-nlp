@@ -29,8 +29,9 @@ periodontal status. They often disagree:
 | 5–6 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
 | 7 | Probing chart | Attachment loss, bone loss, teeth lost | 4th |
 
-The phenotype takes the first evidence in that order that gives a status; all 24 orders are scored
-against the reviewers so a better one can replace it. A radiograph AI reading can only raise the stage.
+When the evidence disagrees, the phenotype uses the first one in this order that gives a status.
+The four can be ranked 24 ways (4×3×2×1); each ranking is checked against the human reviewers, and a
+ranking that agrees better can replace this one. A radiograph AI reading can only raise the stage.
 
 **Free text:** here the chart notes are the only free text and the only AI input; real records have
 more (form and chart comments, radiograph reports, referral letters): [action items](docs/action_items.md). Details: [process.md](docs/process.md).
@@ -76,6 +77,8 @@ Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[de
   loss). Results also split by how hard the chart is ([details](docs/dentbench_methods.md#in-plain-words)).
 
 ## Models evaluated (the 12 from the evaluation sheet; `models.yaml`)
+
+All 12 are BERT-type models: AI that reads text and picks a label. [What is a BERT model?](docs/bert.md)
 
 | Model · paper · domain, role | Model · paper · domain, role |
 |---|---|
