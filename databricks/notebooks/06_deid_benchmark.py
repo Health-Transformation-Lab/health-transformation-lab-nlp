@@ -13,21 +13,29 @@
 # MAGIC | `presidio` | spaCy NER + recognizers | `presidio-analyzer` and a spaCy model (already scored locally) |
 # MAGIC | `regex`, `regex_v2` | patterns | nothing (already scored locally) |
 # MAGIC
-# MAGIC The whole default engine set runs, not just the two new ones, so the output files are
-# MAGIC complete and can replace `data/deid/*.csv` in the repo as they are. Engines that still
-# MAGIC can't run here (Azure, AWS, John Snow Labs) are listed in `not_run.csv`, as before.
+# MAGIC The whole default engine set runs, not just the two new ones. The script overwrites its
+# MAGIC output files, so they replace `data/deid/*.csv` in the repo only when every tier is run:
+# MAGIC the challenge set (always), ASQ-PHI (`external_path`) and the John Snow Labs 48-note
+# MAGIC CSV (`jsl48_path`). Leave either path empty and that tier's rows are missing from the
+# MAGIC output; merge the new engines' rows into the repo files instead of replacing them.
+# MAGIC Engines that still can't run here (Azure, AWS) are listed in `not_run.csv`, as before.
 # MAGIC
-# MAGIC **Free Edition notes.** Serverless notebook compute (CPU) is enough: the transformer engines
-# MAGIC took minutes on a laptop CPU. The `llm` engine needs a pay-per-token endpoint name from
-# MAGIC the Serving tab (provisioned throughput and GPU endpoints are not offered on Free Edition).
-# MAGIC `ai_mask` sends one SQL statement per note, so 1,451 notes (400 challenge + 1,051 ASQ-PHI)
-# MAGIC take a while on a 2X-Small warehouse; the fair-use quota can pause compute for the day if
-# MAGIC it is exceeded, so start with the challenge set alone (`external_path` empty) if unsure.
+# MAGIC **Free Edition notes** (per Databricks'
+# MAGIC [Free Edition limitations](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations)
+# MAGIC page: one 2X-Small SQL warehouse; no provisioned-throughput or GPU serving endpoints;
+# MAGIC a fair-usage quota that can pause compute for the rest of the day). Serverless notebook
+# MAGIC compute (CPU) is enough: the transformer engines took minutes on a laptop CPU. The `llm`
+# MAGIC engine needs a pay-per-token endpoint name from the Serving tab. `ai_mask` sends one SQL
+# MAGIC statement per note (the script caches each engine's output, so `ai_mask` and
+# MAGIC `ai_mask+regex_v2+guard` share one call), so 1,451 notes (400 challenge + 1,051 ASQ-PHI)
+# MAGIC take a while on the one warehouse; start with the challenge set alone if unsure.
 # MAGIC
 # MAGIC **Data.** Synthetic, labeled fake PHI only: the challenge set is generated here and kept
 # MAGIC under `/tmp` on the compute, never written into the Git folder. ASQ-PHI (MIT) is the one
 # MAGIC external set; upload its `synthetic_clinical_queries.txt` to a Unity Catalog volume and
-# MAGIC give the path in `external_path` to score it too (the repo's results include it).
+# MAGIC give the path in `external_path` to score it too (the repo's results include it). The
+# MAGIC John Snow Labs 48-note CSV may hold i2b2 notes, so it belongs on a volume too, never
+# MAGIC in the Git folder (`jsl48_path`).
 # MAGIC
 # MAGIC **Getting results back.** With `save_to_repo` = `yes`, the result CSVs are copied into
 # MAGIC `data/deid/` of this Git folder; commit them from the Git folder's dialog. `not_run.csv`
@@ -53,6 +61,8 @@ dbutils.widgets.text("engines", "")
 dbutils.widgets.text("n_notes", "400")
 # ASQ-PHI as downloaded (synthetic_clinical_queries.txt), e.g. /Volumes/<catalog>/<schema>/<volume>/synthetic_clinical_queries.txt
 dbutils.widgets.text("external_path", "")
+# John Snow Labs' 48-note benchmark CSV, on a volume (tier jsl48); empty = skip that tier.
+dbutils.widgets.text("jsl48_path", "")
 dbutils.widgets.dropdown("save_to_repo", "yes", ["yes", "no"])
 
 # COMMAND ----------
@@ -90,6 +100,10 @@ external = dbutils.widgets.get("external_path").strip()
 if external:
     assert Path(external).exists(), f"external_path not found: {external}"
     cmd += ["--external", external, "--tiers", "all,unseen,external"]
+jsl48 = dbutils.widgets.get("jsl48_path").strip()
+if jsl48:
+    assert Path(jsl48).exists(), f"jsl48_path not found: {jsl48}"
+    cmd += ["--jsl48", jsl48]
 print(" ".join(cmd))
 r = subprocess.run(cmd, capture_output=True, text=True, check=False)   # return code checked below
 print(r.stdout[-6000:], r.stderr[-2000:])
@@ -112,6 +126,7 @@ import shutil
 if dbutils.widgets.get("save_to_repo") == "yes":
     repo_deid = (Path.cwd() / "../../data/deid").resolve()
     repo_deid.mkdir(parents=True, exist_ok=True)
-    copied = [shutil.copy(p, repo_deid / p.name).split("/")[-1] for p in sorted(deid_dir.glob("*.csv"))]
+    copied = [Path(shutil.copy(p, repo_deid / p.name)).name for p in sorted(deid_dir.glob("*.csv"))]
     print("copied to", repo_deid, ":", ", ".join(copied))
-    print("Next: commit from the Git folder dialog, then tick T012b / T016 in specs/007-deid-methods/tasks.md.")
+    print("Next: if a tier was skipped, merge the new engines' rows into the repo's CSVs rather than committing\n"
+          "these wholesale; then commit from the Git folder dialog and tick T012b / T016 in specs/007-deid-methods/tasks.md.")
