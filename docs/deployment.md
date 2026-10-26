@@ -70,12 +70,34 @@ databricks bundle run      -t dev study_benchmark
 One-time setup in GitHub → Settings → Environments:
 
 1. Create environments `dev`, `uat`, `prod`. Give `prod` required reviewers.
-2. In each, add secrets `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`,
+2. Create the service principal and its grants, as a workspace admin. A bundle
+   can't create a service principal, so a script does it with the Databricks SDK,
+   reading the catalog, schema, warehouse and secret scope from the target:
+
+   ```bash
+   cd python && pip install -e ".[databricks]"
+   databricks auth login --host https://<workspace>
+   python scripts/32_service_principal.py --target uat                    # dry run: prints the plan
+   python scripts/32_service_principal.py --target uat --apply --create-secret \
+       [--judge-endpoint <endpoint>] [--warehouse-name "<name>"]
+   ```
+
+   It creates `dental-omop-nlp-uat` (entitlements `workspace-access`,
+   `allow-cluster-create`), grants `USE_CATALOG`, `CREATE_SCHEMA` on the catalog,
+   table/volume/model privileges on the schema, `CAN_USE` on the warehouse,
+   `CAN_QUERY` on the judge endpoint and `READ` on the secret scope, then creates
+   an OAuth secret (scope `all-apis`) and writes the three secrets below to
+   `.databricks-sp-uat.env` (mode 0600, gitignored; it never prints the secret).
+   Re-running reuses the principal and only adds grants. Anything not there yet
+   (catalog schema, secret scope, endpoint) is reported as skipped: create it and
+   re-run. The catalog itself must exist. Not yet run against a real workspace
+   from this repo; tested against a fake client (`tests/test_service_principal.py`).
+3. In each environment, add secrets `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`,
    `DATABRICKS_CLIENT_SECRET` (a service principal's OAuth M2M credentials), and
    variables `SERVICE_PRINCIPAL`, `JUDGE_ENDPOINT`, `WAREHOUSE_NAME`,
    `GPU_NODE_TYPE`, `USERS_GROUP` as needed.
-3. In each workspace: the service principal can use the catalog/schema, the
-   warehouse and the serving endpoint; create the `dental` secret scope with
+4. In each workspace: if you skipped the script, grant the service principal the
+   catalog/schema, the warehouse and the serving endpoint by hand; create the `dental` secret scope with
    `hf_token` for the MedGemma job.
 
 Until those secrets exist, the workflows skip the Databricks steps and still run the tests.
