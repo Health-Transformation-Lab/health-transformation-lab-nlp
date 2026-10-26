@@ -252,3 +252,6 @@ data/sites/parity_*.csv
 
 # local MLflow store (tracking.py)
 mlruns/
+
+# Encoder fine-tuning output and checkpoints (rungs.HFEncoder)
+python/runs/
