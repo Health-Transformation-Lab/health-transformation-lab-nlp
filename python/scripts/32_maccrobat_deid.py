@@ -21,14 +21,16 @@ Writes (aggregates only; the text stays in data/raw/, never committed):
 import argparse
 import functools
 import urllib.request
+from pathlib import Path
 
 import pandas as pd
 
 from dental_omop_nlp import deid, deid_eval, maccrobat
 from dental_omop_nlp.paths import DEID_DIR, RAW_DIR
 
-DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio+regex_v2+guard",
-           "hf_stanford", "hf_stanford+regex_v2+guard", "hf_obi", "hf_obi+regex_v2+guard"]
+DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
+           "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
+           "hf_obi", "hf_obi+regex_v2+guard", "hf_stanford+presidio+regex_v2+guard"]
 ap = argparse.ArgumentParser()
 ap.add_argument("--source", choices=["brat", "bio"], default="brat")
 ap.add_argument("--path", default=None, help="the zip or folder (brat), or the JSONL (bio)")
@@ -39,7 +41,7 @@ a = ap.parse_args()
 default = RAW_DIR / "maccrobat" / ("MACCROBAT2020.zip" if a.source == "brat" else "maccrobat_bio.jsonl")
 a.path = a.path or str(default)
 if a.download:
-    default.parent.mkdir(parents=True, exist_ok=True)
+    Path(a.path).parent.mkdir(parents=True, exist_ok=True)
     urllib.request.urlretrieve(maccrobat.FIGSHARE_URL if a.source == "brat" else maccrobat.HF_URL, a.path)
 recs = (maccrobat.load_brat if a.source == "brat" else maccrobat.load_bio)(a.path)
 n_ent = pd.Series([e["role"] for r in recs for e in r["entities"]]).value_counts()
@@ -60,6 +62,8 @@ for spec in a.engines.split(","):
     by_type.append(deid_eval.damage_by_type(recs, detect_once).assign(method=spec))
     print(f"{spec}: PHI recall {s.entity_recall:.3f} (n={int(s.n_phi)}), clinical damage {s.decoy_damage:.3f}")
 
+if not scores:
+    raise SystemExit("no engine ran: see the reasons above")
 DEID_DIR.mkdir(parents=True, exist_ok=True)
 cols = ["method", "n_notes", "n_phi", "entity_recall", "char_recall", "char_precision", "decoy_damage",
         "leaked_per_1k_notes", "avg_chars"]

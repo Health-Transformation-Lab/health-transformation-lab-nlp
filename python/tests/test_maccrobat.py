@@ -1,4 +1,4 @@
-"""Spec 009: a de-identification test pass on MACCROBAT's BIO labels. Fixtures are invented sentences."""
+"""Spec 009: a de-identification test pass on MACCROBAT (original brat files and BIO labels). Fixtures are invented sentences."""
 
 import json
 
@@ -131,3 +131,20 @@ def test_load_brat_reads_exact_offsets_from_a_folder_or_zip(tmp_path):
         assert [s["text"] for s in r["decoys"]] == ["93", "woman", "cough", "codeine"]   # fragments kept apart
         for s in r["entities"]:
             assert TXT[s["start"]:s["end"]] == s["text"]
+
+
+def test_role_ignores_decimal_ranges_and_ages_not_in_years():
+    assert maccrobat.role("Date", "0.5-1 years later") == "other"
+    assert maccrobat.role("Date", "1.5-2.5 years") == "other"
+    assert maccrobat.role("Date", "12.03.2014") == "phi"
+    assert maccrobat.role("Age", "100-day-old") == "other"
+    assert maccrobat.role("Age", "96 weeks") == "other"
+    assert maccrobat.role("Age", "92 months") == "other"
+    assert maccrobat.role("Age", "aged 91") == "phi"
+
+
+def test_load_brat_folder_keeps_windows_line_endings_so_offsets_hold(tmp_path):
+    (tmp_path / "1.txt").write_bytes(b"Seen\r\nin June 2014.")
+    (tmp_path / "1.ann").write_bytes(b"T1\tDate 9 18\tJune 2014\n")
+    [r] = maccrobat.load_brat(tmp_path)
+    assert [s["text"] for s in r["phi"]] == ["June 2014"]

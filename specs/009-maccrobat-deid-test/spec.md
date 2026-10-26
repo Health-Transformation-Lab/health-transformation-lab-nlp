@@ -1,4 +1,4 @@
-# Feature Specification: a de-identification test pass on MACCROBAT (real published case reports, BIO labels)
+# Feature Specification: a de-identification test pass on MACCROBAT (real published case reports; original brat files or BIO labels)
 
 **Feature Branch**: `009-maccrobat-deid-test`
 

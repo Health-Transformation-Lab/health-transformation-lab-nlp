@@ -31,8 +31,9 @@ CLINICAL_TYPES = {"Sign_symptom", "Disease_disorder", "Diagnostic_procedure", "T
 
 _MONTH = re.compile(r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|june?|july?|aug(?:ust)?"
                     r"|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b|\bmay\b(?! (?:have|be)\b)", re.IGNORECASE)
-_NUMERIC_DATE = re.compile(r"\b\d{1,4}\s*[/.-]\s*\d{1,2}\s*[/.-]\s*\d{1,4}\b")
+_NUMERIC_DATE = re.compile(r"\b\d{1,4}\s*([/.-])\s*\d{1,2}\s*\1\s*\d{1,4}\b")   # same separator twice: not "1.5-2.5"
 _AGE = re.compile(r"\d+")
+_NOT_YEARS = re.compile(r"hour|day|week|month", re.IGNORECASE)
 
 _NO_SPACE_BEFORE = {",", ".", ";", ":", ")", "]", "%", "!", "?", "-", "/"}
 _NO_SPACE_AFTER = {"(", "[", "-", "/"}
@@ -68,7 +69,7 @@ def role(kind: str, text: str) -> str:
     """phi, clinical or other (see the module docstring)."""
     if kind == "Date" and (_MONTH.search(text) or _NUMERIC_DATE.search(text)):
         return "phi"
-    if kind == "Age" and any(int(n) >= 90 for n in _AGE.findall(text)) and "month" not in text.lower():
+    if kind == "Age" and any(int(n) >= 90 for n in _AGE.findall(text)) and not _NOT_YEARS.search(text):
         return "phi"
     return "clinical" if kind in CLINICAL_TYPES else "other"
 
@@ -120,7 +121,7 @@ def load_brat(path, tier: str = "maccrobat") -> list[dict]:
     import zipfile
     path = Path(path)
     if path.is_dir():
-        files = {p.name: p.read_text(encoding="utf-8") for p in path.rglob("*") if p.suffix in (".txt", ".ann")}
+        files = {p.name: p.read_bytes().decode("utf-8") for p in path.rglob("*") if p.suffix in (".txt", ".ann")}
     else:
         with zipfile.ZipFile(path) as z:
             files = {Path(n).name: z.read(n).decode("utf-8") for n in z.namelist() if n.endswith((".txt", ".ann"))}
