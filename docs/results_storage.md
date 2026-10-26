@@ -74,6 +74,6 @@ in between.
 
 ## Cautions
 
-- Only de-identified data in Label Studio and any review app; the same leak gate applies.
+- Only de-identified data in Label Studio and any review app; the same final de-identification check (leak gate) applies.
 - Free Edition: one project, scale-to-zero (first query after idle is slower), fair-use quotas.
 - Lakehouse sync and LTAP direct writes were beta at last check; confirm status before relying on them.

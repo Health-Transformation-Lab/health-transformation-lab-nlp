@@ -48,7 +48,7 @@ step, with links to the code; the Databricks notebook
 | # | Step | Walkthrough |
 |---|---|---|
 | 1 | Generate synthetic patients over time (8 clinics): notes, exam forms, procedure codes and diagnoses, probing chart; fake PHI in notes | [1](docs/code_walkthrough.md#1-generate-the-synthetic-study) |
-| 2 | De-identify; a leak gate blocks any note with PHI left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
+| 2 | Remove names, dates and other identifiers; a final check holds back any note with one left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
 | 3 | Read and compare the diagnostic evidence; build the rule-based phenotype | [3–5](docs/code_walkthrough.md#3-read-the-diagnostic-evidence) |
 | 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
 | 5 | Periodontists label the same 240 charts, each on their own, in a labeling tool (Label Studio) | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
@@ -61,8 +61,8 @@ Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[de
 
 ## Ground rules
 
-- **Synthetic data only.** No PHI, real records, or employer or partner data, ever; a leak gate
-  guards Label Studio and every model. **Python and R** give the same numbers (parity-tested to 1e-9).
+- **Synthetic data only**, never PHI or employer data; no note reaches Label Studio or a model until
+  a final check finds no identifier left. **Python and R** give the same numbers (parity-tested).
 
 ## How results are measured
 

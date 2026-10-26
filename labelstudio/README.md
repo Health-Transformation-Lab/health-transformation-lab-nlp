@@ -2,7 +2,8 @@
 
 **Rule: only de-identified text goes into Label Studio.** The tasks file
 `data/datasets/review_tasks.json` is built only from notes that passed the
-leak gate in `study.py`. With real data, Label Studio runs inside the approved
+final de-identification check (the "leak gate" in `study.py`: any note where a known identifier
+survived is held back). With real data, Label Studio runs inside the approved
 secure environment and still receives only de-identified notes.
 
 ## 1. Run Label Studio locally (synthetic data)

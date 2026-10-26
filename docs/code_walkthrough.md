@@ -60,9 +60,18 @@ chart, and a structured radiograph AI read.
 
 ## 2. De-identify and gate
 
-Notes carry fake PHI at known positions. A regex engine with a dental allowlist
-removes it; a **leak gate** drops any note where an injected value survived; a
-residual scan flags anything PHI-shaped.
+**In plain words:** the synthetic notes contain fake patient identifiers (names, dates of birth,
+record numbers, phone numbers), put there on purpose so we can test removing them. Three steps:
+
+1. **Remove.** A pattern-matching engine finds the identifiers and replaces each with a tag such
+   as `[NAME]` or `[DATE]`. A list of dental abbreviations (BOP, SRP, MB, DL ...) stops it from
+   removing clinical terms that look like names.
+2. **Final check (the "leak gate").** We know every fake identifier we put in, so we search the
+   cleaned note for each one. If even one survived, the note is held back: it never reaches
+   Label Studio, the reviewers or any AI model.
+3. **Second look (residual scan).** The detectors run again on the cleaned text and flag anything
+   still shaped like an identifier. With real notes, where nothing is known in advance, this
+   and a human review sample are what's left.
 
 - Code: [`phi.py`](../python/dental_omop_nlp/phi.py), [`deid.py`](../python/dental_omop_nlp/deid.py) (`deidentify`, `leak_check`, `residual_scan`); `study.apply_deid`.
 - Output: `data/datasets/deid_report.csv`. Raw notes with fake PHI stay in `data/raw/` (gitignored).
