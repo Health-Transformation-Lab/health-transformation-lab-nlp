@@ -22,4 +22,5 @@ REVIEW_DIR = DATA_ROOT / "review"                # Label Studio exports + parsed
 RAW_DIR = DATA_ROOT / "raw"                      # notes WITH (fake) PHI; never committed
 CORPUS_DIR = DATA_ROOT / "corpus"                # corpus sample, predictions, judgments
 COSTS_YAML = REPO_ROOT / "costs.yaml"
+EXTERNAL_DIR = REPO_ROOT / "data" / "external"         # committed: public, redistributable datasets (README each)
 DEID_DIR = DATA_ROOT / "deid"                    # de-id benchmark scores (no PHI); challenge notes go to RAW_DIR

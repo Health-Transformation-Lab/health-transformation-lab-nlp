@@ -9,7 +9,8 @@ It was not built for PHI and holds no names or contact details, so it tests two 
   clinical  entities that must survive (symptoms, drugs, procedures, ...): the scorer's "decoys"
 Everything else (relative dates, a year alone, ages under 90, sex, places, ethnicity) is "other".
 
-Real (published, de-identified) text: download to data/raw/, never commit it.
+Public, already de-identified, CC BY 4.0: committed under data/external/maccrobat/ with its README
+(constitution v1.2.0). It is an external test set only, never mixed into the synthetic data.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from pathlib import Path
 
 # The original release (brat standoff, exact text) on figshare: MACCROBAT2020.zip, file 21489405.
 FIGSHARE_URL = "https://ndownloader.figshare.com/files/21489405"
+FIGSHARE_MD5 = "9d090f3e0719e77e7a33c38750548bb8"   # figshare's published checksum
 # Hugging Face mirror (BIO tokens; drops overlapping entities and the original spacing), pinned.
 HF_REPO = "ktgiahieu/maccrobat2018_2020"
 HF_REVISION = "9a14415289dea0e603687b14d4581a81ecdfe9c9"

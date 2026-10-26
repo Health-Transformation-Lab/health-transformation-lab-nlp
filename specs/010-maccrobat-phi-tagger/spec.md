@@ -12,9 +12,10 @@ fine-tune Longformer, then (A) tune the training settings, (B) add regex post-pr
 (C) report the final system's weighted F1 and analyse the errors left. The course's own files and
 notebook aren't used here; the steps are rebuilt from that description.
 
-> Personal learning project; public data only. MACCROBAT text (Caufield 2019, CC BY 4.0) stays in
-> `data/raw/`; the BIO files, model and error listings are written there or under `python/runs/`
-> (both git-ignored). Only aggregate scores are committed. Test fixtures are invented sentences.
+> Personal learning project; public data only. MACCROBAT (Caufield 2019, CC BY 4.0) and the BIO
+> files and error listings derived from it are committed under `data/external/maccrobat/`
+> (constitution v1.2.0); fine-tuned models stay in `python/runs/` (git-ignored, too large).
+> Test fixtures are invented sentences.
 
 ## Context
 

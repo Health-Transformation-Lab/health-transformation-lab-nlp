@@ -27,11 +27,16 @@ fairer test, and real notes are the real one.
 | **UTHealth / UCSF synthetic notes** (Chuang, Lee, Tokede, Lin, Brandon, Tran, Jiang, Walji; [arXiv 2407.21050](https://arxiv.org/abs/2407.21050v3)) | 450 notes generated with GPT-4 from 15 de-identified templates, labeled status / stage / grade / extent / subtype; RoBERTa trained on them, tested on 240 dentist-labeled real notes per site | Release not stated in the paper | Same label schema as this repo. Ask the authors |
 | **Cross-institutional dental EHR entity extraction via generative AI synthetic notes** ([NSF PAR](https://par.nsf.gov/biblio/10639435-cross-institutional-dental-electronic-health-record-entity-extraction-via-generative-artificial-intelligence-synthetic-notes)) | Follow-on from the same group | Not checked (page blocked automated access) | Ask the authors along with the one above |
 
-## Public real-text test sets (never committed)
+## Public real-text test sets
+
+Published, already de-identified and licensed for redistribution, so committed under
+`data/external/<name>/` with a README (constitution v1.2.0). Test data only: never mixed into the
+synthetic sets.
+
 
 | Dataset | What it has | Access | Used for |
 |---------|-------------|--------|----------|
-| **MACCROBAT** (Caufield 2019, [figshare](https://doi.org/10.6084/m9.figshare.9764942.v2), MACCROBAT2020.zip; BIO mirror [`ktgiahieu/maccrobat2018_2020`](https://huggingface.co/datasets/ktgiahieu/maccrobat2018_2020)) | 200 clinical case reports from PubMed Central, edited to the case details, with hand-annotated entities (41 types: symptoms, diseases, procedures, drugs, lab values, dates, ages ...). The mirror holds the 2018 and 2020 releases of the same 200 | CC BY 4.0; downloaded to `data/raw/` by `scripts/32_maccrobat_deid.py --download` | De-identification test pass on real prose (original brat release by default): date recall and clinical over-redaction ([deidentification.md](deidentification.md#results-on-maccrobat-200-real-case-reports-external-spec-009), spec 009). Not dental, not chart notes |
+| **MACCROBAT** (Caufield 2019, [figshare](https://doi.org/10.6084/m9.figshare.9764942.v2), MACCROBAT2020.zip; BIO mirror [`ktgiahieu/maccrobat2018_2020`](https://huggingface.co/datasets/ktgiahieu/maccrobat2018_2020)) | 200 clinical case reports from PubMed Central, edited to the case details, with hand-annotated entities (41 types: symptoms, diseases, procedures, drugs, lab values, dates, ages ...). The mirror holds the 2018 and 2020 releases of the same 200 | CC BY 4.0; committed in [`data/external/maccrobat/`](../data/external/maccrobat/README.md) (original zip, BIO splits) | De-identification test pass on real prose (original brat release by default): date recall and clinical over-redaction ([deidentification.md](deidentification.md#results-on-maccrobat-200-real-case-reports-external-spec-009), spec 009). Not dental, not chart notes |
 
 ## Not usable for notes
 

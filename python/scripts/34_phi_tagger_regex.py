@@ -10,7 +10,7 @@ are scored for every row but never used to choose.
 Writes (aggregates only):
   data/deid/maccrobat_tagger_regex.csv    per pattern set: val and test F1 (Date, weighted)
   data/deid/maccrobat_tagger_errors.csv   test error kinds per type, model alone and with the chosen set
-Error listings with text go to data/raw/maccrobat/errors_<tag>.txt (never committed).
+  data/external/maccrobat/errors/<tag>.txt  each test error with its words and context (public text)
 """
 
 import argparse
@@ -19,11 +19,11 @@ import json
 import pandas as pd
 
 from dental_omop_nlp import maccrobat, phi_tagger
-from dental_omop_nlp.paths import DEID_DIR, RAW_DIR, REPO_ROOT
+from dental_omop_nlp.paths import DEID_DIR, EXTERNAL_DIR, REPO_ROOT
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--tag", required=True)
-ap.add_argument("--zip", default=str(RAW_DIR / "maccrobat" / "MACCROBAT2020.zip"))
+ap.add_argument("--zip", default=str(EXTERNAL_DIR / "maccrobat" / "MACCROBAT2020.zip"))
 a = ap.parse_args()
 
 pred = json.loads((REPO_ROOT / "python" / "runs" / "phi_tagger" / a.tag / "pred.json").read_text())
@@ -96,5 +96,6 @@ path = DEID_DIR / "maccrobat_tagger_errors.csv"
 old = pd.read_csv(path) if path.exists() else pd.DataFrame()
 old = old[old.tag != a.tag] if len(old) else old
 pd.concat([old, pd.DataFrame(errs)], ignore_index=True).to_csv(path, index=False)
-(RAW_DIR / "maccrobat" / f"errors_{a.tag}.txt").write_text("\n".join(listing) + "\n")
+(EXTERNAL_DIR / "maccrobat" / "errors").mkdir(parents=True, exist_ok=True)
+(EXTERNAL_DIR / "maccrobat" / "errors" / f"{a.tag}.txt").write_text("\n".join(listing) + "\n")
 print("chosen:", chosen or "none", "| wrote", DEID_DIR)

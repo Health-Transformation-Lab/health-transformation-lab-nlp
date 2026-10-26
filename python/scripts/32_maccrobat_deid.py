@@ -1,6 +1,7 @@
 """De-identification test pass on MACCROBAT, real published case reports with hand-made labels (spec 009).
 
-    python scripts/32_maccrobat_deid.py --download          # fetch the original release (figshare) into data/raw/
+    python scripts/32_maccrobat_deid.py                     # the committed copy in data/external/maccrobat/
+    python scripts/32_maccrobat_deid.py --download          # re-fetch the original release from figshare (MD5 checked)
     python scripts/32_maccrobat_deid.py --source bio --download   # or the BIO mirror on Hugging Face
     python scripts/32_maccrobat_deid.py --engines regex,regex_v2+guard,hf_stanford+regex_v2+guard
 
@@ -12,7 +13,8 @@ Scores, per engine (deid_eval.score_records on the records from maccrobat.load_b
   decoy_damage    share of clinical entities (symptoms, drugs, procedures ...) with any character removed
   char_precision  share of removed characters that were derived PHI
 
-Writes (aggregates only; the text stays in data/raw/, never committed):
+Data: data/external/maccrobat/ (public, CC BY 4.0; committed with its README).
+Writes:
   data/deid/maccrobat_scores.csv    one row per engine
   data/deid/maccrobat_by_type.csv   per engine, role and entity type: share touched, share of characters removed
   data/deid/maccrobat_not_run.csv   engines that couldn't run here, and why
@@ -20,13 +22,14 @@ Writes (aggregates only; the text stays in data/raw/, never committed):
 
 import argparse
 import functools
+import hashlib
 import urllib.request
 from pathlib import Path
 
 import pandas as pd
 
 from dental_omop_nlp import deid, deid_eval, maccrobat
-from dental_omop_nlp.paths import DEID_DIR, RAW_DIR
+from dental_omop_nlp.paths import DEID_DIR, EXTERNAL_DIR, RAW_DIR
 
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
            "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
@@ -38,11 +41,13 @@ ap.add_argument("--download", action="store_true", help=f"fetch {maccrobat.FIGSH
 ap.add_argument("--engines", default=",".join(DEFAULT))
 a = ap.parse_args()
 
-default = RAW_DIR / "maccrobat" / ("MACCROBAT2020.zip" if a.source == "brat" else "maccrobat_bio.jsonl")
+default = EXTERNAL_DIR / "maccrobat" / "MACCROBAT2020.zip" if a.source == "brat" else RAW_DIR / "maccrobat" / "maccrobat_bio.jsonl"
 a.path = a.path or str(default)
 if a.download:
     Path(a.path).parent.mkdir(parents=True, exist_ok=True)
     urllib.request.urlretrieve(maccrobat.FIGSHARE_URL if a.source == "brat" else maccrobat.HF_URL, a.path)
+    if a.source == "brat" and hashlib.md5(Path(a.path).read_bytes()).hexdigest() != maccrobat.FIGSHARE_MD5:
+        raise SystemExit(f"{a.path}: MD5 differs from figshare's {maccrobat.FIGSHARE_MD5}")
 recs = (maccrobat.load_brat if a.source == "brat" else maccrobat.load_bio)(a.path)
 n_ent = pd.Series([e["role"] for r in recs for e in r["entities"]]).value_counts()
 print(f"{len(recs)} documents; entities by role: {n_ent.to_dict()}")

@@ -254,7 +254,7 @@ It was not built for PHI and has no names or contact details, so it checks two t
 - **Clinical damage**: share of 22,272 clinical entities (symptoms, diseases, procedures, drugs,
   doses, lab values, anatomy ...) with any character removed. This is over-redaction on real text.
 
-`python python/scripts/32_maccrobat_deid.py --download` (text goes to `data/raw/`, never committed;
+`python python/scripts/32_maccrobat_deid.py` (data committed in `data/external/maccrobat/`, CC BY 4.0;
 scores in `data/deid/maccrobat_scores.csv`, `maccrobat_by_type.csv`). Run 2026-10-26 on CPU:
 
 | Engine | PHI date recall | Clinical damage |

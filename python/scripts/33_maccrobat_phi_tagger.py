@@ -1,13 +1,12 @@
 """Fine-tune an encoder to tag Age, Sex and Date in MACCROBAT case reports (spec 010).
 
-    python scripts/32_maccrobat_deid.py --download                     # once: the original release
     python scripts/33_maccrobat_phi_tagger.py                          # Longformer, default settings
     python scripts/33_maccrobat_phi_tagger.py --lr 5e-5 --epochs 6 --tag lr5e-5_e6
 
 Notes are split 80:20 (seeded) into train and test; 20 training notes are held out as a validation
 set, so settings and regex sets are chosen on validation and the test set is read once at the end.
 Writes:
-  data/raw/maccrobat/bio/{train,val,test}.txt   BIO files (real text: never committed)
+  data/external/maccrobat/bio/{train,val,test}.txt   BIO files (public, CC BY 4.0: committed)
   python/runs/phi_tagger/<tag>/pred.json        word tags, gold and predicted, for val and test (git-ignored)
   data/deid/maccrobat_tagger_runs.csv           one row per run: settings, val and test F1 per type
 """
@@ -20,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 from dental_omop_nlp import maccrobat, phi_tagger
-from dental_omop_nlp.paths import DEID_DIR, RAW_DIR, REPO_ROOT
+from dental_omop_nlp.paths import DEID_DIR, EXTERNAL_DIR, REPO_ROOT
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--model", default="allenai/longformer-base-4096")
@@ -34,7 +33,7 @@ ap.add_argument("--max-length", type=int, default=1024, help="sub-tokens per chu
 ap.add_argument("--seed", type=int, default=42, help="training seed")
 ap.add_argument("--split-seed", type=int, default=42)
 ap.add_argument("--n-val", type=int, default=20)
-ap.add_argument("--zip", default=str(RAW_DIR / "maccrobat" / "MACCROBAT2020.zip"))
+ap.add_argument("--zip", default=str(EXTERNAL_DIR / "maccrobat" / "MACCROBAT2020.zip"))
 ap.add_argument("--tag", default=None)
 a = ap.parse_args()
 tag = a.tag or f"{a.model.split('/')[-1]}_lr{a.lr:g}_e{a.epochs:g}_bs{a.batch_size}_wd{a.weight_decay:g}_s{a.seed}"
@@ -53,7 +52,7 @@ docs = {d["note_id"]: d for d in phi_tagger.bio_docs(maccrobat.load_brat(a.zip))
 train_ids, test_ids = phi_tagger.split_docs(list(docs), 0.2, a.split_seed)
 val_ids = phi_tagger.split_docs(train_ids, a.n_val / len(train_ids), a.split_seed)[1]
 train_ids = [i for i in train_ids if i not in set(val_ids)]
-bio_dir = RAW_DIR / "maccrobat" / "bio"
+bio_dir = EXTERNAL_DIR / "maccrobat" / "bio"
 bio_dir.mkdir(parents=True, exist_ok=True)
 for name, ids in (("train", train_ids), ("val", val_ids), ("test", test_ids)):
     phi_tagger.write_conll([docs[i] for i in ids], bio_dir / f"{name}.txt")

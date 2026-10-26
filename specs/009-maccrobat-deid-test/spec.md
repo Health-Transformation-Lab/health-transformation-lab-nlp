@@ -12,8 +12,9 @@ also published as BIO token labels (B = beginning, I = inside, O = outside an en
 
 > Personal learning project; public data only. MACCROBAT is 200 clinical case reports from PubMed
 > Central, edited by its authors to the case details and annotated by hand (Caufield, 2019). It holds
-> no names or contact details. Its text **never enters the repo**: it is downloaded to `data/raw/`
-> (git-ignored) and only aggregate scores are committed. Test fixtures are invented sentences.
+> no names or contact details. Being public, de-identified and CC BY 4.0, it is committed under
+> `data/external/maccrobat/` with a source-and-licence README (constitution v1.2.0, public-dataset
+> exception). Test fixtures are still invented sentences.
 
 ## Context
 
