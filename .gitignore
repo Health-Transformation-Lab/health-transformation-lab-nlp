@@ -255,3 +255,6 @@ mlruns/
 
 # Encoder fine-tuning output and checkpoints (rungs.HFEncoder)
 python/runs/
+
+# PR reviews written by /create-pr and /pr-review (working notes)
+pull_requests/*-review.md

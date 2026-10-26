@@ -27,7 +27,8 @@ Read `DISCLAIMER.md` and `.specify/memory/constitution.md` first. The short vers
 | Session plan | Superpowers `writing-plans`, then `executing-plans` or `subagent-driven-development` | `docs/superpowers/plans/YYYY-MM-DD-topic.md` |
 | Each task | Superpowers `test-driven-development` | failing test → code → passing test |
 | Before saying done | Superpowers `verification-before-completion` | commands run, output checked |
-| Before merge | Superpowers `requesting-code-review` | review notes on the PR |
+| Open a PR | `/create-pr` (checks, opens the PR, reviews it) | PR + `pull_requests/pr-<n>-review.md` |
+| Before merge | `/pr-review <n>` (Superpowers `requesting-code-review`, rubric in `.claude/review-rubric.md`) | `pull_requests/pr-<n>-review.md` |
 
 Small fixes (a typo, a one-line bug with a regression test) don't need a spec.
 Anything that changes a dataset, a metric, a label rule or the review workflow does.
