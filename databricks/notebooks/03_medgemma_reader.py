@@ -83,9 +83,14 @@ display(d.assign(correct=d.pred == d.truth).groupby("difficulty")["correct"].agg
 
 # MedGemma vs the fine-tuned BERT encoders (committed ai_predictions_<encoder>.csv), paired bootstrap CIs.
 # Meaningful only with limit = 0: the encoders scored all 240 charts.
-r = subprocess.run(["python", "../../python/scripts/29_medgemma_vs_bert.py"], capture_output=True, text=True, check=False)
-print(r.stdout[-4000:], r.stderr[-2000:])
-display(pd.read_csv("../../data/datasets/ladder/medgemma_vs_bert.csv"))  # noqa: F821
+if int(dbutils.widgets.get("limit") or 0):  # noqa: F821
+    print("skipped: set limit to 0 so MedGemma scores all 240 charts, as the encoders did")
+else:
+    r = subprocess.run(["python", "../../python/scripts/29_medgemma_vs_bert.py"], capture_output=True, text=True,
+                       check=False)
+    print(r.stdout[-4000:], r.stderr[-2000:])
+    if r.returncode == 0:
+        display(pd.read_csv("../../data/datasets/ladder/medgemma_vs_bert.csv"))  # noqa: F821
 
 # COMMAND ----------
 

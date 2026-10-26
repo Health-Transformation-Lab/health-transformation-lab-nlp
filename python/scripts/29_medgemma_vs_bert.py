@@ -72,11 +72,18 @@ for group, files in (("llm", llm_files), ("encoder", bert_files), ("rules", {"no
         DATASETS_DIR / "ai_predictions_note_rules.csv")})):
     for rung, f in files.items():
         d = pd.read_csv(f).set_index("visit_id").reindex(truth.index)
+        if (miss := ladder_eval.missing_charts(d["pred"], truth)):
+            print(f"skip {rung}: {miss} of {len(truth)} review charts unscored (a --limit run); rerun on all")
+            continue
         name = f"sim:{rung}" if group == "llm" and a.simulated else rung
         preds[name], kind[name] = d["pred"], group
         pcols = [f"p_{lab}" for lab in LABELS]
         if all(c in d for c in pcols):
             proba[name] = d[pcols].set_axis(LABELS, axis=1)
+if not any(k == "llm" for k in kind.values()):
+    raise SystemExit("no complete MedGemma run to compare (every review chart must be scored)")
+llm_files = {r: f for r, f in llm_files.items() if (f"sim:{r}" if a.simulated else r) in preds}
+bert_files = {r: f for r, f in bert_files.items() if r in preds}
 for m in [m for m in list(preds) if kind[m] != "rules"]:
     preds[f"{m}+rules4"], kind[f"{m}+rules4"] = ladder_eval.rules_override(preds[m], preds["note_rules"]), kind[m]
 

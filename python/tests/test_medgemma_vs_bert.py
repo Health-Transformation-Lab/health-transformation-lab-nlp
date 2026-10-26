@@ -25,12 +25,22 @@ def test_llm_summary_reports_fallback_and_gate_per_rung():
     assert s["input_tokens_mean"] == pytest.approx(415) and s["latency_s_mean"] == pytest.approx(2.0)
 
 
-def test_gated_model_without_token_names_the_licence(monkeypatch):
+def test_gated_model_without_token_names_the_licence(monkeypatch, tmp_path):
     for v in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"):
         monkeypatch.delenv(v, raising=False)
+    monkeypatch.setenv("HF_HOME", str(tmp_path))                 # no cached `huggingface-cli login` either
     entry = {"id": "medgemma-1.5-4b-it", "hf": "google/medgemma-1.5-4b-it", "gated": True,
              "license": "HAI-DEF terms of use, https://example.org/terms"}
     with pytest.raises(RuntimeError, match="HAI-DEF terms"):
         llm_reader.make_backend(entry, "hf")
     monkeypatch.setenv("HF_TOKEN", "x")
+    assert llm_reader.make_backend(entry, "hf").hf_id == "google/medgemma-1.5-4b-it"
+
+
+def test_gated_model_accepts_a_cached_cli_login(monkeypatch, tmp_path):
+    for v in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"):
+        monkeypatch.delenv(v, raising=False)
+    monkeypatch.setenv("HF_HOME", str(tmp_path))
+    (tmp_path / "token").write_text("cached")                   # what `huggingface-cli login` writes
+    entry = {"hf": "google/medgemma-1.5-4b-it", "gated": True}
     assert llm_reader.make_backend(entry, "hf").hf_id == "google/medgemma-1.5-4b-it"

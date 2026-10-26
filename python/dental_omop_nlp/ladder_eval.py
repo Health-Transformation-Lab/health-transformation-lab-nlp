@@ -67,6 +67,11 @@ def ladder_table(truth: pd.Series, preds: dict, proba: dict | None = None, n_boo
     return pd.DataFrame(rows)
 
 
+def missing_charts(pred: pd.Series, truth: pd.Series) -> int:
+    """Review charts a run did not score (e.g. a --limit smoke test); such a run isn't comparable."""
+    return int(pred.reindex(truth.index).isna().sum())
+
+
 def by_difficulty(truth: pd.Series, preds: dict, level: pd.Series) -> pd.DataFrame:
     """Accuracy per method and difficulty level (long: method, difficulty, n, accuracy)."""
     t, lv = truth.to_numpy(), level.reindex(truth.index).to_numpy()

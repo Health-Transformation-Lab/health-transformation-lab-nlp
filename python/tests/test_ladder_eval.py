@@ -67,3 +67,9 @@ def test_head_to_head_uses_the_encoder_as_reference():
                                  reference="bert-base").set_index("method")
     assert t.loc["medgemma", "diff_vs_ref"] == pytest.approx(0.2)
     assert t.loc["bert-base", "diff_vs_ref"] == 0.0
+
+
+def test_missing_charts_counts_unscored_review_charts():
+    truth = pd.Series(["healthy"] * 4, index=[1, 2, 3, 4])
+    assert ladder_eval.missing_charts(pd.Series(["healthy"] * 4, index=[1, 2, 3, 4]), truth) == 0
+    assert ladder_eval.missing_charts(pd.Series(["healthy", None], index=[1, 2]), truth) == 3   # a --limit run
