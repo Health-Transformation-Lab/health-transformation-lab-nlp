@@ -91,7 +91,7 @@ if external:
     assert Path(external).exists(), f"external_path not found: {external}"
     cmd += ["--external", external, "--tiers", "all,unseen,external"]
 print(" ".join(cmd))
-r = subprocess.run(cmd, capture_output=True, text=True)
+r = subprocess.run(cmd, capture_output=True, text=True, check=False)   # return code checked below
 print(r.stdout[-6000:], r.stderr[-2000:])
 assert r.returncode == 0, "benchmark failed; see stderr above"
 
