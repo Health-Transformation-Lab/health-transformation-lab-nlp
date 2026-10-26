@@ -56,8 +56,8 @@ deid:
     presidio:       {kind: local, hardware: cpu, throughput_source: measured}
     azure_deid:     {kind: service, unit: mb, usd_per_unit: 0.50, free_units: 50}                 # ILLUSTRATIVE price
     azure_language: {kind: service, unit: record_1k_chars, usd_per_unit: 0.001, free_units: 0}   # ILLUSTRATIVE price
-    hf_stanford:    {kind: local, hardware: gpu, throughput_source: measured}   # measured when run; GPU recommended
-    hf_obi:         {kind: local, hardware: gpu, throughput_source: measured}
+    hf_stanford:    {kind: local, hardware: cpu, throughput_source: measured}   # measured on a 4-CPU container; a GPU is faster
+    hf_obi:         {kind: local, hardware: cpu, throughput_source: measured}
     llm:            {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
                      prompt_overhead_tokens: 250, output_tokens: 80}            # ILLUSTRATIVE (a small hosted model)
   # "+guard" adds no cost; an ensemble costs the sum of its engines.

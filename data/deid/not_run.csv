@@ -1,9 +1,4 @@
 method,reason
-hf_stanford,ModuleNotFoundError: No module named 'transformers'
-hf_stanford+guard,ModuleNotFoundError: No module named 'transformers'
-hf_stanford+regex_v2+guard,ModuleNotFoundError: No module named 'transformers'
-hf_obi,ModuleNotFoundError: No module named 'transformers'
-hf_obi+regex_v2+guard,ModuleNotFoundError: No module named 'transformers'
 llm,RuntimeError: DEID_LLM_BASE_URL is not set: this engine calls an Azure service (synthetic or de-identified data only)
 llm+regex_v2+guard,RuntimeError: DEID_LLM_BASE_URL is not set: this engine calls an Azure service (synthetic or de-identified data only)
 azure_deid,RuntimeError: AZURE_DEID_ENDPOINT is not set: this engine calls an Azure service (synthetic or de-identified data only)

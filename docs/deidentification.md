@@ -96,41 +96,59 @@ Decoy damage = share of dental decoys with any character removed.
 |---|---|---|---|---|---|---|
 | regex | 1.00 | 0.27 | 0.20 | 0.47 | 0.94 | 0.00 |
 | regex_v2 (+guard) | 1.00 | 1.00\* | 0.27 | 0.76 | 0.96 | 0.00 |
-| presidio | 0.82 | 0.72 | 0.53 | 0.69 | 0.75 | **0.37** |
-| presidio+guard | 0.82 | 0.72 | 0.53 | 0.69 | 0.91 | 0.05 |
-| **presidio+regex_v2+guard** | 1.00 | 1.00\* | **0.57** | **0.86** | 0.89 | 0.05 |
+| presidio | 0.82 | 0.71 | 0.53 | 0.69 | 0.75 | 0.37 |
+| presidio+guard | 0.82 | 0.71 | 0.53 | 0.69 | 0.91 | 0.05 |
+| presidio+regex_v2+guard | 1.00 | 1.00\* | 0.57 | 0.86 | 0.89 | 0.05 |
+| hf_obi | 0.78 | 0.69 | 0.58 | 0.68 | 0.93 | 0.17 |
+| hf_obi+regex_v2+guard | 1.00 | 1.00\* | 0.62 | 0.88 | 0.94 | 0.01 |
+| hf_stanford | 1.00 | 0.69 | 0.71 | 0.79 | 0.85 | 0.17 |
+| hf_stanford+guard | 1.00 | 0.69 | 0.71 | 0.79 | 0.92 | 0.02 |
+| **hf_stanford+regex_v2+guard** | 1.00 | 1.00\* | **0.74** | **0.92** | 0.90 | 0.02 |
 
-\* written alongside this tier; read the unseen column for a fair comparison.
+\* written alongside this tier; read the unseen column for a fair comparison. The Hugging Face
+engines ran on CPU in a 4-CPU container (2026-10-26).
 
-What it shows:
+What each method adds:
 
-- **No single method is enough.** Regex is exact on shapes it knows and blind to the rest. The NER
-  model generalizes better (53% vs 27% on unseen) but misses formatted IDs. The ensemble beats both.
-- **The NER model damages dental text.** Presidio alone redacted part of 37% of dental terms; the
-  dental guard cuts that to 5% without losing any recall.
-- **Even the best engine here leaks.** 43% of the unseen identifiers survive (streets, URLs, IDs,
-  doctors' names are the worst: `data/deid/by_category.csv`). A held-out human review sample stays
-  necessary, and the Microsoft service should be run on the same set before choosing.
+- **regex_v2** contributes exact coverage of formatted identifiers (phones, IDs, member numbers,
+  emails) with no damage to dental text, at about 3,600 notes/s. Every ensemble below relies on it
+  for those shapes.
+- **Presidio** adds context-based detection: on the unseen tier it doubles regex_v2's recall
+  (0.53 vs 0.27) and catches the unseen-tier dates (1.00) that hf_stanford misses.
+- **hf_stanford** adds a model trained on clinical text: the highest recall of any single engine
+  on the unseen tier (0.71), strongest on names (patients 0.84, clinicians 0.85), employers (1.00),
+  other IDs (0.72) and URLs (0.41) (`data/deid/by_category.csv`).
+- **hf_obi** adds a second clinical model trained on different notes (i2b2 2014). It catches the
+  unseen dates that hf_stanford misses (0.97 vs 0.00), so the two models complement each other.
+- **The dental guard** cuts decoy damage from 17% to 2% for hf_stanford and from 37% to 5% for
+  Presidio, at no cost to recall.
+- **The ensembles** combine those strengths: hf_stanford+regex_v2+guard removes 92% of
+  identifiers overall and 74% on the unseen tier, the most of any combination run here.
+
+**What a human review sample still has to cover.** On the unseen tier, about a quarter of
+identifiers survive even the best ensemble. No engine finds street addresses, and URLs are mostly
+missed. Combining hf_stanford with Presidio or hf_obi (for dates) is the next combination to score.
 
 ## Cost-effectiveness
 
 `data/deid/cost_effectiveness.csv`, per 1M notes, for the full mix (`all`) and the held-out tier (`unseen`):
 
 - **Engine cost.** Local engines: node-hours at the throughput **measured** here (regex about
-  13,000 notes/s, regex v2 about 3,600, Presidio about 75 on one CPU) × the CPU node price.
-  Services: price per MB (Azure de-identification, 50 MB/month free) or per 1,000-character record
-  (Azure AI Language). Service prices in `costs.yaml` are **ILLUSTRATIVE** until filled from the
-  pricing pages.
+  13,000 notes/s, regex v2 about 3,600, Presidio about 75, hf_stanford about 7 and hf_obi about 3
+  on CPU) × the CPU node price. Services: price per MB (Azure de-identification, 50 MB/month free) or
+  per 1,000-character record (Azure AI Language). Service prices in `costs.yaml` are
+  **ILLUSTRATIVE** until filled from the pricing pages.
 - **Review cost.** Human QA of 1 in 1,000 de-identified notes, the same for every engine.
 - **Outcome.** Leaked identifiers per 1M notes, then decoy damage as a tie-break.
 - **Frontier.** An engine is dominated if one that costs no more leaks no more. ICER = extra USD
   per leaked identifier avoided.
 
-With these inputs the engines themselves are nearly free locally (under $5 per 1M notes, even
-Presidio); the review sample dominates the cost. So the choice is about leaks, not compute:
-on both tiers the frontier ends at presidio+regex_v2+guard. A cloud service at an illustrative
-$0.50/MB would add roughly $140 per 1M notes of about 320 characters. It's worth it only if it
-leaks measurably less on the unseen tier. That's the comparison to run once an Azure resource exists.
+With these inputs every local engine costs under $90 per 1M notes, even the transformers on CPU;
+the $3,000 review sample is most of the cost. So the choice comes down to leaks. On both tiers the
+frontier ends at hf_stanford+regex_v2+guard: about $33 more per 1M notes than
+presidio+regex_v2+guard buys about 375,000 fewer leaked identifiers (all tier). A cloud service at an
+illustrative $0.50/MB would add roughly $140 per 1M notes of about 320 characters. Its value would be
+any recall it adds on the unseen tier; that's the comparison to run once an Azure resource exists.
 
 Python and R compute the same frontier from `cost_inputs.csv` (parity test).
 
