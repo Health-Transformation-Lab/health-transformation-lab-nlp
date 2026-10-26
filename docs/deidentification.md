@@ -251,11 +251,11 @@ Engine cost to de-identify **1 million notes** in one billing month, list prices
 | Engine | Billed per | Price | 1M notes of 410 chars (study notes) | 1M queries of 151 chars (ASQ-PHI) | Price source |
 |---|---|---|---|---|---|
 | hf_stanford (local, CPU) | node-hour | ~11 notes/s measured | ~$25 | ~$25 | measured; node price ILLUSTRATIVE |
-| Azure Health Data Services de-id | MB, 50 MB/month free | $0.05/MB | ~$18 | ~$5 | third-party summary (unverified) |
-| Databricks `ai_mask` | token | $0.50 in / $1.50 out per 1M tokens | ~$295 | ~$166 | DBU rates: Databricks docs; $/DBU: third-party (unverified) |
+| Azure Health Data Services de-id | MB, 50 MB/month free | $0.05/MB | ~$18 | ~$5 | Azure retail prices API |
+| Databricks `ai_mask` | token | $0.50 in / $1.50 out per 1M tokens | ~$295 | ~$166 | Databricks pricing page ($0.07/DBU × Llama 3.3 70B DBU rates) |
 | Our LLM prompt (`llm`) on the same endpoint | token | same | ~$281 | ~$249 | same |
-| Azure AI Language PII | 1,000-char record | $1.00 per 1,000 to 500K, then $0.75 | ~$875 | ~$875 | third-party reading of Azure's price API (unverified) |
-| **Amazon Comprehend Medical** | 100 chars, 1-unit minimum | $0.0014 to 1M units, $0.0005 to 2M, then $0.00025 | **~$2,650** | ~$1,900 | **AWS price list API (verified)** |
+| Azure AI Language PII | 1,000-char record | $1.00 per 1,000 to 500K, then $0.75 | ~$875 | ~$875 | Azure retail prices API |
+| **Amazon Comprehend Medical** | 100 chars, 1-unit minimum | $0.0014 to 1M units, $0.0005 to 2M, then $0.00025 | **~$2,650** | ~$1,900 | AWS price list API |
 
 For scale, the human review sample costs about $3,000 per 1M notes with any engine.
 
@@ -270,8 +270,9 @@ What drives the differences:
 - **Pay-per-token is a floor.** Databricks rate-limits pay-per-token endpoints and points large
   workloads to provisioned throughput, billed per hour.
 
-Rates live in `costs.yaml` with the source for each. The unverified ones should be confirmed in the
-vendors' calculators before any number leaves this repo.
+Every service rate above was read from the vendor's own price source on 2026-10-26 (list price,
+US East); `costs.yaml` names each one. Contract discounts, other regions and committed-use tiers
+change them. The local engines' node price ($1/hour) is still ILLUSTRATIVE.
 
 Python and R compute the same frontier from `cost_inputs.csv` (parity test).
 

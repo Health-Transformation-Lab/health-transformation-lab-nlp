@@ -39,20 +39,19 @@ judge:                         # the LLM judge itself (used on samples, not the 
   sample_per_method: 400       # judged notes per method on the corpus sample
 
 # De-identification engines (spec 007; scripts/26_deid_benchmark.py).
-# Service prices, us-east, list price, checked 2026-10-26. Each line says where its number came from;
-# "unverified" = the vendor's own page couldn't be read from the authoring workspace.
+# Service prices, US East, list price, checked 2026-10-26 against each vendor's own source:
 #   Amazon Comprehend Medical DetectPHI: AWS price list API (pricing.us-east-1.amazonaws.com,
 #     comprehendmedical, us-east-1). Per 100-character unit, 1-unit minimum per request, volume tiers.
 #     85,000 units free in the first month only (not counted).
-#   Azure Health Data Services de-identification: per MB after 50 MB/month free; $0.05/MB from a
-#     third-party summary (unverified; https://azure.microsoft.com/pricing/details/health-data-services/).
-#   Azure AI Language PII (Standard): per 1,000-character text record, volume tiers from a third-party
-#     reading of the Azure retail prices API, East US (unverified;
-#     https://azure.microsoft.com/pricing/details/language/).
-#   Databricks ai_mask / llm: Foundation Model APIs pay-per-token, Llama 3.3 70B = 7.143 DBU per 1M input
-#     and 21.429 DBU per 1M output tokens (Databricks docs) x $0.07/DBU (AWS us-east; third-party,
-#     unverified) = $0.50 / $1.50. Pay-per-token is rate-limited; large volumes need provisioned
-#     throughput (per hour), so this is a floor.
+#   Azure Health Data Services de-identification: Azure retail prices API (prices.azure.com),
+#     meter "De-Id", eastus: first 50 MB free, then $0.05 per MB.
+#   Azure AI Language PII: Azure retail prices API, meter "Standard Text Records", eastus: per 1,000
+#     records (1 record = 1,000 characters), $1.00 / $0.75 from 500K / $0.30 from 2.5M / $0.25 from 10M.
+#   Databricks ai_mask / llm: databricks.com/product/pricing/foundation-model-serving: $0.07 per DBU
+#     (AWS US East) x Llama 3.3 70B pay-per-token 7.143 DBU per 1M input and 21.429 per 1M output
+#     tokens = $0.50 / $1.50. Pay-per-token is rate-limited; large volumes need provisioned throughput
+#     or batch inference (Llama 3.3 70B batch: 85.714 DBU/hour = $6/hour), so this is a floor.
+#     Which model ai_mask uses isn't fixed in its docs; Llama 3.3 70B is the one they name.
 # Volume tiers assume the whole corpus is processed in one billing month.
 deid:
   review:                        # human QA of a sample of de-identified notes, every engine
@@ -63,10 +62,10 @@ deid:
     regex:          {kind: local, hardware: cpu, throughput_source: measured}
     regex_v2:       {kind: local, hardware: cpu, throughput_source: measured}
     presidio:       {kind: local, hardware: cpu, throughput_source: measured}
-    azure_deid:     {kind: service, unit: mb, usd_per_unit: 0.05, free_units: 50}                 # unverified
-    azure_language: {kind: service, unit: record_1k_chars, usd_per_unit: 0.001, free_units: 0,     # unverified
+    azure_deid:     {kind: service, unit: mb, usd_per_unit: 0.05, free_units: 50}
+    azure_language: {kind: service, unit: record_1k_chars, usd_per_unit: 0.001, free_units: 0,
                      tiers: [[500000, 0.001], [2500000, 0.00075], [10000000, 0.0003], [null, 0.00025]]}
-    aws_comprehend: {kind: service, unit: record_100_chars, usd_per_unit: 0.0014, free_units: 0,   # AWS price list
+    aws_comprehend: {kind: service, unit: record_100_chars, usd_per_unit: 0.0014, free_units: 0,
                      tiers: [[1000000, 0.0014], [2000000, 0.0005], [null, 0.00025]]}
     hf_stanford:    {kind: local, hardware: cpu, throughput_source: measured}   # measured on a 4-CPU container; a GPU is faster
     hf_obi:         {kind: local, hardware: cpu, throughput_source: measured}
