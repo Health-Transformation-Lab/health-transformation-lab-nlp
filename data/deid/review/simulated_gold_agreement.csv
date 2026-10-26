@@ -1,4 +1,4 @@
 annotator_a,annotator_b,n_notes,n_spans_a,n_spans_b,f1_span,f1_typed
-annotator1@example.org,annotator2@example.org,60,391,393,0.9183673469387755,0.8137755102040817
-annotator1@example.org,annotator3@example.org,60,391,388,0.9088575096277278,0.8267008985879333
-annotator2@example.org,annotator3@example.org,60,393,388,0.9193341869398207,0.8322663252240717
+annotator1@example.org,annotator2@example.org,60,394,385,0.926829268292683,0.8189987163029525
+annotator1@example.org,annotator3@example.org,60,394,387,0.9295774647887324,0.8117797695262484
+annotator2@example.org,annotator3@example.org,60,385,387,0.927461139896373,0.8212435233160622

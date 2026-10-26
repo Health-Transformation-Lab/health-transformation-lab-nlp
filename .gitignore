@@ -233,6 +233,8 @@ mlruns/
 .databricks/
 data/review/*
 !data/review/simulated_*
+data/deid/review/*
+!data/deid/review/simulated_*
 data/corpus/*
 !data/corpus/README.md
 !data/corpus/cost_effectiveness*

@@ -15,6 +15,7 @@ Writes to data/raw/ (note text with fake PHI; never committed):
 
 import argparse
 import json
+import random
 
 from dental_omop_nlp import deid, deid_review
 from dental_omop_nlp.paths import RAW_DIR
@@ -30,7 +31,10 @@ ap.add_argument("--seed", type=int, default=0)
 a = ap.parse_args()
 
 recs = load_external(a.records) if a.records else build_challenge(n_notes=a.n_gold + a.n_qa, seed=7)
-gold_recs, qa_recs = recs[:a.n_gold], recs[a.n_gold:] or recs
+random.Random(a.seed).shuffle(recs)                 # a file sorted by tier mustn't decide which set a note is in
+if len(recs) <= a.n_gold:
+    raise SystemExit(f"{len(recs)} notes: need more than --n-gold {a.n_gold} so the QA notes differ from the gold ones")
+gold_recs, qa_recs = recs[:a.n_gold], recs[a.n_gold:]
 detect = deid.get_engine(a.engine)
 gold = deid_review.gold_tasks(gold_recs, detect, a.engine, unaided_share=a.unaided_share, seed=a.seed)
 qa, key = deid_review.qa_tasks(qa_recs, detect, a.engine, n=a.n_qa, seed=a.seed)

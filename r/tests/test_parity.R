@@ -105,26 +105,35 @@ if (file.exists("data/deid/cost_inputs.csv") && file.exists("data/deid/cost_effe
               all(m$dominated.r == as.logical(m$dominated.p))))
   stopifnot(d < 1e-6, same_na, all(m$dominated.r == as.logical(m$dominated.p)))
 } else cat("de-id CE: skipped (run python/scripts/26_deid_benchmark.py first)\n")
-# 9b. Licensed engines (John Snow Labs) never reach cost_inputs.csv without a licence, so check the
-# 9e. De-identification review flows (spec 008): agreement F1 and Wilson leak rate, R == Python.
+# 9e. De-identification review flows (spec 008): agreement, consensus, annotator recall, and the QA
+# leak rate, sensitivity, specificity and leak-span recall, R == Python.
 for (pfx in c("", "simulated_")) {
   f <- sprintf("data/deid/review/%sgold_spans.csv", pfx)
   if (!file.exists(f)) next
   source("r/R/08_deid.R")
-  ra <- deid_agreement(read.csv(f, stringsAsFactors = FALSE))
-  pa <- read.csv(sprintf("data/deid/review/%sgold_agreement.csv", pfx), stringsAsFactors = FALSE)
-  ma <- merge(ra, pa, by = c("annotator_a", "annotator_b"), suffixes = c(".r", ".p"))
+  rd <- function(x) read.csv(sprintf("data/deid/review/%s%s.csv", pfx, x), stringsAsFactors = FALSE)
+  gs <- read.csv(f, stringsAsFactors = FALSE)
+  ma <- merge(deid_agreement(gs), rd("gold_agreement"), by = c("annotator_a", "annotator_b"), suffixes = c(".r", ".p"))
   da <- max(abs(ma$f1_span.r - ma$f1_span.p), abs(ma$f1_typed.r - ma$f1_typed.p), abs(ma$n_notes.r - ma$n_notes.p))
-  rq <- deid_qa_summary(read.csv(sprintf("data/deid/review/%sqa_labels.csv", pfx), stringsAsFactors = FALSE))
-  pq <- read.csv(sprintf("data/deid/review/%sqa_summary.csv", pfx), stringsAsFactors = FALSE)
-  mq <- merge(rq, pq, by = "scope", suffixes = c(".r", ".p"))
-  cols <- c("n_notes", "leak_notes", "leak_rate", "leak_lo", "leak_hi", "over_redaction_rate")
-  dq <- max(sapply(cols, function(k) max(abs(mq[[paste0(k, ".r")]] - mq[[paste0(k, ".p")]]))))
-  cat(sprintf("%sdeid review: %d annotator pairs, max |R - Python| = %.2e; QA %d scopes, %.2e\n",
-              pfx, nrow(ma), da, nrow(mq), dq))
-  stopifnot(nrow(ma) == nrow(pa), da < 1e-9, nrow(mq) == nrow(pq), dq < 1e-9)
+  rc <- deid_consensus(gs); pc <- rd("gold_consensus")
+  mc <- merge(rc, pc, by = c("note_id", "start", "end"), suffixes = c(".r", ".p"))
+  ok_c <- nrow(mc) == nrow(pc) && nrow(rc) == nrow(pc) && all(mc$type.r == mc$type.p)
+  mr <- merge(deid_annotator_recall(gs, rd("generator_spans")), rd("gold_annotator_recall"),
+              by = c("annotator", "aided"), suffixes = c(".r", ".p"))
+  dr <- max(abs(mr$entity_recall.r - mr$entity_recall.p), abs(mr$n_phi.r - mr$n_phi.p))
+  ql <- rd("qa_labels"); pq <- rd("qa_summary")
+  mq <- merge(merge(deid_qa_summary(ql), deid_qa_vs_key(ql, rd("qa_key")), by = "scope"), pq,
+              by = "scope", suffixes = c(".r", ".p"))
+  cols <- c("n_notes", "leak_notes", "leak_rate", "leak_lo", "leak_hi", "over_redaction_rate",
+            "sensitivity", "specificity", "leak_span_recall")
+  dq <- max(sapply(cols, function(k) { x <- abs(mq[[paste0(k, ".r")]] - mq[[paste0(k, ".p")]]); max(ifelse(is.na(x), 0, x)) }))
+  cat(sprintf("%sdeid review: %d pairs %.2e; consensus %d spans same: %s; recall %.2e; QA %d scopes %.2e\n",
+              pfx, nrow(ma), da, nrow(pc), ok_c, dr, nrow(mq), dq))
+  stopifnot(nrow(ma) == nrow(rd("gold_agreement")), da < 1e-9, ok_c, nrow(mr) == nrow(rd("gold_annotator_recall")),
+            dr < 1e-9, nrow(mq) == nrow(pq), dq < 1e-9)
 }
 
+# 9b. Licensed engines (John Snow Labs) never reach cost_inputs.csv without a licence, so check the
 # R twin directly against Python's deid_eval.engine_cost on the vendor's example (1M notes x 5,250 chars).
 source("r/R/08_deid.R")
 lic <- list(chars_per_sec = 6392.7, node_usd_per_hour = 1.2, license_usd_per_month = 7000, hours_per_month = 744)

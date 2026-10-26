@@ -120,13 +120,14 @@ def agreement(spans: pd.DataFrame) -> pd.DataFrame:
 
 
 def consensus(spans: pd.DataFrame) -> dict:
-    """{note_id: [span]}: characters marked by at least half the note's annotators; each run takes
+    """{note_id: [span]}: characters marked by at least half the note's annotators (one vote per
+    annotator, however many spans cover the character); each run takes
     the most common category among the spans covering it (ties: alphabetical)."""
     out = {}
     for nid, g in spans.groupby("note_id", sort=False):
         k = g["annotator"].nunique()
         m = _marked(g)
-        votes = Counter(i for _, s in m.iterrows() for i in range(int(s.start), int(s.end)))
+        votes = Counter(i for _, ga in m.groupby("annotator") for i in _chars(ga.to_dict("records")))
         keep = {i for i, v in votes.items() if v >= k / 2}
         gold = []
         for a, b in _runs(keep):
@@ -161,7 +162,8 @@ def annotator_recall(spans: pd.DataFrame, records: list[dict]) -> pd.DataFrame:
 
 # ------------------------------------------------------------------ QA flow
 def redact_map(text: str, spans: list[dict]) -> tuple[str, list[int]]:
-    """deid.redact plus where each original character landed (-1 = redacted)."""
+    """Redacted text (deid.redact uses this) plus where each original character landed (-1 = redacted).
+    A span inside an earlier one is already redacted; nothing inside an outer span is re-emitted."""
     out, pos, last, n = [], [-1] * len(text), 0, 0
     for s in sorted(spans, key=lambda s: s["start"]):
         if s["start"] < last:                       # overlapping spans: already redacted
@@ -179,6 +181,27 @@ def redact_map(text: str, spans: list[dict]) -> tuple[str, list[int]]:
     return "".join(out), pos
 
 
+_TITLES = {"dr", "mr", "mrs", "ms", "miss", "dds", "dmd", "md", "rdh", "the", "of", "on", "st"}
+
+
+def _is_leak(frag: str) -> bool:
+    """A surviving piece of an identifier counts as a leak unless it is only punctuation, titles or
+    connecting words ("Dr.", "Mrs", "the"): what is left must still say something about the person."""
+    words = [w for w in "".join(c if c.isalnum() else " " for c in frag).lower().split()]
+    return any(w not in _TITLES for w in words)
+
+
+def format_spans(spans) -> str:
+    """[(start, end), ...] as "s-e;s-e" for CSV (R reads the same)."""
+    return ";".join(f"{a}-{b}" for a, b in spans)
+
+
+def parse_spans(s) -> list[tuple[int, int]]:
+    if not isinstance(s, str) or not s:
+        return []
+    return [tuple(int(x) for x in part.split("-")) for part in s.split(";")]
+
+
 def qa_tasks(records: list[dict], detect, engine: str, n: int = 100, seed: int = 0) -> tuple[list[dict], pd.DataFrame]:
     """De-identify each note with the engine; sample residual-scan hits first, then seeded random notes.
     Returns (tasks, key); the key (true leaks, in redacted coordinates) never goes into a task."""
@@ -189,9 +212,11 @@ def qa_tasks(records: list[dict], detect, engine: str, n: int = 100, seed: int =
         covered = _chars(found)
         leaks = []
         for p in r.get("phi", []):
-            left = [pos[i] for i in range(p["start"], p["end"]) if i not in covered and pos[i] >= 0]
-            if left:
-                leaks.append({"start": min(left), "end": max(left) + 1, "type": p["type"]})
+            for a, b in _runs({pos[i] for i in range(p["start"], p["end"]) if i not in covered and pos[i] >= 0}):
+                frag = red[a:b]
+                a, b = a + len(frag) - len(frag.lstrip()), b - len(frag) + len(frag.rstrip())
+                if _is_leak(red[a:b]):
+                    leaks.append({"start": a, "end": b, "type": p["type"]})
         rows.append({"rec": r, "text": red, "residual": residual_scan(red), "leaks": leaks})
     rng = random.Random(seed)
     flagged = [i for i, x in enumerate(rows) if x["residual"]]

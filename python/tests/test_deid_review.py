@@ -174,3 +174,24 @@ def test_qa_summary_leak_span_recall():
     s = deid_review.qa_summary(labels, key).set_index("scope")["leak_span_recall"]
     assert s["r1"] == pytest.approx(1 / 3) and s["r2"] == pytest.approx(1 / 3)
     assert s["pooled"] == pytest.approx(2 / 3)                    # union of what the reviewers marked
+
+
+def test_consensus_counts_annotators_not_spans():
+    exp = [_ann("n1", "a", [(0, 5, "PATIENT"), (0, 5, "PATIENT")]), _ann("n1", "b", []), _ann("n1", "c", [])]
+    assert deid_review.consensus(deid_review.parse_gold_export(exp))["n1"] == []   # 1 of 3 is under half
+
+
+def test_true_leaks_are_surviving_runs_without_tags_or_bare_titles():
+    text = "Seen by Dr. Ann O'Neil today; also Dr. Bo on 3/4."
+    phi = [{"start": 8, "end": 22, "text": "Dr. Ann O'Neil", "type": "DOCTOR"},
+           {"start": 35, "end": 41, "text": "Dr. Bo", "type": "DOCTOR"}]
+    detect = lambda t: [{"start": 12, "end": 15, "type": "NAME"}, {"start": 39, "end": 41, "type": "NAME"}]
+    tasks, key = deid_review.qa_tasks([_rec(text=text, phi=phi)], detect, "e", n=1)
+    red = tasks[0]["data"]["text"]
+    leaks = [red[s["start"]:s["end"]] for s in key.iloc[0]["leak_spans"]]
+    assert leaks == ["O'Neil"]                       # "Dr." alone is no leak; the tag is never inside one
+
+
+def test_leak_spans_round_trip_as_text():
+    assert deid_review.format_spans([(0, 3), (9, 12)]) == "0-3;9-12"
+    assert deid_review.parse_spans("0-3;9-12") == [(0, 3), (9, 12)] and deid_review.parse_spans("") == []

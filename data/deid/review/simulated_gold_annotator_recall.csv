@@ -1,7 +1,7 @@
 annotator,aided,n_notes,n_phi,entity_recall
-annotator1@example.org,False,12,80,0.95
-annotator1@example.org,True,48,347,0.8962536023054755
-annotator2@example.org,False,12,80,0.95
-annotator2@example.org,True,48,347,0.9135446685878963
-annotator3@example.org,False,12,80,0.875
-annotator3@example.org,True,48,347,0.9164265129682997
+annotator1@example.org,False,12,83,0.9036144578313253
+annotator1@example.org,True,48,337,0.9406528189910979
+annotator2@example.org,False,12,83,0.9759036144578314
+annotator2@example.org,True,48,337,0.8991097922848664
+annotator3@example.org,False,12,83,0.9156626506024096
+annotator3@example.org,True,48,337,0.9228486646884273
