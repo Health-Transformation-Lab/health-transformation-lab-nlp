@@ -15,8 +15,11 @@ LLM note readers (MedGemma, spec 004):
         --rung medgemma-27b-text-it --backend openai --endpoint <serving endpoint name>
     python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend simulated   # dry run, no model
 
+LLM variants get their own files: +lora (adapter), +k<shots> (few-shot), +terse (prompt variant).
+Compare with the BERT encoders: scripts/29_medgemma_vs_bert.py.
+
 Writes data/datasets/ai_predictions_<rung>.csv (visit_id, pred, p_<status>...), plus
-llm_details_<rung>.csv for LLM rungs. The simulated backend writes simulated_* files,
+llm_details_<rung><tag>.csv for LLM rungs. The simulated backend writes simulated_* files,
 which the reliability and judge scripts do not pick up.
 """
 
@@ -28,7 +31,7 @@ from dental_omop_nlp.labels import LABELS
 from dental_omop_nlp.paths import DATASETS_DIR
 from dental_omop_nlp.radiograph import FEATURES as RAD_FEATURES
 from dental_omop_nlp.registry import load_registry
-from dental_omop_nlp.rungs import make_rung
+from dental_omop_nlp.rungs import make_rung, output_tag
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--rung", required=True)
@@ -80,13 +83,14 @@ out = review[["visit_id"]].assign(pred=pred)
 if proba is not None:
     for i, lab in enumerate(LABELS):
         out[f"p_{lab}"] = proba[:, i]
-tag = ("+cw" if a.class_weight else "") + (f"+s{a.seed}" if a.seed != 42 else "")
+tag = (output_tag(adapter=a.adapter, shots=a.shots, variant=a.variant) if is_llm
+       else output_tag(class_weight=a.class_weight, seed=a.seed))
 path = DATASETS_DIR / f"{prefix}ai_predictions_{a.rung}{tag}.csv"
 out.to_csv(path, index=False)
 print(f"wrote {path} ({len(out)} visits)")
 if is_llm:
     d = model.details
-    d.to_csv(DATASETS_DIR / f"{prefix}llm_details_{a.rung}.csv", index=False)
+    d.to_csv(DATASETS_DIR / f"{prefix}llm_details_{a.rung}{tag}.csv", index=False)
     print(f"gate pass {d['gate_ok'].mean():.1%}, fallback {d['fallback'].mean():.1%}, "
           f"tokens in/out {d['input_tokens'].mean():.0f}/{d['output_tokens'].mean():.0f} per note")
     if prefix:

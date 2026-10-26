@@ -107,6 +107,11 @@ Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5
 
 The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
 
+**MedGemma vs BERT:** `29_medgemma_vs_bert.py` scores each MedGemma run (zero-shot, few-shot, LoRA)
+against the best encoder on the same charts (paired CI, stage IV recall, by note difficulty, fallback
+rate, assumed cost). MedGemma has **not run yet** (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; a GPU helps:
+[notebook 03](databricks/notebooks/03_medgemma_reader.py)); `--simulated` is a dry run, not a result.
+
 ## Action items
 
 Differences from the study design and open decisions: **[docs/action_items.md](docs/action_items.md)**.

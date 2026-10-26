@@ -245,12 +245,34 @@ class SimulatedReader:
                 "output_tokens": 60, "latency_s": 0.0}
 
 
+def _hf_token() -> str | None:
+    """HF_TOKEN, or the token `huggingface-cli login` cached under HF_HOME (as huggingface_hub looks)."""
+    if tok := os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN"):
+        return tok
+    home = os.environ.get("HF_HOME") or os.path.join(os.path.expanduser("~"), ".cache", "huggingface")
+    path = os.environ.get("HF_TOKEN_PATH") or os.path.join(home, "token")
+    if not os.path.exists(path):
+        return None
+    with open(path) as f:
+        return f.read().strip() or None
+
+
 def make_backend(entry: dict, kind: str, **kw):
     if kind == "hf":
+        if entry.get("gated") and not _hf_token():
+            raise RuntimeError(f"{entry['hf']} is gated ({entry.get('license', 'see its model card')}): accept "
+                               "the terms on its Hugging Face page, then set HF_TOKEN to a read token from that account")
         return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"))
     if kind == "openai":
         return OpenAIChat(model=kw.get("endpoint"))
     raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
+
+
+def summarize_details(d: pd.DataFrame) -> dict:
+    """One run's reliability and cost inputs from its llm_details file."""
+    return {"gate_pass": d["gate_ok"].mean(), "fallback": d["fallback"].mean(),
+            "input_tokens_mean": d["input_tokens"].mean(), "output_tokens_mean": d["output_tokens"].mean(),
+            "latency_s_mean": d["latency_s"].mean()}
 
 
 # ---------------------------------------------------------------- rung

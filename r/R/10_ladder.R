@@ -22,7 +22,7 @@ expected_calibration_error <- function(truth, proba, n_bins = 10) {
 
 ladder_point <- function(preds, proba_long) {
   truth <- preds$truth
-  methods <- setdiff(names(preds), c("visit_id", "truth"))
+  methods <- setdiff(names(preds), c("visit_id", "truth", "difficulty"))
   s4 <- truth == STAGE4
   do.call(rbind, lapply(methods, function(m) {
     p <- preds[[m]]; ok <- p == truth
@@ -35,4 +35,14 @@ ladder_point <- function(preds, proba_long) {
     data.frame(method = m, accuracy = mean(ok), stage4_recall = mean(ok[s4]),
                unsafe_rate = u[["unsafe_rate"]], s2_rate = u[["s2_rate"]], ece = ece, stringsAsFactors = FALSE)
   }))
+}
+
+# Accuracy per method and difficulty level (python ladder_eval.by_difficulty; 29_medgemma_vs_bert.py).
+by_difficulty <- function(preds, level) {
+  methods <- setdiff(names(preds), c("visit_id", "truth", "difficulty"))
+  do.call(rbind, lapply(methods, function(m) do.call(rbind, lapply(sort(unique(level)), function(lv) {
+    k <- level == lv
+    data.frame(method = m, difficulty = lv, n = sum(k), accuracy = mean(preds[[m]][k] == preds$truth[k]),
+               stringsAsFactors = FALSE)
+  }))))
 }

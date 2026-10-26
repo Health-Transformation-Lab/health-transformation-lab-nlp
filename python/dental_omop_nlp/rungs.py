@@ -207,6 +207,18 @@ class HFEncoder:
         return [LABELS[i] for i in proba.argmax(axis=1)], proba
 
 
+def output_tag(class_weight: str | None = None, seed: int = 42, adapter: str | None = None,
+               shots: int = 0, variant: str = "reader-v2") -> str:
+    """Suffix for a run's prediction file, so variants of one rung don't overwrite each other:
+    +cw (class-weighted), +s<seed> (non-default seed), +lora (LoRA adapter), +k<shots> (few-shot),
+    +<variant> (non-default prompt, minus the 'reader-v2-' prefix)."""
+    tag = ("+cw" if class_weight else "") + (f"+s{seed}" if seed != 42 else "")
+    tag += ("+lora" if adapter else "") + (f"+k{shots}" if shots else "")
+    if variant != "reader-v2":
+        tag += "+" + variant.removeprefix("reader-v2-")
+    return tag
+
+
 def make_rung(rung_id: str, registry: dict, **hf_kwargs):
     if rung_id == "rules_baseline":
         return RulesBaseline()
