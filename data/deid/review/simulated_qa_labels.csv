@@ -1,0 +1,301 @@
+note_id,reviewer,leak,over_redaction,n_leak_spans,leak_spans
+60,qa1@example.org,no,no,0,[]
+60,qa2@example.org,no,no,0,[]
+60,qa3@example.org,no,no,0,[]
+61,qa1@example.org,no,yes,0,[]
+61,qa2@example.org,no,no,0,[]
+61,qa3@example.org,no,no,0,[]
+62,qa1@example.org,no,no,0,[]
+62,qa2@example.org,no,no,0,[]
+62,qa3@example.org,no,no,0,[]
+63,qa1@example.org,no,no,0,[]
+63,qa2@example.org,no,no,0,[]
+63,qa3@example.org,no,no,0,[]
+64,qa1@example.org,no,no,0,[]
+64,qa2@example.org,no,no,0,[]
+64,qa3@example.org,no,no,0,[]
+65,qa1@example.org,no,no,0,[]
+65,qa2@example.org,no,no,0,[]
+65,qa3@example.org,no,no,0,[]
+66,qa1@example.org,yes,no,8,"[(0, 4), (40, 47), (173, 188), (210, 219), (238, 244), (255, 272), (315, 325), (351, 359)]"
+66,qa2@example.org,yes,no,7,"[(0, 4), (40, 47), (173, 188), (210, 219), (238, 244), (255, 272), (351, 359)]"
+66,qa3@example.org,yes,no,5,"[(40, 47), (173, 188), (255, 272), (315, 325), (351, 359)]"
+67,qa1@example.org,no,no,0,[]
+67,qa2@example.org,no,no,0,[]
+67,qa3@example.org,no,no,0,[]
+68,qa1@example.org,no,no,0,[]
+68,qa2@example.org,no,no,0,[]
+68,qa3@example.org,no,no,0,[]
+69,qa1@example.org,yes,no,4,"[(6, 12), (180, 187), (232, 242), (257, 265)]"
+69,qa2@example.org,yes,no,4,"[(6, 12), (180, 187), (232, 242), (257, 265)]"
+69,qa3@example.org,yes,yes,4,"[(6, 12), (180, 187), (232, 242), (257, 265)]"
+70,qa1@example.org,no,no,0,[]
+70,qa2@example.org,no,yes,0,[]
+70,qa3@example.org,no,no,0,[]
+71,qa1@example.org,no,no,0,[]
+71,qa2@example.org,no,no,0,[]
+71,qa3@example.org,no,no,0,[]
+72,qa1@example.org,no,yes,0,[]
+72,qa2@example.org,no,no,0,[]
+72,qa3@example.org,no,no,0,[]
+73,qa1@example.org,no,no,0,[]
+73,qa2@example.org,no,yes,0,[]
+73,qa3@example.org,no,no,0,[]
+74,qa1@example.org,no,no,0,[]
+74,qa2@example.org,no,no,0,[]
+74,qa3@example.org,no,no,0,[]
+75,qa1@example.org,yes,no,7,"[(45, 56), (196, 208), (231, 249), (281, 285), (301, 305), (330, 336), (364, 381)]"
+75,qa2@example.org,yes,no,7,"[(45, 56), (196, 208), (231, 249), (281, 285), (301, 305), (330, 336), (364, 381)]"
+75,qa3@example.org,yes,no,5,"[(45, 56), (196, 208), (231, 249), (301, 305), (364, 381)]"
+76,qa1@example.org,no,yes,0,[]
+76,qa2@example.org,no,no,0,[]
+76,qa3@example.org,no,no,0,[]
+77,qa1@example.org,yes,no,3,"[(67, 80), (226, 232), (291, 303)]"
+77,qa2@example.org,yes,yes,4,"[(0, 7), (67, 80), (226, 232), (291, 303)]"
+77,qa3@example.org,yes,no,3,"[(0, 7), (226, 232), (291, 303)]"
+78,qa1@example.org,no,no,0,[]
+78,qa2@example.org,no,no,0,[]
+78,qa3@example.org,no,no,0,[]
+79,qa1@example.org,no,no,0,[]
+79,qa2@example.org,no,no,0,[]
+79,qa3@example.org,no,no,0,[]
+80,qa1@example.org,yes,no,5,"[(44, 54), (198, 202), (242, 260), (333, 346), (348, 366)]"
+80,qa2@example.org,yes,no,7,"[(9, 13), (44, 54), (198, 202), (242, 260), (297, 304), (333, 346), (348, 366)]"
+80,qa3@example.org,yes,no,7,"[(9, 13), (44, 54), (242, 260), (297, 304), (333, 346), (348, 366), (398, 412)]"
+81,qa1@example.org,no,no,0,[]
+81,qa2@example.org,no,no,0,[]
+81,qa3@example.org,yes,yes,0,[]
+82,qa1@example.org,no,no,0,[]
+82,qa2@example.org,no,no,0,[]
+82,qa3@example.org,no,no,0,[]
+83,qa1@example.org,yes,no,4,"[(0, 18), (183, 189), (214, 223), (242, 249)]"
+83,qa2@example.org,yes,no,5,"[(0, 18), (55, 65), (183, 189), (214, 223), (242, 249)]"
+83,qa3@example.org,yes,no,4,"[(0, 18), (55, 65), (214, 223), (242, 249)]"
+84,qa1@example.org,no,no,0,[]
+84,qa2@example.org,no,no,0,[]
+84,qa3@example.org,no,no,0,[]
+85,qa1@example.org,no,no,0,[]
+85,qa2@example.org,no,no,0,[]
+85,qa3@example.org,no,no,0,[]
+86,qa1@example.org,no,no,0,[]
+86,qa2@example.org,no,no,0,[]
+86,qa3@example.org,no,no,0,[]
+87,qa1@example.org,no,no,0,[]
+87,qa2@example.org,no,no,0,[]
+87,qa3@example.org,no,yes,0,[]
+88,qa1@example.org,yes,no,3,"[(12, 16), (133, 140), (170, 176)]"
+88,qa2@example.org,yes,no,3,"[(12, 16), (133, 140), (170, 176)]"
+88,qa3@example.org,yes,no,2,"[(12, 16), (133, 140)]"
+89,qa1@example.org,yes,no,4,"[(216, 220), (245, 252), (271, 279), (281, 285)]"
+89,qa2@example.org,yes,no,6,"[(16, 30), (60, 70), (216, 220), (245, 252), (271, 279), (281, 285)]"
+89,qa3@example.org,yes,no,4,"[(16, 30), (216, 220), (271, 279), (281, 285)]"
+90,qa1@example.org,no,no,0,[]
+90,qa2@example.org,no,no,0,[]
+90,qa3@example.org,no,no,0,[]
+91,qa1@example.org,no,no,0,[]
+91,qa2@example.org,no,no,0,[]
+91,qa3@example.org,no,no,0,[]
+92,qa1@example.org,yes,no,7,"[(27, 40), (171, 183), (213, 218), (228, 235), (271, 279), (302, 312), (327, 335)]"
+92,qa2@example.org,yes,no,5,"[(27, 40), (59, 66), (213, 218), (271, 279), (302, 312)]"
+92,qa3@example.org,yes,yes,8,"[(27, 40), (59, 66), (171, 183), (213, 218), (228, 235), (271, 279), (302, 312), (327, 335)]"
+93,qa1@example.org,yes,no,6,"[(28, 40), (51, 55), (208, 212), (237, 246), (265, 273), (275, 279)]"
+93,qa2@example.org,yes,no,7,"[(28, 40), (51, 55), (192, 198), (208, 212), (237, 246), (265, 273), (275, 279)]"
+93,qa3@example.org,yes,no,6,"[(28, 40), (51, 55), (192, 198), (208, 212), (237, 246), (265, 273)]"
+94,qa1@example.org,no,no,0,[]
+94,qa2@example.org,no,no,0,[]
+94,qa3@example.org,no,no,0,[]
+95,qa1@example.org,no,no,0,[]
+95,qa2@example.org,no,no,0,[]
+95,qa3@example.org,no,no,0,[]
+96,qa1@example.org,no,no,0,[]
+96,qa2@example.org,no,no,0,[]
+96,qa3@example.org,no,no,0,[]
+97,qa1@example.org,no,no,0,[]
+97,qa2@example.org,yes,no,0,[]
+97,qa3@example.org,no,no,0,[]
+98,qa1@example.org,yes,no,5,"[(12, 30), (178, 183), (218, 229), (246, 253), (333, 338)]"
+98,qa2@example.org,yes,no,6,"[(12, 30), (38, 46), (178, 183), (218, 229), (246, 253), (333, 338)]"
+98,qa3@example.org,yes,no,4,"[(12, 30), (38, 46), (178, 183), (218, 229)]"
+99,qa1@example.org,no,no,0,[]
+99,qa2@example.org,no,no,0,[]
+99,qa3@example.org,no,no,0,[]
+100,qa1@example.org,yes,no,5,"[(33, 43), (174, 182), (187, 194), (218, 225), (314, 318)]"
+100,qa2@example.org,yes,no,5,"[(33, 43), (174, 182), (187, 194), (218, 225), (314, 318)]"
+100,qa3@example.org,yes,no,4,"[(33, 43), (174, 182), (187, 194), (218, 225)]"
+101,qa1@example.org,no,no,0,[]
+101,qa2@example.org,no,no,0,[]
+101,qa3@example.org,no,no,0,[]
+102,qa1@example.org,yes,no,4,"[(16, 29), (40, 45), (179, 189), (206, 210)]"
+102,qa2@example.org,yes,no,5,"[(16, 29), (40, 45), (179, 189), (206, 210), (229, 244)]"
+102,qa3@example.org,yes,no,5,"[(16, 29), (40, 45), (179, 189), (206, 210), (229, 244)]"
+103,qa1@example.org,no,no,0,[]
+103,qa2@example.org,no,no,0,[]
+103,qa3@example.org,no,no,0,[]
+104,qa1@example.org,yes,yes,5,"[(6, 14), (194, 209), (234, 240), (282, 289), (366, 376)]"
+104,qa2@example.org,yes,no,6,"[(6, 14), (16, 20), (194, 209), (234, 240), (259, 272), (366, 376)]"
+104,qa3@example.org,yes,no,5,"[(6, 14), (194, 209), (234, 240), (259, 272), (366, 376)]"
+105,qa1@example.org,no,yes,0,[]
+105,qa2@example.org,no,no,0,[]
+105,qa3@example.org,no,no,0,[]
+106,qa1@example.org,yes,no,6,"[(3, 10), (55, 65), (219, 234), (266, 290), (329, 346), (376, 380)]"
+106,qa2@example.org,yes,no,6,"[(3, 10), (55, 65), (219, 234), (266, 290), (329, 346), (376, 380)]"
+106,qa3@example.org,yes,no,4,"[(3, 10), (219, 234), (329, 346), (376, 380)]"
+107,qa1@example.org,no,no,0,[]
+107,qa2@example.org,no,no,0,[]
+107,qa3@example.org,no,no,0,[]
+108,qa1@example.org,yes,no,5,"[(6, 15), (174, 178), (239, 241), (270, 283), (301, 312)]"
+108,qa2@example.org,yes,no,5,"[(6, 15), (174, 178), (239, 241), (270, 283), (301, 312)]"
+108,qa3@example.org,yes,no,4,"[(6, 15), (174, 178), (270, 283), (301, 312)]"
+109,qa1@example.org,no,no,0,[]
+109,qa2@example.org,no,no,0,[]
+109,qa3@example.org,no,yes,0,[]
+110,qa1@example.org,yes,no,5,"[(34, 43), (166, 173), (208, 218), (227, 231), (323, 327)]"
+110,qa2@example.org,yes,no,5,"[(34, 43), (166, 173), (208, 218), (227, 231), (323, 327)]"
+110,qa3@example.org,yes,no,4,"[(34, 43), (166, 173), (208, 218), (227, 231)]"
+111,qa1@example.org,no,no,0,[]
+111,qa2@example.org,no,no,0,[]
+111,qa3@example.org,no,no,0,[]
+112,qa1@example.org,yes,no,3,"[(30, 40), (216, 228), (247, 254)]"
+112,qa2@example.org,yes,no,4,"[(17, 28), (30, 40), (216, 228), (268, 275)]"
+112,qa3@example.org,yes,no,4,"[(17, 28), (30, 40), (216, 228), (247, 254)]"
+113,qa1@example.org,yes,no,6,"[(21, 31), (170, 183), (202, 209), (239, 244), (246, 250), (314, 321)]"
+113,qa2@example.org,yes,no,6,"[(21, 31), (170, 183), (202, 209), (239, 244), (246, 250), (314, 321)]"
+113,qa3@example.org,yes,no,5,"[(21, 31), (170, 183), (202, 209), (246, 250), (314, 321)]"
+114,qa1@example.org,no,no,0,[]
+114,qa2@example.org,no,no,0,[]
+114,qa3@example.org,no,no,0,[]
+115,qa1@example.org,no,yes,0,[]
+115,qa2@example.org,no,no,0,[]
+115,qa3@example.org,no,no,0,[]
+116,qa1@example.org,no,no,0,[]
+116,qa2@example.org,no,no,0,[]
+116,qa3@example.org,no,no,0,[]
+117,qa1@example.org,yes,no,3,"[(6, 15), (17, 24), (211, 215)]"
+117,qa2@example.org,yes,no,4,"[(6, 15), (17, 24), (211, 215), (243, 250)]"
+117,qa3@example.org,yes,no,2,"[(211, 215), (243, 250)]"
+118,qa1@example.org,no,no,0,[]
+118,qa2@example.org,no,no,0,[]
+118,qa3@example.org,no,no,0,[]
+119,qa1@example.org,no,no,0,[]
+119,qa2@example.org,no,no,0,[]
+119,qa3@example.org,no,no,0,[]
+120,qa1@example.org,no,no,0,[]
+120,qa2@example.org,no,no,0,[]
+120,qa3@example.org,no,no,0,[]
+121,qa1@example.org,no,no,0,[]
+121,qa2@example.org,no,no,0,[]
+121,qa3@example.org,no,no,0,[]
+122,qa1@example.org,yes,no,3,"[(68, 78), (202, 209), (249, 261)]"
+122,qa2@example.org,yes,no,3,"[(68, 78), (202, 209), (249, 261)]"
+122,qa3@example.org,yes,no,2,"[(68, 78), (202, 209)]"
+123,qa1@example.org,no,no,0,[]
+123,qa2@example.org,no,no,0,[]
+123,qa3@example.org,no,no,0,[]
+124,qa1@example.org,yes,no,3,"[(6, 14), (212, 220), (243, 253)]"
+124,qa2@example.org,yes,no,7,"[(6, 14), (16, 20), (212, 220), (243, 253), (270, 277), (302, 308), (355, 370)]"
+124,qa3@example.org,yes,no,6,"[(6, 14), (212, 220), (243, 253), (270, 277), (302, 308), (355, 370)]"
+125,qa1@example.org,no,no,0,[]
+125,qa2@example.org,no,no,0,[]
+125,qa3@example.org,no,no,0,[]
+126,qa1@example.org,yes,no,5,"[(6, 12), (37, 46), (165, 176), (186, 193), (224, 228)]"
+126,qa2@example.org,yes,no,4,"[(37, 46), (165, 176), (186, 193), (224, 228)]"
+126,qa3@example.org,yes,no,5,"[(6, 12), (37, 46), (165, 176), (186, 193), (224, 228)]"
+127,qa1@example.org,no,no,0,[]
+127,qa2@example.org,no,no,0,[]
+127,qa3@example.org,yes,no,0,[]
+128,qa1@example.org,no,no,0,[]
+128,qa2@example.org,no,no,0,[]
+128,qa3@example.org,no,no,0,[]
+129,qa1@example.org,no,no,0,[]
+129,qa2@example.org,no,no,0,[]
+129,qa3@example.org,no,no,0,[]
+130,qa1@example.org,yes,no,4,"[(207, 225), (261, 275), (280, 287), (352, 360)]"
+130,qa2@example.org,yes,no,5,"[(207, 225), (261, 275), (280, 287), (323, 327), (352, 360)]"
+130,qa3@example.org,yes,no,4,"[(207, 225), (261, 275), (280, 287), (352, 360)]"
+131,qa1@example.org,no,no,0,[]
+131,qa2@example.org,no,no,0,[]
+131,qa3@example.org,no,no,0,[]
+132,qa1@example.org,no,no,0,[]
+132,qa2@example.org,no,no,0,[]
+132,qa3@example.org,no,no,0,[]
+133,qa1@example.org,yes,no,6,"[(21, 31), (52, 76), (244, 257), (291, 298), (322, 343), (359, 366)]"
+133,qa2@example.org,yes,no,6,"[(21, 31), (52, 76), (265, 274), (291, 298), (322, 343), (359, 366)]"
+133,qa3@example.org,yes,yes,6,"[(21, 31), (52, 76), (244, 257), (265, 274), (322, 343), (359, 366)]"
+134,qa1@example.org,no,no,0,[]
+134,qa2@example.org,yes,no,0,[]
+134,qa3@example.org,no,no,0,[]
+135,qa1@example.org,no,no,0,[]
+135,qa2@example.org,no,no,0,[]
+135,qa3@example.org,no,no,0,[]
+136,qa1@example.org,no,no,0,[]
+136,qa2@example.org,no,no,0,[]
+136,qa3@example.org,no,no,0,[]
+137,qa1@example.org,yes,no,5,"[(17, 28), (224, 230), (266, 273), (296, 314), (374, 378)]"
+137,qa2@example.org,yes,no,5,"[(17, 28), (39, 56), (266, 273), (296, 314), (374, 378)]"
+137,qa3@example.org,yes,no,6,"[(17, 28), (39, 56), (224, 230), (266, 273), (296, 314), (374, 378)]"
+138,qa1@example.org,no,no,0,[]
+138,qa2@example.org,no,no,0,[]
+138,qa3@example.org,no,no,0,[]
+139,qa1@example.org,no,no,0,[]
+139,qa2@example.org,no,no,0,[]
+139,qa3@example.org,no,no,0,[]
+140,qa1@example.org,no,no,0,[]
+140,qa2@example.org,no,no,0,[]
+140,qa3@example.org,no,yes,0,[]
+141,qa1@example.org,no,no,0,[]
+141,qa2@example.org,no,no,0,[]
+141,qa3@example.org,no,no,0,[]
+142,qa1@example.org,yes,no,5,"[(17, 24), (26, 33), (215, 236), (283, 296), (314, 326)]"
+142,qa2@example.org,yes,no,5,"[(17, 24), (26, 33), (215, 236), (283, 296), (314, 326)]"
+142,qa3@example.org,yes,no,5,"[(17, 24), (26, 33), (215, 236), (283, 296), (314, 326)]"
+143,qa1@example.org,no,no,0,[]
+143,qa2@example.org,no,no,0,[]
+143,qa3@example.org,no,no,0,[]
+144,qa1@example.org,no,no,0,[]
+144,qa2@example.org,no,no,0,[]
+144,qa3@example.org,no,no,0,[]
+145,qa1@example.org,no,no,0,[]
+145,qa2@example.org,no,no,0,[]
+145,qa3@example.org,no,no,0,[]
+146,qa1@example.org,no,no,0,[]
+146,qa2@example.org,no,no,0,[]
+146,qa3@example.org,no,no,0,[]
+147,qa1@example.org,no,no,0,[]
+147,qa2@example.org,no,no,0,[]
+147,qa3@example.org,no,no,0,[]
+148,qa1@example.org,no,no,0,[]
+148,qa2@example.org,no,no,0,[]
+148,qa3@example.org,no,no,0,[]
+149,qa1@example.org,no,yes,0,[]
+149,qa2@example.org,no,no,0,[]
+149,qa3@example.org,no,no,0,[]
+150,qa1@example.org,no,no,0,[]
+150,qa2@example.org,no,no,0,[]
+150,qa3@example.org,no,no,0,[]
+151,qa1@example.org,no,no,0,[]
+151,qa2@example.org,no,no,0,[]
+151,qa3@example.org,no,no,0,[]
+152,qa1@example.org,yes,no,3,"[(12, 16), (27, 34), (199, 203)]"
+152,qa2@example.org,yes,no,4,"[(12, 16), (27, 34), (199, 203), (222, 233)]"
+152,qa3@example.org,yes,no,1,"[(199, 203)]"
+153,qa1@example.org,no,no,0,[]
+153,qa2@example.org,no,no,0,[]
+153,qa3@example.org,no,no,0,[]
+154,qa1@example.org,no,no,0,[]
+154,qa2@example.org,no,no,0,[]
+154,qa3@example.org,no,no,0,[]
+155,qa1@example.org,no,no,0,[]
+155,qa2@example.org,no,no,0,[]
+155,qa3@example.org,no,no,0,[]
+156,qa1@example.org,no,no,0,[]
+156,qa2@example.org,no,no,0,[]
+156,qa3@example.org,no,no,0,[]
+157,qa1@example.org,yes,no,4,"[(40, 53), (185, 192), (225, 230), (288, 292)]"
+157,qa2@example.org,yes,no,5,"[(12, 16), (40, 53), (185, 192), (225, 230), (288, 292)]"
+157,qa3@example.org,yes,no,4,"[(12, 16), (40, 53), (225, 230), (288, 292)]"
+158,qa1@example.org,no,yes,0,[]
+158,qa2@example.org,no,no,0,[]
+158,qa3@example.org,no,no,0,[]
+159,qa1@example.org,yes,no,5,"[(3, 10), (147, 154), (201, 206), (229, 239), (284, 288)]"
+159,qa2@example.org,yes,no,3,"[(147, 154), (229, 239), (265, 273)]"
+159,qa3@example.org,yes,no,4,"[(3, 10), (147, 154), (201, 206), (229, 239)]"

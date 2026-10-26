@@ -1,0 +1,33 @@
+<!--
+  Label Studio labeling config: de-identification GOLD annotation (spec 008).
+
+  One task = one ORIGINAL note (fake PHI on synthetic data; on real data this project runs only
+  inside the secure environment). Mark every identifier, whole value, no surrounding words.
+  Pre-annotations come from one engine: accept, fix the boundaries or category, delete, add.
+  PHI_UNSPECIFIED means the engine couldn't name the category: always re-label it.
+  Categories: docs/deid_review_protocol.md. Field names map to dental_omop_nlp/deid_review.py
+  (from_name "phi" on to_name "text"); change one, change the other.
+-->
+<View>
+  <Header value="Mark every identifier (note $note_id)"/>
+  <Labels name="phi" toName="text" showInline="true">
+      <Label value="PATIENT" background="#dc2626"/>
+      <Label value="DOCTOR" background="#ea580c"/>
+      <Label value="RELATIVE" background="#d97706"/>
+      <Label value="AGE" background="#ca8a04"/>
+      <Label value="DATE" background="#65a30d"/>
+      <Label value="PHONE" background="#16a34a"/>
+      <Label value="EMAIL" background="#059669"/>
+      <Label value="URL" background="#0d9488"/>
+      <Label value="SSN" background="#0891b2"/>
+      <Label value="MEDICAL_RECORD" background="#0284c7"/>
+      <Label value="HEALTH_PLAN" background="#2563eb"/>
+      <Label value="STREET" background="#4f46e5"/>
+      <Label value="CITY" background="#7c3aed"/>
+      <Label value="ZIP" background="#9333ea"/>
+      <Label value="ORGANIZATION" background="#c026d3"/>
+      <Label value="ID_OTHER" background="#db2777"/>
+      <Label value="PHI_UNSPECIFIED" background="#64748b"/>
+  </Labels>
+  <Text name="text" value="$text" granularity="symbol"/>
+</View>

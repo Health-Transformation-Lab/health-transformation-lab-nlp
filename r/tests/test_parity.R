@@ -106,6 +106,25 @@ if (file.exists("data/deid/cost_inputs.csv") && file.exists("data/deid/cost_effe
   stopifnot(d < 1e-6, same_na, all(m$dominated.r == as.logical(m$dominated.p)))
 } else cat("de-id CE: skipped (run python/scripts/26_deid_benchmark.py first)\n")
 # 9b. Licensed engines (John Snow Labs) never reach cost_inputs.csv without a licence, so check the
+# 9e. De-identification review flows (spec 008): agreement F1 and Wilson leak rate, R == Python.
+for (pfx in c("", "simulated_")) {
+  f <- sprintf("data/deid/review/%sgold_spans.csv", pfx)
+  if (!file.exists(f)) next
+  source("r/R/08_deid.R")
+  ra <- deid_agreement(read.csv(f, stringsAsFactors = FALSE))
+  pa <- read.csv(sprintf("data/deid/review/%sgold_agreement.csv", pfx), stringsAsFactors = FALSE)
+  ma <- merge(ra, pa, by = c("annotator_a", "annotator_b"), suffixes = c(".r", ".p"))
+  da <- max(abs(ma$f1_span.r - ma$f1_span.p), abs(ma$f1_typed.r - ma$f1_typed.p), abs(ma$n_notes.r - ma$n_notes.p))
+  rq <- deid_qa_summary(read.csv(sprintf("data/deid/review/%sqa_labels.csv", pfx), stringsAsFactors = FALSE))
+  pq <- read.csv(sprintf("data/deid/review/%sqa_summary.csv", pfx), stringsAsFactors = FALSE)
+  mq <- merge(rq, pq, by = "scope", suffixes = c(".r", ".p"))
+  cols <- c("n_notes", "leak_notes", "leak_rate", "leak_lo", "leak_hi", "over_redaction_rate")
+  dq <- max(sapply(cols, function(k) max(abs(mq[[paste0(k, ".r")]] - mq[[paste0(k, ".p")]]))))
+  cat(sprintf("%sdeid review: %d annotator pairs, max |R - Python| = %.2e; QA %d scopes, %.2e\n",
+              pfx, nrow(ma), da, nrow(mq), dq))
+  stopifnot(nrow(ma) == nrow(pa), da < 1e-9, nrow(mq) == nrow(pq), dq < 1e-9)
+}
+
 # R twin directly against Python's deid_eval.engine_cost on the vendor's example (1M notes x 5,250 chars).
 source("r/R/08_deid.R")
 lic <- list(chars_per_sec = 6392.7, node_usd_per_hour = 1.2, license_usd_per_month = 7000, hours_per_month = 744)
