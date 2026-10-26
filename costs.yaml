@@ -54,6 +54,12 @@ judge:                         # the LLM judge itself (used on samples, not the 
 #     or batch inference (Llama 3.3 70B batch: 85.714 DBU/hour = $6/hour), so this is a floor.
 #     Which model ai_mask uses isn't fixed in its docs; Llama 3.3 70B is the one they name.
 # Volume tiers assume the whole corpus is processed in one billing month.
+#   John Snow Labs Healthcare NLP (jsl): no list price. Pay-as-you-go is "per vCPU per hour" and annual
+#     licences are quoted (johnsnowlabs.com/install FAQ). The numbers below are the VENDOR'S OWN EXAMPLE
+#     (johnsnowlabs.com blog, de-identification cost comparison): 48 notes averaging 5,247 characters in
+#     39.4 s on an AWS c6a.8xlarge (32 vCPU, $1.20/hour), and a $7,000 one-month licence charged for the
+#     hours used (744-hour month). They report ~$2,418 for 1M notes of 5,250 characters; set
+#     prorate_license: 0 if the licence must be bought by the month.
 deid:
   review:                        # human QA of a sample of de-identified notes, every engine
     qa_sample_share: 0.001       # 1 in 1,000 notes
@@ -76,4 +82,6 @@ deid:
                      prompt_overhead_tokens: 150, output_tokens: 10, output_echoes_note: 1}
                      # ai_mask returns the whole note (output = note + masks); its own prompt isn't
                      # published, so the 150-token overhead is ASSUMED
+    jsl:            {kind: licensed, chars_per_sec: 6392.7, node_usd_per_hour: 1.20,             # vendor's example
+                     license_usd_per_month: 7000, hours_per_month: 744, prorate_license: 1}
   # "+guard" adds no cost; an ensemble costs the sum of its engines.

@@ -119,14 +119,44 @@ def tfidf_logreg():
 
 
 # ---------------------------------------------------------------- transformers
+def _last_checkpoint(out_dir) -> str | None:
+    """Highest-step complete checkpoint-N folder in out_dir (has trainer_state.json), or None."""
+    from pathlib import Path
+    d = Path(out_dir)
+    steps = [int(c.name.split("-")[1]) for c in d.glob("checkpoint-*")
+             if c.name.split("-")[1].isdigit() and (c / "trainer_state.json").exists()] if d.is_dir() else []
+    return str(d / f"checkpoint-{max(steps)}") if steps else None
+
+
+def _clear_checkpoints(out_dir) -> None:
+    """Drop checkpoints once a run finishes, so only an interrupted run is ever resumed."""
+    import shutil
+    from pathlib import Path
+    for c in Path(out_dir).glob("checkpoint-*"):
+        shutil.rmtree(c, ignore_errors=True)
+
+
+def class_weights(labels, classes, power: float = 0.5) -> list[float]:
+    """Inverse-frequency loss weights raised to `power` (0.5 = square root, gentler than fully
+    balanced), scaled so the average weight over the training notes is 1. Absent classes get 0."""
+    from collections import Counter
+    n, counts = len(labels), Counter(labels)
+    raw = [(n / counts[c]) ** power if counts[c] else 0.0 for c in classes]
+    mean = sum(raw[classes.index(y)] for y in labels) / n
+    return [w / mean for w in raw]
+
+
 class HFEncoder:
     """Fine-tune a Hugging Face encoder. CPU works for the small models on a few
     hundred notes; set epochs/max_len down on Databricks Free Edition."""
 
     def __init__(self, hf_id: str, max_len: int = 256, epochs: int = 3, batch_size: int = 16,
-                 lr: float = 5e-5, out_dir: str = "runs"):
+                 lr: float = 5e-5, out_dir: str = "runs", class_weight: str | None = None, seed: int = 42):
         self.hf_id, self.max_len, self.epochs = hf_id, max_len, epochs
         self.batch_size, self.lr, self.out_dir = batch_size, lr, out_dir
+        self.class_weight, self.seed = class_weight, seed       # class_weight: None or "sqrt"
+        tag = (f"__cw-{class_weight}" if class_weight else "") + (f"__seed{seed}" if seed != 42 else "")
+        self.run_dir = f"{out_dir}/{hf_id.replace('/', '__')}{tag}"
 
     def _ds(self, df):
         from datasets import Dataset
@@ -146,12 +176,28 @@ class HFEncoder:
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.hf_id, num_labels=len(LABELS), id2label=dict(enumerate(LABELS)),
             label2id={l: i for i, l in enumerate(LABELS)}, ignore_mismatched_sizes=True)
-        args = TrainingArguments(output_dir=f"{self.out_dir}/{self.hf_id.replace('/', '__')}",
+        args = TrainingArguments(output_dir=self.run_dir,
                                  num_train_epochs=self.epochs, per_device_train_batch_size=self.batch_size,
-                                 learning_rate=self.lr, logging_steps=20, save_strategy="no",
-                                 report_to=[], seed=42)
-        self.trainer = Trainer(model=self.model, args=args, train_dataset=self._ds(train))
-        self.trainer.train()
+                                 learning_rate=self.lr, logging_steps=20, save_strategy="steps",
+                                 save_steps=50, save_total_limit=1,
+                                 report_to=[], seed=self.seed)
+        trainer_cls = Trainer
+        if self.class_weight == "sqrt":
+            import torch
+            w = torch.tensor(class_weights(list(train["label"]), LABELS), dtype=torch.float)
+
+            class _WeightedTrainer(Trainer):
+                def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+                    labels = inputs.pop("labels")
+                    out = model(**inputs)
+                    loss = torch.nn.functional.cross_entropy(out.logits, labels, weight=w.to(out.logits.device))
+                    return (loss, out) if return_outputs else loss
+            trainer_cls = _WeightedTrainer
+        elif self.class_weight:
+            raise ValueError(f"unknown class_weight {self.class_weight!r}")
+        self.trainer = trainer_cls(model=self.model, args=args, train_dataset=self._ds(train))
+        self.trainer.train(resume_from_checkpoint=_last_checkpoint(args.output_dir))   # resume after a restart
+        _clear_checkpoints(args.output_dir)
         return self
 
     def predict(self, test):

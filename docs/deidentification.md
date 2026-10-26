@@ -300,6 +300,7 @@ Engine cost to de-identify **1 million notes** in one billing month, list prices
 | Databricks `ai_mask` | token | $0.50 in / $1.50 out per 1M tokens | ~$295 | ~$166 | Databricks pricing page ($0.07/DBU × Llama 3.3 70B DBU rates) |
 | Our LLM prompt (`llm`) on the same endpoint | token | same | ~$281 | ~$249 | same |
 | Azure AI Language PII | 1,000-char record | $1.00 per 1,000 to 500K, then $0.75 | ~$875 | ~$875 | Azure retail prices API |
+| John Snow Labs Healthcare NLP | licence + node hours | $7,000/month licence (their example); list price by quote | ~$189 if the licence is charged for hours used; **~$7,000** if bought by the month | ~$70 / ~$7,000 | vendor's own example, not a list price |
 | **Amazon Comprehend Medical** | 100 chars, 1-unit minimum | $0.0014 to 1M units, $0.0005 to 2M, then $0.00025 | **~$2,650** | ~$1,900 | AWS price list API |
 
 For scale, the human review sample costs about $3,000 per 1M notes with any engine.
@@ -314,6 +315,40 @@ What drives the differences:
   own prompt isn't published, so its 150-token overhead is assumed.
 - **Pay-per-token is a floor.** Databricks rate-limits pay-per-token endpoints and points large
   workloads to provisioned throughput, billed per hour.
+
+### Microsoft's options compared: price and quality
+
+Microsoft offers several services that find PHI, billed on very different meters; using the wrong
+one can cost hundreds of times more. Price per 1M notes, list price, US East (Azure retail prices
+API, 2026-10-26). Quality is **measured here** only for Presidio; the Azure services haven't been run
+here yet, so their quality comes from published comparisons, marked as such.
+
+| Option | Built for | Library / call | Billing meter | 1M notes × 410 chars | 1M notes × 5,250 chars | Quality |
+|---|---|---|---|---|---|---|
+| **Health Data Services de-identification service** (`azure_deid`) | PHI in clinical free text: 27 types; tag, redact or surrogate | `azure-health-deidentification`, `DeidentificationClient` | "De-Id": 50 MB free, then $0.05/MB | **~$18** | ~$260 | Token F1 0.91 on John Snow Labs' 48 notes (*vendor-run comparison*, arXiv 2503.20794); not run here |
+| **AI Language PII**, PHI domain (`azure_language`) | General PII, with a health filter | `azure-ai-textanalytics`, `recognize_pii_entities(domain_filter="phi")` | "Standard Text Records": $1 per 1,000 records (1,000 chars), tiered | ~$875 | ~$3,050 | No independent figure found; not run here |
+| **Text Analytics for Health** | Clinical entity extraction (diagnoses, drugs); *not* a de-identification product | same library, `begin_analyze_healthcare_entities` | "Health Text Records": 5K free, then $20 per 1,000 records, tiered | **~$17,400** | **~$60,900** | Not designed for de-identification |
+| Text Analytics for Health commitment tier | Prepaid monthly capacity | — | "Commitment Tier TA4H": $14,000/month and up | fixed | fixed | — |
+| FHIR `$de-identify` / Tools for Health Data Anonymization | Structured FHIR and DICOM records, not free text | FHIR service or open source | "Structured De-Identification": $1.14/GB (FHIR); open source free | n/a | n/a | Rule-based on fields; doesn't read notes |
+| **Presidio** (open source, Microsoft) | General PII, run on your own compute | `presidio-analyzer` | compute only | ~$5 | not measured | **Measured here:** unseen recall 0.53, ASQ-PHI recall 0.54 with over-redaction 0.90, jsl48 token F1 0.66 |
+
+Takeaways:
+
+- **For clinical notes, the de-identification service is the one to use**, and at $0.05/MB it's also
+  the cheapest Azure option. The same text through Text Analytics for Health costs ~1,000× more.
+- **If a small Azure run cost thousands of dollars, check the meter name** in Cost Management (group by
+  Meter). "De-Id" would need ~200 GB of text to reach $10,000; "Health Text Records" reaches it at
+  ~100,000 long notes; a commitment tier bills even when idle.
+- **The de-id service's current price dates from 1 May 2025**; a run before then may have been billed
+  at an earlier rate.
+
+**Checking John Snow Labs' own comparison.** Their benchmark write-up prices 1M notes of 5,250
+characters at $2,418 for Healthcare NLP (node time plus a share of a $7,000-a-month licence), against
+$13,125 for Azure de-identification and $14,525 for Comprehend Medical. With the same inputs this
+model gives $2,420 for theirs and **$14,525 for Comprehend** (identical: same volume tiers), but
+**about $260 for Azure** at today's $0.05/MB. Their Azure figure works out to $2.50/MB; either the price
+has dropped since early 2025 or they used a different rate. At today's list prices Azure
+de-identification is the cheapest paid option here, not the most expensive.
 
 Every service rate above was read from the vendor's own price source on 2026-10-26 (list price,
 US East); `costs.yaml` names each one. Contract discounts, other regions and committed-use tiers

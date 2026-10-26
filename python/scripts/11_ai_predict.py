@@ -5,6 +5,7 @@ The AI model reads ONLY the de-identified note. Reviewers see every source.
     python scripts/11_ai_predict.py --rung tfidf_logreg
     python scripts/11_ai_predict.py --rung distilbert-base --epochs 2 --max-len 256
     python scripts/11_ai_predict.py --rung bioclinical-modernbert-base --label stated_status
+    python scripts/11_ai_predict.py --rung modernbert-base --class-weight sqrt --seed 1   # -> ..._modernbert-base+cw+s1.csv
 
 LLM note readers (MedGemma, spec 004):
 
@@ -34,6 +35,9 @@ ap.add_argument("--rung", required=True)
 ap.add_argument("--label", default="label", help="train target: label (chart) or stated_status (clinician)")
 ap.add_argument("--epochs", type=int, default=3)
 ap.add_argument("--max-len", type=int, default=256)
+ap.add_argument("--class-weight", choices=["sqrt"], default=None,
+                help="encoders: weight the loss by inverse class frequency (square root); output tagged +cw")
+ap.add_argument("--seed", type=int, default=42, help="encoders: training seed; a non-default seed tags the output +s<seed>")
 llm = ap.add_argument_group("LLM readers")
 llm.add_argument("--backend", choices=["hf", "openai", "simulated"], default="hf")
 llm.add_argument("--shots", type=int, default=0, help="few-shot examples per status from train.csv")
@@ -68,7 +72,7 @@ if is_llm:
 elif a.rung in ("rules_baseline", "note_rules", "tfidf_logreg", "fusion_tfidf_rad"):
     kw = {}
 else:
-    kw = {"epochs": a.epochs, "max_len": a.max_len}
+    kw = {"epochs": a.epochs, "max_len": a.max_len, "class_weight": a.class_weight, "seed": a.seed}
 
 model = make_rung(a.rung, reg, **kw).fit(train)
 pred, proba = model.predict(review)
@@ -76,7 +80,8 @@ out = review[["visit_id"]].assign(pred=pred)
 if proba is not None:
     for i, lab in enumerate(LABELS):
         out[f"p_{lab}"] = proba[:, i]
-path = DATASETS_DIR / f"{prefix}ai_predictions_{a.rung}.csv"
+tag = ("+cw" if a.class_weight else "") + (f"+s{a.seed}" if a.seed != 42 else "")
+path = DATASETS_DIR / f"{prefix}ai_predictions_{a.rung}{tag}.csv"
 out.to_csv(path, index=False)
 print(f"wrote {path} ({len(out)} visits)")
 if is_llm:
