@@ -1,9 +1,10 @@
 # Cost model for running each method over the full corpus.
 #
-# !!! ILLUSTRATIVE PRICES !!!  Every price below is a placeholder so the
-# pipeline runs. Replace them with your contract rates (DBU price x DBUs/hour
+# !!! ILLUSTRATIVE PRICES !!!  Every price marked ILLUSTRATIVE is a placeholder so
+# the pipeline runs. Replace them with your contract rates (DBU price x DBUs/hour
 # for the instance type, and per-token prices for your serving endpoints)
-# before any number from cost_effectiveness.py leaves this repo.
+# before any number from cost_effectiveness.py leaves this repo. The
+# de-identification service prices (deid.engines) are vendor list prices; see there.
 
 corpus_notes: 1000000          # hypothetical corpus size for the exercise
 avg_note_tokens: null          # null = measure from the corpus sample (chars / 4)
