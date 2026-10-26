@@ -121,25 +121,23 @@ display(all_res[all_res["class"] == ""].pivot(index="model_id", columns="metric"
 # MAGIC %md ## 5. Optional: LLM challenger
 # MAGIC Zero-shot on the test notes via a Foundation Model endpoint. Check the endpoint name under
 # MAGIC *Serving* in your workspace; pay-per-token endpoints vary by region and over time.
+# MAGIC Skipped unless `llm_endpoint` is set (e.g. `databricks-meta-llama-3-3-70b-instruct`).
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC CREATE OR REPLACE TEMP VIEW llm_preds AS
-# MAGIC SELECT note_id, label,
-# MAGIC   ai_query(
-# MAGIC     'databricks-meta-llama-3-3-70b-instruct',
-# MAGIC     CONCAT('Classify the periodontal status in this dental SOAP note. Answer with exactly one of: ',
-# MAGIC            'healthy, gingivitis, periodontitis_stage_1, periodontitis_stage_2, periodontitis_stage_3, periodontitis_stage_4.\n\n',
-# MAGIC            note_text),
-# MAGIC     failOnError => false
-# MAGIC   ).result AS pred
-# MAGIC FROM <catalog>.<schema>.labeled_notes  -- e.g. workspace.dental_dev
-# MAGIC WHERE split = 'test';
-# MAGIC SELECT * FROM llm_preds LIMIT 10;
-
-# COMMAND ----------
-
-llm = spark.table("llm_preds").toPandas()
-llm["pred"] = llm["pred"].fillna("").str.strip().str.lower()
-display(score(llm["label"], llm["pred"], None, model_id="llm_challenger"))
+dbutils.widgets.text("llm_endpoint", "none")
+llm_endpoint = dbutils.widgets.get("llm_endpoint")
+if llm_endpoint not in ("", "none"):
+    llm = spark.sql(f"""
+        SELECT note_id, label,
+          ai_query(
+            '{llm_endpoint}',
+            CONCAT('Classify the periodontal status in this dental SOAP note. Answer with exactly one of: ',
+                   'healthy, gingivitis, periodontitis_stage_1, periodontitis_stage_2, periodontitis_stage_3, periodontitis_stage_4.\\n\\n',
+                   note_text),
+            failOnError => false
+          ).result AS pred
+        FROM {catalog}.{schema}.labeled_notes
+        WHERE split = 'test'""").toPandas()
+    llm["pred"] = llm["pred"].fillna("").str.strip().str.lower()
+    display(score(llm["label"], llm["pred"], None, model_id="llm_challenger"))

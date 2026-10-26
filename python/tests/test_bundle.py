@@ -73,6 +73,16 @@ def test_notebooks_exist_and_take_the_parameters_passed():
     assert seen >= 3
 
 
+def test_job_notebooks_have_no_placeholders_left():
+    """A literal <catalog>.<schema> in a cell runs as SQL and fails the whole job."""
+    root, jobs = _load()
+    for name, task, base in _tasks(root, jobs):
+        cells = (base / task["notebook_task"]["notebook_path"]).resolve().read_text().split("# COMMAND ----------")
+        code = [c for c in cells
+                if not c.replace("# Databricks notebook source", "").strip().startswith("# MAGIC %md")]
+        assert not any("<catalog>" in c or "<schema>" in c for c in code), name
+
+
 def test_medgemma_gpu_job_only_in_uat_and_prod():
     root, jobs = _load()
     assert "medgemma_reader" not in jobs
