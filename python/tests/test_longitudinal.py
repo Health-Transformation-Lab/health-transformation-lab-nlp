@@ -81,3 +81,52 @@ def test_flags():
     assert f.loc[4, "teeth_regained"] and not f.loc[4, "cal_drop"]
     assert not f.loc[7, FLAGS].any() and not f.loc[1, FLAGS].any()
     assert f["any_flag"].sum() == 2
+
+
+def test_check_history_single_pass_equals_the_per_person_version():
+    """check_history walks the sorted visits once; it must match the per-person groupby it replaced
+    (copied here), including dropping visits with no person_id."""
+    import random
+
+    import numpy as np
+    import pandas as pd
+
+    from dental_omop_nlp.labels import LABELS
+    from dental_omop_nlp.plausibility import CAL_TOL_MM, FLAGS, RBL_TOL_PCT, check_history
+
+    def reference(visits, status_col):
+        rows = []
+        for pid, g in visits.sort_values(["person_id", "visit_date", "visit_id"]).groupby("person_id", sort=False):
+            last_chart, best_rank = None, None
+            for r in g.itertuples():
+                f = dict.fromkeys(FLAGS, False)
+                if bool(r.charted) and pd.notna(r.max_cal_mm):
+                    if last_chart is not None:
+                        f["cal_drop"] = last_chart[0] - r.max_cal_mm > CAL_TOL_MM
+                        f["rbl_drop"] = last_chart[1] - r.rbl_pct > RBL_TOL_PCT
+                        f["teeth_regained"] = r.teeth_lost_perio < last_chart[2]
+                    last_chart = (r.max_cal_mm, r.rbl_pct, r.teeth_lost_perio)
+                s = getattr(r, status_col)
+                if s in LABELS:
+                    rank = LABELS.index(s)
+                    if best_rank is not None and best_rank >= 2:
+                        f["perio_resolved"] = rank < 2
+                        f["stage_drop"] = rank < best_rank
+                    best_rank = rank if best_rank is None else max(best_rank, rank)
+                rows.append({"visit_id": r.visit_id, "person_id": pid, **f})
+        out = pd.DataFrame(rows, columns=["visit_id", "person_id", *FLAGS])
+        out["any_flag"] = out[FLAGS].any(axis=1)
+        return out
+
+    rng = random.Random(5)
+    rows = []
+    for v in range(400):
+        rows.append({"visit_id": v, "person_id": rng.choice([*range(60), np.nan]),
+                     "visit_date": f"202{rng.randint(0, 5)}-0{rng.randint(1, 9)}-01",
+                     "charted": rng.random() < 0.7,
+                     "max_cal_mm": rng.choice([np.nan, *[x / 2 for x in range(14)]]),
+                     "rbl_pct": rng.uniform(0, 60), "teeth_lost_perio": rng.randint(0, 6),
+                     "status": rng.choice([*LABELS, "unknown", None])})
+    visits = pd.DataFrame(rows).sample(frac=1, random_state=1)   # unsorted, as callers may pass
+    pd.testing.assert_frame_equal(check_history(visits, "status").reset_index(drop=True),
+                                  reference(visits, "status").reset_index(drop=True))

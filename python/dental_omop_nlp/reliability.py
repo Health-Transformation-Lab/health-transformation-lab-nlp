@@ -90,6 +90,27 @@ def _kappa_where_both(a: pd.Series, b: pd.Series) -> float:
     return cohen_kappa(a[ok], b[ok])
 
 
+# Labels as integer codes in sorted order (-1 = no answer), so the bootstrap can count with bincount.
+# Same arithmetic in the same order as cohen_kappa, so the kappas are the very same floats.
+_CODE = {label: i for i, label in enumerate(sorted(_VALID))}
+
+
+def _label_codes(s: pd.Series) -> np.ndarray:
+    return np.fromiter((_CODE.get(x, -1) if isinstance(x, str) else -1 for x in s), np.int64, len(s))
+
+
+def _kappa_codes(a: np.ndarray, b: np.ndarray) -> float:
+    ok = (a >= 0) & (b >= 0)
+    a, b = a[ok], b[ok]
+    n = len(a)
+    if n == 0:
+        return float("nan")
+    po = (a == b).mean()
+    ca, cb = np.bincount(a, minlength=len(_CODE)), np.bincount(b, minlength=len(_CODE))
+    pe = sum((ca[c] / n) * (cb[c] / n) for c in range(len(_CODE)) if ca[c] or cb[c])
+    return float("nan") if pe == 1 else float((po - pe) / (1 - pe))
+
+
 def reliability_report(labels: pd.DataFrame, key: pd.DataFrame, compare: dict[str, pd.Series]) -> dict:
     """labels: reviewer_labels.csv; key: review_key.csv indexed by visit_id;
     compare: name -> Series(status) indexed by visit_id (methods, algorithm, AI)."""
@@ -151,31 +172,31 @@ def agreement_vs_humans(wide: pd.DataFrame, compare: dict[str, pd.Series], n_boo
     pairs = list(itertools.combinations(revs, 2))
 
     def bar(w):
-        return float(np.nanmean([_kappa_where_both(w[a], w[b]) for a, b in pairs]))
+        return float(np.nanmean([_kappa_codes(w[a], w[b]) for a, b in pairs]))
 
     def vs_humans(s, w):
-        return float(np.nanmean([_kappa_where_both(s, w[r]) for r in revs]))
+        return float(np.nanmean([_kappa_codes(s, w[r]) for r in revs]))
 
     aligned = {k: v.reindex(wide.index) for k, v in compare.items()}
-    point_bar = bar(wide)
+    codes = {r: _label_codes(wide[r]) for r in revs}           # encode once; the bootstrap indexes arrays
+    s_codes = {k: _label_codes(s) for k, s in aligned.items()}
+    point_bar = bar(codes)
     rows = [{"rater": "humans (mean pairwise)", "kind": "bar", "mean_kappa_vs_humans": point_bar}]
     for r in revs:
         others = [o for o in revs if o != r]
         rows.append({"rater": f"human:{r}", "kind": "human", "mean_kappa_vs_humans": float(
             np.nanmean([_kappa_where_both(wide[r], wide[o]) for o in others]))})
-    point = {k: vs_humans(s, wide) for k, s in aligned.items()}
+    point = {k: vs_humans(c, codes) for k, c in s_codes.items()}
 
     rng = np.random.default_rng(seed)
     n = len(wide)
     boots = {k: [] for k in aligned}
-    W = wide.reset_index(drop=True)
-    S = {k: s.reset_index(drop=True) for k, s in aligned.items()}
     for _ in range(n_boot):
         idx = rng.integers(0, n, n)
-        wb = W.iloc[idx].reset_index(drop=True)
+        wb = {r: c[idx] for r, c in codes.items()}
         b = bar(wb)
-        for k, s in S.items():
-            boots[k].append(vs_humans(s.iloc[idx].reset_index(drop=True), wb) - b)
+        for k, c in s_codes.items():
+            boots[k].append(vs_humans(c[idx], wb) - b)
     for k in aligned:
         lo, hi = (np.nanpercentile(boots[k], [2.5, 97.5]) if n_boot else (np.nan, np.nan))
         verdict = ("non-inferior" if lo > -margin else "inferior" if hi < -margin else "inconclusive")

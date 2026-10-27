@@ -32,24 +32,26 @@ def check_history(visits: pd.DataFrame, status_col: str = "status") -> pd.DataFr
     """visits: visit_id, person_id, visit_date, charted, max_cal_mm, rbl_pct,
     teeth_lost_perio, <status_col>. Returns visit_id, person_id, the FLAGS and any_flag."""
     rows = []
-    for pid, g in visits.sort_values(["person_id", "visit_date", "visit_id"]).groupby("person_id", sort=False):
-        last_chart, best_rank = None, None
-        for r in g.itertuples():
-            f = dict.fromkeys(FLAGS, False)
-            if bool(r.charted) and pd.notna(r.max_cal_mm):
-                if last_chart is not None:
-                    f["cal_drop"] = last_chart[0] - r.max_cal_mm > CAL_TOL_MM
-                    f["rbl_drop"] = last_chart[1] - r.rbl_pct > RBL_TOL_PCT
-                    f["teeth_regained"] = r.teeth_lost_perio < last_chart[2]
-                last_chart = (r.max_cal_mm, r.rbl_pct, r.teeth_lost_perio)
-            s = getattr(r, status_col)
-            if s in LABELS:
-                rank = LABELS.index(s)
-                if best_rank is not None and best_rank >= 2:      # periodontitis seen before
-                    f["perio_resolved"] = rank < 2
-                    f["stage_drop"] = rank < best_rank
-                best_rank = rank if best_rank is None else max(best_rank, rank)
-            rows.append({"visit_id": r.visit_id, "person_id": pid, **f})
+    pid = object()   # one pass over the sorted visits; state resets at each new person
+    visits = visits.dropna(subset=["person_id"])   # no person, no history (as groupby did)
+    for r in visits.sort_values(["person_id", "visit_date", "visit_id"]).itertuples():
+        if r.person_id != pid:
+            pid, last_chart, best_rank = r.person_id, None, None
+        f = dict.fromkeys(FLAGS, False)
+        if bool(r.charted) and pd.notna(r.max_cal_mm):
+            if last_chart is not None:
+                f["cal_drop"] = last_chart[0] - r.max_cal_mm > CAL_TOL_MM
+                f["rbl_drop"] = last_chart[1] - r.rbl_pct > RBL_TOL_PCT
+                f["teeth_regained"] = r.teeth_lost_perio < last_chart[2]
+            last_chart = (r.max_cal_mm, r.rbl_pct, r.teeth_lost_perio)
+        s = getattr(r, status_col)
+        if s in LABELS:
+            rank = LABELS.index(s)
+            if best_rank is not None and best_rank >= 2:      # periodontitis seen before
+                f["perio_resolved"] = rank < 2
+                f["stage_drop"] = rank < best_rank
+            best_rank = rank if best_rank is None else max(best_rank, rank)
+        rows.append({"visit_id": r.visit_id, "person_id": pid, **f})
     out = pd.DataFrame(rows, columns=["visit_id", "person_id", *FLAGS])
     out["any_flag"] = out[FLAGS].any(axis=1)
     return out
