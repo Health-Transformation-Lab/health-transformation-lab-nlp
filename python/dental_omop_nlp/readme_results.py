@@ -110,14 +110,27 @@ def anchor(title: str) -> str:
     return re.sub(r"[^a-z0-9 -]", "", title.lstrip("# ").lower()).replace(" ", "-")
 
 
+def _n_decoys(scores: pd.DataFrame) -> int:
+    """Look-alike dental words in the scored challenge set. scores.csv keeps rates, not this count, so the
+    seeded set is rebuilt (no engine runs) and checked against the scores before use."""
+    from .phi_challenge import build_challenge
+    allt = scores[scores.tier == "all"]
+    ch = build_challenge(int(allt["n_notes"].iloc[0]))
+    n = sum(len(r["decoys"]) for r in ch)
+    if sum(len(r["phi"]) for r in ch) != int(allt["n_phi"].iloc[0]):
+        raise ValueError("rebuilt challenge set doesn't match data/deid/scores.csv: rerun 26_deid_benchmark.py")
+    return n
+
+
 def load_inputs() -> dict:
     lad = DATASETS_DIR / "ladder"
+    deid = pd.read_csv(DEID_DIR / "scores.csv")
     return {"ladder": pd.read_csv(lad / "ladder_vs_truth.csv"),
             "preds": pd.read_csv(lad / "ladder_preds.csv").set_index("visit_id"),
             "by_diff": pd.read_csv(lad / "medgemma_vs_bert_by_difficulty.csv"),
             "key": pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id"),
             "registry": yaml.safe_load(MODELS_YAML.read_text()),
-            "deid": pd.read_csv(DEID_DIR / "scores.csv"),
+            "deid": deid, "n_decoys": _n_decoys(deid),
             "deid_not_run": pd.read_csv(DEID_DIR / "not_run.csv"),
             "maccrobat": pd.read_csv(DEID_DIR / "maccrobat_scores.csv")}
 
@@ -193,17 +206,17 @@ def out_of_100(shares) -> list[int]:
 
 COL_ASSIGNED = "Periodontitis incorrectly assigned (when not present)"
 COL_NOT_ASSIGNED = "Periodontitis incorrectly ruled out (when present)"
-PHENOTYPE_KEY = ("Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage "
+PHENOTYPE_KEY = ("**Correct**: the right status (healthy, gingivitis, or periodontitis stage "
                  "1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. "
-                 "**Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect "
+                 "**Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect "
                  "stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or "
-                 "healthy and gingivitis mixed up. **No answer**: the system gave no status.")
+                 "healthy and gingivitis mixed up. **No answer**: the method gave no status.")
 COL_LEAKED = "Text that is sensitive (PHI) incorrectly leaked"
 COL_SCRUBBED = "Text that is not sensitive incorrectly scrubbed"
-DEID_KEY = ("Out of 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the tool should "
+DEID_KEY = ("**Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should "
             "have removed but left in (one character left counts). **Text that is not sensitive incorrectly "
             "scrubbed**: dental words that look like a name "
-            "or code (Glickman, Gracey 11/12, 6-5-6) that the tool removed.")
+            "or code (Glickman, Gracey 11/12, 6-5-6) that the method removed.")
 
 
 def _pct(x, d=0) -> str:
@@ -252,17 +265,17 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
     level = key["difficulty"]
     links = {m["id"]: f"https://huggingface.co/{m['hf']}" for m in reg["models"] if m.get("hf")}
     out = [PHENOTYPE_TITLE, "",
-           "Every system that assigns one of the six periodontal statuses, on the same 240 synthetic review "
+           "Every method that assigns one of the six periodontal statuses, on the same 240 synthetic review "
            "charts against the generator's truth: models that read only the chart note, the rule phenotypes "
            "that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the "
-           "system's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
+           "method's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
            "means it plausibly ranks anywhere from 1st to 3rd.", "",
-           PHENOTYPE_KEY + " *Unsafe errors*: incorrect answers that could harm a patient "
+           "Numbers are per 100 charts. " + PHENOTYPE_KEY + " *Unsafe errors*: incorrect answers that could harm a patient "
            "if acted on, e.g. a missed stage 3–4. *Stage 4 correct*: of the stage 4 patients, how many it called "
            "stage 4. Easy / medium / hard: correct, out of 100, when the note states the 2017 diagnosis (L1), "
            "states it in older terms (L2), or leaves it to be inferred from the findings (L3). For statisticians: "
            "sensitivity, specificity, PPV and NPV for periodontitis yes/no, with no answer counted as no.", "",
-           f"| Rank | System | Input | Method | Correct (95% CI) | {COL_ASSIGNED} | "
+           f"| Rank | Method | Input | Approach | Correct (95% CI) | {COL_ASSIGNED} | "
            f"{COL_NOT_ASSIGNED} | Incorrect stage | No answer | Unsafe errors | Sensitivity | Specificity | "
            "PPV | NPV | Stage 4 correct | Easy / medium / hard |",
            "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
@@ -308,17 +321,17 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
     n_notes, n_phi = int(allt["n_notes"].iloc[0]), int(allt["n_phi"].iloc[0])
 
     out = [DEID_TITLE, "",
-           f"Every engine on the {n_notes} synthetic dental notes with fake PHI ({n_phi:,} identifiers, all tiers), "
+           f"Every method on the {n_notes} synthetic dental notes with fake PHI ({n_phi:,} identifiers, all tiers), "
            "ranked by sensitive text leaked (fewest first), with a Wilson 95% CI. Per-identifier results aren't saved, so there is "
-           "no paired bootstrap: **Rank** is the range the intervals allow, from only the engines clearly above "
-           "counting to every engine whose interval reaches this one's counting.", "",
-           DEID_KEY + " Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note "
+           "no paired bootstrap: **Rank** is the range the intervals allow, from only the methods clearly above "
+           "counting to every method whose interval reaches this one's counting.", "",
+           "Numbers are per 100. " + DEID_KEY + " Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note "
            "the AI reads, so read them together. *Unseen tier*: the notes no engine was written against. "
            "**ASQ-PHI**: 1,051 synthetic clinical queries (MIT); its text that is not sensitive is the queries with "
            "no PHI, out of 100 queries. **MACCROBAT**: 200 real, published case reports (CC BY 4.0); its sensitive "
            "text is the dates, its text that is not sensitive the clinical terms. "
            "[More on these numbers](deidentification.md#how-to-read-the-numbers).", "",
-           f"| Rank | Engine | {COL_LEAKED} (95% CI) | {COL_LEAKED}, unseen tier | {COL_SCRUBBED} | "
+           f"| Rank | Method | {COL_LEAKED} (95% CI) | {COL_LEAKED}, unseen tier | {COL_SCRUBBED} | "
            f"ASQ-PHI: {COL_LEAKED} | ASQ-PHI: {COL_SCRUBBED} | MACCROBAT: {COL_LEAKED} | MACCROBAT: {COL_SCRUBBED} |",
            "|---|---|---|---:|---:|---:|---:|---:|---:|"]
 
@@ -333,7 +346,7 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
                    f"{left(unseen, m)} | {scrub(allt, m, 'decoy_damage')} | {left(asq, m)} | "
                    f"{scrub(asq, m, 'hard_negative_damage')} | {left(mac, m)} | {scrub(mac, m, 'decoy_damage', 1)} |")
     out += ["", f"{NOT_RUN} " + ", ".join(f"`{m}`" for m in inp["deid_not_run"]["method"]) +
-            " (cloud and LLM engines; each needs its service's credentials)."]
+            " (cloud and LLM methods; each needs its service's credentials)."]
     summary = allt.assign(rank=[_rank(r) for r in ranks],
                           mac=[mac.loc[m, "entity_recall"] if m in mac.index else np.nan for m in allt.index])
     return "\n".join(out), summary
@@ -365,33 +378,38 @@ def results_markdown(inp: dict) -> str:
     _, de = _deid(inp)
     ph = ph.assign(group=[phenotype_group(s) for s in ph.index])
     de = de.assign(group=[deid_group(m) for m in de.index])
+    n_charts = len(inp["preds"])
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
-           "Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it "
-           f"plausibly ranks among all {len(ph)} systems. *Stage 4 rule*: keyword rules decide stage 4, which the "
-           "trained AI rarely learned (few stage 4 notes to learn from). " + PHENOTYPE_KEY, "",
-           f"| Group | Best system | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | No answer | "
-           "Rank | Systems |",
-           "|---|---|---:|---:|---:|---:|---:|---|---:|"]
+           f"Best method in each group, counted on the {n_charts} review charts; groups ordered by their best. Rank: "
+           f"where it plausibly ranks among all {len(ph)} methods. *Stage 4 rule*: keyword rules decide stage 4, "
+           "which the trained AI rarely learned (few stage 4 notes to learn from). " + PHENOTYPE_KEY, "",
+           f"| Group | Best method | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | No answer | "
+           "Total charts | Rank | Methods in group |",
+           "|---|---|---:|---:|---:|---:|---:|---:|---|---:|"]
     for g in _by_best(ph, PHENOTYPE_GROUPS, "accuracy"):
         sub = ph[ph.group == g]
         s, r = sub.index[0], sub.iloc[0]
-        nums = out_of_100([r["correct"], r["dx_said_yes"], r["dx_said_no"], r["stage"], r["no_answer"]])
-        out.append(f"| {g} | {plain_system(s)} | " + " | ".join(map(str, nums)) + f" | {r['rank']} | {len(sub)} |")
-    out += ["", f"All {len(ph)} systems, with the 95% CIs, unsafe errors, "
-            f"results by note difficulty, and the {int(ph['n_missing'].iloc[0])} models not run yet: "
+        nums = [round(n_charts * r[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage", "no_answer")]
+        out.append(f"| {g} | {plain_system(s)} | " + " | ".join(map(str, nums)) +
+                   f" | {n_charts} | {r['rank']} | {len(sub)} |")
+    out += ["", f"All {len(ph)} methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, "
+            f"and the {int(ph['n_missing'].iloc[0])} models not run yet: "
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "",
             DEID_TITLE, "",
-            "Best tool in each group on the synthetic notes, groups ordered by their best. Rank: where it plausibly "
-            f"ranks among all {len(de)} tools. " + DEID_KEY, "",
-            f"| Group | Best tool | {COL_LEAKED} | {COL_SCRUBBED} | Rank | Tools |",
-            "|---|---|---:|---:|---|---:|"]
+            f"Best method in each group, counted on the {int(de['n_notes'].iloc[0])} synthetic notes; groups ordered "
+            f"by their best. Rank: where it plausibly ranks among all {len(de)} methods. " + DEID_KEY, "",
+            f"| Group | Best method | {COL_LEAKED} | Total PHI items | {COL_SCRUBBED} | Total look-alike dental words | "
+            "Rank | Methods in group |",
+            "|---|---|---:|---:|---:|---:|---|---:|"]
+    n_words = inp["n_decoys"]
     for g in _by_best(de, DEID_GROUPS, "entity_recall"):
         sub = de[de.group == g]
         m, r = sub.index[0], sub.iloc[0]
-        out.append(f"| {g} | {plain_tool(m)} | {round(100 * (1 - r['entity_recall']))} | {round(100 * r['decoy_damage'])} | "
-                   f"{r['rank']} | {len(sub)} |")
-    out += ["", f"All {len(de)} tools, with 95% CIs and two outside test sets (ASQ-PHI, and MACCROBAT's real case "
-            f"reports), and the tools not run yet: [full de-identification table](docs/results.md#{anchor(DEID_TITLE)})."]
+        n_phi = int(r["n_phi"])
+        out.append(f"| {g} | {plain_tool(m)} | {round(n_phi * (1 - r['entity_recall']))} | {n_phi:,} | "
+                   f"{round(n_words * r['decoy_damage'])} | {n_words:,} | {r['rank']} | {len(sub)} |")
+    out += ["", f"All {len(de)} methods, per 100 with 95% CIs, two outside test sets (ASQ-PHI, and MACCROBAT's real "
+            f"case reports), and the methods not run yet: [full de-identification table](docs/results.md#{anchor(DEID_TITLE)})."]
     return "\n".join(out)
 
 

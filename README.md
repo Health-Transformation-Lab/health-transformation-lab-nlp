@@ -48,30 +48,30 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 ### Phenotyping: periodontal status per chart
 
-Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it plausibly ranks among all 38 systems. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the system gave no status.
+Best method in each group, counted on the 240 review charts; groups ordered by their best. Rank: where it plausibly ranks among all 38 methods. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the method gave no status.
 
-| Group | Best system | Correct | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer | Rank | Systems |
-|---|---|---:|---:|---:|---:|---:|---|---:|
-| Rules on the whole record | Gum measurements first | 98 | 0 | 0 | 2 | 0 | 1 | 2 |
-| Trained AI on the note + stage 4 rule | ModernBERT | 91 | 2 | 0 | 7 | 0 | 2–10 | 11 |
-| Simple text methods on the note | Word counts + X-ray reading | 87 | 3 | 1 | 9 | 0 | 7–16 | 5 |
-| Trained AI on the note | ModernBERT | 84 | 1 | 1 | 14 | 0 | 12–18 | 11 |
-| One part of the record alone | Gum measurements (probing chart) | 80 | 0 | 0 | 1 | 19 | 14–31 | 7 |
-| Untrained medical AI on the note (MedGemma) | MedGemma | 77 | 3 | 4 | 16 | 0 | 17–31 | 2 |
+| Group | Best method | Correct | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer | Total charts | Rank | Methods in group |
+|---|---|---:|---:|---:|---:|---:|---:|---|---:|
+| Rules on the whole record | Gum measurements first | 234 | 0 | 0 | 6 | 0 | 240 | 1 | 2 |
+| Trained AI on the note + stage 4 rule | ModernBERT | 219 | 4 | 1 | 16 | 0 | 240 | 2–10 | 11 |
+| Simple text methods on the note | Word counts + X-ray reading | 209 | 6 | 3 | 22 | 0 | 240 | 7–16 | 5 |
+| Trained AI on the note | ModernBERT | 201 | 4 | 2 | 33 | 0 | 240 | 12–18 | 11 |
+| One part of the record alone | Gum measurements (probing chart) | 193 | 0 | 0 | 2 | 45 | 240 | 14–31 | 7 |
+| Untrained medical AI on the note (MedGemma) | MedGemma | 185 | 8 | 10 | 37 | 0 | 240 | 17–31 | 2 |
 
-All 38 systems, with the 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
+All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
 ### De-identification
 
-Best tool in each group on the synthetic notes, groups ordered by their best. Rank: where it plausibly ranks among all 15 tools. Out of 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the tool should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the tool removed.
+Best method in each group, counted on the 400 synthetic notes; groups ordered by their best. Rank: where it plausibly ranks among all 15 methods. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed.
 
-| Group | Best tool | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Tools |
-|---|---|---:|---:|---|---:|
-| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 4 | 2 | 1–2 | 6 |
-| One AI tool | Stanford AI + dental-word guard | 21 | 2 | 7–8 | 5 |
-| Pattern matching only | Patterns | 24 | 0 | 9–10 | 4 |
+| Group | Best method | Text that is sensitive (PHI) incorrectly leaked | Total PHI items | Text that is not sensitive incorrectly scrubbed | Total look-alike dental words | Rank | Methods in group |
+|---|---|---:|---:|---:|---:|---|---:|
+| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 | 2,714 | 41 | 2,462 | 1–2 | 6 |
+| One AI tool | Stanford AI + dental-word guard | 560 | 2,714 | 41 | 2,462 | 7–8 | 5 |
+| Pattern matching only | Patterns | 645 | 2,714 | 0 | 2,462 | 9–10 | 4 |
 
-All 15 tools, with 95% CIs and two outside test sets (ASQ-PHI, and MACCROBAT's real case reports), and the tools not run yet: [full de-identification table](docs/results.md#de-identification).
+All 15 methods, per 100 with 95% CIs, two outside test sets (ASQ-PHI, and MACCROBAT's real case reports), and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
 <!-- results:end -->
 
 ## What it does, step by step
