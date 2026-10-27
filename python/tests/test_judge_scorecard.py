@@ -239,3 +239,19 @@ def test_judge_agreement_with_the_truth(inp, answers):
     assert a.loc[("all", "all"), "agreement"] == 1 and a.loc[("all", "all"), "kappa"] == 1
     assert a.loc[("all", "all"), "coverage"] == 1 and a.loc[("all", "all"), "n"] == 240
     assert {"truth_status", "difficulty"} <= set(a.index.get_level_values("group"))
+
+
+def test_script_dry_run_writes_simulated_tables(tmp_path):
+    """scripts/36_judge_scorecard.py --simulated: no endpoint, outputs named and marked simulated."""
+    import subprocess
+    import sys
+
+    from dental_omop_nlp.paths import REPO_ROOT
+    r = subprocess.run([sys.executable, str(REPO_ROOT / "python" / "scripts" / "36_judge_scorecard.py"),
+                        "--simulated", "--out", str(tmp_path), "--n-boot", "20"],
+                       capture_output=True, text=True, check=True)
+    assert "SIMULATED" in r.stdout
+    for name in ("chart_answers", "judgments", "judge_metrics", "judge_agreement"):
+        assert (tmp_path / f"simulated_{name}.csv").exists(), name
+    j = pd.read_csv(tmp_path / "simulated_judgments.csv")
+    assert j["simulated"].all() and (j["endpoint"] == "sim:judge").all()
