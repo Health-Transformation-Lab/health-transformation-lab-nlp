@@ -6,7 +6,7 @@
    "queryLines": [
     "SELECT `group` AS group_name, system, ROUND(100 * vs_truth, 1) AS `exact_truth`, ROUND(100 * vs_judge, 1) AS `exact_judge`,\n",
     "  ROUND(100 * difference, 1) AS `difference`, ROUND(100 * corrected_accuracy, 1) AS `corrected`, ROUND(100 * ci_low, 1) AS `corrected_low`,\n",
-    "  ROUND(100 * ci_high, 1) AS `corrected_high`, n_judged FROM dental_omop.gold_dental_omop_perio.judge_metrics WHERE metric = 'exact_status'\n"
+    "  ROUND(100 * ci_high, 1) AS `corrected_high`, n_judged FROM dental_omop.gold_dental_omop_perio.judge_metrics WHERE metric = 'correct'\n"
    ]
   },
   {
@@ -220,11 +220,11 @@
          },
          {
           "fieldName": "exact_truth",
-          "displayName": "Exact status right, vs truth (%)"
+          "displayName": "Correct, vs truth (%)"
          },
          {
           "fieldName": "exact_judge",
-          "displayName": "Exact status right, vs judge (%)"
+          "displayName": "Correct, vs judge (%)"
          },
          {
           "fieldName": "difference",
@@ -250,7 +250,7 @@
        },
        "frame": {
         "showTitle": true,
-        "title": "Exact status right: truth vs judge",
+        "title": "Correct: truth vs judge",
         "showDescription": true,
         "description": "Judge-corrected accuracy adjusts for how often the judge's verdicts are wrong (Rogan-Gladen)"
        }
@@ -428,7 +428,7 @@
         "showTitle": true,
         "title": "Every README metric, truth vs judge",
         "showDescription": true,
-        "description": "Exact status right, sensitivity, specificity, PPV, NPV, stage IV caught, unsafe errors, by note difficulty"
+        "description": "Correct, periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty"
        }
       }
      },

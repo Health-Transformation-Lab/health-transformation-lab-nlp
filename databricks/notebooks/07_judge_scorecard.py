@@ -107,4 +107,4 @@ save(pd.read_csv(DEID_DIR / "scores.csv").assign(group=lambda d: d["method"].map
 label = "LLM judgment" if len(judgments) else "no judge run"
 print(f"{label}: {len(judgments)} calls; tables written to {catalog}.{schema}")
 display(agreement)
-display(metrics[metrics.metric == "exact_status"].sort_values("vs_truth", ascending=False))
+display(metrics[metrics.metric == "correct"].sort_values("vs_truth", ascending=False))

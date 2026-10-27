@@ -110,10 +110,12 @@ def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | No
 LEVELS = ("L1", "L2", "L3")
 LEVEL_NAMES = {"L1": "easy", "L2": "medium", "L3": "hard"}   # the README's Easy / medium / hard
 
-# The README's own names (readme_results), so tables and the dashboard read like the README.
-METRIC_LABELS = {"exact_status": "Exact status right", "sensitivity": "Sensitivity", "specificity": "Specificity",
-                 "ppv": "PPV", "npv": "NPV", "stage4_caught": "Stage IV caught", "unsafe_rate": "Unsafe errors",
-                 **{f"exact_{lv}": f"Exact status right: {n} note" for lv, n in LEVEL_NAMES.items()}}
+# The README's own column names (readme_results), so tables and the dashboard read like the README.
+METRIC_LABELS = {"correct": "Correct", "incorrectly_assigned": rr.COL_ASSIGNED,
+                 "incorrectly_ruled_out": rr.COL_NOT_ASSIGNED, "incorrect_stage": "Incorrect stage",
+                 "no_answer": "No answer", "unsafe_rate": "Unsafe errors", "sensitivity": "Sensitivity",
+                 "specificity": "Specificity", "ppv": "PPV", "npv": "NPV", "stage4_correct": "Stage 4 correct",
+                 **{f"correct_{lv}": f"Correct: {n} note" for lv, n in LEVEL_NAMES.items()}}
 STATUS_NAMES = {"healthy": "Healthy", "gingivitis": "Gingivitis", "periodontitis_stage_1": "Stage I",
                 "periodontitis_stage_2": "Stage II", "periodontitis_stage_3": "Stage III",
                 "periodontitis_stage_4": "Stage IV"}
@@ -126,10 +128,12 @@ def _point(ref: pd.Series, p: pd.Series, level: pd.Series, score) -> dict:
     p, level = p.reindex(ref.index), level.reindex(ref.index)
     ok = (p == ref)                                  # no status is wrong, as in the README
     s4 = ref == STAGE4
-    return {"exact_status": ok.mean(), **rr.yes_no(ref, p, score),
-            "stage4_caught": ok[s4].mean() if s4.any() else np.nan,
-            "unsafe_rate": unsafe_rates(ref, p)["unsafe_rate"],
-            **{f"exact_{lv}": ok[level == lv].mean() if (level == lv).any() else np.nan for lv in LEVELS}}
+    bd = rr.breakdown(ref, p)                        # the README's five outcomes, adding to 1
+    return {"correct": bd["correct"], "incorrectly_assigned": bd["dx_said_yes"],
+            "incorrectly_ruled_out": bd["dx_said_no"], "incorrect_stage": bd["stage"], "no_answer": bd["no_answer"],
+            "unsafe_rate": unsafe_rates(ref, p)["unsafe_rate"], **rr.yes_no(ref, p, score),
+            "stage4_correct": ok[s4].mean() if s4.any() else np.nan,
+            **{f"correct_{lv}": ok[level == lv].mean() if (level == lv).any() else np.nan for lv in LEVELS}}
 
 
 def _judge_status(judgments: pd.DataFrame) -> pd.Series:
@@ -141,7 +145,7 @@ def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_b
                   seed: int = 0) -> pd.DataFrame:
     """One row per (system, metric): vs_truth (the README number, all 240 charts), vs_truth_judged and
     vs_judge (the charts the judge gave a status for), difference = vs_judge - vs_truth_judged, and
-    n_judged. exact_status rows also carry judge-corrected accuracy among answered charts
+    n_judged. `correct` rows also carry judge-corrected accuracy among answered charts
     (Rogan-Gladen from verdicts, judge calibrated on the same charts' truth) with a 95% range."""
     truth, pred, level = rr.phenotype_predictions(inp)
     js_ = _judge_status(judgments) if len(judgments) else pd.Series(dtype=object)
@@ -165,7 +169,7 @@ def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_b
             rows.append({"system": s, "metric": k, "vs_truth": t_all[k], "vs_truth_judged": t_j[k],
                          "vs_judge": j[k], "difference": j[k] - t_j[k], "n_judged": len(judged),
                          **({"corrected_accuracy": ca["accuracy_est"], "ci_low": ca["ci_low"], "ci_high": ca["ci_high"]}
-                            if k == "exact_status" else {})})
+                            if k == "correct" else {})})
     out = pd.DataFrame(rows, columns=["system", "metric", "vs_truth", "vs_truth_judged", "vs_judge", "difference",
                                       "n_judged", "corrected_accuracy", "ci_low", "ci_high"])
     out.insert(1, "group", out["system"].map(rr.phenotype_group))

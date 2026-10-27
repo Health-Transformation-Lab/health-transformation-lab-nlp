@@ -259,4 +259,4 @@ def test_judge_section_reports_agreement_and_the_gap_when_a_real_run_exists(tmp_
     monkeypatch.setattr(rr, "JUDGE_DIR", tmp_path)
     inp = rr.load_inputs()
     sec = rr.details_markdown(inp).split(rr.JUDGE_TITLE)[1]
-    assert "Judge agrees with truth" in sec and "Exact status right, vs truth" in sec and "vs judge" in sec
+    assert "Judge agrees with truth" in sec and "Correct, vs truth" in sec and "vs judge" in sec

@@ -70,5 +70,5 @@ label = "SIMULATED judge" if a.simulated else f"LLM judgment ({endpoint})"
 print(f"{label}: {len(judgments)} calls, {int(judgments['api_error'].sum())} endpoint errors, "
       f"{int((~judgments['gate_ok']).sum())} failed the quote gate")
 print(agreement[agreement.group == "all"].round(3).to_string(index=False))
-ex = metrics[metrics.metric == "exact_status"].sort_values("vs_truth", ascending=False)
+ex = metrics[metrics.metric == "correct"].sort_values("vs_truth", ascending=False)
 print(ex[["system", "vs_truth", "vs_judge", "difference", "corrected_accuracy"]].head(10).round(3).to_string(index=False))

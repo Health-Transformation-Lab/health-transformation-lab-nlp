@@ -188,8 +188,9 @@ def test_calls_that_failed_on_the_network_are_retried_on_resume(inp, answers):
     assert not again["api_error"].any() and (again["prompt_tokens"] == 5).all()
 
 
-METRICS = ["exact_status", "sensitivity", "specificity", "ppv", "npv", "stage4_caught", "unsafe_rate",
-           "exact_L1", "exact_L2", "exact_L3"]
+METRICS = ["correct", "incorrectly_assigned", "incorrectly_ruled_out", "incorrect_stage", "no_answer",
+           "unsafe_rate", "sensitivity", "specificity", "ppv", "npv", "stage4_correct",
+           "correct_L1", "correct_L2", "correct_L3"]
 
 
 def _perfect_judgments(inp, answers):
@@ -210,15 +211,18 @@ def test_metrics_against_the_truth_are_the_readme_numbers(inp, answers):
     m = js.judge_metrics(inp, answers, _perfect_judgments(inp, answers), n_boot=50).set_index(["system", "metric"])
     assert set(m.index.get_level_values("metric")) == set(METRICS)
     lad = rr.ladder_eval.ladder_table(truth, pred, n_boot=1, reference="").set_index("method")
-    for s in ("algorithm_v0", "modernbert-base+cw", "note_rules", "medgemma-1.5-4b-it"):
-        yn = rr.yes_no(truth, pred[s])
-        assert m.loc[(s, "exact_status"), "vs_truth"] == pytest.approx(lad.loc[s, "accuracy"], abs=1e-12)
-        assert m.loc[(s, "stage4_caught"), "vs_truth"] == pytest.approx(lad.loc[s, "stage4_recall"], abs=1e-12)
+    for s in ("algorithm_v0", "modernbert-base+cw", "note_rules", "medgemma-1.5-4b-it", "probing_chart"):
+        yn, bd = rr.yes_no(truth, pred[s]), rr.breakdown(truth, pred[s])
+        assert m.loc[(s, "correct"), "vs_truth"] == pytest.approx(lad.loc[s, "accuracy"], abs=1e-12)
+        for k, b in (("correct", "correct"), ("incorrectly_assigned", "dx_said_yes"),
+                     ("incorrectly_ruled_out", "dx_said_no"), ("incorrect_stage", "stage"), ("no_answer", "no_answer")):
+            assert m.loc[(s, k), "vs_truth"] == pytest.approx(bd[b], abs=1e-12), (s, k)
+        assert m.loc[(s, "stage4_correct"), "vs_truth"] == pytest.approx(lad.loc[s, "stage4_recall"], abs=1e-12)
         assert m.loc[(s, "unsafe_rate"), "vs_truth"] == pytest.approx(lad.loc[s, "unsafe_rate"], abs=1e-12)
         for k in ("sensitivity", "specificity", "ppv", "npv"):
             assert m.loc[(s, k), "vs_truth"] == pytest.approx(yn[k], abs=1e-12, nan_ok=True)
         ok = pred[s] == truth
-        assert m.loc[(s, "exact_L3"), "vs_truth"] == pytest.approx(ok[level == "L3"].mean(), abs=1e-12)
+        assert m.loc[(s, "correct_L3"), "vs_truth"] == pytest.approx(ok[level == "L3"].mean(), abs=1e-12)
 
 
 def test_a_judge_that_knows_the_truth_scores_every_system_exactly_as_the_truth(inp, answers):
@@ -226,7 +230,7 @@ def test_a_judge_that_knows_the_truth_scores_every_system_exactly_as_the_truth(i
     both = m.dropna(subset=["vs_truth"])
     assert (both["vs_judge"] - both["vs_truth"]).abs().max() < 1e-12
     assert both["difference"].abs().max() < 1e-12 and (m["n_judged"] == 240).all()
-    ex = m[m.metric == "exact_status"].set_index("system")
+    ex = m[m.metric == "correct"].set_index("system")
     answered = answers.dropna(subset=["answer"]).groupby("system").size()
     right = answers.assign(ok=answers["answer"] == inp["key"]["truth_status"].reindex(answers["visit_id"]).to_numpy()
                            ).groupby("system")["ok"].sum()
@@ -264,8 +268,9 @@ def test_tables_use_the_readme_names(inp, answers):
     header = next(line for line in (REPO_ROOT / "docs" / "results.md").read_text().splitlines()
                   if line.startswith("| Rank | System |"))
     for label in m["metric_label"].unique():
-        assert label.split(":")[0].split(" (")[0] in header, label
-    assert set(m.loc[m.metric == "exact_L3", "metric_label"]) == {"Exact status right: hard note"}
+        assert label.split(":")[0] in header, label          # the README's column names, verbatim
+    assert set(m.loc[m.metric == "incorrectly_assigned", "metric_label"]) == {rr.COL_ASSIGNED}
+    assert set(m.loc[m.metric == "correct_L3", "metric_label"]) == {"Correct: hard note"}
     assert set(m["group"]) == set(rr.PHENOTYPE_GROUPS)
     assert (m["group"] == m["system"].map(rr.phenotype_group)).all()
     a = js.judge_agreement(inp, _perfect_judgments(inp, answers), n_boot=20)

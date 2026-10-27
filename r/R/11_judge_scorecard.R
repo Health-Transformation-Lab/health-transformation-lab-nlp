@@ -11,8 +11,21 @@ if (!exists("unsafe_rates")) source("r/R/04_reliability.R")
 if (!exists("score_run")) source("eval/score.R")
 
 JUDGE_LEVELS <- c("L1", "L2", "L3")
-JUDGE_METRICS <- c("exact_status", "sensitivity", "specificity", "ppv", "npv", "stage4_caught",
-                   "unsafe_rate", paste0("exact_", JUDGE_LEVELS))
+JUDGE_METRICS <- c("correct", "incorrectly_assigned", "incorrectly_ruled_out", "incorrect_stage", "no_answer",
+                   "unsafe_rate", "sensitivity", "specificity", "ppv", "npv", "stage4_correct",
+                   paste0("correct_", JUDGE_LEVELS))
+
+# The README's five outcomes, adding to 1 (twin of readme_results.breakdown): correct; periodontitis
+# incorrectly assigned / ruled out (wrong about yes/no); incorrect stage (right yes/no, wrong status); no answer.
+judge_breakdown <- function(ref, p) {
+  answered <- !is.na(p)
+  perio_t <- startsWith(ref, "periodontitis"); perio_p <- answered & startsWith(ifelse(answered, p, ""), "periodontitis")
+  right <- answered & p == ref
+  right[is.na(right)] <- FALSE
+  said_no <- answered & perio_t & !perio_p; said_yes <- answered & !perio_t & perio_p
+  c(correct = mean(right), incorrectly_assigned = mean(said_yes), incorrectly_ruled_out = mean(said_no),
+    incorrect_stage = mean(answered & !right & !said_no & !said_yes), no_answer = mean(!answered))
+}
 
 # Every metric for one system's answers p against reference ref (aligned; ref has no NA).
 judge_point <- function(ref, p, level) {
@@ -20,10 +33,10 @@ judge_point <- function(ref, p, level) {
   s4 <- ref == "periodontitis_stage_4"
   sc <- score_run(ref, ifelse(is.na(p), "none", p), model_id = "judge", run_id = "judge")
   yn <- setNames(sc$value[sc$class == ""], sc$metric[sc$class == ""])
-  out <- c(exact_status = mean(ok), sensitivity = yn[["sensitivity"]], specificity = yn[["specificity"]],
-           ppv = yn[["ppv"]], npv = yn[["npv"]], stage4_caught = if (any(s4)) mean(ok[s4]) else NA_real_,
-           unsafe_rate = unsafe_rates(ref, ifelse(is.na(p), "", p))[["unsafe_rate"]])
-  for (lv in JUDGE_LEVELS) out[[paste0("exact_", lv)]] <- if (any(level == lv)) mean(ok[level == lv]) else NA_real_
+  out <- c(judge_breakdown(ref, p), unsafe_rate = unsafe_rates(ref, ifelse(is.na(p), "", p))[["unsafe_rate"]],
+           sensitivity = yn[["sensitivity"]], specificity = yn[["specificity"]], ppv = yn[["ppv"]], npv = yn[["npv"]],
+           stage4_correct = if (any(s4)) mean(ok[s4]) else NA_real_)
+  for (lv in JUDGE_LEVELS) out[[paste0("correct_", lv)]] <- if (any(level == lv)) mean(ok[level == lv]) else NA_real_
   out
 }
 
@@ -79,6 +92,6 @@ if (sys.nframe() == 0) {
   args <- commandArgs(trailingOnly = TRUE)
   inp <- read_judge_inputs(if (length(args) && args[1] == "simulated") "simulated_" else "")
   m <- judge_metrics_point(inp$answers, inp$judgments, inp$truth)
-  print(head(m[m$metric == "exact_status", ], 10))
+  print(head(m[m$metric == "correct", ], 10))
   print(judge_agreement_point(inp$judgments, inp$truth, inp$level))
 }

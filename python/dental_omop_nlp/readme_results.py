@@ -373,8 +373,8 @@ def _judge(inp) -> tuple[str, str]:
         if g in ("all", "difficulty"):
             sec.append(f"| {r['label']} ({int(r['n'])}) | {_pct(r['coverage'])} | {_ci(r['agreement'], r['ci_low'], r['ci_high'])} | "
                        f"{r['kappa']:.2f} |")
-    ex = m[m.metric == "exact_status"].sort_values("vs_truth", ascending=False)
-    sec += ["", ("| System | Group | Exact status right, vs truth | vs judge | Difference | "
+    ex = m[m.metric == "correct"].sort_values("vs_truth", ascending=False)
+    sec += ["", ("| System | Group | Correct, vs truth | vs judge | Difference | "
                  "Judge-corrected accuracy where it answers (95% CI) |"), "|---|---|---:|---:|---:|---|"]
     for r in ex.itertuples():
         corr = "–" if pd.isna(r.corrected_accuracy) else _ci(r.corrected_accuracy, r.ci_low, r.ci_high)
