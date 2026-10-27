@@ -54,6 +54,8 @@ Counted on the 240 review charts, by what is available to read:
 2. **Only the chart note** (where structured data is missing): the best trained AI, simple keyword rules, and a medical AI used as is
 3. **One part of the record by itself**
 
+How each part of the record (gum measurements, chart note, exam form, codes, X-ray) is turned into a status: [rules for each evidence type](docs/evidence_rules.md).
+
 What the columns mean:
 
 - **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4).

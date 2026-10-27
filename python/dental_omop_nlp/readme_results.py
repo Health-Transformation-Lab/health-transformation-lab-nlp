@@ -381,7 +381,8 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
            "charts against the generator's truth: models that read only the chart note, the rule phenotypes "
            "that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the "
            "method's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
-           "means it plausibly ranks anywhere from 1st to 3rd.", "",
+           "means it plausibly ranks anywhere from 1st to 3rd. How each part of the record is turned into a "
+           "status, with worked examples: [rules for each evidence type](evidence_rules.md).", "",
            "Numbers are per 100 charts. What the columns mean:", "",
            PHENOTYPE_KEY + "\n" + _bullets([
                ("Unsafe errors", "incorrect answers that could harm a patient if acted on, e.g. a missed stage 3–4."),
@@ -621,6 +622,8 @@ def results_markdown(inp: dict) -> str:
            "2. **Only the chart note** (where structured data is missing): the best trained AI, simple keyword rules, "
            "and a medical AI used as is",
            "3. **One part of the record by itself**", "",
+           ("How each part of the record (gum measurements, chart note, exam form, codes, X-ray) is turned into a "
+            "status: [rules for each evidence type](docs/evidence_rules.md)."), "",
            "What the columns mean:", "",
            _bullets(PHENOTYPE_TERMS[:2] + [
                ("Specificity", f"(in brackets) of the {n_neg} charts without periodontitis, the share correctly "
