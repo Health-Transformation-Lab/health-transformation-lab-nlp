@@ -48,9 +48,9 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 ### Phenotyping: periodontal status per chart
 
-Best method in each group, counted on the 240 review charts; groups ordered by their best. Rank: where it plausibly ranks among all 38 methods. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the method gave no status.
+Best method in each group, counted on the 240 review charts; groups ordered by their best. Rank: where it plausibly ranks among all 38 methods. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken.
 
-| Group | Best method | Correct | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer | Total charts | Rank | Methods in group |
+| Group | Best method | Correct | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer (evidence not available) | Total charts | Rank | Methods in group |
 |---|---|---:|---:|---:|---:|---:|---:|---|---:|
 | Rules on the whole record | Gum measurements first | 234 | 0 | 0 | 6 | 0 | 240 | 1 | 2 |
 | Trained AI on the note + stage 4 rule | ModernBERT | 219 | 4 | 1 | 16 | 0 | 240 | 2–10 | 11 |

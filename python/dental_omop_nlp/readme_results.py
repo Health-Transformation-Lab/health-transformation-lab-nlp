@@ -206,11 +206,13 @@ def out_of_100(shares) -> list[int]:
 
 COL_ASSIGNED = "Periodontitis incorrectly assigned (when not present)"
 COL_NOT_ASSIGNED = "Periodontitis incorrectly ruled out (when present)"
+COL_NO_ANSWER = "No answer (evidence not available)"
 PHENOTYPE_KEY = ("**Correct**: the right status (healthy, gingivitis, or periodontitis stage "
                  "1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. "
                  "**Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect "
                  "stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or "
-                 "healthy and gingivitis mixed up. **No answer**: the method gave no status.")
+                 "healthy and gingivitis mixed up. **No answer (evidence not available)**: the method gave no status "
+                 "because what it reads wasn't in the record, e.g. no probing chart was taken.")
 COL_LEAKED = "Text that is sensitive (PHI) incorrectly leaked"
 COL_SCRUBBED = "Text that is not sensitive incorrectly scrubbed"
 DEID_KEY = ("**Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should "
@@ -276,7 +278,7 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
            "states it in older terms (L2), or leaves it to be inferred from the findings (L3). For statisticians: "
            "sensitivity, specificity, PPV and NPV for periodontitis yes/no, with no answer counted as no.", "",
            f"| Rank | Method | Input | Approach | Correct (95% CI) | {COL_ASSIGNED} | "
-           f"{COL_NOT_ASSIGNED} | Incorrect stage | No answer | Unsafe errors | Sensitivity | Specificity | "
+           f"{COL_NOT_ASSIGNED} | Incorrect stage | {COL_NO_ANSWER} | Unsafe errors | Sensitivity | Specificity | "
            "PPV | NPV | Stage 4 correct | Easy / medium / hard |",
            "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     tab = tab.sort_values("accuracy", ascending=False, kind="stable")
@@ -383,7 +385,7 @@ def results_markdown(inp: dict) -> str:
            f"Best method in each group, counted on the {n_charts} review charts; groups ordered by their best. Rank: "
            f"where it plausibly ranks among all {len(ph)} methods. *Stage 4 rule*: keyword rules decide stage 4, "
            "which the trained AI rarely learned (few stage 4 notes to learn from). " + PHENOTYPE_KEY, "",
-           f"| Group | Best method | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | No answer | "
+           f"| Group | Best method | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | {COL_NO_ANSWER} | "
            "Total charts | Rank | Methods in group |",
            "|---|---|---:|---:|---:|---:|---:|---:|---|---:|"]
     for g in _by_best(ph, PHENOTYPE_GROUPS, "accuracy"):
