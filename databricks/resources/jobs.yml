@@ -1,7 +1,6 @@
 # Jobs deployed to every target. Notebook tasks without a cluster run on
-# serverless compute (the only option on Free Edition). The MedGemma GPU job is
-# defined per target in databricks.yml (uat/prod); in dev, run
-# databricks/notebooks/03_medgemma_reader.py interactively on serverless GPU.
+# serverless compute (the only option on Free Edition); the GPU jobs below ask
+# for a serverless GPU per task (compute.hardware_accelerator).
 
 resources:
   jobs:
@@ -70,3 +69,42 @@ resources:
               catalog: ${resources.schemas.gold.catalog_name}
               schema: ${resources.schemas.gold.name}
               judge_endpoint: ${var.judge_endpoint}
+
+    # GPU jobs on serverless GPU (Free Edition has it; one A10 by default, var.gpu_accelerator).
+    # Run on demand: no schedule.
+    medgemma_reader:
+      name: dental-omop-nlp medgemma reader (${bundle.target})
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: read_notes
+          compute:
+            hardware_accelerator: ${var.gpu_accelerator}
+          notebook_task:
+            notebook_path: ../notebooks/03_medgemma_reader.py
+            base_parameters:
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
+              rung: ${var.reader_rung}
+              limit: ${var.reader_limit}
+              shots: "0"
+              hf_secret_scope: ${var.hf_secret_scope}
+
+    encoder_gpu:
+      name: dental-omop-nlp encoders on GPU (${bundle.target})
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: fine_tune_and_predict
+          compute:
+            hardware_accelerator: ${var.gpu_accelerator}
+          notebook_task:
+            notebook_path: ../notebooks/08_encoder_gpu.py
+            base_parameters:
+              rungs: ${var.encoder_gpu_rungs}
+              lr_overrides: ${var.encoder_gpu_lr}
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
+              landing_schema: ${resources.volumes.data.schema_name}

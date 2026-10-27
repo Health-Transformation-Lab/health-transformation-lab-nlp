@@ -26,6 +26,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 
 import pandas as pd
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
@@ -44,9 +45,8 @@ w = {k: dbutils.widgets.get(k) for k in ("rungs", "lr_overrides", "epochs", "max
 rungs = [r.strip() for r in w["rungs"].split(",") if r.strip()]
 lrs = dict(x.strip().split("=") for x in w["lr_overrides"].split(",") if "=" in x)
 out_dir = f"/Volumes/{w['catalog']}/{w['landing_schema']}/data/encoder_gpu"
-work = "/local_disk0/encoder_gpu"          # training checkpoints: the cluster's disk, not workspace files
+work = tempfile.mkdtemp(prefix="encoder_gpu_")   # training checkpoints: local scratch, not workspace files
 os.makedirs(out_dir, exist_ok=True)
-os.makedirs(work, exist_ok=True)
 
 # COMMAND ----------
 

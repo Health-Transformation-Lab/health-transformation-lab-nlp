@@ -91,11 +91,19 @@ def test_job_notebooks_have_no_placeholders_left():
         assert not any("<catalog>" in c or "<schema>" in c for c in code), name
 
 
-def test_medgemma_gpu_job_only_in_uat_and_prod():
+def test_gpu_jobs_run_on_serverless_gpu_in_every_target():
+    """Free Edition (the dev workspace) has serverless GPU, so the GPU jobs are in every target and ask
+    for a serverless GPU per task; no job cluster or node type."""
     root, jobs = _load()
-    assert "medgemma_reader" not in jobs
-    for env in ("uat", "prod"):
-        assert "medgemma_reader" in root["targets"][env]["resources"]["jobs"]
+    for name in ("medgemma_reader", "encoder_gpu"):
+        j = jobs[name][0]
+        assert "job_clusters" not in j, name
+        for t in j["tasks"]:
+            assert t["compute"] == {"hardware_accelerator": "${var.gpu_accelerator}"} and "job_cluster_key" not in t
+        for env, tgt in root["targets"].items():
+            assert name not in tgt.get("resources", {}).get("jobs", {}), (name, env)
+    assert root["variables"]["gpu_accelerator"]["default"] == "GPU_1xA10"
+    assert not {"gpu_node_type", "gpu_spark_version"} & set(root["variables"])
 
 
 def test_mlflow_experiment_and_uc_model_per_target():
@@ -239,19 +247,12 @@ GPU_ENCODERS = {"modernbert-large", "bioclinical-modernbert-large", "longformer-
                 "gatortron-base"}
 
 
-def test_encoder_gpu_job_runs_the_gpu_encoders_in_uat_and_prod_only():
+def test_encoder_gpu_job_runs_the_gpu_encoders():
     """spec 002 T017: the encoders that need a GPU, and GatorTron-base at a lower learning rate."""
     root, jobs = _load()
-    assert "encoder_gpu" not in jobs and "encoder_gpu" not in root["targets"]["dev"].get("resources", {}).get("jobs", {})
-    for env in ("uat", "prod"):
-        j = root["targets"][env]["resources"]["jobs"]["encoder_gpu"]
-        cluster = j["job_clusters"][0]["new_cluster"]
-        assert cluster["node_type_id"] == "${var.gpu_node_type}" and "gpu" in root["variables"]["gpu_spark_version"]["default"]
-        t = j["tasks"][0]
-        assert t["job_cluster_key"] == j["job_clusters"][0]["job_cluster_key"]
-        p = t["notebook_task"]["base_parameters"]
-        assert p["rungs"] == "${var.encoder_gpu_rungs}" and p["lr_overrides"] == "${var.encoder_gpu_lr}"
-        assert p["landing_schema"] == "${resources.volumes.data.schema_name}"
+    p = jobs["encoder_gpu"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert p["rungs"] == "${var.encoder_gpu_rungs}" and p["lr_overrides"] == "${var.encoder_gpu_lr}"
+    assert p["landing_schema"] == "${resources.volumes.data.schema_name}"
     assert set(root["variables"]["encoder_gpu_rungs"]["default"].split(",")) == GPU_ENCODERS
     lr = dict(x.split("=") for x in root["variables"]["encoder_gpu_lr"]["default"].split(","))
     assert set(lr) == {"gatortron-base"} and 1e-5 <= float(lr["gatortron-base"]) <= 2e-5
@@ -261,6 +262,7 @@ def test_encoder_gpu_notebook_runs_the_script_and_keeps_the_predictions():
     nb = (ROOT / "databricks/notebooks/08_encoder_gpu.py").read_text()
     assert "scripts/11_ai_predict.py" in nb and "--lr" in nb
     assert "/Volumes/" in nb and "encoder_gpu" in nb          # predictions copied to the landing volume
+    assert "local_disk0" not in nb                           # serverless has no local_disk0
     assert "saveAsTable" in nb                                # and kept as a table
 
 
