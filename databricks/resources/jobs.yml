@@ -84,8 +84,8 @@ resources:
       tasks:
         - task_key: read_notes
           environment_key: gpu
-          max_retries: 2                    # serverless GPU can fail to start or to restart Python
-          min_retry_interval_millis: 120000
+          max_retries: 6                    # serverless GPU can fail to start (no GPU free) or to restart Python;
+          min_retry_interval_millis: 1800000  # 30 min apart, so a run keeps trying for ~4.5 hours
           retry_on_timeout: true
           compute:
             hardware_accelerator: ${var.gpu_accelerator}
@@ -112,8 +112,8 @@ resources:
       tasks:
         - task_key: fine_tune_and_predict
           environment_key: gpu
-          max_retries: 2                    # serverless GPU can fail to start or to restart Python
-          min_retry_interval_millis: 120000
+          max_retries: 6                    # serverless GPU can fail to start (no GPU free) or to restart Python;
+          min_retry_interval_millis: 1800000  # 30 min apart, so a run keeps trying for ~4.5 hours
           retry_on_timeout: true
           compute:
             hardware_accelerator: ${var.gpu_accelerator}
