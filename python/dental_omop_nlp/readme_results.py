@@ -309,7 +309,8 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
             "(LoRA needs a GPU)."]
     summary = tab.assign(rank=[_rank(ranks[s]) for s in tab.index], n_missing=len(missing),
                          **{k: [bd[s][k] for s in tab.index] for k in ("correct", "dx_said_no", "dx_said_yes",
-                                                                         "stage", "no_answer")})
+                                                                         "stage", "no_answer")},
+                         **{k: [yn[s][k] for s in tab.index] for k in ("sensitivity", "specificity")})
     return "\n".join(out), summary
 
 
@@ -384,19 +385,25 @@ def results_markdown(inp: dict) -> str:
     ph = ph.assign(group=[phenotype_group(s) for s in ph.index])
     de = de.assign(group=[deid_group(m) for m in de.index])
     n_charts = len(inp["preds"])
+    n_neg = int((~inp["preds"]["truth"].str.startswith("periodontitis")).sum())
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
            f"Best method in each group, counted on the {n_charts} review charts; groups ordered by their best. Rank: "
            f"where it plausibly ranks among all {len(ph)} methods. *Stage 4 rule*: keyword rules decide stage 4, "
-           "which the trained AI rarely learned (few stage 4 notes to learn from). " + PHENOTYPE_KEY, "",
-           f"| Group | Best method | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | {COL_NO_ANSWER} | "
-           "Total charts | Rank | Methods in group |",
-           "|---|---|---:|---:|---:|---:|---:|---:|---|---:|"]
+           "which the trained AI rarely learned (few stage 4 notes to learn from). " + PHENOTYPE_KEY +
+           f" **Specificity**: of the {n_neg} charts without periodontitis, the share correctly called \"no\"; "
+           "periodontitis incorrectly assigned is what lowers it. **Sensitivity**: of the "
+           f"{n_charts - n_neg} charts with periodontitis, the share correctly called \"yes\"; periodontitis "
+           "incorrectly ruled out lowers it, and so does no answer.", "",
+           f"| Group | Best method | Correct | {COL_ASSIGNED} | Specificity | {COL_NOT_ASSIGNED} | Sensitivity | "
+           f"Incorrect stage | {COL_NO_ANSWER} | Total charts | Rank | Methods in group |",
+           "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|"]
     for g in _by_best(ph, PHENOTYPE_GROUPS, "accuracy"):
         sub = ph[ph.group == g]
         s, r = sub.index[0], sub.iloc[0]
-        nums = [round(n_charts * r[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage", "no_answer")]
-        out.append(f"| {g} | {plain_system(s)} | " + " | ".join(map(str, nums)) +
-                   f" | {n_charts} | {r['rank']} | {len(sub)} |")
+        c, yes, no, st, na = [round(n_charts * r[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage",
+                                                                "no_answer")]
+        out.append(f"| {g} | {plain_system(s)} | {c} | {yes} | {_pct(r['specificity'])} | {no} | "
+                   f"{_pct(r['sensitivity'])} | {st} | {na} | {n_charts} | {r['rank']} | {len(sub)} |")
     out += ["", f"All {len(ph)} methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, "
             f"and the {int(ph['n_missing'].iloc[0])} models not run yet: "
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "",

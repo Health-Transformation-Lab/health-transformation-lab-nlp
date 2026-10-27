@@ -153,6 +153,12 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
         assert "left in" not in de and "Valid text" not in de
 
 
+def test_sensitivity_and_specificity_sit_next_to_the_counts_they_summarise(summary):
+    header = next(x for x in _section(summary, rr.PHENOTYPE_TITLE).splitlines() if x.startswith("| Group"))
+    cols = [c.strip() for c in header.split("|")]
+    assert cols[4:8] == [rr.COL_ASSIGNED, "Specificity", rr.COL_NOT_ASSIGNED, "Sensitivity"]
+
+
 def test_readme_says_method_in_both_tables(summary):
     for title in (rr.PHENOTYPE_TITLE, rr.DEID_TITLE):
         header = next(x for x in _section(summary, title).splitlines() if x.startswith("| Group"))
@@ -186,12 +192,14 @@ def test_readme_phenotype_rows_are_counts_that_add_to_the_total(inp, summary, md
     preds, key = inp["preds"], inp["key"].reindex(inp["preds"].index)
     for r in rows:
         s = best[_cell(r, 1)]
-        nums = [int(_cell(r, i)) for i in (3, 4, 5, 6, 7)]
-        total = int(_cell(r, 8))
+        nums = [int(_cell(r, i)) for i in (3, 4, 6, 8, 9)]
+        total = int(_cell(r, 10))
         assert total == len(preds) == 240 and sum(nums) == total, r
         pred = preds[s] if s in preds else key[s]
         b = rr.breakdown(preds["truth"], pred.where(pred.isin(rr.LABELS)))
         assert nums == [round(total * b[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage", "no_answer")]
+        yn = rr.yes_no(preds["truth"], pred.where(pred.isin(rr.LABELS)))
+        assert (_cell(r, 5), _cell(r, 7)) == (rr._pct(yn["specificity"]), rr._pct(yn["sensitivity"])), r
 
 
 def test_plain_names():
