@@ -106,3 +106,16 @@ def test_actions_run_on_node_24():
     for wf in (ROOT / ".github" / "workflows").glob("*.yml"):
         text = wf.read_text()
         assert "actions/checkout@v4" not in text and "actions/setup-python@v5" not in text, wf.name
+
+
+def test_merge_to_main_deploys_dev_and_uat_and_a_manual_run_only_its_target():
+    """Spec 012 US1: dev stays current. A push deploys every environment (each still skips
+    without its client secret); workflow_dispatch deploys the one target chosen."""
+    doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
+    job = doc["jobs"]["deploy"]
+    matrix = job["strategy"]["matrix"]["target"]
+    assert "workflow_dispatch" in matrix and "github.event.inputs.target" in matrix
+    assert '["dev","uat"]' in matrix.replace(" ", "")
+    assert job["strategy"]["fail-fast"] is False          # dev failing mustn't cancel uat
+    assert job["environment"] == "${{ matrix.target }}" and job["env"]["TARGET"] == "${{ matrix.target }}"
+    assert "deploy-${{ matrix.target }}" in str(job.get("concurrency", ""))

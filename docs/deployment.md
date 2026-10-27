@@ -13,7 +13,7 @@ variables.
 |---|---|---|---|
 | Purpose | your sandbox (e.g. Free Edition) | shared test | production |
 | Bundle mode | default (no name prefixes; schedules paused by preset) | `production` | `production` |
-| Deployed by | you, from your laptop | CI on push to `main`, or on demand | CI on demand, after approval |
+| Deployed by | CI on push to `main`, or you from your laptop | CI on push to `main`, or on demand | CI on demand, after approval |
 | Runs as | you | service principal | service principal |
 | Workspace path | your home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
 | Workspace | your dev workspace | the UAT workspace | the prod workspace |
@@ -95,7 +95,7 @@ databricks bundle run      -t dev study_benchmark
 - `.github/workflows/ci.yml`: Python tests (including `tests/test_bundle.py`,
   which checks the three targets, variables, notebook paths and parameters),
   R parity, and `bundle validate` for all targets when dev credentials exist.
-- `.github/workflows/deploy.yml`: push to `main` deploys **uat**; run it
+- `.github/workflows/deploy.yml`: push to `main` deploys **dev** and **uat** (each skips until its environment has the client secret); run it
   manually to choose dev, uat or prod. Prod waits for approval.
 
 One-time setup, per target (the same steps worked on a Free Edition workspace, which
