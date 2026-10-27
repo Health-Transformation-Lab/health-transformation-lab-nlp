@@ -20,7 +20,7 @@ variables.
 | Catalog | `dental_omop` (schemas below) | same | same |
 | `n_people` | 300 | 1,500 | 1,500 |
 | DistilBERT in the benchmark job (`run_encoder`) | no (baselines only, ~3 min; no torch install) | yes | yes |
-| MedGemma GPU job | no (run notebook 03 on serverless GPU) | yes, single-node GPU cluster | yes, all review notes |
+| GPU jobs (MedGemma reader, encoders) | yes, serverless GPU | yes, serverless GPU | yes, serverless GPU, all review notes |
 
 Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
 schema names are the same everywhere. One catalog, one schema per layer:
@@ -80,7 +80,8 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
 | `hf_secret_scope` | `dental` | secret scope with `hf_token` |
-| `gpu_node_type`, `gpu_spark_version` | `g5.2xlarge`, `16.4.x-gpu-ml-scala2.12` | GPU job cluster (uat/prod; AWS node type, change on Azure/GCP) |
+| `gpu_accelerator` | `GPU_1xA10` | serverless GPU for the GPU jobs (Free Edition offers A10) |
+| `encoder_gpu_rungs`, `encoder_gpu_lr` | the five GPU encoders; `gatortron-base=2e-5` | what the encoder GPU job fine-tunes, and learning-rate overrides |
 | `lakebase_instance`, `lakebase_database`, `lakebase_schema` | `dental-dev` / `-uat` / `-prod`, `databricks_postgres`, `cdm_dev` / `cdm` | where the OMOP CDM goes in Lakebase |
 | `service_principal` | placeholder id | who runs uat/prod jobs |
 | `users_group` | `users` | group given CAN_VIEW on uat/prod jobs |
@@ -95,7 +96,8 @@ Override any variable with `--var name=value`, or the environment variable
 | `study_benchmark` | `01_run_benchmark.py`: build synthetic study, baselines, Delta tables | serverless |
 | `llm_judge` | `02_llm_judge.sql`: judge with `ai_query` | SQL warehouse |
 | `load_lakebase` | `04_load_lakebase.py`: OMOP CDM 5.4 + dental extension into Lakebase (Postgres) | serverless |
-| `medgemma_reader` (uat/prod) | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | single-node GPU |
+| `medgemma_reader` | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | serverless GPU |
+| `encoder_gpu` | `08_encoder_gpu.py`: fine-tunes the encoders that need a GPU (large ModernBERTs, Longformers, GatorTron-base at a lower learning rate; spec 002 T017); predictions to the landing volume and `encoder_gpu_predictions` | serverless GPU |
 
 ## Run in dev from your laptop
 
@@ -160,7 +162,7 @@ its own workspace: names are the same in all three, so they can't share one.
    gh secret set   DATABRICKS_CLIENT_SECRET -R <owner>/dental-omop-nlp -e uat
    ```
    Optional variables: `JUDGE_ENDPOINT`, `WAREHOUSE_NAME` (default
-   `Serverless Starter Warehouse`), `GPU_NODE_TYPE`, `USERS_GROUP` (default `users`).
+   `Serverless Starter Warehouse`), `USERS_GROUP` (default `users`).
    Give `prod` required reviewers (Settings → Environments → prod).
 4. **Check the sign-in:** Actions → `auth_check` → Run workflow, environment `uat`. It
    should print a `userName` equal to `DATABRICKS_CLIENT_ID`. Before the secret

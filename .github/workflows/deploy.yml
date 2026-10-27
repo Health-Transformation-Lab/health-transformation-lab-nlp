@@ -6,7 +6,7 @@
 #   variables DATABRICKS_HOST, DATABRICKS_CLIENT_ID; secret DATABRICKS_CLIENT_SECRET
 # (an older setup with HOST / CLIENT_ID as secrets still works), and variables passed to the
 # bundle as BUNDLE_VAR_<name>, e.g.
-#   SERVICE_PRINCIPAL, JUDGE_ENDPOINT, WAREHOUSE_NAME, GPU_NODE_TYPE, USERS_GROUP
+#   SERVICE_PRINCIPAL, JUDGE_ENDPOINT, WAREHOUSE_NAME, USERS_GROUP
 name: deploy
 on:
   push:
@@ -40,7 +40,6 @@ jobs:
       TARGET: ${{ matrix.target }}
       BUNDLE_VAR_service_principal: ${{ vars.SERVICE_PRINCIPAL }}
       BUNDLE_VAR_warehouse_name: ${{ vars.WAREHOUSE_NAME || 'Serverless Starter Warehouse' }}
-      BUNDLE_VAR_gpu_node_type: ${{ vars.GPU_NODE_TYPE || 'g5.2xlarge' }}
       BUNDLE_VAR_users_group: ${{ vars.USERS_GROUP || 'users' }}
     steps:
       - uses: actions/checkout@v6

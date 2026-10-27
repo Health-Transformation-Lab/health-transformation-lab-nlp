@@ -1,12 +1,11 @@
 # Jobs deployed to every target. Notebook tasks without a cluster run on
-# serverless compute (the only option on Free Edition). The MedGemma GPU job is
-# defined per target in databricks.yml (uat/prod); in dev, run
-# databricks/notebooks/03_medgemma_reader.py interactively on serverless GPU.
+# serverless compute (the only option on Free Edition); the GPU jobs below ask
+# for a serverless GPU per task (compute.hardware_accelerator).
 
 resources:
   jobs:
     study_benchmark:
-      name: dental-omop-nlp study + benchmark (${bundle.target})
+      name: Benchmark
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -24,7 +23,7 @@ resources:
               experiment_id: ${resources.experiments.dental_experiment.id}
 
     load_lakebase:
-      name: dental-omop-nlp load OMOP into Lakebase (${bundle.target})
+      name: Load Lakebase
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -39,7 +38,7 @@ resources:
               secret_scope: ${var.hf_secret_scope}
 
     judge_scorecard:
-      name: dental-omop-nlp judge scorecard (${bundle.target})
+      name: Judge scorecard
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -57,7 +56,7 @@ resources:
               max_usd: "5"
 
     llm_judge:
-      name: dental-omop-nlp LLM judge via ai_query (${bundle.target})
+      name: LLM judge
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -70,3 +69,42 @@ resources:
               catalog: ${resources.schemas.gold.catalog_name}
               schema: ${resources.schemas.gold.name}
               judge_endpoint: ${var.judge_endpoint}
+
+    # GPU jobs on serverless GPU (Free Edition has it; one A10 by default, var.gpu_accelerator).
+    # Run on demand: no schedule.
+    medgemma_reader:
+      name: MedGemma reader
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: read_notes
+          compute:
+            hardware_accelerator: ${var.gpu_accelerator}
+          notebook_task:
+            notebook_path: ../notebooks/03_medgemma_reader.py
+            base_parameters:
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
+              rung: ${var.reader_rung}
+              limit: ${var.reader_limit}
+              shots: "0"
+              hf_secret_scope: ${var.hf_secret_scope}
+
+    encoder_gpu:
+      name: Encoders on GPU
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: fine_tune_and_predict
+          compute:
+            hardware_accelerator: ${var.gpu_accelerator}
+          notebook_task:
+            notebook_path: ../notebooks/08_encoder_gpu.py
+            base_parameters:
+              rungs: ${var.encoder_gpu_rungs}
+              lr_overrides: ${var.encoder_gpu_lr}
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
+              landing_schema: ${resources.volumes.data.schema_name}

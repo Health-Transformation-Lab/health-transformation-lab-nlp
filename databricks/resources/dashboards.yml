@@ -3,6 +3,6 @@
 resources:
   dashboards:
     scorecard:
-      display_name: dental-omop-nlp scorecard
+      display_name: Scorecard
       file_path: ../dashboards/scorecard.lvdash.json
       warehouse_id: ${var.warehouse_id}

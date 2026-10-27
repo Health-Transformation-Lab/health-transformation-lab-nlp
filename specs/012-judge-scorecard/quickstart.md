@@ -17,7 +17,7 @@ equal to the README's numbers; parity passes.
 1. Merge to `main` (non-doc change): the `deploy` run shows a `dev` job that deploys (FR-001).
 2. Run the `judge_scorecard` job (or `deploy` with `run_benchmark`). The job prints the queue
    size and the estimated cost before calling the endpoint.
-3. Open the dashboard *dental-omop-nlp scorecard*: Phenotyping page shows truth vs judge per
+3. Open the dashboard *Scorecard*: Phenotyping page shows truth vs judge per
    system; filter a system to see per-chart answers, judge status, verdict and quote.
    De-identification page shows the existing de-id scores.
 4. Open the MLflow experiment: one trace per judge call.

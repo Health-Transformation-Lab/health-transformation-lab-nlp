@@ -91,11 +91,19 @@ def test_job_notebooks_have_no_placeholders_left():
         assert not any("<catalog>" in c or "<schema>" in c for c in code), name
 
 
-def test_medgemma_gpu_job_only_in_uat_and_prod():
+def test_gpu_jobs_run_on_serverless_gpu_in_every_target():
+    """Free Edition (the dev workspace) has serverless GPU, so the GPU jobs are in every target and ask
+    for a serverless GPU per task; no job cluster or node type."""
     root, jobs = _load()
-    assert "medgemma_reader" not in jobs
-    for env in ("uat", "prod"):
-        assert "medgemma_reader" in root["targets"][env]["resources"]["jobs"]
+    for name in ("medgemma_reader", "encoder_gpu"):
+        j = jobs[name][0]
+        assert "job_clusters" not in j, name
+        for t in j["tasks"]:
+            assert t["compute"] == {"hardware_accelerator": "${var.gpu_accelerator}"} and "job_cluster_key" not in t
+        for env, tgt in root["targets"].items():
+            assert name not in tgt.get("resources", {}).get("jobs", {}), (name, env)
+    assert root["variables"]["gpu_accelerator"]["default"] == "GPU_1xA10"
+    assert not {"gpu_node_type", "gpu_spark_version"} & set(root["variables"])
 
 
 def test_mlflow_experiment_and_uc_model_per_target():
@@ -233,3 +241,48 @@ def test_dev_catalog_states_its_default_storage_root():
     assert dev["storage_root"].startswith("s3://") and "/uc/" in dev["storage_root"]
     for env in ("uat", "prod"):
         assert "catalogs" not in root["targets"][env].get("resources", {})
+
+
+GPU_ENCODERS = {"modernbert-large", "bioclinical-modernbert-large", "longformer-base", "clinical-longformer",
+                "gatortron-base"}
+
+
+def test_encoder_gpu_job_runs_the_gpu_encoders():
+    """spec 002 T017: the encoders that need a GPU, and GatorTron-base at a lower learning rate."""
+    root, jobs = _load()
+    p = jobs["encoder_gpu"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert p["rungs"] == "${var.encoder_gpu_rungs}" and p["lr_overrides"] == "${var.encoder_gpu_lr}"
+    assert p["landing_schema"] == "${resources.volumes.data.schema_name}"
+    assert set(root["variables"]["encoder_gpu_rungs"]["default"].split(",")) == GPU_ENCODERS
+    lr = dict(x.split("=") for x in root["variables"]["encoder_gpu_lr"]["default"].split(","))
+    assert set(lr) == {"gatortron-base"} and 1e-5 <= float(lr["gatortron-base"]) <= 2e-5
+
+
+def test_encoder_gpu_notebook_runs_the_script_and_keeps_the_predictions():
+    nb = (ROOT / "databricks/notebooks/08_encoder_gpu.py").read_text()
+    assert "scripts/11_ai_predict.py" in nb and "--lr" in nb
+    assert "/Volumes/" in nb and "encoder_gpu" in nb          # predictions copied to the landing volume
+    assert "local_disk0" not in nb                           # serverless has no local_disk0
+    assert "saveAsTable" in nb                                # and kept as a table
+
+
+def test_every_model_that_can_be_scored_has_a_plain_name():
+    import yaml
+    from dental_omop_nlp import readme_results as rr
+    reg = yaml.safe_load((ROOT / "models.yaml").read_text())
+    for m in reg["models"]:
+        if m["role"] in ("classifier", "long_context", "llm"):
+            assert "_" not in rr.plain_system(m["id"]) and rr.plain_system(m["id"] + "+lr2e-05"), m["id"]
+    assert "learning rate" in rr._model_method("gatortron-base+lr2e-05")
+
+
+def test_job_and_dashboard_names_are_short_and_the_same_in_every_target():
+    """Readable on a phone; no per-target suffix (CLAUDE.md: names identical in every target)."""
+    root, jobs = _load()
+    names = [j["name"] for j, _ in jobs.values()]
+    names += [j["name"] for t in root["targets"].values() for j in t.get("resources", {}).get("jobs", {}).values()]
+    for f in (ROOT / "databricks" / "resources").glob("*.yml"):
+        names += [d["display_name"] for d in (yaml.safe_load(f.read_text())["resources"].get("dashboards") or {}).values()]
+    assert len(names) >= 8
+    for n in names:
+        assert len(n) <= 20 and "${bundle.target}" not in n and "dental-omop-nlp" not in n, n

@@ -40,7 +40,7 @@ END = "<!-- results:end -->"
 PHENOTYPE_TITLE = "### Phenotyping: periodontal status per chart"
 DEID_TITLE = "### De-identification"
 JUDGE_TITLE = "#### LLM judge: every system against an LLM's reading"   # part of phenotyping
-DASHBOARD = "dental-omop-nlp scorecard"
+DASHBOARD = "Scorecard"
 NOT_RUN = "**Not run yet:**"
 OTHER_SETS_TITLE = "#### The other note sets"
 DEID_SETS = {"unseen": "#### Synthetic dental notes, hardest tier only",
@@ -75,7 +75,9 @@ _PLAIN = {"algorithm_v0": "Gum measurements first", "algorithm_design": "Exam fo
           "radiograph_ai": "X-ray AI reading", "note_rules": "Keyword rules", "tfidf_logreg": "Word counts",
           "fusion_tfidf_rad": "Word counts + X-ray reading", "bert-base": "BERT", "distilbert-base": "DistilBERT",
           "modernbert-base": "ModernBERT", "bio-clinicalbert": "Bio ClinicalBERT", "biomedbert": "BiomedBERT",
-          "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT"}
+          "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT",
+          "modernbert-large": "ModernBERT large", "bioclinical-modernbert-large": "BioClinical ModernBERT large",
+          "longformer-base": "Longformer", "clinical-longformer": "Clinical-Longformer", "gatortron-base": "GatorTron"}
 _PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Presidio", "regex_v2": "patterns",
                "regex": "patterns (first version)", "guard": "dental-word guard", "routed": "routed by identifier type"}
 
@@ -292,18 +294,28 @@ def out_of_100(shares) -> list[int]:
 COL_ASSIGNED = "Periodontitis incorrectly assigned (when not present)"
 COL_NOT_ASSIGNED = "Periodontitis incorrectly ruled out (when present)"
 COL_NO_ANSWER = "No answer (evidence not available)"
-PHENOTYPE_KEY = ("**Correct**: the right status (healthy, gingivitis, or periodontitis stage "
-                 "1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. "
-                 "**Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect "
-                 "stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or "
-                 "healthy and gingivitis mixed up. **No answer (evidence not available)**: the method gave no status "
-                 "because what it reads wasn't in the record, e.g. no probing chart was taken.")
+def _bullets(terms) -> str:
+    return "\n".join(f"- **{t}**: {d}" for t, d in terms)
+
+
+PHENOTYPE_TERMS = [
+    ("Correct", "the right status (healthy, gingivitis, or periodontitis stage 1–4)."),
+    ("Periodontitis incorrectly assigned", "said periodontitis, but the patient doesn't have it."),
+    ("Periodontitis incorrectly ruled out", "the patient has periodontitis, but the method said they don't."),
+    ("Incorrect stage", "right that it is or isn't periodontitis, but the wrong stage (1 mild to 4 most severe), "
+                        "or healthy and gingivitis mixed up."),
+    ("No answer (evidence not available)", "the method gave no status because what it reads wasn't in the record, "
+                                           "e.g. no probing chart was taken."),
+]
+PHENOTYPE_KEY = _bullets(PHENOTYPE_TERMS)
 COL_LEAKED = "Text that is sensitive (PHI) incorrectly leaked"
 COL_SCRUBBED = "Text that is not sensitive incorrectly scrubbed"
-DEID_KEY = ("**Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should "
-            "have removed but left in (one character left counts). **Text that is not sensitive incorrectly "
-            "scrubbed**: dental words that look like a name "
-            "or code (Glickman, Gracey 11/12, 6-5-6) that the method removed.")
+DEID_KEY = _bullets([
+    (COL_LEAKED, "patient names, dates and IDs the method should have removed but left in (one character left "
+                 "counts). This risks patients."),
+    (COL_SCRUBBED, "dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method "
+                   "removed. This damages the note the AI reads."),
+])
 
 
 def _pct(x, d=0) -> str:
@@ -334,7 +346,8 @@ def _model_method(method: str) -> str:
          "TF-IDF + radiograph features" if b == "fusion_tfidf_rad" else
          "zero-shot LLM" if b.startswith("medgemma") else "fine-tuned encoder")
     mods = {"cw": "class-weighted", "s1": "seed 1", "s2": "seed 2", "rules4": "+ rules for stage IV"}
-    return ", ".join([s, *[mods[m] for m in method.split("+")[1:] if m in mods]])
+    extra = [mods.get(m) or (f"learning rate {m[2:]}" if m.startswith("lr") else None) for m in method.split("+")[1:]]
+    return ", ".join([s, *[e for e in extra if e]])
 
 
 def phenotype_systems(inp) -> dict:
@@ -369,11 +382,14 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
            "that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the "
            "method's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
            "means it plausibly ranks anywhere from 1st to 3rd.", "",
-           "Numbers are per 100 charts. " + PHENOTYPE_KEY + " *Unsafe errors*: incorrect answers that could harm a patient "
-           "if acted on, e.g. a missed stage 3–4. *Stage 4 correct*: of the stage 4 patients, how many it called "
-           "stage 4. Easy / medium / hard: correct, out of 100, when the note states the 2017 diagnosis (L1), "
-           "states it in older terms (L2), or leaves it to be inferred from the findings (L3). For statisticians: "
-           "sensitivity, specificity, PPV and NPV for periodontitis yes/no, with no answer counted as no.", "",
+           "Numbers are per 100 charts. What the columns mean:", "",
+           PHENOTYPE_KEY + "\n" + _bullets([
+               ("Unsafe errors", "incorrect answers that could harm a patient if acted on, e.g. a missed stage 3–4."),
+               ("Stage 4 correct", "of the stage 4 patients, how many it called stage 4."),
+               ("Easy / medium / hard", "correct, out of 100, when the note states the 2017 diagnosis (L1), states it "
+                                        "in older terms (L2), or leaves it to be inferred from the findings (L3)."),
+               ("Sensitivity, specificity, PPV, NPV", "for statisticians: periodontitis yes/no, with no answer "
+                                                      "counted as no.")]), "",
            f"| Rank | Method | Input | Approach | Correct (95% CI) | {COL_ASSIGNED} | "
            f"{COL_NOT_ASSIGNED} | Incorrect stage | {COL_NO_ANSWER} | Unsafe errors | Sensitivity | Specificity | "
            "PPV | NPV | Stage 4 correct | Easy / medium / hard |",
@@ -433,8 +449,8 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
         return of(t.loc[m, "n_phi"] * (1 - t.loc[m, "entity_recall"]), t.loc[m, "n_phi"])
 
     out = [DEID_TITLE, "",
-           "Counts on each note set. " + DEID_KEY + " Leaking sensitive text risks patients; scrubbing text that "
-           "isn't sensitive damages the note the AI reads, so read them together. "
+           "Counts on each note set. What the columns mean (read them together):", "",
+           DEID_KEY, "",
            "[More on these numbers](deidentification.md#how-to-read-the-numbers).", "",
            f"**Synthetic dental notes**: {n_notes} notes with fake PHI, {n_phi:,} identifiers and {n_words:,} "
            "look-alike dental words. Ranked by sensitive text leaked, fewest first. The 95% range is the likely "
@@ -600,15 +616,22 @@ def results_markdown(inp: dict) -> str:
     n_charts = len(inp["preds"])
     n_neg = int((~inp["preds"]["truth"].str.startswith("periodontitis")).sum())
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
-           f"Counted on the {n_charts} review charts, by what is available to read: **1.** the whole dental record; "
-           "**2.** only the chart note (where structured data is missing), comparing the best trained AI with simple "
-           "keyword rules and a medical AI used as is; **3.** one part of the record by itself. *Stage 4 rule*: "
-           "keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). "
-           f"Rank: where it plausibly ranks among all {len(ph)} methods. " + PHENOTYPE_KEY +
-           f" **Specificity**: of the {n_neg} charts without periodontitis, the share correctly called \"no\"; "
-           "periodontitis incorrectly assigned is what lowers it. **Sensitivity**: of the "
-           f"{n_charts - n_neg} charts with periodontitis, the share correctly called \"yes\"; periodontitis "
-           "incorrectly ruled out lowers it, and so does no answer.", "",
+           f"Counted on the {n_charts} review charts, by what is available to read:", "",
+           "1. **The whole dental record**",
+           "2. **Only the chart note** (where structured data is missing): the best trained AI, simple keyword rules, "
+           "and a medical AI used as is",
+           "3. **One part of the record by itself**", "",
+           "What the columns mean:", "",
+           _bullets(PHENOTYPE_TERMS[:2] + [
+               ("Specificity", f"of the {n_neg} charts without periodontitis, the share correctly called \"no\". "
+                               "Periodontitis incorrectly assigned is what lowers it.")]
+               + PHENOTYPE_TERMS[2:3] + [
+               ("Sensitivity", f"of the {n_charts - n_neg} charts with periodontitis, the share correctly called "
+                               "\"yes\". Periodontitis incorrectly ruled out lowers it, and so does no answer.")]
+               + PHENOTYPE_TERMS[3:] + [
+               ("Rank", f"where it plausibly ranks among all {len(ph)} methods."),
+               ("Stage 4 rule", "keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 "
+                                "notes to learn from).")]), "",
            f"| Question | Method | Correct | {COL_ASSIGNED} | Specificity | {COL_NOT_ASSIGNED} | Sensitivity | "
            f"Incorrect stage | {COL_NO_ANSWER} | Total charts | Rank |",
            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
@@ -625,7 +648,8 @@ def results_markdown(inp: dict) -> str:
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}). " + _judge(inp)[1], "",
             DEID_TITLE, "",
             f"Best method in each group, counted on the {int(de['n_notes'].iloc[0])} synthetic notes; groups ordered "
-            f"by their best. Rank: where it plausibly ranks among all {len(de)} methods. " + DEID_KEY, "",
+            "by their best. What the columns mean:", "",
+            DEID_KEY + "\n" + _bullets([("Rank", f"where it plausibly ranks among all {len(de)} methods.")]), "",
             f"| Group | Best method | {COL_LEAKED} | {COL_SCRUBBED} | Rank | Methods in group |",
             "|---|---|---:|---:|---|---:|"]
     n_words = inp["n_decoys"]
