@@ -10,10 +10,10 @@
 
 ## Phase 2: Foundational
 
-- [ ] T002 Failing test in `python/tests/test_judge_scorecard.py`: `chart_answers()` returns one row per (visit_id, system) for the 240 review charts from `data/datasets/ladder/ladder_preds.csv` plus the phenotype systems in `answer_key/review_key.csv`, with `difficulty`; `answer` is one of six statuses or null
-- [ ] T003 Implement `chart_answers()` in `python/dental_omop_nlp/judge_scorecard.py` (paths via `dental_omop_nlp.paths`)
-- [ ] T004 Failing test: `judge_queue()` has one `status` row per chart and one `verdict` row per unique (visit_id, answer) with a non-null answer; unique on (visit_id, kind, answer); `note_text` from `review_key.csv`
-- [ ] T005 Implement `judge_queue()` and `estimate_cost(queue, usd_per_1m_in, usd_per_1m_out)` in `python/dental_omop_nlp/judge_scorecard.py`
+- [x] T002 Failing test in `python/tests/test_judge_scorecard.py`: `chart_answers()` returns one row per (visit_id, system) for the 240 review charts from `data/datasets/ladder/ladder_preds.csv` plus the phenotype systems in `answer_key/review_key.csv`, with `difficulty`; `answer` is one of six statuses or null
+- [x] T003 Implement `chart_answers()` in `python/dental_omop_nlp/judge_scorecard.py` (paths via `dental_omop_nlp.paths`)
+- [x] T004 Failing test: `judge_queue()` has one `status` row per chart and one `verdict` row per unique (visit_id, answer) with a non-null answer; unique on (visit_id, kind, answer); `note_text` from `review_key.csv`
+- [x] T005 Implement `judge_queue()` and `estimate_cost(queue, usd_per_1m_in, usd_per_1m_out)` in `python/dental_omop_nlp/judge_scorecard.py`
 
 ## Phase 3: User Story 1 - Dev deploys on merge (P1)
 

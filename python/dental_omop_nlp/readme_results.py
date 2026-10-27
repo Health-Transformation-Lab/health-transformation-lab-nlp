@@ -178,18 +178,30 @@ def _model_method(method: str) -> str:
     return ", ".join([s, *[mods[m] for m in method.split("+")[1:] if m in mods]])
 
 
-def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
-    preds, key, reg = inp["preds"], inp["key"].reindex(inp["preds"].index), inp["registry"]
-    truth = preds["truth"]
+def phenotype_systems(inp) -> dict:
+    """Every phenotyping system on the leaderboard: system -> (input, method), as the README describes it."""
     systems = {m: ("chart note" + (" + radiograph" if base_id(m) == "fusion_tfidf_rad" else ""), _model_method(m))
                for m in inp["ladder"]["method"]}
-    systems |= PHENOTYPES | EVIDENCE
-    pred = {s: (preds[s] if s in preds else key[s]).where(lambda x: x.isin(LABELS)) for s in systems}
+    return systems | PHENOTYPES | EVIDENCE
+
+
+def phenotype_predictions(inp) -> tuple[pd.Series, dict, pd.Series]:
+    """(truth, {system: status per review chart, NaN = no status}, note difficulty), indexed by visit_id.
+    The one place the leaderboard's inputs are assembled; the judge scorecard (spec 012) reuses it."""
+    preds = inp["preds"]
+    key = inp["key"].reindex(preds.index)
+    pred = {s: (preds[s] if s in preds else key[s]).where(lambda x: x.isin(LABELS)) for s in phenotype_systems(inp)}
+    return preds["truth"], pred, key["difficulty"]
+
+
+def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
+    reg = inp["registry"]
+    systems = phenotype_systems(inp)
+    truth, pred, level = phenotype_predictions(inp)
     tab = ladder_eval.ladder_table(truth, pred, n_boot=N_BOOT, seed=SEED, reference="").set_index("method")
     ranks = paired_rank_range({s: (pred[s] == truth).to_numpy() for s in systems})
     score = _shared_scorer()
     yn = {s: yes_no(truth, pred[s], score) for s in systems}
-    level = key["difficulty"]
     links = {m["id"]: f"https://huggingface.co/{m['hf']}" for m in reg["models"] if m.get("hf")}
     out = [PHENOTYPE_TITLE, "",
            "Every system that assigns one of the six periodontal statuses, on the same 240 synthetic review "
