@@ -56,9 +56,21 @@ judge_metrics_point <- function(answers, judgments, truth) {
     t_all <- judge_point(truth[ids], p[ids], lev[ids])
     t_j <- judge_point(truth[judged], p[judged], lev[judged])
     j <- judge_point(js[judged], p[judged], lev[judged])
+    # how well the judge caught this system's answers (Rogan-Gladen assumes the same rate for every system)
+    vd <- judgments[judgments$kind == "verdict", ]
+    a <- answers[answers$system == s & !is.na(answers$answer), ]
+    v <- vd[match(paste(a$visit_id, a$answer), paste(vd$visit_id, vd$answer)), ]
+    has <- v$verdict %in% c("correct", "incorrect") & as.logical(v$gate_ok) & !is.na(v$gate_ok)
+    right <- a$answer == truth[as.character(a$visit_id)]; ok <- v$verdict == "correct"
+    sh <- function(x, m) if (any(m)) mean(x[m]) else NA_real_
+    check <- c(judged_correct = sh(ok, has), verdict_sensitivity = sh(ok, has & right),
+               verdict_specificity = sh(!ok, has & !right))
     rows[[s]] <- data.frame(system = s, metric = JUDGE_METRICS, vs_truth = t_all[JUDGE_METRICS],
                             vs_truth_judged = t_j[JUDGE_METRICS], vs_judge = j[JUDGE_METRICS],
-                            difference = j[JUDGE_METRICS] - t_j[JUDGE_METRICS], n_judged = length(judged))
+                            difference = j[JUDGE_METRICS] - t_j[JUDGE_METRICS], n_judged = length(judged),
+                            judged_correct = ifelse(JUDGE_METRICS == "correct", check[["judged_correct"]], NA_real_),
+                            verdict_sensitivity = ifelse(JUDGE_METRICS == "correct", check[["verdict_sensitivity"]], NA_real_),
+                            verdict_specificity = ifelse(JUDGE_METRICS == "correct", check[["verdict_specificity"]], NA_real_))
   }
   out <- do.call(rbind, rows); rownames(out) <- NULL; out
 }
@@ -73,7 +85,7 @@ judge_agreement_point <- function(judgments, truth, level) {
     m <- g[[3]]; t <- truth[m]; j <- js[m]; has <- !is.na(j)
     data.frame(group = g[[1]], value = g[[2]], n = sum(m), coverage = mean(has),
                agreement = if (any(has)) mean(j[has] == t[has]) else NA_real_,
-               kappa = if (any(has)) cohen_kappa(t[has], j[has]) else NA_real_)
+               kappa = if (any(has) && g[[1]] != "truth_status") cohen_kappa(t[has], j[has]) else NA_real_)
   }))
 }
 

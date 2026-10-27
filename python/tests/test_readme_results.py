@@ -1,6 +1,8 @@
 """Results leaderboards (one per capability) are generated from committed results and stay in sync:
 a short summary in the README (best system per group) and the full tables in docs/results.md."""
 
+import re
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -31,7 +33,8 @@ def _rows(section):
 
 
 def _section(md, title):
-    return md.split(title, 1)[1].split("\n### ", 1)[0]
+    """The text under a heading, up to the next heading (its own subsections, e.g. the LLM judge, excluded)."""
+    return re.split(r"\n#{3,4} ", md.split(title, 1)[1], maxsplit=1)[0]
 
 
 def _cell(row, i):

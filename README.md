@@ -61,7 +61,7 @@ Best system in each group on the 240 review charts, groups ordered by their best
 
 All 38 systems, with the 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
-**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against the truth): not run yet; [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading), then the *dental-omop-nlp scorecard* dashboard in Databricks.
+**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against the truth): it agrees with the truth on 83% of the charts it reads (53% on hard notes); [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading), and the *dental-omop-nlp scorecard* dashboard in Databricks.
 
 ### De-identification
 

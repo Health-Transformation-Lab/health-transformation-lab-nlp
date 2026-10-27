@@ -356,7 +356,8 @@ for (pfx in c("", "simulated_")) {
   r <- judge_metrics_point(inp$answers, inp$judgments, inp$truth)
   py <- read.csv(sprintf("data/datasets/judge/%sjudge_metrics.csv", pfx), stringsAsFactors = FALSE)
   m <- merge(r, py, by = c("system", "metric"), suffixes = c(".r", ".p"))
-  cols <- c("vs_truth", "vs_truth_judged", "vs_judge", "difference", "n_judged")
+  cols <- c("vs_truth", "vs_truth_judged", "vs_judge", "difference", "n_judged", "judged_correct",
+            "verdict_sensitivity", "verdict_specificity")
   gap <- function(df, k) { x <- abs(df[[paste0(k, ".r")]] - df[[paste0(k, ".p")]]); max(ifelse(is.na(x), 0, x)) }
   same_na <- function(df, ks) all(sapply(ks, function(k) all(is.na(df[[paste0(k, ".r")]]) == is.na(df[[paste0(k, ".p")]]))))
   d <- max(sapply(cols, function(k) gap(m, k)))

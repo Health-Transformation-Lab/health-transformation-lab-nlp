@@ -55,7 +55,61 @@ Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or period
 
 #### LLM judge: every system against an LLM's reading
 
-**Not run yet.** Every system's answers scored against an LLM judge's own reading of each note, next to the truth, once `python/scripts/36_judge_scorecard.py --endpoint ...` or the `judge_scorecard` job in dev has run; then also the *dental-omop-nlp scorecard* dashboard in Databricks.
+The same 240 charts, each system's answers scored against the truth and against an LLM judge's own reading of each note (**LLM judgment**: `databricks-meta-llama-3-3-70b-instruct`, prompts `judge-status-v1`, `judge-v2`). The judge's agreement with the truth says how far it could stand in for an answer key on real notes; every number is computed in code, never by the LLM. In Databricks: the *dental-omop-nlp scorecard* dashboard.
+
+| Charts | Judge gave a status | Judge agrees with truth (95% CI) | Kappa |
+|---|---:|---|---:|
+| All charts (240) | 98% | **82.9%** (77.8%–87.6%) | 0.79 |
+| Easy note (141) | 98% | **95.7%** (92.0%–98.6%) | 0.95 |
+| Medium note (31) | 97% | **90.0%** (76.7%–100.0%) | 0.87 |
+| Hard note (68) | 97% | **53.0%** (40.9%–66.7%) | 0.43 |
+
+The judge reads only the note, like the note models; the truth and the rule phenotypes also use the exam form, codes and chart, so the judge can't know what a note leaves out (see hard notes). It caught between 26% and 90% of each system's wrong answers: the better the system, the subtler its mistakes and the more the judge misses. Correcting accuracy for the judge's errors (Rogan-Gladen) assumes one error rate for every system, so it isn't shown as a result; on real notes, check the judge on reviewed charts first.
+
+| System | Group | Correct, vs truth | vs judge | Difference | Judge called it correct | Wrong answers the judge caught |
+|---|---|---:|---:|---:|---:|---:|
+| `algorithm_v0` | Rule phenotype, whole record | 97.5% | 83.3% | -14.1 pts | 83% | 60% |
+| `modernbert-base+cw+s2+rules4` | Fine-tuned note model + rules for stage IV | 91.2% | 88.5% | -2.6 pts | 87% | 26% |
+| `modernbert-base+rules4` | Fine-tuned note model + rules for stage IV | 90.8% | 87.2% | -3.4 pts | 85% | 40% |
+| `modernbert-base+cw+rules4` | Fine-tuned note model + rules for stage IV | 90.8% | 87.2% | -3.4 pts | 84% | 45% |
+| `bert-base+rules4` | Fine-tuned note model + rules for stage IV | 90.4% | 87.6% | -2.6 pts | 84% | 43% |
+| `bio-clinicalbert+rules4` | Fine-tuned note model + rules for stage IV | 90.0% | 87.2% | -2.6 pts | 84% | 45% |
+| `bert-base+cw+rules4` | Fine-tuned note model + rules for stage IV | 90.0% | 86.3% | -3.4 pts | 84% | 48% |
+| `modernbert-base+cw+s1+rules4` | Fine-tuned note model + rules for stage IV | 89.6% | 88.0% | -1.3 pts | 85% | 41% |
+| `bioclinical-modernbert-base+rules4` | Fine-tuned note model + rules for stage IV | 89.2% | 87.2% | -1.7 pts | 84% | 46% |
+| `scibert+rules4` | Fine-tuned note model + rules for stage IV | 88.8% | 85.5% | -3.0 pts | 82% | 58% |
+| `distilbert-base+rules4` | Fine-tuned note model + rules for stage IV | 88.8% | 86.3% | -2.1 pts | 82% | 54% |
+| `fusion_tfidf_rad+rules4` | Note baselines (rules, TF-IDF) | 87.1% | 85.9% | -0.9 pts | 84% | 50% |
+| `tfidf_logreg+rules4` | Note baselines (rules, TF-IDF) | 86.7% | 86.8% | +0.4 pts | 83% | 53% |
+| `biomedbert+rules4` | Fine-tuned note model + rules for stage IV | 86.7% | 86.3% | +0.0 pts | 81% | 59% |
+| `modernbert-base+cw` | Fine-tuned note model | 83.8% | 76.1% | -7.7 pts | 76% | 67% |
+| `modernbert-base` | Fine-tuned note model | 82.1% | 74.4% | -7.7 pts | 76% | 65% |
+| `modernbert-base+cw+s2` | Fine-tuned note model | 81.7% | 74.8% | -6.8 pts | 78% | 59% |
+| `fusion_tfidf_rad` | Note baselines (rules, TF-IDF) | 80.8% | 75.6% | -5.1 pts | 76% | 68% |
+| `bert-base` | Fine-tuned note model | 80.8% | 73.9% | -6.8 pts | 75% | 65% |
+| `bio-clinicalbert` | Fine-tuned note model | 80.4% | 73.5% | -6.8 pts | 75% | 66% |
+| `probing_chart` | One evidence type alone | 80.4% | 67.1% | -12.8 pts | 82% | 50% |
+| `bert-base+cw` | Fine-tuned note model | 80.4% | 72.6% | -7.7 pts | 74% | 67% |
+| `modernbert-base+cw+s1` | Fine-tuned note model | 80.0% | 74.4% | -5.6 pts | 75% | 64% |
+| `bioclinical-modernbert-base` | Fine-tuned note model | 79.6% | 73.5% | -6.0 pts | 75% | 65% |
+| `distilbert-base` | Fine-tuned note model | 79.2% | 72.6% | -6.4 pts | 73% | 70% |
+| `scibert` | Fine-tuned note model | 79.2% | 71.8% | -7.3 pts | 72% | 72% |
+| `note_rules` | Note baselines (rules, TF-IDF) | 78.8% | 83.8% | +5.6 pts | 85% | 50% |
+| `tfidf_logreg` | Note baselines (rules, TF-IDF) | 77.1% | 73.1% | -3.8 pts | 74% | 67% |
+| `medgemma-1.5-4b-it+rules4` | Zero-shot LLM on the note | 77.1% | 83.8% | +6.8 pts | 85% | 49% |
+| `biomedbert` | Fine-tuned note model | 77.1% | 72.6% | -4.3 pts | 72% | 71% |
+| `medgemma-1.5-4b-it` | Zero-shot LLM on the note | 75.8% | 82.9% | +6.8 pts | 84% | 48% |
+| `algorithm_design` | Rule phenotype, whole record | 72.1% | 59.8% | -12.4 pts | 61% | 89% |
+| `exam_form` | One evidence type alone | 62.1% | 50.9% | -11.1 pts | 61% | 89% |
+| `proc_codes_planned` | One evidence type alone | 50.8% | 45.3% | -6.0 pts | 50% | 90% |
+| `proc_dx_planned` | One evidence type alone | 50.0% | 44.0% | -7.3 pts | 65% | 82% |
+| `proc_codes_completed` | One evidence type alone | 47.1% | 41.0% | -6.4 pts | 50% | 90% |
+| `proc_dx_completed` | One evidence type alone | 45.0% | 38.9% | -6.8 pts | 58% | 87% |
+| `radiograph_ai` | One evidence type alone | 17.5% | 16.7% | -0.9 pts | 62% | 77% |
+
+Every metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty) both ways: `data/datasets/judge/judge_metrics.csv`.
+
+**Cost and speed**: 742 calls, US$0.37 at the endpoint's list price (US$0.0016 per chart); latency median 1.3 s, 95th percentile 2.8 s; 42 answers failed the quote gate, 0 endpoint errors.
 
 ### De-identification
 

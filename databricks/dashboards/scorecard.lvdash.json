@@ -5,8 +5,8 @@
    "displayName": "ph_exact",
    "queryLines": [
     "SELECT `group` AS group_name, system, ROUND(100 * vs_truth, 1) AS `exact_truth`, ROUND(100 * vs_judge, 1) AS `exact_judge`,\n",
-    "  ROUND(100 * difference, 1) AS `difference`, ROUND(100 * corrected_accuracy, 1) AS `corrected`, ROUND(100 * ci_low, 1) AS `corrected_low`,\n",
-    "  ROUND(100 * ci_high, 1) AS `corrected_high`, n_judged FROM dental_omop.gold_dental_omop_perio.judge_metrics WHERE metric = 'correct'\n"
+    "  ROUND(100 * difference, 1) AS `difference`, ROUND(100 * judged_correct, 1) AS `judged_correct`, ROUND(100 * verdict_sensitivity, 1) AS `caught_right`,\n",
+    "  ROUND(100 * verdict_specificity, 1) AS `caught_wrong`, n_judged FROM dental_omop.gold_dental_omop_perio.judge_metrics WHERE metric = 'correct'\n"
    ]
   },
   {
@@ -194,16 +194,16 @@
            "expression": "`difference`"
           },
           {
-           "name": "corrected",
-           "expression": "`corrected`"
+           "name": "judged_correct",
+           "expression": "`judged_correct`"
           },
           {
-           "name": "corrected_low",
-           "expression": "`corrected_low`"
+           "name": "caught_right",
+           "expression": "`caught_right`"
           },
           {
-           "name": "corrected_high",
-           "expression": "`corrected_high`"
+           "name": "caught_wrong",
+           "expression": "`caught_wrong`"
           },
           {
            "name": "n_judged",
@@ -240,16 +240,16 @@
           "displayName": "Difference (points)"
          },
          {
-          "fieldName": "corrected",
-          "displayName": "Judge-corrected accuracy where it answers (%)"
+          "fieldName": "judged_correct",
+          "displayName": "Judge called it correct (%)"
          },
          {
-          "fieldName": "corrected_low",
-          "displayName": "95% CI low"
+          "fieldName": "caught_right",
+          "displayName": "Right answers the judge confirmed (%)"
          },
          {
-          "fieldName": "corrected_high",
-          "displayName": "95% CI high"
+          "fieldName": "caught_wrong",
+          "displayName": "Wrong answers the judge caught (%)"
          },
          {
           "fieldName": "n_judged",
@@ -261,7 +261,7 @@
         "showTitle": true,
         "title": "Correct: truth vs judge",
         "showDescription": true,
-        "description": "Judge-corrected accuracy adjusts for how often the judge's verdicts are wrong (Rogan-Gladen)"
+        "description": "The judge reads only the note. It misses more of the subtle mistakes good systems make, so check it on reviewed charts before trusting it on real notes."
        }
       }
      },

@@ -171,13 +171,25 @@ def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_b
         sample = by_pair.reindex(pd.MultiIndex.from_frame(a[["visit_id", "answer"]]))[["verdict", "gate_ok"]]
         ca = (corrected_accuracy(sample.reset_index(drop=True), vd.reset_index(drop=True), n_boot=n_boot, seed=seed)
               if len(sample) and len(vd) else {"accuracy_est": np.nan, "ci_low": np.nan, "ci_high": np.nan})
+        # Rogan-Gladen assumes the judge errs at the same rate for every system; on synthetic charts we can
+        # check it per system: of this system's right answers, the share called correct, and of its wrong
+        # answers, the share called incorrect (judged verdicts only), and the raw share called correct.
+        sv = sample.reset_index()
+        has_verdict = (sv["verdict"].isin(["correct", "incorrect"]) & sv["gate_ok"].fillna(False).astype(bool)).to_numpy()
+        right = (sv["answer"].to_numpy() == truth.reindex(sv["visit_id"]).to_numpy())
+        said_ok = (sv["verdict"] == "correct").to_numpy()
+        share = lambda x, m: float(x[m].mean()) if m.any() else np.nan
+        check = {"judged_correct": share(said_ok, has_verdict),
+                 "verdict_sensitivity": share(said_ok, has_verdict & right),
+                 "verdict_specificity": share(~said_ok, has_verdict & ~right)}
         for k in t_all:
             rows.append({"system": s, "metric": k, "vs_truth": t_all[k], "vs_truth_judged": t_j[k],
                          "vs_judge": j[k], "difference": j[k] - t_j[k], "n_judged": len(judged),
-                         **({"corrected_accuracy": ca["accuracy_est"], "ci_low": ca["ci_low"], "ci_high": ca["ci_high"]}
-                            if k == "correct" else {})})
+                         **({"corrected_accuracy": ca["accuracy_est"], "ci_low": ca["ci_low"], "ci_high": ca["ci_high"],
+                             **check} if k == "correct" else {})})
     out = pd.DataFrame(rows, columns=["system", "metric", "vs_truth", "vs_truth_judged", "vs_judge", "difference",
-                                      "n_judged", "corrected_accuracy", "ci_low", "ci_high"])
+                                      "n_judged", "corrected_accuracy", "ci_low", "ci_high", "judged_correct",
+                                      "verdict_sensitivity", "verdict_specificity"])
     out.insert(1, "group", out["system"].map(rr.phenotype_group))
     out.insert(3, "metric_label", out["metric"].map(METRIC_LABELS))
     return out
@@ -203,7 +215,8 @@ def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed
                  else f"{LEVEL_NAMES[v].capitalize()} note")
         rows.append({"group": g, "value": v, "label": label, "n": int(mask.sum()), "coverage": float(has.mean()),
                      "agreement": float(ok.mean()) if len(ok) else np.nan, "ci_low": float(lo), "ci_high": float(hi),
-                     "kappa": cohen_kappa(t[has], j[has]) if len(ok) else np.nan})
+                     # within one true status the truth doesn't vary: kappa is undefined there, not 0
+                     "kappa": cohen_kappa(t[has], j[has]) if len(ok) and g != "truth_status" else np.nan})
     return pd.DataFrame(rows)
 
 

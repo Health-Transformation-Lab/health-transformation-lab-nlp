@@ -375,12 +375,18 @@ def _judge(inp) -> tuple[str, str]:
             sec.append(f"| {r['label']} ({int(r['n'])}) | {_pct(r['coverage'])} | {_ci(r['agreement'], r['ci_low'], r['ci_high'])} | "
                        f"{r['kappa']:.2f} |")
     ex = m[m.metric == "correct"].sort_values("vs_truth", ascending=False)
-    sec += ["", ("| System | Group | Correct, vs truth | vs judge | Difference | "
-                 "Judge-corrected accuracy where it answers (95% CI) |"), "|---|---|---:|---:|---:|---|"]
+    spec = ex["verdict_specificity"]
+    sec += ["", ("The judge reads only the note, like the note models; the truth and the rule phenotypes also use "
+                 "the exam form, codes and chart, so the judge can't know what a note leaves out (see hard notes). "
+                 f"It caught between {_pct(spec.min())} and {_pct(spec.max())} of each system's wrong answers: "
+                 "the better the system, the subtler its mistakes and the more the judge misses. Correcting "
+                 "accuracy for the judge's errors (Rogan-Gladen) assumes one error rate for every system, so it "
+                 "isn't shown as a result; on real notes, check the judge on reviewed charts first."), "",
+            ("| System | Group | Correct, vs truth | vs judge | Difference | Judge called it correct | "
+             "Wrong answers the judge caught |"), "|---|---|---:|---:|---:|---:|---:|"]
     for r in ex.itertuples():
-        corr = "–" if pd.isna(r.corrected_accuracy) else _ci(r.corrected_accuracy, r.ci_low, r.ci_high)
         sec.append(f"| `{r.system}` | {r.group} | {_pct(r.vs_truth, 1)} | {_pct(r.vs_judge, 1)} | "
-                   f"{r.difference * 100:+.1f} pts | {corr} |")
+                   f"{r.difference * 100:+.1f} pts | {_pct(r.judged_correct)} | {_pct(r.verdict_specificity)} |")
     sec += ["", ("Every metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe "
                  "errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty) both ways: "
                  "`data/datasets/judge/judge_metrics.csv`.")]
@@ -391,7 +397,8 @@ def _judge(inp) -> tuple[str, str]:
                      f"percentile {t['latency_p95_s']:.1f} s; {int(t['gate_failures'])} answers failed the quote gate, "
                      f"{int(t['endpoint_errors'])} endpoint errors.")]
     line = (f"**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against "
-            f"the truth): it agrees with the truth on {_pct(allr['agreement'])} of the charts it reads; {link}, "
+            f"the truth): it agrees with the truth on {_pct(allr['agreement'])} of the charts it reads "
+            f"({_pct(a.loc[('difficulty', 'L3'), 'agreement'])} on hard notes); {link}, "
             f"and the *{DASHBOARD}* dashboard in Databricks.")
     return "\n".join(sec), line
 

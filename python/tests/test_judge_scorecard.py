@@ -305,3 +305,28 @@ def test_run_summary_reports_cost_and_speed_per_call_type():
     assert a["usd_per_chart"] == pytest.approx(a["usd"] / 2)
     assert a["latency_mean_s"] == pytest.approx(2.0)            # endpoint errors carry no latency
     assert r.loc["status", "latency_p95_s"] == pytest.approx(2.9)
+
+
+def test_kappa_is_blank_where_the_truth_doesnt_vary(inp, answers):
+    """Within one true status kappa is undefined, not 0."""
+    j = _perfect_judgments(inp, answers)
+    st = j.index[j["kind"] == "status"][::3]
+    j.loc[st, "judge_status"] = "gingivitis"            # a judge that errs, so its status varies within a group
+    a = js.judge_agreement(inp, j, n_boot=20)
+    assert a.loc[a.group == "truth_status", "kappa"].isna().all()
+    assert a.loc[a.group == "difficulty", "kappa"].notna().all()
+
+
+def test_correct_rows_show_how_well_the_judge_caught_each_systems_answers(inp, answers):
+    """Rogan-Gladen assumes the judge errs at the same rate for every system. On synthetic charts we can
+    check: the judge's share of this system's right answers it called correct (verdict_sensitivity) and
+    of its wrong answers it called incorrect (verdict_specificity), and the raw share it called correct."""
+    j = _perfect_judgments(inp, answers)
+    m = js.judge_metrics(inp, answers, j, n_boot=20).set_index(["system", "metric"])
+    r = m.loc[("note_rules", "correct")]
+    assert r["verdict_sensitivity"] == 1 and r["verdict_specificity"] == 1
+    assert r["judged_correct"] == pytest.approx(r["vs_truth"] / (1 - m.loc[("note_rules", "no_answer"), "vs_truth"]))
+    # a judge that calls everything correct catches no wrong answer
+    lenient = j.assign(verdict=j["verdict"].where(j["kind"] != "verdict", "correct"))
+    r2 = js.judge_metrics(inp, answers, lenient, n_boot=20).set_index(["system", "metric"]).loc[("note_rules", "correct")]
+    assert r2["judged_correct"] == 1 and r2["verdict_specificity"] == 0
