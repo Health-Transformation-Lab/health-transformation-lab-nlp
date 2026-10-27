@@ -108,7 +108,7 @@ def test_phenotype_leaderboard_has_every_system_best_first(inp, md):
     names = [_cell(r, 2) for r in rows]
     for s in systems:
         assert sum(f"`{s}`" == n or n.startswith(f"[`{s}`]") for n in names) == 1, s
-    acc = [float(_cell(r, 5).split("**")[1].rstrip("%")) for r in rows]
+    acc = [float(_cell(r, 5).split("**")[1].rstrip("%")) for r in rows]   # exact status right
     assert acc == sorted(acc, reverse=True)
     assert _cell(rows[0], 1).startswith("1")
 
@@ -120,12 +120,29 @@ def test_note_model_accuracy_and_ci_match_the_ladder_file(inp, md):
         assert f"**{r['accuracy']:.1%}** ({r['acc_lo']:.1%}–{r['acc_hi']:.1%})" in row, r["method"]
 
 
-def test_macro_f1_matches_sklearn(inp):
-    from sklearn.metrics import f1_score
-    from dental_omop_nlp.labels import LABELS
-    p = inp["preds"]
-    want = f1_score(p["truth"], p["note_rules"].fillna("none"), labels=LABELS, average="macro", zero_division=0)
-    assert rr.macro_f1(p["truth"], p["note_rules"]) == pytest.approx(want)
+def test_periodontitis_yes_no_columns_match_the_shared_scorer(inp, md):
+    import sys
+    sys.path.insert(0, str(REPO_ROOT / "eval"))
+    from score import score
+    rows = _rows(_section(md, rr.PHENOTYPE_TITLE))
+    for s in ("note_rules", "medgemma-1.5-4b-it", "algorithm_v0", "exam_form"):
+        pred = inp["preds"][s] if s in inp["preds"] else inp["key"].reindex(inp["preds"].index)[s]
+        res = score(inp["preds"]["truth"], pred.where(pred.isin(rr.LABELS)).fillna("none"), None, s)
+        m = res[res["class"] == ""].set_index("metric")["value"]
+        row = next(r for r in rows if _cell(r, 2) == f"`{s}`" or _cell(r, 2).startswith(f"[`{s}`]"))
+        assert [_cell(row, i) for i in (6, 7, 8, 9)] == [rr._pct(m[k]) for k in ("sensitivity", "specificity", "ppv", "npv")], s
+
+
+def test_plain_column_names_and_a_key_for_false_alarms(summary, md):
+    for text in (summary, md):
+        headers = [line.lower() for line in text.splitlines() if line.startswith(("| Rank", "| Group"))]
+        assert len(headers) == 2
+        for h in headers:
+            for jargon in ("accuracy", "recall", "precision", "macro", "f1"):
+                assert jargon not in h, (jargon, h)
+        for title in (rr.PHENOTYPE_TITLE, rr.DEID_TITLE):
+            sec = _section(text, title)
+            assert "missed" in sec and "false alarm" in sec, title
 
 
 def test_difficulty_levels_match_the_medgemma_comparison(inp, md):

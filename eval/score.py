@@ -39,6 +39,8 @@ def score(y_true, y_pred, proba: np.ndarray | None, model_id: str,
     tn, fp = int((~t & ~p).sum()), int((~t & p).sum())
     add("sensitivity", tp / (tp + fn) if tp + fn else None)
     add("specificity", tn / (tn + fp) if tn + fp else None)
+    add("ppv", tp / (tp + fp) if tp + fp else None)   # of the "periodontitis" calls, the share right
+    add("npv", tn / (tn + fn) if tn + fn else None)   # of the "no periodontitis" calls, the share right
 
     auroc = None
     if proba is not None and t.any() and (~t).any():
