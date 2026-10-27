@@ -22,13 +22,13 @@ reliable assigned diagnosis, so the phenotype has to be derived from the evidenc
 **Evidence types per visit:** seven parts of the dental record that each suggest a
 periodontal status. They often disagree:
 
-| # | Evidence type | What it is | Phenotype order |
+| # | Evidence type | How it's turned into a status | Phenotype order |
 |---|---|---|---|
-| 1 | Chart note | Free text the clinician writes | 3rd |
-| 2 | Exam form | Structured fields, e.g. PSR score, perio status | 1st |
-| 3–4 | Procedure codes, completed / planned | CDT codes done / planned, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | compared, not used |
-| 5–6 | Procedure diagnosis codes, completed / planned | ICD-10-CM codes on procedures done / on the treatment plan, e.g. K05.3x | 2nd |
-| 7 | Probing chart | Attachment loss, bone loss, teeth lost | 4th |
+| 1 | Chart note: free text the clinician writes | A written diagnosis first (2017 stage as written; mild / moderate / severe → stage 1 / 2 / 3). If none, the bleeding, attachment loss and teeth lost written in the note go through the probing-chart rules. [Rules](docs/evidence_rules.md#chart-note-keyword-rules) | 3rd |
+| 2 | Exam form: PSR score and perio-status checkbox | The checkbox if ticked. Otherwise PSR: 0 healthy, 1–2 gingivitis, 3 stage 2, 4 stage 3 (never stage 1 or 4). [Rules](docs/evidence_rules.md#exam-form) | 1st |
+| 3–4 | Procedure codes, completed / planned: CDT codes, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | A rough guess from the treatment: D4346 gingivitis, D4342 stage 1, D4341 stage 2, bone surgery stage 3, cleaning only healthy. [Rules](docs/evidence_rules.md#procedure-codes-planned--procedure-codes-done) | compared, not used |
+| 5–6 | Procedure diagnosis codes, completed / planned: ICD-10-CM on the procedure | Z01.20 healthy, K05.0x/K05.1x gingivitis, K05.3x slight / moderate / severe → stage 1 / 2 / 3 (no stage 4 code). [Rules](docs/evidence_rules.md#diagnosis-codes-planned-treatment--diagnosis-codes-done-treatment) | 2nd |
+| 7 | Probing chart: attachment loss, pockets, bleeding, teeth lost | The 2017 AAP worksheet: worst attachment loss 1–2 mm stage 1, 3–4 mm stage 2, 5 mm+ stage 3; teeth lost and complications raise it. [Rules](docs/evidence_rules.md#gum-measurements-probing-chart) | 4th |
 
 When the evidence disagrees, the phenotype uses the first one in this order that gives a status.
 The four can be ranked 24 ways (4×3×2×1); each ranking is checked against the human reviewers, and a
