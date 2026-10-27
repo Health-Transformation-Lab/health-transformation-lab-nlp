@@ -87,6 +87,47 @@ def plain_system(system: str) -> str:
     return _PLAIN[b]
 
 
+PHENOTYPE_QUESTIONS = ("1. Whole record available", "2. Only the note available", "3. One part of the record alone")
+
+
+def readme_label(system: str) -> str:
+    """The README's name for a phenotyping method."""
+    b = base_id(system)
+    rule = " + stage 4 rule" if system.endswith("+rules4") else ""
+    if system == "algorithm_v0":
+        return "Rules, gum measurements first"
+    if system == "algorithm_design":
+        return "Rules, exam form first"
+    if b == "note_rules":
+        return "Keyword rules (simple baseline)"
+    if b.startswith("medgemma"):
+        return f"Medical AI, untrained ({plain_system(system)}){rule}"
+    if b in _BASELINES:
+        return plain_system(system) + rule
+    if system in EVIDENCE:
+        return plain_system(system)
+    return f"Trained AI ({plain_system(system)}){rule}"
+
+
+def readme_phenotype_rows(inp: dict) -> list[tuple[str, str]]:
+    """(question, method) rows for the README, best first within each question: the best rule phenotype on
+    the whole record; on the note alone, the best trained AI, the keyword-rules baseline and the best
+    MedGemma run; the two best single parts of the record."""
+    acc = inp["ladder"].set_index("method")["accuracy"]
+    key, truth = inp["key"].reindex(inp["preds"].index), inp["preds"]["truth"]
+    for s in (*PHENOTYPES, *EVIDENCE):
+        acc[s] = (key[s] == truth).mean()
+    acc = acc.sort_values(ascending=False, kind="stable")
+    note = [s for s in acc.index if s in set(inp["ladder"]["method"])]
+    trained = next(s for s in note if phenotype_group(s) in PHENOTYPE_GROUPS[1:3])
+    medgemma = next(s for s in note if base_id(s).startswith("medgemma"))
+    whole = next(s for s in acc.index if s in PHENOTYPES)
+    parts = [s for s in acc.index if s in EVIDENCE][:2]
+    q1, q2, q3 = PHENOTYPE_QUESTIONS
+    return ([(q1, whole)] + [(q2, s) for s in sorted([trained, "note_rules", medgemma], key=lambda s: -acc[s])]
+            + [(q3, s) for s in parts])
+
+
 def plain_tool(engine: str) -> str:
     """'hf_stanford+hf_obi+regex_v2+guard' -> 'Stanford AI + OBI AI + patterns + dental-word guard'."""
     name = " + ".join(_PLAIN_TOOL[p] for p in engine.split("+"))
@@ -446,23 +487,26 @@ def results_markdown(inp: dict) -> str:
     n_charts = len(inp["preds"])
     n_neg = int((~inp["preds"]["truth"].str.startswith("periodontitis")).sum())
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
-           f"Best method in each group, counted on the {n_charts} review charts; groups ordered by their best. Rank: "
-           f"where it plausibly ranks among all {len(ph)} methods. *Stage 4 rule*: keyword rules decide stage 4, "
-           "which the trained AI rarely learned (few stage 4 notes to learn from). " + PHENOTYPE_KEY +
+           f"Counted on the {n_charts} review charts, by what is available to read: **1.** the whole dental record; "
+           "**2.** only the chart note (where structured data is missing), comparing the best trained AI with simple "
+           "keyword rules and a medical AI used as is; **3.** one part of the record by itself. *Stage 4 rule*: "
+           "keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). "
+           f"Rank: where it plausibly ranks among all {len(ph)} methods. " + PHENOTYPE_KEY +
            f" **Specificity**: of the {n_neg} charts without periodontitis, the share correctly called \"no\"; "
            "periodontitis incorrectly assigned is what lowers it. **Sensitivity**: of the "
            f"{n_charts - n_neg} charts with periodontitis, the share correctly called \"yes\"; periodontitis "
            "incorrectly ruled out lowers it, and so does no answer.", "",
-           f"| Group | Best method | Correct | {COL_ASSIGNED} | Specificity | {COL_NOT_ASSIGNED} | Sensitivity | "
-           f"Incorrect stage | {COL_NO_ANSWER} | Total charts | Rank | Methods in group |",
-           "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|"]
-    for g in _by_best(ph, PHENOTYPE_GROUPS, "accuracy"):
-        sub = ph[ph.group == g]
-        s, r = sub.index[0], sub.iloc[0]
+           f"| Question | Method | Correct | {COL_ASSIGNED} | Specificity | {COL_NOT_ASSIGNED} | Sensitivity | "
+           f"Incorrect stage | {COL_NO_ANSWER} | Total charts | Rank |",
+           "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
+    last_q = None
+    for q, s in readme_phenotype_rows(inp):
+        r = ph.loc[s]
         c, yes, no, st, na = [round(n_charts * r[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage",
                                                                 "no_answer")]
-        out.append(f"| {g} | {plain_system(s)} | {c} | {yes} | {_pct(r['specificity'])} | {no} | "
-                   f"{_pct(r['sensitivity'])} | {st} | {na} | {n_charts} | {r['rank']} | {len(sub)} |")
+        out.append(f"| {q if q != last_q else ''} | {readme_label(s)} | {c} | {yes} | {_pct(r['specificity'])} | "
+                   f"{no} | {_pct(r['sensitivity'])} | {st} | {na} | {n_charts} | {r['rank']} |")
+        last_q = q
     out += ["", f"All {len(ph)} methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, "
             f"and the {int(ph['n_missing'].iloc[0])} models not run yet: "
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "",

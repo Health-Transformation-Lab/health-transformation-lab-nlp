@@ -48,16 +48,16 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 ### Phenotyping: periodontal status per chart
 
-Best method in each group, counted on the 240 review charts; groups ordered by their best. Rank: where it plausibly ranks among all 38 methods. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken. **Specificity**: of the 84 charts without periodontitis, the share correctly called "no"; periodontitis incorrectly assigned is what lowers it. **Sensitivity**: of the 156 charts with periodontitis, the share correctly called "yes"; periodontitis incorrectly ruled out lowers it, and so does no answer.
+Counted on the 240 review charts, by what is available to read: **1.** the whole dental record; **2.** only the chart note (where structured data is missing), comparing the best trained AI with simple keyword rules and a medical AI used as is; **3.** one part of the record by itself. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). Rank: where it plausibly ranks among all 38 methods. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken. **Specificity**: of the 84 charts without periodontitis, the share correctly called "no"; periodontitis incorrectly assigned is what lowers it. **Sensitivity**: of the 156 charts with periodontitis, the share correctly called "yes"; periodontitis incorrectly ruled out lowers it, and so does no answer.
 
-| Group | Best method | Correct | Periodontitis incorrectly assigned (when not present) | Specificity | Periodontitis incorrectly ruled out (when present) | Sensitivity | Incorrect stage | No answer (evidence not available) | Total charts | Rank | Methods in group |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|
-| Rules on the whole record | Gum measurements first | 234 | 0 | 100% | 0 | 100% | 6 | 0 | 240 | 1 | 2 |
-| Trained AI on the note + stage 4 rule | ModernBERT | 219 | 4 | 95% | 1 | 99% | 16 | 0 | 240 | 2–10 | 11 |
-| Simple text methods on the note | Word counts + X-ray reading | 209 | 6 | 93% | 3 | 98% | 22 | 0 | 240 | 7–16 | 5 |
-| Trained AI on the note | ModernBERT | 201 | 4 | 95% | 2 | 99% | 33 | 0 | 240 | 12–18 | 11 |
-| One part of the record alone | Gum measurements (probing chart) | 193 | 0 | 100% | 0 | 80% | 2 | 45 | 240 | 14–31 | 7 |
-| Untrained medical AI on the note (MedGemma 1.5 4B) | MedGemma 1.5 4B | 185 | 8 | 90% | 10 | 94% | 37 | 0 | 240 | 17–31 | 2 |
+| Question | Method | Correct | Periodontitis incorrectly assigned (when not present) | Specificity | Periodontitis incorrectly ruled out (when present) | Sensitivity | Incorrect stage | No answer (evidence not available) | Total charts | Rank |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 1. Whole record available | Rules, gum measurements first | 234 | 0 | 100% | 0 | 100% | 6 | 0 | 240 | 1 |
+| 2. Only the note available | Trained AI (ModernBERT) + stage 4 rule | 219 | 4 | 95% | 1 | 99% | 16 | 0 | 240 | 2–10 |
+|  | Keyword rules (simple baseline) | 189 | 10 | 88% | 8 | 95% | 33 | 0 | 240 | 15–30 |
+|  | Medical AI, untrained (MedGemma 1.5 4B) + stage 4 rule | 185 | 8 | 90% | 10 | 94% | 37 | 0 | 240 | 17–31 |
+| 3. One part of the record alone | Gum measurements (probing chart) | 193 | 0 | 100% | 0 | 80% | 2 | 45 | 240 | 14–31 |
+|  | Exam form | 149 | 10 | 88% | 0 | 87% | 48 | 33 | 240 | 33 |
 
 All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 

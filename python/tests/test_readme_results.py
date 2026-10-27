@@ -29,7 +29,7 @@ def summary(inp):
 
 
 def _rows(section):
-    return [r for r in section.splitlines() if r.startswith("| ") and not r.startswith(("| Rank", "| Group"))]
+    return [r for r in section.splitlines() if r.startswith("| ") and not r.startswith(("| Rank", "| Group", "| Question"))]
 
 
 def _section(md, title):
@@ -67,9 +67,7 @@ def _best_by_group(full_rows, group_of):
     return best
 
 
-@pytest.mark.parametrize("title, groups, group_of", [
-    (rr.PHENOTYPE_TITLE, rr.PHENOTYPE_GROUPS, rr.phenotype_group),
-    (rr.DEID_TITLE, rr.DEID_GROUPS, rr.deid_group)])
+@pytest.mark.parametrize("title, groups, group_of", [(rr.DEID_TITLE, rr.DEID_GROUPS, rr.deid_group)])
 def test_summary_shows_the_best_system_of_each_group_and_links_the_full_table(summary, md, title, groups, group_of):
     rows = _rows(_section(summary, title))
     assert sorted(_cell(r, 1) for r in rows) == sorted(groups)
@@ -140,7 +138,7 @@ def test_periodontitis_yes_no_columns_match_the_shared_scorer(inp, md):
 
 def test_plain_column_names_say_correct_or_incorrect(summary, md):
     for text in (summary, md):
-        headers = [line for line in text.splitlines() if line.startswith(("| Rank", "| Group"))]
+        headers = [line for line in text.splitlines() if line.startswith(("| Rank", "| Group", "| Question"))]
         assert len(headers) == 2
         for h in headers:
             for jargon in ("accuracy", "recall", "precision", "macro", "f1", "false alarm"):
@@ -157,15 +155,16 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
 
 
 def test_sensitivity_and_specificity_sit_next_to_the_counts_they_summarise(summary):
-    header = next(x for x in _section(summary, rr.PHENOTYPE_TITLE).splitlines() if x.startswith("| Group"))
+    header = next(x for x in _section(summary, rr.PHENOTYPE_TITLE).splitlines() if x.startswith("| Question"))
     cols = [c.strip() for c in header.split("|")]
     assert cols[4:8] == [rr.COL_ASSIGNED, "Specificity", rr.COL_NOT_ASSIGNED, "Sensitivity"]
 
 
 def test_readme_says_method_in_both_tables(summary):
-    for title in (rr.PHENOTYPE_TITLE, rr.DEID_TITLE):
-        header = next(x for x in _section(summary, title).splitlines() if x.startswith("| Group"))
-        assert "| Best method |" in header and "| Methods in group |" in header and "| Total " in header, title
+    ph = next(x for x in _section(summary, rr.PHENOTYPE_TITLE).splitlines() if x.startswith("| Question"))
+    assert "| Method |" in ph and "| Total charts |" in ph
+    de = next(x for x in _section(summary, rr.DEID_TITLE).splitlines() if x.startswith("| Group"))
+    assert "| Best method |" in de and "| Methods in group |" in de and "| Total " in de
 
 
 def test_dental_word_count_matches_the_scored_challenge_set(inp):
@@ -273,12 +272,22 @@ def test_out_of_100_adds_to_100():
     assert sum(rr.out_of_100([1 / 3, 1 / 3, 1 / 3])) == 100
 
 
-def test_readme_phenotype_rows_are_counts_that_add_to_the_total(inp, summary, md):
+def test_readme_phenotype_table_answers_three_questions(inp, summary):
     rows = _rows(_section(summary, rr.PHENOTYPE_TITLE))
-    best = _best_by_group(_rows(_section(md, rr.PHENOTYPE_TITLE)), rr.phenotype_group)
+    picks = rr.readme_phenotype_rows(inp)
+    assert len(rows) == len(picks)
+    questions = [q for q, _ in picks]
+    assert list(dict.fromkeys(questions)) == list(rr.PHENOTYPE_QUESTIONS)
+    systems = [s for _, s in picks]
+    assert systems[0] == "algorithm_v0"                              # whole record: the best rule phenotype
+    assert "note_rules" in systems                                    # the simple baseline is always shown
+    assert any(s.startswith("medgemma") for s in systems)
+    assert systems[questions.index(rr.PHENOTYPE_QUESTIONS[2])] == "probing_chart"
+    shown = [_cell(r, 1) for r in rows]                               # question named once, on its first row
+    assert [q for q in shown if q] == list(rr.PHENOTYPE_QUESTIONS)
     preds, key = inp["preds"], inp["key"].reindex(inp["preds"].index)
-    for r in rows:
-        s = best[_cell(r, 1)]
+    for r, s in zip(rows, systems):
+        assert _cell(r, 2) == rr.readme_label(s)
         nums = [int(_cell(r, i)) for i in (3, 4, 6, 8, 9)]
         total = int(_cell(r, 10))
         assert total == len(preds) == 240 and sum(nums) == total, r
@@ -300,7 +309,7 @@ def test_plain_names():
 
 def test_readme_names_the_medgemma_version_that_ran(summary):
     rows = [r for r in _rows(_section(summary, rr.PHENOTYPE_TITLE)) if "MedGemma" in r]
-    assert rows and all("MedGemma 1.5 4B" in _cell(r, 1) and _cell(r, 2) == "MedGemma 1.5 4B" for r in rows)
+    assert rows and all("MedGemma 1.5 4B" in _cell(r, 2) for r in rows)
     assert rr.plain_tool("hf_stanford+hf_obi+regex_v2+guard") == "Stanford AI + OBI AI + patterns + dental-word guard"
     assert rr.plain_tool("regex_v2") == "Patterns"
 
