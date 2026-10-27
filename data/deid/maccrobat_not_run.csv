@@ -1,2 +1,1 @@
 method,reason
-routed+guard,"run 2026-10-27 with a different spaCy model (en_core_web_lg 3.7.1 under spaCy 3.8); Presidio's results shifted, and routed+guard routes dates, IDs, locations, names and phones to Presidio, so it isn't recorded until it runs under the original setup"
