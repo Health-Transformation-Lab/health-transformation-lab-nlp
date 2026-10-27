@@ -72,7 +72,7 @@ jobs:
       # harmlessly and the deploy below decides.
       - name: Migrate Terraform state to the direct engine (once)
         if: env.DATABRICKS_CLIENT_SECRET != ''
-        run: databricks bundle deployment migrate -t "$TARGET" --noplancheck || echo "migrate did not run (see above): the deploy below uses the direct engine either way"
+        run: databricks bundle deployment migrate -t "$TARGET" --noplancheck || echo "migrate did not run (see above); the deploy below uses the direct engine either way"
       - name: Deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
