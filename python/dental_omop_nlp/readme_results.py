@@ -40,7 +40,7 @@ END = "<!-- results:end -->"
 PHENOTYPE_TITLE = "### Phenotyping: periodontal status per chart"
 DEID_TITLE = "### De-identification"
 NOT_RUN = "**Not run yet:**"
-OTHER_SETS_TITLE = "#### The same best methods on the other note sets"
+OTHER_SETS_TITLE = "#### The other note sets"
 DEID_SETS = {"unseen": "#### Synthetic dental notes, hardest tier only",
              "jsl48": "#### John Snow Labs benchmark",
              "external": "#### ASQ-PHI",
@@ -489,22 +489,25 @@ def results_markdown(inp: dict) -> str:
         return of(t.loc[m, "n_phi"] * (1 - t.loc[m, "entity_recall"]), t.loc[m, "n_phi"]) if m in t.index else "not run"
 
     out += ["", OTHER_SETS_TITLE, "",
-            "**John Snow Labs**: their published benchmark, 48 clinical notes. **ASQ-PHI**: 1,051 synthetic "
-            "clinical queries; the not-sensitive text is the 219 queries with no PHI. **MACCROBAT**: 200 real, "
-            "published case reports; the sensitive text is their dates, the not-sensitive text their clinical terms.", "",
-            f"| Best method | John Snow Labs: {COL_LEAKED} | ASQ-PHI: {COL_LEAKED} | ASQ-PHI: {COL_SCRUBBED} | "
-            f"MACCROBAT: {COL_LEAKED} | MACCROBAT: {COL_SCRUBBED} |",
-            "|---|---:|---:|---:|---:|---:|"]
-    for g in _by_best(de, DEID_GROUPS, "entity_recall"):
-        m = de[de.group == g].index[0]
-        scrub_mac = of(clin.loc[m, "n_touched"], clin.loc[m, "n"]) if m in mac.index else "not run"
-        out.append(f"| {plain_tool(m)} | {leaked(jsl, m)} | {leaked(asq, m)} | "
-                   f"{of(asq.loc[m, 'n_hard_negatives'] * asq.loc[m, 'hard_negative_damage'], asq.loc[m, 'n_hard_negatives'])} | "
-                   f"{leaked(mac, m)} | {scrub_mac} |")
+            "The best method on each of the other note sets; the link opens that set's full table.", "",
+            f"| Note set | Best method on it | {COL_LEAKED} | {COL_SCRUBBED} | Details |",
+            "|---|---|---:|---:|---|"]
+    names = {"jsl48": "John Snow Labs benchmark (48 clinical notes)",
+             "external": "ASQ-PHI (1,051 synthetic clinical queries)",
+             "maccrobat": "MACCROBAT (200 real, published case reports)"}
+    for key in ("jsl48", "external", "maccrobat"):
+        t = mac if key == "maccrobat" else d[d.tier == key].set_index("method")
+        m = t.sort_values("entity_recall", ascending=False, kind="stable").index[0]
+        scrub = {"jsl48": "not labelled",
+                 "external": of(asq.loc[m, "n_hard_negatives"] * asq.loc[m, "hard_negative_damage"],
+                                asq.loc[m, "n_hard_negatives"]),
+                 "maccrobat": of(clin.loc[m, "n_touched"], clin.loc[m, "n"]) if m in clin.index else "–"}[key]
+        out.append(f"| {names[key]} | {plain_tool(m)} | {leaked(t, m)} | {scrub} | "
+                   f"[{DEID_SETS[key].lstrip('# ')}](docs/results.md#{anchor(DEID_SETS[key])}) |")
     c = inp["course"]
-    out += ["", f"**University of Michigan course files** (MACCROBAT, split for a course assignment): a separately trained "
-            f"PHI tagger found {c['found']} of {c['total']} identifiers exactly "
-            f"([details](docs/results.md#{anchor(COURSE_TITLE)}))."]
+    out.append(f"| University of Michigan course files (40 MACCROBAT test reports) | A trained PHI tagger "
+               f"(exact matches only) | {c['missed']} of {c['total']} missed or only partly found | "
+               f"{c['wrong_tags']} tagged wrongly | [Course tagger](docs/results.md#{anchor(COURSE_TITLE)}) |")
     return "\n".join(out)
 
 
