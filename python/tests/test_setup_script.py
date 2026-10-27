@@ -121,18 +121,18 @@ def test_merge_to_main_deploys_dev_and_uat_and_a_manual_run_only_its_target():
     assert "deploy-${{ matrix.target }}" in str(job.get("concurrency", ""))
 
 
-def test_deploy_uses_the_direct_engine_and_migrates_terraform_state_once():
-    """unity_catalog.yml's catalog resource deploys only with the direct engine; a target deployed
-    earlier with Terraform migrates its state first (a no-op once migrated or never deployed)."""
+def test_deploy_uses_the_direct_engine_and_never_hides_a_state_migration():
+    """unity_catalog.yml's catalog resource deploys only with the direct engine. Moving Terraform state over
+    is a one-off manual step (docs/deployment.md), not a CI step whose failure is swallowed: a migrate that
+    failed for a real reason would let the deploy treat the target as new and duplicate its jobs."""
     doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
     steps = doc["jobs"]["deploy"]["steps"]
     names = [s.get("name", "") for s in steps]
-    mig = next(i for i, n in enumerate(names) if "direct" in n.lower() and "migrat" in n.lower())
-    dep = names.index("Deploy")
-    assert mig < dep and "bundle deployment migrate" in steps[mig]["run"]
+    assert not any("bundle deployment migrate" in s.get("run", "") for s in steps)
     for i, s in enumerate(steps):
         if "bundle validate" in s.get("run", "") or "bundle deploy " in s.get("run", "") or "bundle run" in s.get("run", ""):
             assert s.get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct", names[i]
+    assert "bundle deployment migrate" in (ROOT / "docs" / "deployment.md").read_text()
 
 
 def test_deploy_adopts_a_catalog_made_by_hand_before_deploying():

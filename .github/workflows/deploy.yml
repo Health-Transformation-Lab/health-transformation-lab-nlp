@@ -66,13 +66,8 @@ jobs:
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle validate -t "$TARGET"
-      # unity_catalog.yml's catalog resource deploys only with the direct engine. A target deployed
-      # before with Terraform moves its state over once. --noplancheck: the migrate command's Terraform
-      # plan check can't pass once the config has a catalog. Already direct or never deployed: it fails
-      # harmlessly and the deploy below decides.
-      - name: Migrate Terraform state to the direct engine (once)
-        if: env.DATABRICKS_CLIENT_SECRET != ''
-        run: databricks bundle deployment migrate -t "$TARGET" --noplancheck || echo "migrate did not run (see above); the deploy below uses the direct engine either way"
+      # The catalog resource deploys only with the direct engine. A target last deployed with Terraform
+      # is migrated once by hand (docs/deployment.md); otherwise the deploy below fails and says so.
       # A workspace with Default Storage can't create a catalog through the API the bundle uses, so
       # dental_omop is made once with SQL CREATE CATALOG (docs/deployment.md); adopt it into the bundle.
       # Already bound, or not made by hand: this fails harmlessly and the deploy below decides.
