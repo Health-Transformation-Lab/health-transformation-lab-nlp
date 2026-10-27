@@ -167,8 +167,8 @@ def out_of_100(shares) -> list[int]:
     return out
 
 
-COL_ASSIGNED = "Periodontitis incorrectly assigned (not present)"
-COL_NOT_ASSIGNED = "Periodontitis incorrectly ruled out (present)"
+COL_ASSIGNED = "Periodontitis incorrectly assigned (when not present)"
+COL_NOT_ASSIGNED = "Periodontitis incorrectly ruled out (when present)"
 PHENOTYPE_KEY = ("Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage "
                  "1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. "
                  "**Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect "

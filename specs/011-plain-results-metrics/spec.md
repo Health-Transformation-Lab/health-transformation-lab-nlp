@@ -82,3 +82,5 @@ leaked** and **Text that is not sensitive incorrectly scrubbed** (was "PHI incor
 
 Fourth revision: "Periodontitis incorrectly not assigned (present)" becomes **Periodontitis
 incorrectly ruled out (present)**.
+
+Fifth revision: the brackets read **(when not present)** and **(when present)**.

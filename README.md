@@ -50,7 +50,7 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it plausibly ranks among all 38 systems. Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the system gave no status.
 
-| Group | Best system | Correct | Periodontitis incorrectly assigned (not present) | Periodontitis incorrectly ruled out (present) | Incorrect stage | No answer | Rank | Systems |
+| Group | Best system | Correct | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer | Rank | Systems |
 |---|---|---:|---:|---:|---:|---:|---|---:|
 | Rule phenotype, whole record | `algorithm_v0` | 98 | 0 | 0 | 2 | 0 | 1 | 2 |
 | Fine-tuned note model + rules for stage IV | `modernbert-base+cw+s2+rules4` | 91 | 2 | 0 | 7 | 0 | 2–10 | 11 |
