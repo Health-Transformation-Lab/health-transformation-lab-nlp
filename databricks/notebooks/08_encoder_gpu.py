@@ -12,13 +12,10 @@
 # MAGIC `encoder_gpu_predictions` in the gold schema. To score them with the other models, copy the CSVs into
 # MAGIC `data/datasets/`, then run `python/scripts/28_ladder_vs_truth.py` and `35_readme_results.py`.
 
-# COMMAND ----------
-
-# MAGIC %pip install -q -e ../../python[models]
-
-# COMMAND ----------
-
-dbutils.library.restartPython()  # noqa: F821
+# MAGIC
+# MAGIC **Packages** come from the job's environment (`databricks/resources/jobs.yml`): a `%pip install`
+# MAGIC followed by a Python restart kills the notebook on serverless GPU. Running it by hand, add the
+# MAGIC same packages in the notebook's Environment side panel first.
 
 # COMMAND ----------
 
@@ -27,6 +24,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+
+# The repo's code, for this notebook and the scripts it runs, without installing it.
+_REPO_PY = os.path.abspath("../../python")
+sys.path.insert(0, _REPO_PY)
+os.environ["PYTHONPATH"] = os.pathsep.join(p for p in (_REPO_PY, os.environ.get("PYTHONPATH")) if p)
 
 import pandas as pd
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT

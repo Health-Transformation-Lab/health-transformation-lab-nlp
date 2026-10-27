@@ -339,3 +339,28 @@ def test_gpu_jobs_keep_retrying_long_enough_to_outlast_a_gpu_shortage():
             span = t["max_retries"] * t["min_retry_interval_millis"] + (t["max_retries"] + 1) * start_wait
             assert span >= 4 * 3_600_000, name
             assert t["min_retry_interval_millis"] >= 20 * 60_000, name     # spaced out, not back to back
+
+
+def _extras(*names):
+    import tomllib
+    proj = tomllib.loads((ROOT / "python" / "pyproject.toml").read_text())["project"]
+    deps = list(proj["dependencies"])
+    for n in names:
+        deps += proj["optional-dependencies"][n]
+    return sorted(set(deps))
+
+
+def test_gpu_jobs_install_their_packages_in_the_job_environment_not_with_pip_in_the_notebook():
+    """On serverless GPU, `%pip install` then a Python restart kills the notebook ("Py4JException: Error while
+    obtaining a new communication channel ... Connection refused", MedGemma run in dev). The packages come from
+    the job environment instead, the same ones pyproject.toml lists, and the notebooks import the repo from
+    its folder, so nothing restarts Python."""
+    _, jobs = _load()
+    for name, extras, nb in (("medgemma_reader", ("llm", "lora"), "03_medgemma_reader.py"),
+                             ("encoder_gpu", ("models",), "08_encoder_gpu.py")):
+        env = {e["environment_key"]: e["spec"] for e in jobs[name][0]["environments"]}["gpu"]
+        assert sorted(env["dependencies"]) == _extras(*extras), name
+        text = (ROOT / "databricks" / "notebooks" / nb).read_text()
+        assert "# MAGIC %pip" not in text and "%restart_python" not in text and "restartPython()" not in text, nb
+        assert "PYTHONPATH" in text and "sys.path.insert" in text, nb      # the repo, for the notebook and its scripts
+        assert '["python",' not in text, nb                                # scripts run with sys.executable
