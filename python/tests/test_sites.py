@@ -12,6 +12,7 @@ from dental_omop_nlp.sites import (
     aap_from_derived,
     cdc_aap,
     derive,
+    derive_all,
     draw_mouth,
 )
 from dental_omop_nlp.synthetic import draw_chart
@@ -81,3 +82,24 @@ def test_many_teeth_lost():
     c = PerioChart(8, 60, 9, 70, 10)
     sites, teeth = draw_mouth(c, 80, rng)
     assert derive(sites, teeth)["teeth_lost_perio"] == 10
+
+
+def test_draw_mouth_output_is_unchanged_for_seeded_charts():
+    """Speed-ups must keep every random draw in order: parity and committed data depend on it."""
+    import hashlib
+    parts = []
+    for i, (_, _, (sites, teeth)) in enumerate(_mouths(60)):
+        parts += [sites.assign(v=i).to_csv(index=False), teeth.assign(v=i).to_csv(index=False)]
+    assert hashlib.sha256("".join(parts).encode()).hexdigest() == \
+        "0b9ae13bf6fafe4f674c7ef4ab0d146420a42f7a198b0bfd57513f4899535943"
+
+
+def test_derive_all_equals_derive_per_visit():
+    """derive_all does every visit in one pass; it must match derive() exactly."""
+    site_parts, tooth_parts, want = [], [], []
+    for i, (_, _, (sites, teeth)) in enumerate(_mouths(300)):
+        site_parts.append(sites.assign(visit_id=i))
+        tooth_parts.append(teeth.assign(visit_id=i))
+        want.append({"visit_id": i, **derive(sites, teeth)})
+    got = derive_all(pd.concat(site_parts, ignore_index=True), pd.concat(tooth_parts, ignore_index=True))
+    pd.testing.assert_frame_equal(got.reset_index(), pd.DataFrame(want), check_exact=True)
