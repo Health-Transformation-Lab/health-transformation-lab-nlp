@@ -329,6 +329,20 @@ def test_gpu_jobs_retry_a_failed_start():
             assert t["min_retry_interval_millis"] >= 60_000 and t["retry_on_timeout"] is True, name
 
 
+def test_nhanes_job_downloads_public_files_to_the_volume_and_keeps_only_aggregates():
+    _, jobs = _load()
+    j, _ = jobs["nhanes_perio"]
+    assert len(j["name"]) <= 20
+    t = j["tasks"][0]
+    p = t["notebook_task"]["base_parameters"]
+    assert t["notebook_task"]["notebook_path"].endswith("09_nhanes_perio.py")
+    assert p["data_dir"].startswith("/Volumes/${resources.volumes.data.catalog_name}/") and p["data_dir"].endswith("/nhanes_raw")
+    assert p["out_dir"].endswith("/nhanes")
+    assert j["tags"]["data"] == "public"
+    nb = (ROOT / "databricks/notebooks/09_nhanes_perio.py").read_text()
+    assert "38_nhanes_perio.py" in nb and "--download" in nb
+
+
 def test_gpu_jobs_keep_retrying_long_enough_to_outlast_a_gpu_shortage():
     """A start that fails because no GPU is free (seen in dev: "failed to start within 900 seconds", twice,
     two minutes apart) needs retries spread over hours, not minutes: at least 4 hours of retrying."""
@@ -339,3 +353,17 @@ def test_gpu_jobs_keep_retrying_long_enough_to_outlast_a_gpu_shortage():
             span = t["max_retries"] * t["min_retry_interval_millis"] + (t["max_retries"] + 1) * start_wait
             assert span >= 4 * 3_600_000, name
             assert t["min_retry_interval_millis"] >= 20 * 60_000, name     # spaced out, not back to back
+
+
+def test_pipeline_jobs_send_telemetry_from_the_secret_scope():
+    """Spec 014: the jobs that start scripts pass the telemetry switch; the notebook reads the Application
+    Insights connection string from the secret scope (never a job parameter)."""
+    root, jobs = _load()
+    assert root["variables"]["telemetry_exporter"]["default"] == "azure"
+    for name, nb in (("medgemma_reader", "03_medgemma_reader.py"), ("encoder_gpu", "08_encoder_gpu.py"),
+                     ("nhanes_perio", "09_nhanes_perio.py")):
+        p = jobs[name][0]["tasks"][0]["notebook_task"]["base_parameters"]
+        assert p["telemetry"] == "${var.telemetry_exporter}", name
+        assert not any("InstrumentationKey" in str(v) for v in p.values()), name
+        text = (ROOT / "databricks/notebooks" / nb).read_text()
+        assert "telemetry.use_databricks_secret(dbutils" in text and 'widgets.text("telemetry"' in text, nb

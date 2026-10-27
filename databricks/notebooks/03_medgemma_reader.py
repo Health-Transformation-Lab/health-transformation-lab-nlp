@@ -18,7 +18,7 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -q -e ../../python[llm,lora]
+# MAGIC %pip install -q -e ../../python[llm,lora,azure]
 # MAGIC %restart_python
 
 # COMMAND ----------
@@ -35,6 +35,10 @@ dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
 dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
+dbutils.widgets.text("telemetry", "azure")           # noqa: F821  spec 014: off / console / azure / otlp
+from dental_omop_nlp import telemetry  # noqa: E402
+telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"),  # noqa: F821  scripts inherit it
+                                scope=dbutils.widgets.get("hf_secret_scope"))  # noqa: F821
 
 import torch  # noqa: E402
 
