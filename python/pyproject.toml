@@ -28,6 +28,8 @@ lora = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30", "peft>=0.11", "t
 db = ["sqlalchemy>=2", "psycopg[binary]>=3.1"]
 # Experiment tracking; on Databricks the workspace MLflow is used instead.
 track = ["mlflow>=3.4"]                 # tracking, UC registry, GenAI judges (make_judge)
+# Mixed models on real (unbalanced) charts: reliability_cal.reml_components (spec 013 G5)
+stats = ["statsmodels>=0.14"]
 dev = ["pytest>=8", "ruff>=0.5"]
 
 [build-system]

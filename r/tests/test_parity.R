@@ -404,3 +404,19 @@ for (pfx in c("", "simulated_")) {
   }
 }
 cat("parity OK (spec 012)\n")
+
+# 7b. Spec 013: CAL reliability (nested ANOVA, ICCs, stage-band flips).
+cg <- "data/datasets/reliability_cal/simulated_cal_charts.csv.gz"
+cr <- "data/datasets/reliability_cal/simulated_cal_reliability.csv"
+if (file.exists(cg) && file.exists(cr)) {
+  source("r/R/12_spec013.R")
+  d <- read.csv(gzfile(cg), stringsAsFactors = FALSE)
+  py <- read.csv(cr); py <- py[py$sd_error_true == 0.8, ]
+  r <- c(cal_nested_components(d), cal_icc(cal_nested_components(d)), stage_band_flips(d))
+  num <- c("slope_mm_per_year", "var_patient", "var_tooth", "var_site", "var_error",
+           "icc_patient", "icc_tooth", "icc_site", "sem_mm", "flip_rate", "down_rate")
+  dd <- max(abs(unlist(r[num]) - unlist(py[num])))
+  cat(sprintf("CAL reliability: max |R - Python| = %.2e\n", dd))
+  stopifnot(dd < 1e-9)
+} else cat("CAL reliability: skipped (run 37_cal_reliability.py)\n")
+cat("parity OK (spec 013)\n")
