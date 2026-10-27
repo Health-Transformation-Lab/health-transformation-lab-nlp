@@ -199,7 +199,13 @@ def test_plain_names():
     assert rr.plain_system("modernbert-base+cw+s2+rules4") == "ModernBERT"
     assert rr.plain_system("fusion_tfidf_rad+rules4") == "Word counts + X-ray reading"
     assert rr.plain_system("probing_chart") == "Gum measurements (probing chart)"
-    assert rr.plain_system("medgemma-1.5-4b-it+rules4") == "MedGemma"
+    assert rr.plain_system("medgemma-1.5-4b-it+rules4") == "MedGemma 1.5 4B"
+    assert rr.plain_system("medgemma-27b-text-it") == "MedGemma 27B text"
+
+
+def test_readme_names_the_medgemma_version_that_ran(summary):
+    rows = [r for r in _rows(_section(summary, rr.PHENOTYPE_TITLE)) if "MedGemma" in r]
+    assert rows and all("MedGemma 1.5 4B" in _cell(r, 1) and _cell(r, 2) == "MedGemma 1.5 4B" for r in rows)
     assert rr.plain_tool("hf_stanford+hf_obi+regex_v2+guard") == "Stanford AI + OBI AI + patterns + dental-word guard"
     assert rr.plain_tool("regex_v2") == "Patterns"
 

@@ -55,7 +55,7 @@ EVIDENCE = {"probing_chart": ("probing chart", "staged from the measurements"),
 
 
 PHENOTYPE_GROUPS = ("Rules on the whole record", "Trained AI on the note + stage 4 rule", "Trained AI on the note",
-                    "Untrained medical AI on the note (MedGemma)", "Simple text methods on the note",
+                    "Untrained medical AI on the note (MedGemma 1.5 4B)", "Simple text methods on the note",
                     "One part of the record alone")
 DEID_GROUPS = ("Several tools combined", "One AI tool", "Pattern matching only")
 
@@ -75,7 +75,10 @@ _PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Pr
 def plain_system(system: str) -> str:
     """'modernbert-base+cw+s2+rules4' -> 'ModernBERT' (the group says what the variants add)."""
     b = base_id(system)
-    return "MedGemma" if b.startswith("medgemma") else _PLAIN[b]
+    if b.startswith("medgemma"):   # medgemma-1.5-4b-it -> MedGemma 1.5 4B; medgemma-27b-text-it -> MedGemma 27B text
+        parts = [p for p in b.split("-")[1:] if p != "it"]
+        return "MedGemma " + " ".join(p.upper() if p[-1] == "b" and p[:-1].isdigit() else p for p in parts)
+    return _PLAIN[b]
 
 
 def plain_tool(engine: str) -> str:
