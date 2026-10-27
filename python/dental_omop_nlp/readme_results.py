@@ -22,13 +22,13 @@ generator's truth: not clinical performance.
 
 from __future__ import annotations
 
+import importlib.util
 import math
 import re
 
 import numpy as np
 import pandas as pd
 import yaml
-from sklearn.metrics import f1_score
 
 from . import ladder_eval
 from .labels import LABELS
@@ -129,8 +129,31 @@ def wilson(k: float, n: float, z: float = 1.96) -> tuple[float, float]:
     return centre - half, centre + half
 
 
-def macro_f1(truth: pd.Series, pred: pd.Series) -> float:
-    return float(f1_score(truth, pred.fillna("none"), labels=LABELS, average="macro", zero_division=0))
+def _shared_scorer():
+    """eval/score.py, the scorer the R parity test checks (eval/score.R)."""
+    spec = importlib.util.spec_from_file_location("eval_score", REPO_ROOT / "eval" / "score.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.score
+
+
+def yes_no(truth: pd.Series, pred: pd.Series, score=None) -> dict:
+    """Periodontitis (any stage) yes/no: sensitivity, specificity, PPV, NPV; no status counts as "no"."""
+    res = (score or _shared_scorer())(truth, pred.fillna("none"), None, "readme")
+    m = res[res["class"] == ""].set_index("metric")["value"]
+    return {k: m[k] for k in ("sensitivity", "specificity", "ppv", "npv")}
+
+
+PHENOTYPE_KEY = ("**Exact status right**: the share of charts given the right one of six statuses (healthy, "
+                 "gingivitis, stage I–IV); no status counts as wrong. The next four ask the yes/no question *does "
+                 "this patient have periodontitis?*: **Sensitivity**, of the patients who have it, the share flagged "
+                 "(the rest are *missed cases*); **Specificity**, of those who don't, the share correctly cleared "
+                 "(the rest are *false alarms*); **PPV**, when it says yes, how often that's right; **NPV**, when "
+                 "it says no, how often that's right. No status counts as \"no\".")
+DEID_KEY = ("**Identifiers caught**: the share of names, dates and IDs removed; the rest are *missed* and leak "
+            "(one character left counts). **Removals that were identifiers**: of everything removed, the share "
+            "that really was an identifier; the rest is ordinary text removed by mistake, the *false alarms*. "
+            "The damage columns count the same false alarms on dental terms, clinical text and clean queries.")
 
 
 def _pct(x, d=0) -> str:
@@ -164,19 +187,23 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
     pred = {s: (preds[s] if s in preds else key[s]).where(lambda x: x.isin(LABELS)) for s in systems}
     tab = ladder_eval.ladder_table(truth, pred, n_boot=N_BOOT, seed=SEED, reference="").set_index("method")
     ranks = paired_rank_range({s: (pred[s] == truth).to_numpy() for s in systems})
+    score = _shared_scorer()
+    yn = {s: yes_no(truth, pred[s], score) for s in systems}
     level = key["difficulty"]
     links = {m["id"]: f"https://huggingface.co/{m['hf']}" for m in reg["models"] if m.get("hf")}
     out = [PHENOTYPE_TITLE, "",
            "Every system that assigns one of the six periodontal statuses, on the same 240 synthetic review "
            "charts against the generator's truth: models that read only the chart note, the rule phenotypes "
-           "that combine the whole record, and each evidence type alone. A chart a system gives no status for "
-           "counts as wrong (see *Coverage*). **Rank** is the 95% range of the system's rank over the same "
-           "chart resamples as the accuracy CI (paired bootstrap): \"1–3\" means it plausibly ranks anywhere "
-           "from 1st to 3rd. Easy / medium / hard: the note states the 2017 diagnosis (L1), states it in older "
-           "terms (L2), or leaves it to be inferred from the findings (L3).", "",
-           "| Rank | System | Input | Method | Accuracy (95% CI) | Coverage | Macro-F1 | Stage IV recall | "
-           "Unsafe errors | Easy / medium / hard |",
-           "|---|---|---|---|---|---:|---:|---:|---:|---|"]
+           "that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the "
+           "system's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
+           "means it plausibly ranks anywhere from 1st to 3rd.", "",
+           PHENOTYPE_KEY + " *Coverage*: share of charts it gives a status for. *Stage IV caught*: share of "
+           "stage IV patients called stage IV. *Unsafe errors*: mistakes that could harm a patient if acted on, "
+           "e.g. a missed stage III–IV. Easy / medium / hard: exact status right when the note states the 2017 "
+           "diagnosis (L1), states it in older terms (L2), or leaves it to be inferred from the findings (L3).", "",
+           "| Rank | System | Input | Method | Exact status right (95% CI) | Sensitivity | Specificity | PPV | NPV | "
+           "Coverage | Stage IV caught | Unsafe errors | Easy / medium / hard |",
+           "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|"]
     tab = tab.sort_values("accuracy", ascending=False, kind="stable")
     for s, r in tab.iterrows():
         b = base_id(s)
@@ -184,8 +211,9 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
         ok = pred[s] == truth
         levels = " / ".join(_pct(ok[level == lv].mean()) for lv in ("L1", "L2", "L3"))
         out.append(f"| {_rank(ranks[s])} | {name} | {systems[s][0]} | {systems[s][1]} | "
-                   f"{_ci(r['accuracy'], r['acc_lo'], r['acc_hi'])} | {_pct(pred[s].notna().mean())} | "
-                   f"{macro_f1(truth, pred[s]):.2f} | {_pct(r['stage4_recall'])} | {_pct(r['unsafe_rate'])} | {levels} |")
+                   f"{_ci(r['accuracy'], r['acc_lo'], r['acc_hi'])} | "
+                   + " | ".join(_pct(yn[s][k]) for k in ("sensitivity", "specificity", "ppv", "npv")) +
+                   f" | {_pct(pred[s].notna().mean())} | {_pct(r['stage4_recall'])} | {_pct(r['unsafe_rate'])} | {levels} |")
     scored = {base_id(m) for m in inp["ladder"]["method"]}
     missing = []
     for m in reg["models"]:
@@ -196,7 +224,8 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
         missing.append(f"[`{m['id']}`](https://huggingface.co/{m['hf']}) ({why})")
     out += ["", f"{NOT_RUN} " + "; ".join(missing) + ". MedGemma few-shot and LoRA runs are not done yet "
             "(LoRA needs a GPU)."]
-    summary = tab.assign(rank=[_rank(ranks[s]) for s in tab.index], n_missing=len(missing))
+    summary = tab.assign(rank=[_rank(ranks[s]) for s in tab.index], n_missing=len(missing),
+                         **{k: [yn[s][k] for s in tab.index] for k in ("sensitivity", "specificity", "ppv")})
     return "\n".join(out), summary
 
 
@@ -217,16 +246,18 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
 
     out = [DEID_TITLE, "",
            f"Every engine on the {n_notes} synthetic dental notes with fake PHI ({n_phi:,} identifiers, all tiers), "
-           "ranked by **recall** (share of identifiers removed; one character left counts as a leak), with a "
-           "Wilson 95% CI. Per-identifier results aren't saved, so there is no paired bootstrap: **Rank** is the "
-           "range the intervals allow, from only the engines clearly above counting to every engine whose interval "
-           "reaches this one's counting. Recall protects patients; the other columns protect the text the AI "
-           "reads, so read them together. *Unseen*: the tier no engine was written against. **ASQ-PHI**: 1,051 "
-           "synthetic clinical queries (MIT); *over-redaction* = share of identifier-free queries changed. "
-           "**MACCROBAT**: 200 real, published case reports (CC BY 4.0); recall on its dates, *damage* = share of "
-           "clinical terms cut. [How to read these](docs/deidentification.md#how-to-read-the-numbers).", "",
-           "| Rank | Engine | Recall (95% CI) | Unseen recall | Precision | Dental-term damage | "
-           "ASQ-PHI recall | ASQ-PHI over-redaction | MACCROBAT recall | MACCROBAT damage |",
+           "ranked by identifiers caught, with a Wilson 95% CI. Per-identifier results aren't saved, so there is "
+           "no paired bootstrap: **Rank** is the range the intervals allow, from only the engines clearly above "
+           "counting to every engine whose interval reaches this one's counting.", "",
+           DEID_KEY + " Catching identifiers protects patients; the false-alarm columns protect the text the AI "
+           "reads, so read them together. *Unseen tier*: the notes no engine was written against. **ASQ-PHI**: "
+           "1,051 synthetic clinical queries (MIT); *clean queries changed* = identifier-free queries altered. "
+           "**MACCROBAT**: 200 real, published case reports (CC BY 4.0); its dates are the identifiers, and "
+           "*clinical text damaged* = share of clinical terms cut. "
+           "[More on these numbers](deidentification.md#how-to-read-the-numbers).", "",
+           "| Rank | Engine | Identifiers caught (95% CI) | Caught, unseen tier | Removals that were identifiers | "
+           "Dental terms damaged | ASQ-PHI: caught | ASQ-PHI: clean queries changed | MACCROBAT: dates caught | "
+           "MACCROBAT: clinical text damaged |",
            "|---|---|---|---:|---:|---:|---:|---:|---:|---:|"]
     for rank, (m, r) in zip(ranks, allt.iterrows()):
         out.append(f"| {_rank(rank)} | `{m}` | {_ci(r['entity_recall'], r['lo'], r['hi'])} | "
@@ -268,21 +299,22 @@ def results_markdown(inp: dict) -> str:
     de = de.assign(group=[deid_group(m) for m in de.index])
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
            "Best system in each group on the 240 review charts, groups ordered by their best. Rank: 95% range among all "
-           f"{len(ph)} systems (paired bootstrap).", "",
-           "| Group | Best system | Accuracy (95% CI) | Rank | Stage IV recall | Systems |",
-           "|---|---|---|---|---:|---:|"]
+           f"{len(ph)} systems (paired bootstrap). " + PHENOTYPE_KEY, "",
+           "| Group | Best system | Exact status right (95% CI) | Rank | Sensitivity | Specificity | PPV | Systems |",
+           "|---|---|---|---|---:|---:|---:|---:|"]
     for g in _by_best(ph, PHENOTYPE_GROUPS, "accuracy"):
         sub = ph[ph.group == g]
         s, r = sub.index[0], sub.iloc[0]
         out.append(f"| {g} | `{s}` | {_ci(r['accuracy'], r['acc_lo'], r['acc_hi'])} | {r['rank']} | "
-                   f"{_pct(r['stage4_recall'])} | {len(sub)} |")
-    out += ["", f"All {len(ph)} systems with coverage, macro-F1, unsafe errors and accuracy by note difficulty, "
+                   f"{_pct(r['sensitivity'])} | {_pct(r['specificity'])} | {_pct(r['ppv'])} | {len(sub)} |")
+    out += ["", f"All {len(ph)} systems with NPV, coverage, stage IV, unsafe errors and results by note difficulty, "
             f"and the {int(ph['n_missing'].iloc[0])} models not run yet: "
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "",
             DEID_TITLE, "",
             f"Best engine in each group on the synthetic notes, groups ordered by their best. Rank: range among all {len(de)} engines "
-            "(Wilson intervals).", "",
-            "| Group | Best engine | Recall (95% CI) | Rank | Precision | MACCROBAT recall | Engines |",
+            "(Wilson intervals). " + DEID_KEY, "",
+            "| Group | Best engine | Identifiers caught (95% CI) | Rank | Removals that were identifiers | "
+            "MACCROBAT: dates caught | Engines |",
             "|---|---|---|---|---:|---:|---:|"]
     for g in _by_best(de, DEID_GROUPS, "entity_recall"):
         sub = de[de.group == g]
