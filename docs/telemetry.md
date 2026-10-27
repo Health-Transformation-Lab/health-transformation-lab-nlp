@@ -40,29 +40,36 @@ switch (`telemetry_exporter`, default `azure`) and read the connection string fr
 
 ## Set up Azure (once, from your laptop)
 
-You need an Azure subscription (a free account works) and the Azure CLI. Sign in with `az login`;
-no token is created or copied.
+The Azure resources are Terraform in `infra/azure/` (the azurerm provider). You need an Azure
+subscription (a free account works), the Azure CLI and Terraform 1.6 or later. Sign in with
+`az login`; Terraform uses that sign-in, so no token is created or copied.
 
 ```bash
-az group create -n rg-dental-omop-telemetry -l eastus
-az deployment group create -g rg-dental-omop-telemetry -f infra/azure/main.bicep \
-  -p budgetEmail=you@example.com          # optional: an email the moment anything costs money
+export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+terraform -chdir=infra/azure init
+terraform -chdir=infra/azure apply -var budget_email=you@example.com   # budget_email is optional
 ```
 
-`infra/azure/main.bicep` creates:
+It creates, in resource group `rg-dental-omop-telemetry`:
 
 - a Log Analytics workspace `dental-omop-nlp-logs` with a **daily cap of 0.16 GB** (31 days × 0.16
   = 4.96 GB, under the 5 GB/month free ingestion per billing account), 30-day retention;
 - workspace-based Application Insights `dental-omop-nlp-appi`, **90-day retention** (included);
 - optionally a 1 USD monthly budget on the resource group that emails on any actual charge.
 
+`terraform -chdir=infra/azure destroy` removes all of it.
+
+**State.** Terraform records what it created in `infra/azure/terraform.tfstate`. That file holds
+the connection string in plain text, so it is git-ignored and stays on your laptop. To share or
+automate the deployment later, move the state to an Azure Storage backend (a `backend "azurerm"`
+block) rather than committing it.
+
 Put the connection string straight into the Databricks secret scope, without printing it:
 
 ```bash
 databricks secrets create-scope dental          # skip if it exists (it holds hf_token too)
 databricks secrets put-secret dental appinsights_connection_string --string-value \
-  "$(az monitor app-insights component show -g rg-dental-omop-telemetry -a dental-omop-nlp-appi \
-     --query connectionString -o tsv)"
+  "$(terraform -chdir=infra/azure output -raw connection_string)"
 ```
 
 The connection string lets a holder *send* telemetry to this resource; it can't read anything. It
@@ -77,8 +84,8 @@ Locally: `export DENTAL_TELEMETRY=azure APPLICATIONINSIGHTS_CONNECTION_STRING=..
 
 | Guard | Where | Setting |
 |---|---|---|
-| Daily cap | Log Analytics workspace (Bicep) | 0.16 GB/day; ingestion stops for the day at the cap |
-| Budget alert | resource group (Bicep, optional) | email on any actual charge |
+| Daily cap | Log Analytics workspace (Terraform) | 0.16 GB/day; ingestion stops for the day at the cap |
+| Budget alert | resource group (Terraform, optional) | email on any actual charge |
 | Sampling | `DENTAL_TELEMETRY_SAMPLING` | 1.0: a batch run is a few hundred spans (kilobytes), and a sampled-away failure is the one you needed. Lower it only for high-volume services |
 | Log level | `telemetry.setup()` | INFO and above from the `dental_omop_nlp` logger; no DEBUG |
 | Live Metrics | on | real-time view, not billed as ingestion |

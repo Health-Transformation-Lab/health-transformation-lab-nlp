@@ -34,8 +34,8 @@ connection string warns and runs with telemetry off: a missing secret never fail
 - Live Metrics on (not billed as ingestion).
 
 ### US4 - Infrastructure as code (P2)
-`infra/azure/main.bicep`: Log Analytics workspace with the daily cap, workspace-based Application
-Insights. CI compiles it. Connection string goes to the Databricks secret scope `dental`, key
+`infra/azure/*.tf` (Terraform, azurerm provider): Log Analytics workspace with the daily cap, workspace-based Application
+Insights. CI checks formatting and validates it (`terraform fmt -check`, `terraform validate`). Connection string goes to the Databricks secret scope `dental`, key
 `appinsights_connection_string`; Databricks jobs read it and pass it to the scripts.
 
 ### US5 - Queries for the questions DataOps asks (P2)
@@ -45,3 +45,9 @@ pass-rate trends, and the last successful run per pipeline.
 ## Out of scope (next spec)
 The "pipeline doctor": classifying failures, choosing a recovery, escalation and notification, and
 its evaluation on this repo's real incidents.
+
+## Revision 2026-10-27: Terraform instead of Bicep
+The infrastructure moved from Bicep (Azure-only) to Terraform with the azurerm provider: the same
+resources and limits, one tool that also manages Databricks (the Databricks Terraform provider) and
+other clouds. Terraform also creates the resource group. Its state file holds the connection string,
+so it is git-ignored.
