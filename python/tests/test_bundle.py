@@ -187,3 +187,49 @@ def test_benchmark_notebook_installs_cpu_torch_only_for_the_encoder():
 def test_deploy_does_not_wait_for_the_benchmark_run():
     wf = (ROOT / ".github/workflows/deploy.yml").read_text()
     assert "bundle run -t \"$TARGET\" --no-wait study_benchmark" in wf
+
+
+def test_judge_scorecard_job_and_dev_judge_endpoint():
+    """Spec 012: the scorecard job writes to the gold schema with the bundle's judge endpoint; dev
+    defaults to a pay-per-token endpoint, other targets to none (skip)."""
+    root, jobs = _load()
+    job, _ = jobs["judge_scorecard"]
+    p = job["tasks"][0]["notebook_task"]["base_parameters"]
+    assert p["judge_endpoint"] == "${var.judge_endpoint}"
+    assert p["catalog"] == "${resources.schemas.gold.catalog_name}" and p["schema"] == "${resources.schemas.gold.name}"
+    assert p["experiment_id"] == "${resources.experiments.dental_experiment.id}"
+    assert root["variables"]["judge_endpoint"]["default"] == "none"
+    assert root["targets"]["dev"]["variables"]["judge_endpoint"] == "databricks-meta-llama-3-3-70b-instruct"
+    deploy = (ROOT / ".github" / "workflows" / "deploy.yml").read_text()
+    assert "JUDGE_ENDPOINT || 'none'" not in deploy     # CI must not mask the dev default
+
+
+def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
+    """Spec 012 US3: an AI/BI dashboard deployed with the bundle, same name in every target, reading
+    the gold tables the judge_scorecard job writes."""
+    import json
+    res = yaml.safe_load((ROOT / "databricks/resources/dashboards.yml").read_text())["resources"]["dashboards"]
+    d = res["scorecard"]
+    assert "${bundle.target}" not in d["display_name"] and d["warehouse_id"] == "${var.warehouse_id}"
+    dash = json.loads((ROOT / "databricks/resources" / d["file_path"]).resolve().read_text())
+    assert [p["displayName"] for p in dash["pages"]] == ["Phenotyping", "De-identification"]
+    names = {ds["name"] for ds in dash["datasets"]}
+    tables = {"chart_answers", "judgments", "judge_metrics", "judge_agreement", "judge_run", "deid_scores"}
+    for ds in dash["datasets"]:
+        sql = " ".join(ds["queryLines"])
+        used = set(re.findall(r"dental_omop\.gold_dental_omop_perio\.(\w+)", sql))
+        assert used and used <= tables, ds["name"]
+    for page in dash["pages"]:
+        for item in page["layout"]:
+            for q in item["widget"].get("queries", []):
+                assert q["query"]["datasetName"] in names, item["widget"]["name"]
+
+
+def test_dev_catalog_states_its_default_storage_root():
+    """dev's dental_omop was made with SQL on Default Storage (docs/deployment.md), which sets a storage
+    root; without it in the config the deploy plans to recreate the catalog (prevent_destroy stops it)."""
+    root, _ = _load()
+    dev = root["targets"]["dev"]["resources"]["catalogs"]["dental_omop"]
+    assert dev["storage_root"].startswith("s3://") and "/uc/" in dev["storage_root"]
+    for env in ("uat", "prod"):
+        assert "catalogs" not in root["targets"][env].get("resources", {})

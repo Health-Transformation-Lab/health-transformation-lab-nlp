@@ -59,7 +59,7 @@ Counted on the 240 review charts, by what is available to read: **1.** the whole
 | 3. One part of the record alone | Gum measurements (probing chart) | 193 | 0 | 100% | 0 | 80% | 2 | 45 | 240 | 14–31 |
 |  | Exam form | 149 | 10 | 88% | 0 | 87% | 48 | 33 | 240 | 33 |
 
-All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
+All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart). **LLM judge** (could an LLM replace the answer key?): its own reading matches the truth on 83% of charts (53% on hard notes), and it flags most mistakes of weak methods but only 26% of the best note model's, so it can't yet rank good methods (LLM judgment); [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading), and the *dental-omop-nlp scorecard* dashboard in Databricks.
 
 ### De-identification
 

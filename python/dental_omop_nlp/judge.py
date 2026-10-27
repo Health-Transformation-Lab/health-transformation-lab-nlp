@@ -34,7 +34,7 @@ import os
 import random
 import time
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import ClassVar
 
 from .labels import LABELS
@@ -72,6 +72,27 @@ Answer with JSON only:
  "rationale": "one sentence"}"""
 
 )
+
+# Spec 012: the judge's own status, with no system's answer shown, so it isn't anchored on one.
+STATUS_PROMPT_VERSION = "judge-status-v1"
+
+STATUS_SYSTEM = ("You are a periodontist reading a dental chart note. You decide which periodontal status "
+                 "the note supports under the 2017 AAP/EFP classification.\n\n"
+                 + CRITERIA + """
+
+Answer with JSON only:
+{"supported_status": one of the six statuses, or null if the note alone can't settle it,
+ "quote": "the exact sentence or phrase from the note that decides it, copied verbatim",
+ "rationale": "one sentence"}"""
+)
+
+STATUS_USER = """Note:
+<<<
+{note}
+>>>
+
+Which periodontal status does the note support?"""
+
 
 USER = """Note:
 <<<
@@ -205,6 +226,17 @@ def gate(note: str, out: dict) -> tuple[bool, str]:
     return True, ""
 
 
+def gate_status(note: str, out: dict) -> tuple[bool, str]:
+    """Quote gate for a status call: a status (or null) from the six, and a verbatim quote for a status."""
+    st = out.get("supported_status")
+    if st not in (None, *LABELS):
+        return False, "bad status"
+    q = (out.get("quote") or "").strip()
+    if st is not None and (not q or q not in note):
+        return False, "quote not in note"
+    return True, ""
+
+
 class OpenAIJudge:
     def __init__(self, model: str | None = None, base_url: str | None = None, api_key: str | None = None,
                  temperature: float = 0.0, max_retries: int = 3):
@@ -214,9 +246,17 @@ class OpenAIJudge:
         self.temperature, self.max_retries = temperature, max_retries
 
     def __call__(self, note: str, pred: str) -> Verdict:
+        return self._ask(SYSTEM, USER.format(note=note, pred=pred), lambda out: gate(note, out))
+
+    def status(self, note: str) -> Verdict:
+        """The status the note supports, with no answer shown (spec 012); verdict is 'status'."""
+        v = self._ask(STATUS_SYSTEM, STATUS_USER.format(note=note), lambda out: gate_status(note, out))
+        return v if v.error else replace(v, verdict="status")
+
+    def _ask(self, system: str, user: str, check) -> Verdict:
         body = json.dumps({"model": self.model, "temperature": self.temperature, "max_tokens": 300,
-                           "messages": [{"role": "system", "content": SYSTEM},
-                                        {"role": "user", "content": USER.format(note=note, pred=pred)}]}).encode()
+                           "messages": [{"role": "system", "content": system},
+                                        {"role": "user", "content": user}]}).encode()
         req = urllib.request.Request(f"{self.base_url}/chat/completions", data=body, method="POST",
                                      headers={"Authorization": f"Bearer {self.api_key}",
                                               "Content-Type": "application/json"})
@@ -228,7 +268,7 @@ class OpenAIJudge:
                     resp = json.loads(r.read())
                 usage = resp.get("usage", {})
                 out = _parse(resp["choices"][0]["message"]["content"])
-                ok, why = gate(note, out)
+                ok, why = check(out)
                 return Verdict(out.get("verdict", ""), out.get("supported_status"), out.get("quote", ""),
                                out.get("rationale", ""), ok, usage.get("prompt_tokens", 0),
                                usage.get("completion_tokens", 0), time.time() - t0, why)
@@ -279,3 +319,14 @@ class SimulatedJudge:
         tok_in = (len(SYSTEM) + len(note)) // 4 + 20
         return Verdict(v, t if v == "incorrect" else (pred if v == "correct" else None), quote,
                        "simulated", True, tok_in, 60, 0.0)
+
+    def status(self, note: str, visit_id: int | None = None) -> Verdict:
+        """Simulated own status: the truth at rate `sensitivity`, else another status, or none at nd_rate."""
+        t = self.truth[visit_id]
+        if self.rng.random() < self.nd:
+            st, quote = None, ""
+        else:
+            st = t if self.rng.random() < self.sens else self.rng.choice([x for x in LABELS if x != t])
+            quote = note.split("\n")[-1][:80]
+        tok_in = (len(STATUS_SYSTEM) + len(note)) // 4 + 20
+        return Verdict("status", st, quote, "simulated", True, tok_in, 60, 0.0)

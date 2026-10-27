@@ -1,0 +1,854 @@
+{
+ "datasets": [
+  {
+   "name": "ph_exact",
+   "displayName": "ph_exact",
+   "queryLines": [
+    "SELECT `group` AS group_name, system, ROUND(100 * vs_truth, 1) AS `exact_truth`, ROUND(100 * vs_judge, 1) AS `exact_judge`,\n",
+    "  ROUND(100 * difference, 1) AS `difference`, ROUND(100 * judged_correct, 1) AS `judged_correct`, ROUND(100 * verdict_sensitivity, 1) AS `caught_right`,\n",
+    "  ROUND(100 * verdict_specificity, 1) AS `caught_wrong`, n_judged FROM dental_omop.gold_dental_omop_perio.judge_metrics WHERE metric = 'correct'\n"
+   ]
+  },
+  {
+   "name": "ph_metrics",
+   "displayName": "ph_metrics",
+   "queryLines": [
+    "SELECT `group` AS group_name, system, metric_label, ROUND(100 * vs_truth, 1) AS `vs_truth`, ROUND(100 * vs_judge, 1) AS `vs_judge`,\n",
+    "  ROUND(100 * difference, 1) AS `difference` FROM dental_omop.gold_dental_omop_perio.judge_metrics\n"
+   ]
+  },
+  {
+   "name": "ph_agree",
+   "displayName": "ph_agree",
+   "queryLines": [
+    "SELECT label, n, ROUND(100 * coverage, 1) AS `coverage`, ROUND(100 * agreement, 1) AS `agreement`, ROUND(100 * ci_low, 1) AS `agreement_low`,\n",
+    "  ROUND(100 * ci_high, 1) AS `agreement_high`, ROUND(kappa, 3) AS kappa FROM dental_omop.gold_dental_omop_perio.judge_agreement\n"
+   ]
+  },
+  {
+   "name": "ph_charts",
+   "displayName": "ph_charts",
+   "queryLines": [
+    "SELECT a.system, a.visit_id, a.difficulty, a.truth, a.answer, s.judge_status, v.verdict,\n",
+    "  COALESCE(v.quote, s.quote) AS quote, (a.answer = a.truth) AS answer_right\n",
+    "  FROM dental_omop.gold_dental_omop_perio.chart_answers a\n",
+    "  LEFT JOIN dental_omop.gold_dental_omop_perio.judgments s ON s.visit_id = a.visit_id AND s.kind = 'status'\n",
+    "  LEFT JOIN dental_omop.gold_dental_omop_perio.judgments v ON v.visit_id = a.visit_id AND v.kind = 'verdict' AND v.answer = a.answer\n"
+   ]
+  },
+  {
+   "name": "ph_run",
+   "displayName": "ph_run",
+   "queryLines": [
+    "SELECT kind, calls, charts, endpoint_errors, gate_failures, ROUND(usd, 4) AS usd,\n",
+    "  ROUND(usd_per_chart, 5) AS usd_per_chart, ROUND(latency_p50_s, 2) AS latency_p50_s, ROUND(latency_p95_s, 2) AS latency_p95_s,\n",
+    "  CAST(prompt_tokens AS BIGINT) AS prompt_tokens, CAST(completion_tokens AS BIGINT) AS completion_tokens FROM dental_omop.gold_dental_omop_perio.judge_run\n"
+   ]
+  },
+  {
+   "name": "deid",
+   "displayName": "deid",
+   "queryLines": [
+    "SELECT `group` AS group_name, method AS engine, ROUND(100 * entity_recall, 1) AS `caught`, ROUND(100 * char_precision, 1) AS `precision`,\n",
+    "  ROUND(100 * decoy_damage, 1) AS `dental_damage`, ROUND(100 * hard_negative_damage, 1) AS `clean_changed`\n",
+    "  FROM dental_omop.gold_dental_omop_perio.deid_scores WHERE tier = 'all'\n"
+   ]
+  },
+  {
+   "name": "deid_tiers",
+   "displayName": "deid_tiers",
+   "queryLines": [
+    "SELECT method AS engine, tier, ROUND(100 * entity_recall, 1) AS `caught` FROM dental_omop.gold_dental_omop_perio.deid_scores WHERE tier <> 'all'\n"
+   ]
+  }
+ ],
+ "pages": [
+  {
+   "name": "phenotyping",
+   "displayName": "Phenotyping",
+   "pageType": "PAGE_TYPE_CANVAS",
+   "layout": [
+    {
+     "widget": {
+      "name": "p_title",
+      "multilineTextboxSpec": {
+       "lines": [
+        "## Phenotyping: every system against the truth and against an LLM judge\n",
+        "Synthetic data, 240 review charts: **not clinical performance**. *vs truth* is the README's number (the generator's answer key); *vs judge* scores the same answers against an LLM judge's own reading of each note (**LLM judgment**, on the charts it gave a status for). The gap shows how far the judge could stand in for an answer key on real notes. Metric names as in the README.\n"
+       ]
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 0,
+      "width": 6,
+      "height": 2
+     }
+    },
+    {
+     "widget": {
+      "name": "p_f_system",
+      "queries": [
+       {
+        "name": "f_p_f_system_ph_exact",
+        "query": {
+         "datasetName": "ph_exact",
+         "fields": [
+          {
+           "name": "system",
+           "expression": "`system`"
+          }
+         ],
+         "disaggregated": false
+        }
+       },
+       {
+        "name": "f_p_f_system_ph_metrics",
+        "query": {
+         "datasetName": "ph_metrics",
+         "fields": [
+          {
+           "name": "system",
+           "expression": "`system`"
+          }
+         ],
+         "disaggregated": false
+        }
+       },
+       {
+        "name": "f_p_f_system_ph_charts",
+        "query": {
+         "datasetName": "ph_charts",
+         "fields": [
+          {
+           "name": "system",
+           "expression": "`system`"
+          }
+         ],
+         "disaggregated": false
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "filter-multi-select",
+       "encodings": {
+        "fields": [
+         {
+          "fieldName": "system",
+          "displayName": "System",
+          "queryName": "f_p_f_system_ph_exact"
+         },
+         {
+          "fieldName": "system",
+          "displayName": "System",
+          "queryName": "f_p_f_system_ph_metrics"
+         },
+         {
+          "fieldName": "system",
+          "displayName": "System",
+          "queryName": "f_p_f_system_ph_charts"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "System"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 2,
+      "width": 3,
+      "height": 2
+     }
+    },
+    {
+     "widget": {
+      "name": "p_t_exact",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "ph_exact",
+         "fields": [
+          {
+           "name": "group_name",
+           "expression": "`group_name`"
+          },
+          {
+           "name": "system",
+           "expression": "`system`"
+          },
+          {
+           "name": "exact_truth",
+           "expression": "`exact_truth`"
+          },
+          {
+           "name": "exact_judge",
+           "expression": "`exact_judge`"
+          },
+          {
+           "name": "difference",
+           "expression": "`difference`"
+          },
+          {
+           "name": "judged_correct",
+           "expression": "`judged_correct`"
+          },
+          {
+           "name": "caught_right",
+           "expression": "`caught_right`"
+          },
+          {
+           "name": "caught_wrong",
+           "expression": "`caught_wrong`"
+          },
+          {
+           "name": "n_judged",
+           "expression": "`n_judged`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "group_name",
+          "displayName": "Group"
+         },
+         {
+          "fieldName": "system",
+          "displayName": "System"
+         },
+         {
+          "fieldName": "exact_truth",
+          "displayName": "Correct, vs truth (%)"
+         },
+         {
+          "fieldName": "exact_judge",
+          "displayName": "Correct, vs judge (%)"
+         },
+         {
+          "fieldName": "difference",
+          "displayName": "Difference (points)"
+         },
+         {
+          "fieldName": "judged_correct",
+          "displayName": "Judge called it correct (%)"
+         },
+         {
+          "fieldName": "caught_right",
+          "displayName": "Right answers the judge confirmed (%)"
+         },
+         {
+          "fieldName": "caught_wrong",
+          "displayName": "Wrong answers the judge caught (%)"
+         },
+         {
+          "fieldName": "n_judged",
+          "displayName": "Charts the judge read"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Correct: truth vs judge",
+        "showDescription": true,
+        "description": "The judge reads only the note. It misses more of the subtle mistakes good systems make, so check it on reviewed charts before trusting it on real notes."
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 4,
+      "width": 6,
+      "height": 8
+     }
+    },
+    {
+     "widget": {
+      "name": "p_t_agree",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "ph_agree",
+         "fields": [
+          {
+           "name": "label",
+           "expression": "`label`"
+          },
+          {
+           "name": "n",
+           "expression": "`n`"
+          },
+          {
+           "name": "coverage",
+           "expression": "`coverage`"
+          },
+          {
+           "name": "agreement",
+           "expression": "`agreement`"
+          },
+          {
+           "name": "agreement_low",
+           "expression": "`agreement_low`"
+          },
+          {
+           "name": "agreement_high",
+           "expression": "`agreement_high`"
+          },
+          {
+           "name": "kappa",
+           "expression": "`kappa`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "label",
+          "displayName": "Charts"
+         },
+         {
+          "fieldName": "n",
+          "displayName": "Charts"
+         },
+         {
+          "fieldName": "coverage",
+          "displayName": "Judge gave a status (%)"
+         },
+         {
+          "fieldName": "agreement",
+          "displayName": "Judge agrees with truth (%)"
+         },
+         {
+          "fieldName": "agreement_low",
+          "displayName": "95% CI low"
+         },
+         {
+          "fieldName": "agreement_high",
+          "displayName": "95% CI high"
+         },
+         {
+          "fieldName": "kappa",
+          "displayName": "Kappa"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "How often the judge agrees with the truth",
+        "showDescription": true,
+        "description": "Overall, by true status and by note difficulty. Judge metrics are only as good as this."
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 16,
+      "width": 6,
+      "height": 5
+     }
+    },
+    {
+     "widget": {
+      "name": "p_t_run",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "ph_run",
+         "fields": [
+          {
+           "name": "kind",
+           "expression": "`kind`"
+          },
+          {
+           "name": "calls",
+           "expression": "`calls`"
+          },
+          {
+           "name": "charts",
+           "expression": "`charts`"
+          },
+          {
+           "name": "usd",
+           "expression": "`usd`"
+          },
+          {
+           "name": "usd_per_chart",
+           "expression": "`usd_per_chart`"
+          },
+          {
+           "name": "latency_p50_s",
+           "expression": "`latency_p50_s`"
+          },
+          {
+           "name": "latency_p95_s",
+           "expression": "`latency_p95_s`"
+          },
+          {
+           "name": "gate_failures",
+           "expression": "`gate_failures`"
+          },
+          {
+           "name": "endpoint_errors",
+           "expression": "`endpoint_errors`"
+          },
+          {
+           "name": "prompt_tokens",
+           "expression": "`prompt_tokens`"
+          },
+          {
+           "name": "completion_tokens",
+           "expression": "`completion_tokens`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "kind",
+          "displayName": "Call"
+         },
+         {
+          "fieldName": "calls",
+          "displayName": "Calls"
+         },
+         {
+          "fieldName": "charts",
+          "displayName": "Charts"
+         },
+         {
+          "fieldName": "usd",
+          "displayName": "Cost (US$)"
+         },
+         {
+          "fieldName": "usd_per_chart",
+          "displayName": "Cost per chart (US$)"
+         },
+         {
+          "fieldName": "latency_p50_s",
+          "displayName": "Latency, median (s)"
+         },
+         {
+          "fieldName": "latency_p95_s",
+          "displayName": "Latency, 95th percentile (s)"
+         },
+         {
+          "fieldName": "gate_failures",
+          "displayName": "Failed the quote gate"
+         },
+         {
+          "fieldName": "endpoint_errors",
+          "displayName": "Endpoint errors"
+         },
+         {
+          "fieldName": "prompt_tokens",
+          "displayName": "Input tokens"
+         },
+         {
+          "fieldName": "completion_tokens",
+          "displayName": "Output tokens"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Judge cost and speed",
+        "showDescription": true,
+        "description": "Tokens priced at the endpoint's list price (job parameters); latency per call. status: the judge's own reading; verdict: is an answer right"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 12,
+      "width": 6,
+      "height": 4
+     }
+    },
+    {
+     "widget": {
+      "name": "p_t_metrics",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "ph_metrics",
+         "fields": [
+          {
+           "name": "group_name",
+           "expression": "`group_name`"
+          },
+          {
+           "name": "system",
+           "expression": "`system`"
+          },
+          {
+           "name": "metric_label",
+           "expression": "`metric_label`"
+          },
+          {
+           "name": "vs_truth",
+           "expression": "`vs_truth`"
+          },
+          {
+           "name": "vs_judge",
+           "expression": "`vs_judge`"
+          },
+          {
+           "name": "difference",
+           "expression": "`difference`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "group_name",
+          "displayName": "Group"
+         },
+         {
+          "fieldName": "system",
+          "displayName": "System"
+         },
+         {
+          "fieldName": "metric_label",
+          "displayName": "Metric"
+         },
+         {
+          "fieldName": "vs_truth",
+          "displayName": "vs truth (%)"
+         },
+         {
+          "fieldName": "vs_judge",
+          "displayName": "vs judge (%)"
+         },
+         {
+          "fieldName": "difference",
+          "displayName": "Difference (points)"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Every README metric, truth vs judge",
+        "showDescription": true,
+        "description": "Correct, periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 21,
+      "width": 6,
+      "height": 8
+     }
+    },
+    {
+     "widget": {
+      "name": "p_t_charts",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "ph_charts",
+         "fields": [
+          {
+           "name": "system",
+           "expression": "`system`"
+          },
+          {
+           "name": "visit_id",
+           "expression": "`visit_id`"
+          },
+          {
+           "name": "difficulty",
+           "expression": "`difficulty`"
+          },
+          {
+           "name": "truth",
+           "expression": "`truth`"
+          },
+          {
+           "name": "answer",
+           "expression": "`answer`"
+          },
+          {
+           "name": "answer_right",
+           "expression": "`answer_right`"
+          },
+          {
+           "name": "judge_status",
+           "expression": "`judge_status`"
+          },
+          {
+           "name": "verdict",
+           "expression": "`verdict`"
+          },
+          {
+           "name": "quote",
+           "expression": "`quote`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "system",
+          "displayName": "System"
+         },
+         {
+          "fieldName": "visit_id",
+          "displayName": "Chart"
+         },
+         {
+          "fieldName": "difficulty",
+          "displayName": "Note difficulty"
+         },
+         {
+          "fieldName": "truth",
+          "displayName": "Truth"
+         },
+         {
+          "fieldName": "answer",
+          "displayName": "System's answer"
+         },
+         {
+          "fieldName": "answer_right",
+          "displayName": "Right?"
+         },
+         {
+          "fieldName": "judge_status",
+          "displayName": "Judge's status"
+         },
+         {
+          "fieldName": "verdict",
+          "displayName": "Judge's verdict on the answer"
+         },
+         {
+          "fieldName": "quote",
+          "displayName": "Judge's quote from the note"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Each chart: answer, truth and judge",
+        "showDescription": true,
+        "description": "Pick a system above. The quote is verbatim from the note (quote gate)."
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 29,
+      "width": 6,
+      "height": 10
+     }
+    }
+   ]
+  },
+  {
+   "name": "deid",
+   "displayName": "De-identification",
+   "pageType": "PAGE_TYPE_CANVAS",
+   "layout": [
+    {
+     "widget": {
+      "name": "d_title",
+      "multilineTextboxSpec": {
+       "lines": [
+        "## De-identification: removing names, dates and IDs before any AI reads a note\n",
+        "Synthetic notes with fake identifiers, scored in code (no judge): **Identifiers caught**: the share removed (the rest leak); **Removals that were identifiers**: of everything removed, the share that really was one. Dental terms damaged and clean queries changed count removals made by mistake.\n"
+       ]
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 0,
+      "width": 6,
+      "height": 2
+     }
+    },
+    {
+     "widget": {
+      "name": "d_t_all",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "deid",
+         "fields": [
+          {
+           "name": "group_name",
+           "expression": "`group_name`"
+          },
+          {
+           "name": "engine",
+           "expression": "`engine`"
+          },
+          {
+           "name": "caught",
+           "expression": "`caught`"
+          },
+          {
+           "name": "precision",
+           "expression": "`precision`"
+          },
+          {
+           "name": "dental_damage",
+           "expression": "`dental_damage`"
+          },
+          {
+           "name": "clean_changed",
+           "expression": "`clean_changed`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "group_name",
+          "displayName": "Group"
+         },
+         {
+          "fieldName": "engine",
+          "displayName": "Engine"
+         },
+         {
+          "fieldName": "caught",
+          "displayName": "Identifiers caught (%)"
+         },
+         {
+          "fieldName": "precision",
+          "displayName": "Removals that were identifiers (%)"
+         },
+         {
+          "fieldName": "dental_damage",
+          "displayName": "Dental terms damaged (%)"
+         },
+         {
+          "fieldName": "clean_changed",
+          "displayName": "Clean queries changed (%)"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Every engine, all tiers",
+        "showDescription": true,
+        "description": "From data/deid/scores.csv"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 2,
+      "width": 6,
+      "height": 8
+     }
+    },
+    {
+     "widget": {
+      "name": "d_t_tiers",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "deid_tiers",
+         "fields": [
+          {
+           "name": "engine",
+           "expression": "`engine`"
+          },
+          {
+           "name": "tier",
+           "expression": "`tier`"
+          },
+          {
+           "name": "caught",
+           "expression": "`caught`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "engine",
+          "displayName": "Engine"
+         },
+         {
+          "fieldName": "tier",
+          "displayName": "Tier"
+         },
+         {
+          "fieldName": "caught",
+          "displayName": "Identifiers caught (%)"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Identifiers caught by tier",
+        "showDescription": true,
+        "description": "unseen: identifier shapes no engine was built for"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 10,
+      "width": 6,
+      "height": 8
+     }
+    }
+   ]
+  }
+ ]
+}

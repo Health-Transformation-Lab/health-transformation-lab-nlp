@@ -1,0 +1,4 @@
+kind,calls,charts,endpoint_errors,gate_failures,prompt_tokens,completion_tokens,usd,usd_per_chart,latency_mean_s,latency_p50_s,latency_p95_s
+status,240,240,0,0,155591.0,14400.0,0.0993955,0.00041414791666666664,0.0,0.0,0.0
+verdict,502,240,0,0,332659.0,30120.0,0.2115095,0.0008812895833333333,0.0,0.0,0.0
+all,742,240,0,0,488250.0,44520.0,0.310905,0.0012954375,0.0,0.0,0.0

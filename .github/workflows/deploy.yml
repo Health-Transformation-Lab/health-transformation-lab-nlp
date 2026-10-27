@@ -1,4 +1,4 @@
-# Deploy the bundle. dev and uat on demand (uat also on every push to main);
+# Deploy the bundle. dev and uat on every push to main and on demand;
 # prod on demand only, gated by the "prod" GitHub environment (required reviewers).
 #
 # Each GitHub environment (dev, uat, prod) holds the service principal's sign-in (OAuth M2M;
@@ -24,18 +24,21 @@ on:
         type: boolean
         default: false
 
-concurrency:
-  group: deploy-${{ github.event.inputs.target || 'uat' }}
-  cancel-in-progress: false
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.target || 'uat' }}
+    # A merge deploys dev and uat (each skips without its client secret); a manual run, its one target.
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ github.event_name == 'workflow_dispatch' && fromJSON(format('["{0}"]', github.event.inputs.target)) || fromJSON('["dev","uat"]') }}
+    concurrency:
+      group: deploy-${{ matrix.target }}
+      cancel-in-progress: false
+    environment: ${{ matrix.target }}
     env:
-      TARGET: ${{ github.event.inputs.target || 'uat' }}
+      TARGET: ${{ matrix.target }}
       BUNDLE_VAR_service_principal: ${{ vars.SERVICE_PRINCIPAL }}
-      BUNDLE_VAR_judge_endpoint: ${{ vars.JUDGE_ENDPOINT || 'none' }}
       BUNDLE_VAR_warehouse_name: ${{ vars.WAREHOUSE_NAME || 'Serverless Starter Warehouse' }}
       BUNDLE_VAR_gpu_node_type: ${{ vars.GPU_NODE_TYPE || 'g5.2xlarge' }}
       BUNDLE_VAR_users_group: ${{ vars.USERS_GROUP || 'users' }}
@@ -46,6 +49,11 @@ jobs:
           host: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
           client_id: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
           client_secret: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+      - name: Judge endpoint from the environment's JUDGE_ENDPOINT variable, if set (else databricks.yml's)
+        if: vars.JUDGE_ENDPOINT != ''
+        env:
+          JUDGE_ENDPOINT: ${{ vars.JUDGE_ENDPOINT }}
+        run: echo "BUNDLE_VAR_judge_endpoint=$JUDGE_ENDPOINT" >> "$GITHUB_ENV"
       - name: Stop if this environment isn't configured
         if: env.DATABRICKS_CLIENT_SECRET == ''
         run: echo "No service principal sign-in (DATABRICKS_CLIENT_SECRET) for $TARGET; skipping." && exit 0
@@ -56,11 +64,23 @@ jobs:
         run: pip install -e "./python[dev]" matplotlib && (cd python && pytest -q tests)
       - name: Validate
         if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle validate -t "$TARGET"
+      # The catalog resource deploys only with the direct engine. A target last deployed with Terraform
+      # is migrated once by hand (docs/deployment.md); otherwise the deploy below fails and says so.
+      # A workspace with Default Storage can't create a catalog through the API the bundle uses, so
+      # dental_omop is made once with SQL CREATE CATALOG (docs/deployment.md); adopt it into the bundle.
+      # Already bound, or not made by hand: this fails harmlessly and the deploy below decides.
+      - name: Adopt the dental_omop catalog if it was made by hand (once)
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
+        run: databricks bundle deployment bind dental_omop dental_omop -t "$TARGET" --auto-approve || echo "bind did not run (see above); the deploy below decides"
       - name: Deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle deploy -t "$TARGET"
       - name: Run benchmark job
         if: env.DATABRICKS_CLIENT_SECRET != '' && github.event.inputs.run_benchmark == 'true'
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Returns once Databricks has started the run; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait study_benchmark

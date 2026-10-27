@@ -13,9 +13,9 @@ variables.
 |---|---|---|---|
 | Purpose | your sandbox (e.g. Free Edition) | shared test | production |
 | Bundle mode | default (no name prefixes; schedules paused by preset) | `production` | `production` |
-| Deployed by | you, from your laptop | CI on push to `main`, or on demand | CI on demand, after approval |
-| Runs as | you | service principal | service principal |
-| Workspace path | your home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
+| Deployed by | CI on push to `main` (not from a laptop: a second deploy state would duplicate the jobs) | CI on push to `main`, or on demand | CI on demand, after approval |
+| Runs as | the CI service principal | service principal | service principal |
+| Workspace path | the service principal's home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
 | Workspace | your dev workspace | the UAT workspace | the prod workspace |
 | Catalog | `dental_omop` (schemas below) | same | same |
 | `n_people` | 300 | 1,500 | 1,500 |
@@ -47,11 +47,27 @@ The dev target keeps schedules paused with `presets.trigger_pause_status`.
 Resources an earlier development-mode deploy created under `dev_` names are not
 removed by this; drop them by hand once nothing uses them.
 
+**Workspaces with Default Storage** (no metastore storage root) can't create a catalog through the
+API the bundle uses ("Metastore storage root URL does not exist"). Create it once with SQL, as a
+workspace admin, owned by the target's admin group; the deploy workflow then adopts it
+(`bundle deployment bind`) and manages its schemas, volume and grants:
+
+```sql
+CREATE CATALOG IF NOT EXISTS dental_omop COMMENT 'Dental OMOP. Synthetic data only.';
+ALTER CATALOG dental_omop OWNER TO `dental_omop_nlp_dev_admin`;
+```
+
 If a catalog, schema or volume already exists in a workspace (made by hand, or
 deployed by someone else's copy of the bundle), deploy fails rather than take it
 over. Adopt it once with, e.g.,
 `databricks bundle deployment bind dental_omop dental_omop -t dev`
 (resource key, then the object's name), and likewise for the schemas and volume.
+
+**A target deployed before with Terraform** (before the catalog resource) must move its state to the
+direct engine once, by hand, before CI can deploy it:
+`DATABRICKS_BUNDLE_ENGINE=direct databricks bundle deployment migrate -t <target> --noplancheck`.
+CI doesn't try this itself: a migrate that failed for a real reason would let the deploy treat the
+target as new and duplicate its jobs. dev is already migrated; uat and prod were never deployed.
 
 ## Variables
 
@@ -81,21 +97,25 @@ Override any variable with `--var name=value`, or the environment variable
 | `load_lakebase` | `04_load_lakebase.py`: OMOP CDM 5.4 + dental extension into Lakebase (Postgres) | serverless |
 | `medgemma_reader` (uat/prod) | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | single-node GPU |
 
-## Deploy from your laptop (dev)
+## Run in dev from your laptop
+
+CI deploys dev on every merge to `main`, as the service principal; don't `bundle deploy` dev from a
+laptop too (its own deploy state would make a second copy of every job). Validate and run instead:
 
 ```bash
 databricks auth login --host https://<your-workspace>      # once
 databricks bundle validate -t dev
-databricks bundle deploy   -t dev
 databricks bundle run      -t dev study_benchmark
 ```
 
-## Deploy with CI (uat, prod)
+To deploy dev before a merge, run the deploy workflow by hand (Actions → Deploy → Run workflow → dev).
+
+## Deploy with CI (dev, uat, prod)
 
 - `.github/workflows/ci.yml`: Python tests (including `tests/test_bundle.py`,
   which checks the three targets, variables, notebook paths and parameters),
   R parity, and `bundle validate` for all targets when dev credentials exist.
-- `.github/workflows/deploy.yml`: push to `main` deploys **uat**; run it
+- `.github/workflows/deploy.yml`: push to `main` deploys **dev** and **uat** (each skips until its environment has the client secret); run it
   manually to choose dev, uat or prod. Prod waits for approval.
 
 One-time setup, per target (the same steps worked on a Free Edition workspace, which

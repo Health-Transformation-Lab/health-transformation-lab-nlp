@@ -53,6 +53,68 @@ Numbers are per 100 charts. **Correct**: the right status (healthy, gingivitis, 
 
 **Not run yet:** [`modernbert-large`](https://huggingface.co/answerdotai/ModernBERT-large) (needs a GPU); [`longformer-base`](https://huggingface.co/allenai/longformer-base-4096) (needs a GPU); [`gatortron-base`](https://huggingface.co/UFNLP/gatortron-base) (not scheduled yet); [`sapbert`](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) (not a classifier; scored on its own task); [`bioclinical-modernbert-large`](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-large) (needs a GPU); [`clinical-longformer`](https://huggingface.co/yikuan8/Clinical-Longformer) (needs a GPU); [`gte-moderncolbert`](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) (not a classifier; scored on its own task); [`medgemma-4b-it`](https://huggingface.co/google/medgemma-4b-it) (not scheduled yet); [`medgemma-27b-text-it`](https://huggingface.co/google/medgemma-27b-text-it) (needs a GPU). MedGemma few-shot and LoRA runs are not done yet (LoRA needs a GPU).
 
+#### LLM judge: every system against an LLM's reading
+
+Could an LLM stand in for the answer key on real notes? A general-purpose LLM (`databricks-meta-llama-3-3-70b-instruct`; prompts `judge-status-v1`, `judge-v2`) read each of the 240 synthetic notes and did two things: gave its own status for the chart, and said whether each method's answer was right. Both are compared with the truth below (**LLM judgment**; every number is computed in code, not by the LLM). In Databricks: the *dental-omop-nlp scorecard* dashboard.
+
+**How often the LLM's status matches the truth**
+
+| Charts | LLM gave a status | LLM's status matches the truth (95% CI) | Kappa |
+|---|---:|---|---:|
+| All charts (240) | 98% | **82.9%** (77.8%–87.6%) | 0.79 |
+| Easy note (141) | 98% | **95.7%** (92.0%–98.6%) | 0.95 |
+| Medium note (31) | 97% | **90.0%** (76.7%–100.0%) | 0.87 |
+| Hard note (68) | 97% | **53.0%** (40.9%–66.7%) | 0.43 |
+
+It does well on easy notes and badly on hard ones (53%). The LLM reads only the note; the truth also comes from the exam form, procedure codes and chart, which hard notes leave out.
+
+**It misses the mistakes good methods make.** Asked whether an answer was right, it flagged 90% of the wrong answers from `proc_codes_planned`, but only 26% of those from `modernbert-base+cw+s2+rules4` (91% right by the truth), which are mostly one step off (21 of 21; most often stage 3 called stage 4). So it can tell a weak method from a strong one, but not two strong ones apart. This also rules out the usual fix of adjusting each method's score for the judge's own error rate (the Rogan-Gladen correction): that fix assumes the judge misses the same share of every method's mistakes, and here it would put the top methods at about 100%, so it isn't shown. Before trusting a judge on real notes, measure how many of each method's mistakes it catches on charts a person has reviewed.
+
+| Method | Group | Right, by the truth | Right, by the LLM's status | Gap | LLM said right | Wrong answers the LLM flagged |
+|---|---|---:|---:|---:|---:|---:|
+| `algorithm_v0` | Rules on the whole record | 97.5% | 83.3% | -14.1 pts | 83% | 60% |
+| `modernbert-base+cw+s2+rules4` | Trained AI on the note + stage 4 rule | 91.2% | 88.5% | -2.6 pts | 87% | 26% |
+| `modernbert-base+rules4` | Trained AI on the note + stage 4 rule | 90.8% | 87.2% | -3.4 pts | 85% | 40% |
+| `modernbert-base+cw+rules4` | Trained AI on the note + stage 4 rule | 90.8% | 87.2% | -3.4 pts | 84% | 45% |
+| `bert-base+rules4` | Trained AI on the note + stage 4 rule | 90.4% | 87.6% | -2.6 pts | 84% | 43% |
+| `bio-clinicalbert+rules4` | Trained AI on the note + stage 4 rule | 90.0% | 87.2% | -2.6 pts | 84% | 45% |
+| `bert-base+cw+rules4` | Trained AI on the note + stage 4 rule | 90.0% | 86.3% | -3.4 pts | 84% | 48% |
+| `modernbert-base+cw+s1+rules4` | Trained AI on the note + stage 4 rule | 89.6% | 88.0% | -1.3 pts | 85% | 41% |
+| `bioclinical-modernbert-base+rules4` | Trained AI on the note + stage 4 rule | 89.2% | 87.2% | -1.7 pts | 84% | 46% |
+| `scibert+rules4` | Trained AI on the note + stage 4 rule | 88.8% | 85.5% | -3.0 pts | 82% | 58% |
+| `distilbert-base+rules4` | Trained AI on the note + stage 4 rule | 88.8% | 86.3% | -2.1 pts | 82% | 54% |
+| `fusion_tfidf_rad+rules4` | Simple text methods on the note | 87.1% | 85.9% | -0.9 pts | 84% | 50% |
+| `tfidf_logreg+rules4` | Simple text methods on the note | 86.7% | 86.8% | +0.4 pts | 83% | 53% |
+| `biomedbert+rules4` | Trained AI on the note + stage 4 rule | 86.7% | 86.3% | +0.0 pts | 81% | 59% |
+| `modernbert-base+cw` | Trained AI on the note | 83.8% | 76.1% | -7.7 pts | 76% | 67% |
+| `modernbert-base` | Trained AI on the note | 82.1% | 74.4% | -7.7 pts | 76% | 65% |
+| `modernbert-base+cw+s2` | Trained AI on the note | 81.7% | 74.8% | -6.8 pts | 78% | 59% |
+| `fusion_tfidf_rad` | Simple text methods on the note | 80.8% | 75.6% | -5.1 pts | 76% | 68% |
+| `bert-base` | Trained AI on the note | 80.8% | 73.9% | -6.8 pts | 75% | 65% |
+| `bio-clinicalbert` | Trained AI on the note | 80.4% | 73.5% | -6.8 pts | 75% | 66% |
+| `probing_chart` | One part of the record alone | 80.4% | 67.1% | -12.8 pts | 82% | 50% |
+| `bert-base+cw` | Trained AI on the note | 80.4% | 72.6% | -7.7 pts | 74% | 67% |
+| `modernbert-base+cw+s1` | Trained AI on the note | 80.0% | 74.4% | -5.6 pts | 75% | 64% |
+| `bioclinical-modernbert-base` | Trained AI on the note | 79.6% | 73.5% | -6.0 pts | 75% | 65% |
+| `distilbert-base` | Trained AI on the note | 79.2% | 72.6% | -6.4 pts | 73% | 70% |
+| `scibert` | Trained AI on the note | 79.2% | 71.8% | -7.3 pts | 72% | 72% |
+| `note_rules` | Simple text methods on the note | 78.8% | 83.8% | +5.6 pts | 85% | 50% |
+| `tfidf_logreg` | Simple text methods on the note | 77.1% | 73.1% | -3.8 pts | 74% | 67% |
+| `medgemma-1.5-4b-it+rules4` | Untrained medical AI on the note (MedGemma 1.5 4B) | 77.1% | 83.8% | +6.8 pts | 85% | 49% |
+| `biomedbert` | Trained AI on the note | 77.1% | 72.6% | -4.3 pts | 72% | 71% |
+| `medgemma-1.5-4b-it` | Untrained medical AI on the note (MedGemma 1.5 4B) | 75.8% | 82.9% | +6.8 pts | 84% | 48% |
+| `algorithm_design` | Rules on the whole record | 72.1% | 59.8% | -12.4 pts | 61% | 89% |
+| `exam_form` | One part of the record alone | 62.1% | 50.9% | -11.1 pts | 61% | 89% |
+| `proc_codes_planned` | One part of the record alone | 50.8% | 45.3% | -6.0 pts | 50% | 90% |
+| `proc_dx_planned` | One part of the record alone | 50.0% | 44.0% | -7.3 pts | 65% | 82% |
+| `proc_codes_completed` | One part of the record alone | 47.1% | 41.0% | -6.4 pts | 50% | 90% |
+| `proc_dx_completed` | One part of the record alone | 45.0% | 38.9% | -6.8 pts | 58% | 87% |
+| `radiograph_ai` | One part of the record alone | 17.5% | 16.7% | -0.9 pts | 62% | 77% |
+
+*Right, by the LLM's status*: the method's answer matches the LLM's own status (on the charts the LLM gave one). *LLM said right*: share of the method's answers the LLM called right. *Wrong answers the LLM flagged*: of the method's wrong answers, the share the LLM called wrong. Every other metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty) both ways: `data/datasets/judge/judge_metrics.csv`.
+
+**Cost and speed**: 742 calls, US$0.37 at the endpoint's list price (US$0.0016 per chart); latency median 1.3 s, 95th percentile 2.8 s; 42 answers failed the quote gate, 0 endpoint errors.
+
 ### De-identification
 
 Counts on each note set. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note the AI reads, so read them together. [More on these numbers](deidentification.md#how-to-read-the-numbers).

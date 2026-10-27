@@ -18,6 +18,7 @@ MODELS_YAML = REPO_ROOT / "models.yaml"
 
 # Study (chart review) paths
 DATASETS_DIR = REPO_ROOT / "data" / "datasets"   # committed: synthetic, de-identified
+JUDGE_DIR = DATASETS_DIR / "judge"                # spec 012: judge scorecard (committed)
 REVIEW_DIR = DATA_ROOT / "review"                # Label Studio exports + parsed labels
 RAW_DIR = DATA_ROOT / "raw"                      # notes WITH (fake) PHI; never committed
 CORPUS_DIR = DATA_ROOT / "corpus"                # corpus sample, predictions, judgments

@@ -106,3 +106,41 @@ def test_actions_run_on_node_24():
     for wf in (ROOT / ".github" / "workflows").glob("*.yml"):
         text = wf.read_text()
         assert "actions/checkout@v4" not in text and "actions/setup-python@v5" not in text, wf.name
+
+
+def test_merge_to_main_deploys_dev_and_uat_and_a_manual_run_only_its_target():
+    """Spec 012 US1: dev stays current. A push deploys every environment (each still skips
+    without its client secret); workflow_dispatch deploys the one target chosen."""
+    doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
+    job = doc["jobs"]["deploy"]
+    matrix = job["strategy"]["matrix"]["target"]
+    assert "workflow_dispatch" in matrix and "github.event.inputs.target" in matrix
+    assert '["dev","uat"]' in matrix.replace(" ", "")
+    assert job["strategy"]["fail-fast"] is False          # dev failing mustn't cancel uat
+    assert job["environment"] == "${{ matrix.target }}" and job["env"]["TARGET"] == "${{ matrix.target }}"
+    assert "deploy-${{ matrix.target }}" in str(job.get("concurrency", ""))
+
+
+def test_deploy_uses_the_direct_engine_and_never_hides_a_state_migration():
+    """unity_catalog.yml's catalog resource deploys only with the direct engine. Moving Terraform state over
+    is a one-off manual step (docs/deployment.md), not a CI step whose failure is swallowed: a migrate that
+    failed for a real reason would let the deploy treat the target as new and duplicate its jobs."""
+    doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
+    steps = doc["jobs"]["deploy"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    assert not any("bundle deployment migrate" in s.get("run", "") for s in steps)
+    for i, s in enumerate(steps):
+        if "bundle validate" in s.get("run", "") or "bundle deploy " in s.get("run", "") or "bundle run" in s.get("run", ""):
+            assert s.get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct", names[i]
+    assert "bundle deployment migrate" in (ROOT / "docs" / "deployment.md").read_text()
+
+
+def test_deploy_adopts_a_catalog_made_by_hand_before_deploying():
+    """Default Storage workspaces can't create a catalog through the API the bundle uses, so it's made
+    with SQL CREATE CATALOG (docs/deployment.md) and the deploy binds it, once, with the direct engine."""
+    doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
+    steps = doc["jobs"]["deploy"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    bind = next(i for i, s in enumerate(steps) if "bundle deployment bind dental_omop dental_omop" in s.get("run", ""))
+    assert bind < names.index("Deploy") and "--auto-approve" in steps[bind]["run"]
+    assert steps[bind].get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct"

@@ -346,3 +346,39 @@ if (file.exists("data/sites/parity_sites.csv") && file.exists("data/sites/derive
   stopifnot(nrow(m) == length(unique(s$visit_id)), d < 1e-9, cdc_bad == 0)
 } else cat("sites: skipped (run 22_build_sites.py)\n")
 cat("parity OK (spec 006)\n")
+
+# 12. Spec 012 judge scorecard: R 11_judge_scorecard.R == Python judge_scorecard point estimates
+# (metrics vs truth and vs the judge's status, judge agreement). Real judge if run, and the simulated dry run.
+for (pfx in c("", "simulated_")) {
+  if (!file.exists(sprintf("data/datasets/judge/%sjudge_metrics.csv", pfx))) next
+  source("r/R/11_judge_scorecard.R")
+  inp <- read_judge_inputs(pfx)
+  r <- judge_metrics_point(inp$answers, inp$judgments, inp$truth)
+  py <- read.csv(sprintf("data/datasets/judge/%sjudge_metrics.csv", pfx), stringsAsFactors = FALSE)
+  m <- merge(r, py, by = c("system", "metric"), suffixes = c(".r", ".p"))
+  cols <- c("vs_truth", "vs_truth_judged", "vs_judge", "difference", "n_judged", "judged_correct",
+            "verdict_sensitivity", "verdict_specificity")
+  gap <- function(df, k) { x <- abs(df[[paste0(k, ".r")]] - df[[paste0(k, ".p")]]); max(ifelse(is.na(x), 0, x)) }
+  same_na <- function(df, ks) all(sapply(ks, function(k) all(is.na(df[[paste0(k, ".r")]]) == is.na(df[[paste0(k, ".p")]]))))
+  d <- max(sapply(cols, function(k) gap(m, k)))
+  ra <- judge_agreement_point(inp$judgments, inp$truth, inp$level)
+  pa <- read.csv(sprintf("data/datasets/judge/%sjudge_agreement.csv", pfx), stringsAsFactors = FALSE)
+  ma <- merge(ra, pa, by = c("group", "value"), suffixes = c(".r", ".p"))
+  acols <- c("n", "coverage", "agreement", "kappa")
+  da <- max(sapply(acols, function(k) gap(ma, k)))
+  cat(sprintf("%sjudge scorecard: %d system x metric rows, max |R - Python| = %.2e; agreement %d rows, %.2e\n",
+              pfx, nrow(m), d, nrow(ma), da))
+  stopifnot(nrow(m) == nrow(py), d < 1e-9, same_na(m, cols), nrow(ma) == nrow(pa), da < 1e-9, same_na(ma, acols))
+  rf <- sprintf("data/datasets/judge/%sjudge_run.csv", pfx)
+  if (file.exists(rf)) {   # priced at the list price the script used (judge_scorecard.LIST_USD_PER_1M_*)
+    pr <- read.csv(rf, stringsAsFactors = FALSE)
+    rr <- judge_run_summary(inp$judgments, 0.50, 1.50)
+    mr <- merge(rr, pr, by = "kind", suffixes = c(".r", ".p"))
+    rcols <- c("calls", "charts", "endpoint_errors", "gate_failures", "usd", "usd_per_chart", "latency_mean_s",
+               "latency_p50_s", "latency_p95_s")
+    dr <- max(sapply(rcols, function(k) gap(mr, k)))
+    cat(sprintf("%sjudge run cost and speed: max |R - Python| = %.2e\n", pfx, dr))
+    stopifnot(nrow(mr) == nrow(pr), dr < 1e-9)
+  }
+}
+cat("parity OK (spec 012)\n")
