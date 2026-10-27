@@ -167,8 +167,11 @@ def out_of_100(shares) -> list[int]:
     return out
 
 
+COL_ASSIGNED = "Periodontitis incorrectly assigned (not present)"
+COL_NOT_ASSIGNED = "Periodontitis incorrectly not assigned (present)"
 PHENOTYPE_KEY = ("Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage "
-                 "1–4). **Incorrect diagnosis**: wrong about whether the patient has periodontitis. **Incorrect "
+                 "1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. "
+                 "**Periodontitis incorrectly not assigned**: the patient has it, the system didn't say so. **Incorrect "
                  "stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or "
                  "healthy and gingivitis mixed up. **No answer**: the system gave no status.")
 DEID_KEY = ("Out of 100. **PHI incorrectly left in**: patient names, dates and IDs the tool should have removed "
@@ -227,14 +230,13 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
            "that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the "
            "system's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
            "means it plausibly ranks anywhere from 1st to 3rd.", "",
-           PHENOTYPE_KEY + " Incorrect diagnosis is split by what the system said: *said no* (it was "
-           "periodontitis) and *said yes* (it wasn't). *Unsafe errors*: incorrect answers that could harm a patient "
+           PHENOTYPE_KEY + " *Unsafe errors*: incorrect answers that could harm a patient "
            "if acted on, e.g. a missed stage 3–4. *Stage 4 correct*: of the stage 4 patients, how many it called "
            "stage 4. Easy / medium / hard: correct, out of 100, when the note states the 2017 diagnosis (L1), "
            "states it in older terms (L2), or leaves it to be inferred from the findings (L3). For statisticians: "
            "sensitivity, specificity, PPV and NPV for periodontitis yes/no, with no answer counted as no.", "",
-           "| Rank | System | Input | Method | Correct (95% CI) | Incorrect diagnosis: said no | "
-           "Incorrect diagnosis: said yes | Incorrect stage | No answer | Unsafe errors | Sensitivity | Specificity | "
+           f"| Rank | System | Input | Method | Correct (95% CI) | {COL_ASSIGNED} | "
+           f"{COL_NOT_ASSIGNED} | Incorrect stage | No answer | Unsafe errors | Sensitivity | Specificity | "
            "PPV | NPV | Stage 4 correct | Easy / medium / hard |",
            "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     tab = tab.sort_values("accuracy", ascending=False, kind="stable")
@@ -246,7 +248,7 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
         bx = bd[s]
         out.append(f"| {_rank(ranks[s])} | {name} | {systems[s][0]} | {systems[s][1]} | "
                    f"{_ci100(r['accuracy'], r['acc_lo'], r['acc_hi'])} | "
-                   + " | ".join(_n(bx[k]) for k in ("dx_said_no", "dx_said_yes", "stage", "no_answer")) +
+                   + " | ".join(_n(bx[k]) for k in ("dx_said_yes", "dx_said_no", "stage", "no_answer")) +
                    f" | {_n(r['unsafe_rate'])} | "
                    + " | ".join(_pct(yn[s][k]) for k in ("sensitivity", "specificity", "ppv", "npv")) +
                    f" | {_pct(r['stage4_recall'])} | {levels} |")
@@ -339,14 +341,15 @@ def results_markdown(inp: dict) -> str:
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
            "Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it "
            f"plausibly ranks among all {len(ph)} systems. " + PHENOTYPE_KEY, "",
-           "| Group | Best system | Correct | Incorrect diagnosis | Incorrect stage | No answer | Rank | Systems |",
-           "|---|---|---:|---:|---:|---:|---|---:|"]
+           f"| Group | Best system | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | No answer | "
+           "Rank | Systems |",
+           "|---|---|---:|---:|---:|---:|---:|---|---:|"]
     for g in _by_best(ph, PHENOTYPE_GROUPS, "accuracy"):
         sub = ph[ph.group == g]
         s, r = sub.index[0], sub.iloc[0]
-        nums = out_of_100([r["correct"], r["dx_said_no"] + r["dx_said_yes"], r["stage"], r["no_answer"]])
+        nums = out_of_100([r["correct"], r["dx_said_yes"], r["dx_said_no"], r["stage"], r["no_answer"]])
         out.append(f"| {g} | `{s}` | " + " | ".join(map(str, nums)) + f" | {r['rank']} | {len(sub)} |")
-    out += ["", f"All {len(ph)} systems, with the 95% CIs, which way each incorrect diagnosis went, unsafe errors, "
+    out += ["", f"All {len(ph)} systems, with the 95% CIs, unsafe errors, "
             f"results by note difficulty, and the {int(ph['n_missing'].iloc[0])} models not run yet: "
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "",
             DEID_TITLE, "",
