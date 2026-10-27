@@ -153,6 +153,7 @@ def load_inputs() -> dict:
             "by_diff": pd.read_csv(lad / "medgemma_vs_bert_by_difficulty.csv"),
             "key": pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id"),
             "registry": yaml.safe_load(MODELS_YAML.read_text()),
+            "maccrobat_not_run": pd.read_csv(DEID_DIR / "maccrobat_not_run.csv"),
             "deid": deid, "n_decoys": _n_decoys(deid)["all"], "n_decoys_by_tier": _n_decoys(deid),
             "maccrobat_clinical": (pd.read_csv(DEID_DIR / "maccrobat_by_type.csv").query("role == 'clinical'")
                                    .groupby("method")[["n", "n_touched"]].sum()),
@@ -398,6 +399,8 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
                      "external": lambda: of(r["n_hard_negatives"] * r["hard_negative_damage"], r["n_hard_negatives"]),
                      "maccrobat": lambda: of(clin.loc[m, "n_touched"], clin.loc[m, "n"])}[key]()
             out.append(f"| `{m}` | {plain_tool(m)} | {leaked(t, m)} | {scrub} |")
+        if key == "maccrobat" and len(inp["maccrobat_not_run"]):
+            out += [""] + [f"{NOT_RUN} `{r['method']}`: {r['reason']}." for _, r in inp["maccrobat_not_run"].iterrows()]
     c = inp["course"]
     out += ["", COURSE_TITLE, "",
             "MACCROBAT case reports split and labelled for a University of Michigan course assignment (de-identification "

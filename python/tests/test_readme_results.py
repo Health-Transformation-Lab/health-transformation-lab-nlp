@@ -242,6 +242,12 @@ def test_full_page_has_one_table_per_note_set_in_x_of_n(inp, md):
             assert _cell(r, 4) == want, (title, m)
 
 
+def test_maccrobat_table_says_which_methods_were_not_recorded_and_why(inp, md):
+    sec = _section(md, rr.DEID_SETS["maccrobat"])
+    for _, r in inp["maccrobat_not_run"].iterrows():
+        assert f"`{r['method']}`" in sec and r["reason"] in sec, r["method"]
+
+
 def test_full_synthetic_table_is_counts_with_the_95_range(inp, md):
     allt = inp["deid"].query("tier == 'all'").set_index("method")
     for r in _rows(_section(md, rr.DEID_TITLE)):

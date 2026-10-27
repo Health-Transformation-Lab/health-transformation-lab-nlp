@@ -157,6 +157,7 @@ MACCROBAT (CC BY 4.0): 200 real, published case reports. Sensitive text: their 1
 | `hf_stanford+guard` | Stanford AI + dental-word guard | 2 of 105 | 38 of 22,272 |
 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 2 of 105 | 114 of 22,272 |
 | `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 2 of 105 | 173 of 22,272 |
+| `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 2 of 105 | 182 of 22,272 |
 | `presidio` | Presidio | 3 of 105 | 756 of 22,272 |
 | `presidio+guard` | Presidio + dental-word guard | 3 of 105 | 756 of 22,272 |
 | `hf_obi` | OBI AI | 3 of 105 | 119 of 22,272 |
@@ -164,6 +165,8 @@ MACCROBAT (CC BY 4.0): 200 real, published case reports. Sensitive text: their 1
 | `regex_v2+guard` | Patterns + dental-word guard | 77 of 105 | 90 of 22,272 |
 | `regex` | Patterns (first version) | 82 of 105 | 88 of 22,272 |
 | `regex+guard` | Patterns (first version) + dental-word guard | 82 of 105 | 88 of 22,272 |
+
+**Not run yet:** `routed+guard`: run 2026-10-27 with a different spaCy model (en_core_web_lg 3.7.1 under spaCy 3.8); Presidio's results shifted, and routed+guard routes dates, IDs, locations, names and phones to Presidio, so it isn't recorded until it runs under the original setup.
 
 #### A trained PHI tagger on the University of Michigan course files
 
