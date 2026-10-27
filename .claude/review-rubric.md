@@ -96,4 +96,5 @@ verdict: approve | approve-with-nits | request-changes
 <approve / approve-with-nits / request-changes, and what must change first>
 ```
 
-Review files are working notes: not committed (`.gitignore`), not posted to GitHub unless asked.
+Commit the review file with the PR's branch (or after merge) so the record stays in git; don't post it
+to GitHub as a comment unless asked. It must pass the same scans: no secrets, PHI or real data in it.

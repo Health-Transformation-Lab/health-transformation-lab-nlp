@@ -39,3 +39,15 @@ course_lr3e-5_e3,model+regex,year,Date,boundary,23
 course_lr3e-5_e3,model+regex,year,Date,missed,6
 course_lr3e-5_e3,model+regex,year,Date,spurious,31
 course_lr3e-5_e3,model+regex,year,Sex,spurious,1
+course_lr5e-5_e3,model,,Age,boundary,1
+course_lr5e-5_e3,model,,Age,wrong_type,1
+course_lr5e-5_e3,model,,Date,boundary,26
+course_lr5e-5_e3,model,,Date,missed,5
+course_lr5e-5_e3,model,,Date,spurious,15
+course_lr5e-5_e3,model,,Sex,spurious,1
+course_lr5e-5_e3,model+regex,,Age,boundary,1
+course_lr5e-5_e3,model+regex,,Age,wrong_type,1
+course_lr5e-5_e3,model+regex,,Date,boundary,26
+course_lr5e-5_e3,model+regex,,Date,missed,5
+course_lr5e-5_e3,model+regex,,Date,spurious,15
+course_lr5e-5_e3,model+regex,,Sex,spurious,1

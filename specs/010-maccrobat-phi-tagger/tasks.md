@@ -10,3 +10,4 @@
 - [ ] T008 Score MACCROBAT `Time` with Date (or map it); trailing-only trim rule (seen on validation); year pattern (test-informed); check both on a fresh split
 - [ ] T009 Cross-validation over the 160 training notes instead of one 20-note validation set; batch size, 512+ word chunks, other seeds (needs a GPU)
 - [x] T010 Review fixes: wording of the constitution exception; device-safe prediction; tested split and word mapping; one-to-one overlap; validation error listings
+- [x] T011 The course's own train/test files: `read_conll`, `--conll-dir`; two runs; regex scoring; the period defect (88 train, 16 test dates cut short)
