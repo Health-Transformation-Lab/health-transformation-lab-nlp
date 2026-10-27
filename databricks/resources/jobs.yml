@@ -143,3 +143,18 @@ resources:
               sql_warehouse_id: ${var.warehouse_id}
               save_to_repo: "no"
               out_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/deid_ai
+
+    # NHANES 2009-2014 periodontal exam (spec 013 G4): public-domain CDC files, downloaded here because
+    # cdc.gov isn't reachable from every environment. Raw files and the aggregate table stay on the volume.
+    nhanes_perio:
+      name: NHANES perio
+      tags:
+        project: dental-omop-nlp
+        data: public
+      tasks:
+        - task_key: prevalence
+          notebook_task:
+            notebook_path: ../notebooks/09_nhanes_perio.py
+            base_parameters:
+              data_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/nhanes_raw
+              out_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/nhanes

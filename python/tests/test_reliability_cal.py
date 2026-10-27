@@ -5,7 +5,12 @@ trend; ICC per level (de Vet et al. 2006: reliability = between-subject variance
 
 import pytest
 
-from dental_omop_nlp.reliability_cal import CalParams, draw_repeated_charts, icc_report, nested_components
+from dental_omop_nlp.reliability_cal import (
+    CalParams,
+    draw_repeated_charts,
+    icc_report,
+    nested_components,
+)
 
 
 def test_estimator_recovers_known_components_on_unrounded_data():

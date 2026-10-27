@@ -102,6 +102,7 @@ Override any variable with `--var name=value`, or the environment variable
 | `medgemma_reader` | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | serverless GPU; retried twice, 2 minutes apart, if the GPU fails to start or Python fails to restart |
 | `encoder_gpu` | `08_encoder_gpu.py`: fine-tunes the encoders that need a GPU (large ModernBERTs, Longformers, GatorTron-base at a lower learning rate; spec 002 T017); predictions to the landing volume and `encoder_gpu_predictions` | serverless GPU; retried like the reader |
 | `deid_ai` (De-id AI methods) | `06_deid_benchmark.py` with the de-identification methods that need Databricks services: `llm` (serving endpoint `deid_llm_endpoint`) and `ai_mask` (the SQL warehouse), each alone and with patterns + guard; result CSVs to the landing volume (`deid_ai/`) | serverless |
+| `nhanes_perio` (NHANES perio) | `09_nhanes_perio.py`: downloads the public NHANES 2009–2014 periodontal files to the landing volume (`nhanes_raw/`), runs `38_nhanes_perio.py` (CDC/AAP 2012 and ACES, survey-weighted) and writes `nhanes/nhanes_prevalence.csv` next to the published figures; copy that CSV to `data/datasets/nhanes/` | serverless |
 
 ## Run in dev from your laptop
 

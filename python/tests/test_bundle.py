@@ -327,3 +327,17 @@ def test_gpu_jobs_retry_a_failed_start():
         for t in jobs[name][0]["tasks"]:
             assert t["max_retries"] >= 1, name
             assert t["min_retry_interval_millis"] >= 60_000 and t["retry_on_timeout"] is True, name
+
+
+def test_nhanes_job_downloads_public_files_to_the_volume_and_keeps_only_aggregates():
+    _, jobs = _load()
+    j, _ = jobs["nhanes_perio"]
+    assert len(j["name"]) <= 20
+    t = j["tasks"][0]
+    p = t["notebook_task"]["base_parameters"]
+    assert t["notebook_task"]["notebook_path"].endswith("09_nhanes_perio.py")
+    assert p["data_dir"].startswith("/Volumes/${resources.volumes.data.catalog_name}/") and p["data_dir"].endswith("/nhanes_raw")
+    assert p["out_dir"].endswith("/nhanes")
+    assert j["tags"]["data"] == "public"
+    nb = (ROOT / "databricks/notebooks/09_nhanes_perio.py").read_text()
+    assert "38_nhanes_perio.py" in nb and "--download" in nb

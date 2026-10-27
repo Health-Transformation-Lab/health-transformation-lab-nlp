@@ -56,6 +56,9 @@ class AcesRules:
             raise ValueError(f"stage4_rule must be one of {STAGE4_RULES}")
 
 
+DEFAULT = AcesRules()
+
+
 def _non_adjacent(teeth) -> bool:
     """At least two teeth that are not neighbours in the same arch (universal numbering)."""
     t = sorted(set(teeth))
@@ -74,7 +77,7 @@ def occluding_pairs(teeth: pd.DataFrame) -> int:
     return sum(1 for t in range(2, 16) if t in present and 33 - t in present)
 
 
-def aces(sites: pd.DataFrame, teeth: pd.DataFrame, rules: AcesRules = AcesRules()) -> dict:
+def aces(sites: pd.DataFrame, teeth: pd.DataFrame, rules: AcesRules = DEFAULT) -> dict:
     """One exam. sites: tooth, site, cal_mm, pd_mm, bop. teeth: tooth, present, missing_reason."""
     r = rules
     tt = teeth[~teeth["tooth"].isin(THIRD_MOLARS)]
@@ -122,7 +125,7 @@ def _non_adjacent_by(df: pd.DataFrame, key: str, index) -> pd.Series:
     return ok.reindex(index, fill_value=False)
 
 
-def aces_all(sites: pd.DataFrame, teeth: pd.DataFrame, rules: AcesRules = AcesRules(),
+def aces_all(sites: pd.DataFrame, teeth: pd.DataFrame, rules: AcesRules = DEFAULT,
              key: str = "visit_id") -> pd.DataFrame:
     """aces() for every exam at once (same rules, vectorized); one row per `key`."""
     r = rules
