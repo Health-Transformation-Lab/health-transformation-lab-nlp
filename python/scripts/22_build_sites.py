@@ -16,6 +16,7 @@ import random
 
 import pandas as pd
 
+from dental_omop_nlp.aces import AcesRules, aces_all
 from dental_omop_nlp.labels import PerioChart
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
 from dental_omop_nlp.sites import aap_from_derived, cdc_aap, derive_all, draw_mouth_columns
@@ -50,6 +51,15 @@ rows = [{"visit_id": r.visit_id, "person_id": r.person_id, "clinic_id": r.clinic
          "cdc_aap_2012": cdc_aap(d[r.visit_id])}
         for r in v.itertuples()]
 derived = pd.DataFrame(rows)
+# ACES (spec 013 G1-G3): default rules, then the variants the published applications differ on
+ACES_VARIANTS = {"aces": AcesRules(), "aces_teeth20": AcesRules(stage4_rule="teeth20"),
+                 "aces_no_complexity": AcesRules(complexity=False), "aces_case_cal3": AcesRules(case_cal_min_mm=3)}
+for name, rules in ACES_VARIANTS.items():
+    a = aces_all(sites, teeth, rules).set_index("visit_id")
+    derived[name] = derived["visit_id"].map(a["status"])
+    if name == "aces":
+        derived["occluding_pairs"] = derived["visit_id"].map(a["occluding_pairs"])
+        derived["aces_extent"] = derived["visit_id"].map(a["extent"])
 sites.to_parquet(OUT / "sites.parquet")
 teeth.to_parquet(OUT / "teeth.parquet")
 derived.to_csv(OUT / "derived.csv", index=False)
@@ -62,3 +72,8 @@ xt.to_csv(OUT / "aap_vs_cdc.csv")
 print(f"SYNTHETIC: {len(derived)} charted exams, {len(sites):,} site rows, {len(teeth):,} tooth rows")
 print("\n2017 AAP/EFP stage (rows) vs 2012 CDC/AAP category (columns), from the same sites:")
 print(xt.to_string())
+print("\nACES (Holtfreter 2024, as applied by Tay 2025) vs 2017 AAP/EFP from the same sites:")
+print(pd.crosstab(derived["aap_2017"], derived["aces"]).to_string())
+pd.crosstab(derived["aap_2017"], derived["aces"]).to_csv(OUT / "aap_vs_aces.csv")
+print("\nshare by ACES variant:")
+print(pd.DataFrame({k: derived[k].value_counts(normalize=True) for k in ACES_VARIANTS}).fillna(0).round(3).to_string())

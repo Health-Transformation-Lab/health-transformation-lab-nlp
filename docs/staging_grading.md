@@ -89,12 +89,38 @@ Localized (< 30% of teeth involved), generalized (≥ 30%), or molar/incisor pat
 | Grade: smoking, diabetes modifiers | yes | yes |
 | Extent incl. molar/incisor | yes (`molar_incisor=True`) | localized/generalized only |
 
+## ACES: the same classification for survey and secondary data (spec 013)
+
+The worksheet needs things a survey or an extract often lacks (radiographs, teeth lost to
+periodontitis, complexity factors). ACES (Holtfreter et al., J Clin Periodontol 2024;51:512–521,
+doi:10.1111/jcpe.13965) turns it into rules that run on site-level charts alone. `aces.py` /
+`r/R/12_spec013.R` implement it from the site and tooth tables of spec 006. The primary paper is
+not open access, so the rules are as stated by three open papers that apply it: Tay et al. 2025
+(NHANES, PMC12176459), Holde et al. 2025 (Norway, PMC12003053), Nafz et al. 2026 (SHIP-TREND,
+PMC13263721).
+
+| Step | Rule | Setting where the papers differ |
+|---|---|---|
+| Teeth | third molars excluded | |
+| Case | interproximal CAL ≥ 1 mm at ≥ 2 non-adjacent teeth, or buccal/oral CAL ≥ 3 mm with PD > 3 mm at the same site on ≥ 2 teeth | `buccal_pd_min_mm` (Tay > 3; Holde ≥ 3); `case_cal_min_mm=3` for the stricter "CAL above 2 mm" case (Tokede et al.) |
+| Stage | worst interproximal CAL 1–2 mm I, 3–4 mm II, ≥ 5 mm III/IV | |
+| Complexity | II → III with PD ≥ 6 mm at ≥ 2 non-adjacent teeth (distal of second molars ignored) | `complexity=False` reports III/IV together |
+| III vs IV | < 10 opposing pairs of natural teeth → IV | `stage4_rule`: `opposing_pairs` (Tay, Nafz), `teeth20` (< 20 teeth; Holde), `teeth_lost_perio` (≥ 5 recorded), `all_missing_perio` (every missing tooth counted) |
+| Not a case | healthy, or gingivitis with bleeding ≥ 10% of sites | ACES threshold not confirmed from the primary paper |
+| Other | edentulous; non-classified when fewer than two non-adjacent teeth can be assessed; extent generalized at ≥ 30% of teeth | |
+
+Furcation, vertical bone loss and mobility are ACES complexity factors too, but their thresholds and
+place in the tree are not stated in the open papers, so they are not used yet. `22_build_sites.py`
+reports ACES and its variants next to the 2017 worksheet and CDC/AAP 2012 for every synthetic exam
+(`data/sites/derived.csv`, `aap_vs_aces.csv`).
+
 ## Where the rules live
 
 | Place | What to keep in step |
 |---|---|
 | `python/dental_omop_nlp/labels.py`, `r/R/labels.R` | ground truth; parity-tested, including 3,456 edge cases (`aap_rule_cases.csv`) |
 | `python/tests/test_aap_rules.py` | one test per worksheet rule |
+| `python/dental_omop_nlp/aces.py`, `r/R/12_spec013.R`, `python/tests/test_aces.py` | ACES and its variants; parity-tested on 200 exams × 4 variants |
 | `docs/labeling_protocol.md`, `labelstudio/chart_review.xml` | what reviewers apply |
 | `judge.CRITERIA` (shared by the judge and the MedGemma reader), `databricks/notebooks/02_llm_judge.sql` | what LLMs apply (prompt versions `judge-v2`, `reader-v2`) |
 

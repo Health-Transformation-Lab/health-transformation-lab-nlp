@@ -419,4 +419,21 @@ if (file.exists(cg) && file.exists(cr)) {
   cat(sprintf("CAL reliability: max |R - Python| = %.2e\n", dd))
   stopifnot(dd < 1e-9)
 } else cat("CAL reliability: skipped (run 37_cal_reliability.py)\n")
+if (file.exists("data/sites/parity_sites.csv") && file.exists("data/sites/derived.csv")) {
+  source("r/R/12_spec013.R")
+  s <- read.csv("data/sites/parity_sites.csv", stringsAsFactors = FALSE)
+  t <- read.csv("data/sites/parity_teeth.csv", stringsAsFactors = FALSE)
+  t$missing_reason[is.na(t$missing_reason)] <- ""
+  py <- read.csv("data/sites/derived.csv", stringsAsFactors = FALSE)
+  ids <- sort(unique(t$visit_id)); S <- split(s, s$visit_id); Tt <- split(t, t$visit_id)
+  variants <- list(aces = list(), aces_teeth20 = list(stage4_rule = "teeth20"),
+                   aces_no_complexity = list(complexity = FALSE), aces_case_cal3 = list(case_cal = 3))
+  bad <- 0
+  for (v in names(variants)) {
+    r <- sapply(ids, function(k) do.call(aces_exam, c(list(S[[as.character(k)]], Tt[[as.character(k)]]), variants[[v]])))
+    bad <- bad + sum(r != py[[v]][match(ids, py$visit_id)])
+  }
+  cat(sprintf("ACES:         %d exams x %d variants, %d mismatches\n", length(ids), length(variants), bad))
+  stopifnot(bad == 0)
+} else cat("ACES: skipped (run 22_build_sites.py)\n")
 cat("parity OK (spec 013)\n")
