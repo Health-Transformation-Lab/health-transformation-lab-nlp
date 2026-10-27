@@ -7,9 +7,11 @@
 # MAGIC 1. Build synthetic OMOP tables + labeled SOAP notes (no Synthea/Java needed; stand-in population)
 # MAGIC 2. Patient-level split
 # MAGIC 3. Baseline rungs (rules, structured, TF-IDF) — seconds
-# MAGIC 4. One encoder rung (DistilBERT) — minutes on CPU at this sample size
+# MAGIC 4. One encoder rung (DistilBERT) — minutes on CPU at this sample size; `run_encoder=false` skips it
+# MAGIC    and the torch install (the bundle's dev target does, as a quick smoke test)
 # MAGIC 5. Optional: LLM challenger via `ai_query` on a Foundation Model endpoint
-# MAGIC 6. Results and OMOP tables land as Delta in `<catalog>.<schema>` (set per target in `databricks.yml`)
+# MAGIC 6. Results and OMOP tables land as Delta in the gold schema; files in the landing volume
+# MAGIC    (`databricks/resources/unity_catalog.yml`)
 # MAGIC
 # MAGIC **Free Edition notes:** serverless is Python/SQL only (no R). Limited serverless GPU is
 # MAGIC available from the notebook compute selector, subject to capacity and fair-use limits
@@ -20,7 +22,19 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -q -e ../../python[models,track]
+dbutils.widgets.dropdown("run_encoder", "false", ["true", "false"])   # uat/prod jobs set "true" (databricks.yml)
+
+# COMMAND ----------
+
+import subprocess, sys
+
+run_encoder = dbutils.widgets.get("run_encoder") == "true"
+pip = [sys.executable, "-m", "pip", "install", "-q"]
+if run_encoder:
+    # CPU-only torch (~200 MB) instead of PyPI's default CUDA build (~2.5 GB with the
+    # nvidia-* wheels); serverless here is CPU. Installed first so [models] finds it.
+    subprocess.check_call(pip + ["torch", "--index-url", "https://download.pytorch.org/whl/cpu"])
+subprocess.check_call(pip + ["-e", "../../python[models,track]" if run_encoder else "../../python[track]"])
 
 # COMMAND ----------
 
@@ -30,17 +44,22 @@ dbutils.library.restartPython()
 
 import os
 
-dbutils.widgets.text("catalog", "workspace")
-dbutils.widgets.text("schema", "dental")
+run_encoder = dbutils.widgets.get("run_encoder") == "true"   # widget defined above the install
+
+dbutils.widgets.text("catalog", "dental_omop")
+dbutils.widgets.text("schema", "gold_dental_omop_perio")              # tables
+dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")   # data volume
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
 dbutils.widgets.text("experiment_id", "")   # set per target by the bundle (resources/jobs.yml)
-dbutils.widgets.dropdown("train_encoder", "false", ["true", "false"])   # uat/prod jobs set "true" (databricks.yml)
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")
+landing = dbutils.widgets.get("landing_schema")
 
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
-spark.sql(f"CREATE VOLUME IF NOT EXISTS {catalog}.{schema}.data")
-os.environ["DENTAL_DATA_ROOT"] = f"/Volumes/{catalog}/{schema}/data"
+# The bundle creates these; IF NOT EXISTS covers running the notebook by hand.
+for s in (schema, landing):
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{s}")
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {catalog}.{landing}.data")
+os.environ["DENTAL_DATA_ROOT"] = f"/Volumes/{catalog}/{landing}/data"
 
 # COMMAND ----------
 
@@ -109,7 +128,7 @@ results = [run(r) for r in ["rules_baseline", "structured_baseline", "tfidf_logr
 
 # One encoder rung, small for CPU (~600 notes x 2 epochs x 192 tokens). On serverless CPU this took
 # over 16 minutes, so the bundle turns it off in dev and on in uat and prod.
-if dbutils.widgets.get("train_encoder") == "true":
+if run_encoder:
     results.append(run("distilbert-base", epochs=2, max_len=192, batch_size=16))
 
 # COMMAND ----------

@@ -3,8 +3,8 @@
 # dental_omop_nlp_<target>_sp and the admin group dental_omop_nlp_<target>_admin (you and the principal).
 # both are account level (unity catalog sees only account principals) and assigned to this workspace;
 # works on Free Edition, which has no account console, through the workspace's account SCIM proxy.
-# it then makes the target's catalog and schema if missing, so the bundle's registered model has a
-# place at deploy time, and gives the group ALL PRIVILEGES on the catalog and CREATE CATALOG on the metastore.
+# it gives the group CREATE CATALOG on the metastore: the deploy creates the catalog, schemas and volume
+# (databricks/resources/unity_catalog.yml) and grants the group ALL PRIVILEGES on the catalog.
 # the OAuth secret is not made here: the script prints the command, and the secret goes straight into
 # GitHub (gh secret set), never into a file. run once per target, logged in as a workspace admin:
 #   databricks auth login --host https://<workspace>
@@ -23,20 +23,20 @@ while [ $# -gt 0 ]; do
   esac
 done
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-# catalog, schema and secret scope as the bundle resolves them for the target (default, then target override)
-read -r catalog schema scope < <(python3 - "$root/databricks.yml" "$target" <<'EOF'
+# catalog and secret scope as the bundle resolves them for the target (default, then target override)
+read -r catalog scope < <(python3 - "$root/databricks.yml" "$target" <<'EOF'
 import sys, yaml
 b = yaml.safe_load(open(sys.argv[1]))
 if sys.argv[2] not in b["targets"]:
     sys.exit(f"no target {sys.argv[2]!r} in databricks.yml")
 v = {k: x.get("default") for k, x in b["variables"].items()}
 v.update(b["targets"][sys.argv[2]].get("variables", {}))
-print(v["catalog"], v["schema"], v["hf_secret_scope"])
+print(v["catalog"], v["hf_secret_scope"])
 EOF
 )
 sp="dental_omop_nlp_${target}_sp"
 group="dental_omop_nlp_${target}_admin"
-if [ -n "$print_only" ]; then echo "$sp $group $catalog $schema $scope"; exit 0; fi
+if [ -n "$print_only" ]; then echo "$sp $group $catalog $scope"; exit 0; fi
 json_field() { python3 -c "import json,sys; print(json.load(sys.stdin)['$1'])"; }
 
 me=$(databricks current-user me -o json | json_field id)
@@ -56,19 +56,17 @@ databricks service-principals patch "$sp_id" --json '{"schemas": ["urn:ietf:para
 # the secret scope the MedGemma (hf_token) and Lakebase (lakebase_url) notebooks read
 databricks secrets create-scope "$scope" 2> /dev/null || true
 databricks secrets put-acl "$scope" "$sp_app" READ
-# the catalog and schema: the deploy creates the registered model in them, so they must exist before it
+# the deploy creates catalog $catalog (and its schemas and volume), so the group needs CREATE CATALOG;
+# don't create the catalog here, or the deploy fails on "already exists"
 metastore=$(databricks metastores current -o json | json_field metastore_id)
 databricks grants update metastore "$metastore" --json "{\"changes\": [{\"principal\": \"$group\", \"add\": [\"CREATE_CATALOG\"]}]}" > /dev/null
-databricks catalogs get "$catalog" > /dev/null 2>&1 || databricks catalogs create "$catalog" > /dev/null
-databricks schemas get "$catalog.$schema" > /dev/null 2>&1 || databricks schemas create "$schema" "$catalog" > /dev/null
-databricks grants update catalog "$catalog" --json "{\"changes\": [{\"principal\": \"$group\", \"add\": [\"ALL_PRIVILEGES\"]}]}" > /dev/null
 if [ -n "$endpoint" ]; then   # the LLM judge's serving endpoint (bundle variable judge_endpoint)
   ep_id=$(databricks serving-endpoints get "$endpoint" -o json | json_field id)
   databricks serving-endpoints update-permissions "$ep_id" \
     --json "{\"access_control_list\": [{\"service_principal_name\": \"$sp_app\", \"permission_level\": \"CAN_QUERY\"}]}" > /dev/null
 fi
 cat <<EOF
-done: $catalog.$schema, secret scope $scope, group $group.
+done: secret scope $scope, group $group with CREATE CATALOG (the deploy creates $catalog).
 next (docs/deployment.md):
   1. OAuth secret, 90 days; shown once, put it straight into GitHub:
        databricks service-principal-secrets-proxy create $sp_id --lifetime 7776000s

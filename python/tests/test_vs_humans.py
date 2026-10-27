@@ -46,3 +46,34 @@ def test_seeded():
     a = agreement_vs_humans(wide, {"m": truth}, n_boot=30, seed=3)
     b = agreement_vs_humans(wide, {"m": truth}, n_boot=30, seed=3)
     pd.testing.assert_frame_equal(a, b)
+
+
+def _kappa_reference(a, b):
+    # The original pandas implementation; the fast one must match it exactly.
+    cats = sorted(set(a) | set(b))
+    if len(a) == 0:
+        return float("nan")
+    po = (a.values == b.values).mean()
+    pe = sum((a == c).mean() * (b == c).mean() for c in cats)
+    return float("nan") if pe == 1 else (po - pe) / (1 - pe)
+
+
+def test_fast_kappa_matches_pandas_reference_exactly():
+    from dental_omop_nlp.reliability import VALID, _kappa_where_both
+    from dental_omop_nlp.phenotype import cohen_kappa
+    rng = np.random.default_rng(3)
+    for dtype, vals in ((object, np.array([*VALID, "unsure", None], dtype=object)),
+                        ("str", np.array([*VALID, "unsure"], dtype=object))):
+        for _ in range(50):
+            n = int(rng.integers(0, 40))
+            idx = rng.permutation(n)   # callers pass two series on the same index
+            a = pd.Series(rng.choice(vals, n), dtype=dtype, index=idx)
+            b = pd.Series(rng.choice(vals, n), dtype=dtype, index=idx)
+            ok = a.isin(VALID).values & b.isin(VALID).values
+            ref = _kappa_reference(a[ok], b[ok])
+            got = _kappa_where_both(a, b)
+            assert (np.isnan(ref) and np.isnan(got)) or ref == got
+            fa, fb = a.dropna(), b.dropna().iloc[:len(a.dropna())]
+            fa = fa.iloc[:len(fb)]
+            r2, g2 = _kappa_reference(fa, fb), cohen_kappa(fa, fb)
+            assert (np.isnan(r2) and np.isnan(g2)) or r2 == g2

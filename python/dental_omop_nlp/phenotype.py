@@ -89,11 +89,13 @@ def phenotype_v0(row: pd.Series, rules: dict = RULES_V0) -> tuple[str, str]:
 
 
 def cohen_kappa(a: pd.Series, b: pd.Series) -> float:
+    # Plain object arrays, not pandas ops: the reliability bootstrap calls this ~10^5 times.
+    a, b = np.asarray(a, dtype=object), np.asarray(b, dtype=object)
     cats = sorted(set(a) | set(b))
     n = len(a)
     if n == 0:
         return float("nan")
-    po = (a.values == b.values).mean()
+    po = (a == b).mean()
     pe = sum((a == c).mean() * (b == c).mean() for c in cats)
     return float("nan") if pe == 1 else (po - pe) / (1 - pe)
 

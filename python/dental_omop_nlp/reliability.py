@@ -81,8 +81,12 @@ def consensus(wide: pd.DataFrame) -> pd.Series:
     return wide.apply(vote, axis=1).rename("consensus")
 
 
+_VALID = frozenset(VALID)
+
+
 def _kappa_where_both(a: pd.Series, b: pd.Series) -> float:
-    ok = a.isin(VALID) & b.isin(VALID)
+    a, b = np.asarray(a, dtype=object), np.asarray(b, dtype=object)
+    ok = np.fromiter((x in _VALID and y in _VALID for x, y in zip(a, b)), bool, len(a))
     return cohen_kappa(a[ok], b[ok])
 
 

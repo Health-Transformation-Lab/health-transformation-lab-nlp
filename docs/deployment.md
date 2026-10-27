@@ -12,25 +12,54 @@ variables.
 | | dev | uat | prod |
 |---|---|---|---|
 | Purpose | your sandbox (e.g. Free Edition) | shared test | production |
-| Bundle mode | `development` (resources prefixed `[dev <you>]`, schedules paused) | `production` | `production` |
+| Bundle mode | default (no name prefixes; schedules paused by preset) | `production` | `production` |
 | Deployed by | you, from your laptop | CI on push to `main`, or on demand | CI on demand, after approval |
 | Runs as | you | service principal | service principal |
 | Workspace path | your home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
-| Catalog.schema | `workspace.dental_dev` | `dental_uat.dental` | `dental_prod.dental` |
+| Workspace | your dev workspace | the UAT workspace | the prod workspace |
+| Catalog | `dental_omop` (schemas below) | same | same |
 | `n_people` | 300 | 1,500 | 1,500 |
-| DistilBERT in the benchmark job (`train_encoder`) | no (baselines only, ~3 min) | yes | yes |
+| DistilBERT in the benchmark job (`run_encoder`) | no (baselines only, ~3 min; no torch install) | yes | yes |
 | MedGemma GPU job | no (run notebook 03 on serverless GPU) | yes, single-node GPU cluster | yes, all review notes |
 
-The catalog names for uat and prod are placeholders: set them to the
-catalogs your workspaces actually have.
+Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
+schema names are the same everywhere. One catalog, one schema per layer:
+
+| Schema in `dental_omop` | Holds |
+|---|---|
+| `landing_dental_omop_perio` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
+| `bronze_dental_omop_perio` | raw tables (empty for now) |
+| `silver_dental_omop_perio` | cleaned tables (empty for now) |
+| `gold_dental_omop_perio` | OMOP and study tables, `benchmark_results`, `judgments`, `llm_reader_runs`, `perio_note_classifier` |
+
+The bundle creates the catalog, all four schemas and the volume on deploy
+(`databricks/resources/unity_catalog.yml`), each with `prevent_destroy` so
+`bundle destroy` never drops them. Deploying needs Databricks CLI 0.288 or later
+and `CREATE CATALOG` on the metastore. (Older setups used `workspace.dental_dev`,
+`dental_uat.dental` and `dental_prod.dental`, made by hand or by an earlier version of
+the setup script. Nothing uses them now; drop them once the new catalog is deployed.)
+
+No target uses `mode: development`. That mode prefixes every name (`[dev <user>]`
+on jobs, `dev_<user>_` on catalogs, schemas, volumes and registered models, which
+is where names like `dev_dental_omop_ci_perio_note_classifier` came from). The
+workspace separates environments, so names are identical in dev, uat and prod.
+The dev target keeps schedules paused with `presets.trigger_pause_status`.
+Resources an earlier development-mode deploy created under `dev_` names are not
+removed by this; drop them by hand once nothing uses them.
+
+If a catalog, schema or volume already exists in a workspace (made by hand, or
+deployed by someone else's copy of the bundle), deploy fails rather than take it
+over. Adopt it once with, e.g.,
+`databricks bundle deployment bind dental_omop dental_omop -t dev`
+(resource key, then the object's name), and likewise for the schemas and volume.
 
 ## Variables
 
 | Variable | Default | What it sets |
 |---|---|---|
-| `catalog`, `schema` | per target (above) | where tables and the data volume go |
+| `catalog`, `domain` | `dental_omop`, `dental_omop_perio` | the catalog, and the suffix of the `landing_`/`bronze_`/`silver_`/`gold_` schemas |
 | `n_people` | `300` | synthetic people in the benchmark job |
-| `train_encoder` | `false` (uat/prod `true`) | train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
+| `run_encoder` | `false` (uat/prod `true`) | install CPU-only torch and train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
@@ -70,10 +99,10 @@ databricks bundle run      -t dev study_benchmark
   manually to choose dev, uat or prod. Prod waits for approval.
 
 One-time setup, per target (the same steps worked on a Free Edition workspace, which
-has no account console and no AWS account of your own to configure). uat and prod can
-be the same workspace as dev: each target has its own catalog.
+has no account console and no AWS account of your own to configure). Each target is
+its own workspace: names are the same in all three, so they can't share one.
 
-1. **Create the service principal, its group, catalog and schema.** Logged in as a
+1. **Create the service principal and its group.** Logged in as a
    workspace admin:
 
    ```bash
@@ -87,11 +116,12 @@ be the same workspace as dev: each target has its own catalog.
    principal), both at account level through the workspace's SCIM proxy, and assigns
    them to the workspace. It gives the principal `workspace-access` (every API call
    needs it) and `databricks-sql-access` (validate looks up the SQL warehouse), and
-   `READ` on the `dental` secret scope (created if missing). It creates the target's
-   catalog and schema if missing (`dental_uat.dental`; the deploy creates the
-   registered model there, so they must exist first), gives the group `ALL PRIVILEGES`
-   on the catalog and `CREATE CATALOG` on the metastore, and, with `--judge-endpoint`,
-   `CAN_QUERY` on that endpoint. It prints the principal's `id` and `applicationId`.
+   `READ` on the `dental` secret scope (created if missing). It gives the group
+   `CREATE CATALOG` on the metastore and, with `--judge-endpoint`, `CAN_QUERY` on that
+   endpoint. It does not create the catalog: the first deploy creates `dental_omop`,
+   its schemas and the volume, and grants the group `ALL PRIVILEGES` on the catalog.
+   Deploy dev from your laptop only after running this for `dev` too, since the
+   catalog grant names the target's group. It prints the principal's `id` and `applicationId`.
    Run it once per target; a second run fails at the first step because the
    principal exists.
 2. **Create its OAuth secret**, here for 90 days. The output shows it once: put it
@@ -126,10 +156,10 @@ Windows line endings from the three values first, so a pasted `\r\n` can't break
 
 ## Checked here, and not
 
-- Both YAML files validate against the bundle schema from Databricks CLI
-  v0.270.0, and the CLI loads all three targets.
+- The YAML was checked against the bundle schema from Databricks CLI v0.270.0,
+  before the catalogs resource (CLI >= 0.288) was added; re-run `bundle validate`.
 - `bundle validate` and `deploy` against a real workspace haven't been run from
   this repo yet (they need workspace credentials). Run `validate -t dev` first.
 - `databricks/setup/create_service_principal.sh` hasn't been run from this repo; its
   calls are the ones that set up a Free Edition workspace for another bundle. The tests
-  check its syntax, its names and catalog per target, and the workflows' sign-in.
+  check its syntax, its names per target, and the workflows' sign-in.

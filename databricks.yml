@@ -1,7 +1,7 @@
 # Databricks Asset Bundle: deploys the notebooks as jobs to dev, uat and prod.
 #
 #   databricks bundle validate -t dev
-#   databricks bundle deploy   -t dev            # your own copy, prefixed [dev <you>]
+#   databricks bundle deploy   -t dev            # the dev workspace, same names as uat/prod
 #   databricks bundle run      -t dev study_benchmark
 #
 # uat and prod are deployed by CI (.github/workflows/deploy.yml) as a service
@@ -18,17 +18,20 @@ include:
   - databricks/resources/*.yml
 
 variables:
+  # dev, uat and prod are separate workspaces, so the names are the same in every
+  # target: catalog dental_omop, schemas landing_/bronze_/silver_/gold_<domain>
+  # (databricks/resources/unity_catalog.yml).
   catalog:
-    description: Unity Catalog catalog for all tables and the data volume
-    default: workspace
-  schema:
-    description: Schema for tables and the data volume
-    default: dental_dev
+    description: Unity Catalog catalog the bundle creates
+    default: dental_omop
+  domain:
+    description: Suffix of the layer schemas (landing_, bronze_, silver_, gold_)
+    default: dental_omop_perio
   n_people:
     description: Synthetic people to generate in the benchmark job
     default: "300"
-  train_encoder:
-    description: Train the DistilBERT rung in the benchmark job (16+ min on serverless CPU; baselines take ~3)
+  run_encoder:
+    description: Fine-tune the DistilBERT rung in the benchmark job (installs CPU torch; adds ~10 min)
     default: "false"
   judge_endpoint:
     description: Model Serving endpoint for the LLM judge (approved for de-identified data)
@@ -75,13 +78,14 @@ variables:
     default: users
 
 targets:
-  # Your own sandbox, e.g. Databricks Free Edition. Resources get a [dev <user>]
-  # prefix, schedules are paused, and everything is serverless.
+  # The dev workspace (e.g. Databricks Free Edition). Not `mode: development`: that
+  # prefixes every name ([dev <user>] jobs, dev_<user>_ catalogs and schemas), and
+  # the workspace already separates environments. Names are the same in every
+  # target. Schedules stay paused; everything is serverless.
   dev:
-    mode: development
     default: true
-    variables:
-      schema: dental_dev
+    presets:
+      trigger_pause_status: PAUSED
 
   # Shared test environment. Deployed by CI from main, runs as the service principal.
   uat:
@@ -91,11 +95,9 @@ targets:
     run_as:
       service_principal_name: ${var.service_principal}
     variables:
-      catalog: dental_uat
-      schema: dental
       n_people: "1500"
+      run_encoder: "true"
       lakebase_instance: dental-uat
-      train_encoder: "true"
       lakebase_schema: cdm
     permissions:
       - group_name: ${var.users_group}
@@ -135,8 +137,8 @@ targets:
               notebook_task:
                 notebook_path: databricks/notebooks/03_medgemma_reader.py
                 base_parameters:
-                  catalog: ${var.catalog}
-                  schema: ${var.schema}
+                  catalog: ${resources.schemas.gold.catalog_name}
+                  schema: ${resources.schemas.gold.name}
                   rung: ${var.reader_rung}
                   limit: ${var.reader_limit}
                   shots: "0"
@@ -150,10 +152,8 @@ targets:
     run_as:
       service_principal_name: ${var.service_principal}
     variables:
-      catalog: dental_prod
-      schema: dental
+      run_encoder: "true"
       lakebase_instance: dental-prod
-      train_encoder: "true"
       lakebase_schema: cdm
       n_people: "1500"
       reader_limit: "0"
