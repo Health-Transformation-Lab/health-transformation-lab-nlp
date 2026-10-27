@@ -177,8 +177,8 @@ def test_readme_phenotype_rows_add_to_100_and_match_the_predictions(inp, summary
 
 
 def test_periodontitis_column_names():
-    assert rr.COL_ASSIGNED == "Periodontitis incorrectly assigned (not present)"
-    assert rr.COL_NOT_ASSIGNED == "Periodontitis incorrectly ruled out (present)"
+    assert rr.COL_ASSIGNED == "Periodontitis incorrectly assigned (when not present)"
+    assert rr.COL_NOT_ASSIGNED == "Periodontitis incorrectly ruled out (when present)"
 
 
 def test_full_table_uses_the_same_two_column_names(md):
