@@ -99,8 +99,8 @@ Override any variable with `--var name=value`, or the environment variable
 | `study_benchmark` | `01_run_benchmark.py`: build synthetic study, baselines, Delta tables | serverless |
 | `llm_judge` | `02_llm_judge.sql`: judge with `ai_query` | SQL warehouse |
 | `load_lakebase` | `04_load_lakebase.py`: OMOP CDM 5.4 + dental extension into Lakebase (Postgres) | serverless |
-| `medgemma_reader` | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | serverless GPU |
-| `encoder_gpu` | `08_encoder_gpu.py`: fine-tunes the encoders that need a GPU (large ModernBERTs, Longformers, GatorTron-base at a lower learning rate; spec 002 T017); predictions to the landing volume and `encoder_gpu_predictions` | serverless GPU |
+| `medgemma_reader` | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | serverless GPU; retried twice, 2 minutes apart, if the GPU fails to start or Python fails to restart |
+| `encoder_gpu` | `08_encoder_gpu.py`: fine-tunes the encoders that need a GPU (large ModernBERTs, Longformers, GatorTron-base at a lower learning rate; spec 002 T017); predictions to the landing volume and `encoder_gpu_predictions` | serverless GPU; retried like the reader |
 | `deid_ai` (De-id AI methods) | `06_deid_benchmark.py` with the de-identification methods that need Databricks services: `llm` (serving endpoint `deid_llm_endpoint`) and `ai_mask` (the SQL warehouse), each alone and with patterns + guard; result CSVs to the landing volume (`deid_ai/`) | serverless |
 
 ## Run in dev from your laptop
