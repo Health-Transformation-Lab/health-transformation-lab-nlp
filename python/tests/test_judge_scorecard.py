@@ -46,3 +46,57 @@ def test_cost_estimate_prices_every_call():
     est = js.estimate_cost(q, usd_per_1m_in=1.0, usd_per_1m_out=2.0, system_tokens=1000, out_tokens=100)
     assert est["calls"] == 10
     assert est["usd"] == pytest.approx(10 * (1100 / 1e6 * 1.0 + 100 / 1e6 * 2.0))
+
+
+NOTE = "S: bleeding gums. O: max CAL 4 mm interproximal, PD 5 mm. A: Generalized periodontitis stage II, grade B."
+
+
+def test_status_prompt_shows_no_answer_and_uses_the_aap_criteria():
+    from dental_omop_nlp import judge
+    assert judge.CRITERIA in judge.STATUS_SYSTEM
+    prompt = judge.STATUS_USER.format(note=NOTE)
+    assert NOTE in prompt and "Predicted" not in prompt and "{pred}" not in judge.STATUS_USER
+    assert judge.STATUS_PROMPT_VERSION != judge.PROMPT_VERSION
+
+
+@pytest.mark.parametrize(("out", "ok", "why"), [
+    ({"supported_status": "periodontitis_stage_2", "quote": "max CAL 4 mm interproximal"}, True, ""),
+    ({"supported_status": None, "quote": ""}, True, ""),                      # can't tell is allowed
+    ({"supported_status": "stage two", "quote": "max CAL 4 mm"}, False, "bad status"),
+    ({"supported_status": "periodontitis_stage_2", "quote": "CAL of 4mm"}, False, "quote not in note"),
+    ({"supported_status": "periodontitis_stage_2"}, False, "quote not in note"),
+])
+def test_status_gate(out, ok, why):
+    from dental_omop_nlp import judge
+    assert judge.gate_status(NOTE, out) == (ok, why)
+
+
+def test_simulated_judge_gives_a_status_and_a_verbatim_quote():
+    from dental_omop_nlp import judge
+    j = judge.SimulatedJudge({1: "periodontitis_stage_2"}, seed=0)
+    v = j.status(NOTE, visit_id=1)
+    assert v.supported_status in (None, *LABELS) and v.quote_ok
+    assert v.supported_status is None or v.quote in NOTE
+
+
+def test_openai_judge_status_call_sends_no_answer_and_gates_the_reply(monkeypatch):
+    """The HTTP path, with the endpoint faked: the request carries the status prompt, the reply is gated."""
+    import io
+    import json
+
+    from dental_omop_nlp import judge
+    sent = {}
+
+    def fake_urlopen(req, timeout):
+        sent["body"] = json.loads(req.data)
+        reply = {"supported_status": "periodontitis_stage_2", "quote": "max CAL 4 mm interproximal",
+                 "rationale": "CAL 3-4 mm"}
+        return io.BytesIO(json.dumps({"choices": [{"message": {"content": json.dumps(reply)}}],
+                                      "usage": {"prompt_tokens": 900, "completion_tokens": 40}}).encode())
+
+    monkeypatch.setattr(judge.urllib.request, "urlopen", fake_urlopen)
+    j = judge.OpenAIJudge(model="m", base_url="https://example.invalid/serving-endpoints", api_key="k")
+    v = j.status(NOTE)
+    assert sent["body"]["messages"][0]["content"] == judge.STATUS_SYSTEM
+    assert "Predicted" not in sent["body"]["messages"][1]["content"]
+    assert (v.verdict, v.supported_status, v.quote_ok, v.input_tokens) == ("status", "periodontitis_stage_2", True, 900)

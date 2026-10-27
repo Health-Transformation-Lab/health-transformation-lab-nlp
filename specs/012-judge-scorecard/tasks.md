@@ -26,8 +26,8 @@
 
 **Independent test**: `python scripts/36_judge_scorecard.py --simulated` writes `simulated_judge_metrics.csv` whose `vs_truth` equals the README's numbers.
 
-- [ ] T008 [P] [US2] Failing test in `python/tests/test_judge.py` (or existing judge test file): status prompt `judge-v3` (`STATUS_SYSTEM`, `STATUS_USER`, no answer shown) and `gate_status(note, out)`: status ∈ six or null; non-null status needs a verbatim quote
-- [ ] T009 [US2] Implement the status prompt, `gate_status` and `OpenAIJudge.status(note)` in `python/dental_omop_nlp/judge.py`; simulated twin on `SimulatedJudge`
+- [x] T008 [P] [US2] Failing test in `python/tests/test_judge.py` (or existing judge test file): status prompt `judge-v3` (`STATUS_SYSTEM`, `STATUS_USER`, no answer shown) and `gate_status(note, out)`: status ∈ six or null; non-null status needs a verbatim quote
+- [x] T009 [US2] Implement the status prompt, `gate_status` and `OpenAIJudge.status(note)` in `python/dental_omop_nlp/judge.py`; simulated twin on `SimulatedJudge`
 - [ ] T010 [US2] Failing test: `run_judge(queue, judge, done=None)` returns `judgments` per data-model (gate_ok false → verdict not_determinable / judge_status null), skips rows already in `done` (resumable), records endpoint, prompt_version, tokens, `simulated`
 - [ ] T011 [US2] Implement `run_judge` in `python/dental_omop_nlp/judge_scorecard.py` with optional MLflow tracing (`track` extra, no-op when absent)
 - [ ] T012 [US2] Failing test: `judge_metrics(answers, judgments, key)`: for every system and metric (exact_status, sensitivity, specificity, ppv, npv, stage4_caught, unsafe_rate, exact_L1/L2/L3) `vs_truth` equals the scorer used by `readme_results`; `vs_judge` uses the judge's status as reference; `difference = vs_judge - vs_truth`; exact_status rows carry Rogan-Gladen corrected accuracy with a seeded 95% range from verdicts
