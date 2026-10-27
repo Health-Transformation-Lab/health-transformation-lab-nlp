@@ -44,6 +44,7 @@ cd python && pip install -e ".[dev]"
 pytest -q tests                                   # Python tests
 cd .. && python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R   # R vs Python parity
 cd python && python scripts/10_build_study.py     # rebuild study datasets (seeded)
+cd python && python scripts/35_readme_results.py  # refresh the README results leaderboards after new results
 ```
 
 Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
