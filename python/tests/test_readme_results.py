@@ -173,7 +173,8 @@ def test_readme_phenotyping_table_is_narrow_and_each_cell_carries_its_total(summ
         n = int(right.group(2))
         assert int(yes.group(2)) + int(no.group(2)) == n                      # without + with periodontitis
         assert sum(int(m.group(1)) for m in (right, yes, no, stage, na)) == n, r
-        assert "specificity" in r[3] and "sensitivity" in r[4], r
+        assert "correctly ruled out)" in r[3] and "correctly assigned)" in r[4], r
+        assert "specificity" not in r[3] and "sensitivity" not in r[4], r      # plain words in the cells
     assert f"adds up to the {n}" in sec
 
 
@@ -313,8 +314,8 @@ def test_readme_phenotype_table_answers_three_questions(inp, summary):
         b = rr.breakdown(preds["truth"], pred.where(pred.isin(rr.LABELS)))
         assert nums == [round(total * b[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage", "no_answer")]
         yn = rr.yes_no(preds["truth"], pred.where(pred.isin(rr.LABELS)))
-        assert f"(specificity {rr._pct(yn['specificity'])})" in _cell(r, 4), r
-        assert f"(sensitivity {rr._pct(yn['sensitivity'])})" in _cell(r, 5), r
+        assert f"({rr._pct(yn['specificity'])} correctly ruled out)" in _cell(r, 4), r
+        assert f"({rr._pct(yn['sensitivity'])} correctly assigned)" in _cell(r, 5), r
 
 
 def test_plain_names():
@@ -455,9 +456,12 @@ def test_readme_explains_the_questions_and_columns_as_lists(summary):
     numbered = [x for x in ph.splitlines() if re.match(r"[123]\. \*\*", x)]
     assert len(numbered) == 3
     bullets = [x for x in ph.splitlines() if x.startswith("- **")]
-    for term in ("Correct", "Periodontitis incorrectly assigned", "Specificity", "Periodontitis incorrectly ruled out",
-                 "Sensitivity", "Incorrect stage", "No answer (evidence not available)", "Rank", "Stage 4 rule"):
+    for term in ("Correct", "Periodontitis incorrectly assigned", "Periodontitis correctly ruled out",
+                 "Periodontitis incorrectly ruled out", "Periodontitis correctly assigned", "Incorrect stage", "No answer (evidence not available)", "Rank", "Stage 4 rule"):
         assert sum(x.startswith(f"- **{term}**") for x in bullets) == 1, term
+    # the standard names stay, in the definitions only
+    assert any("specificity" in x for x in bullets if x.startswith("- **Periodontitis correctly ruled out**"))
+    assert any("sensitivity" in x for x in bullets if x.startswith("- **Periodontitis correctly assigned**"))
     de = _section(summary, rr.DEID_TITLE)
     for term in (rr.COL_LEAKED, rr.COL_SCRUBBED, "Rank"):
         assert sum(x.startswith(f"- **{term}**") for x in de.splitlines()) == 1, term
