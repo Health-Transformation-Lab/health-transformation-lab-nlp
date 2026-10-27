@@ -92,6 +92,11 @@ def plain_system(system: str) -> str:
 PHENOTYPE_QUESTIONS = ("1. Whole record available", "2. Only the note available", "3. One part of the record alone")
 
 
+# Models that were tried and failed, so "not scheduled" would be wrong (spec 002 T016/T017).
+_NOT_RUN_WHY = {"gatortron-base": "ran on CPU but diverged and called every chart healthy, so it wasn't kept, "
+                                  "to rerun on a GPU at a lower learning rate, spec 002 task T017"}
+
+
 def readme_label(system: str) -> str:
     """The README's name for a phenotyping method."""
     b = base_id(system)
@@ -391,8 +396,10 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
     for m in reg["models"]:
         if m["id"] in scored:
             continue
-        why = ("not a classifier; scored on its own task" if m.get("role") in ("entity_linking", "retrieval") else
-               "needs a GPU" if re.search(r"large|longformer|27b", m["id"]) else "not scheduled yet")
+        why = ("not a periodontal status classifier, and no scorer for its own task yet"
+               if m.get("role") in ("entity_linking", "retrieval") else
+               _NOT_RUN_WHY.get(m["id"]) or ("needs a GPU" if re.search(r"large|longformer|27b", m["id"])
+                                             else "not scheduled yet"))
         missing.append(f"[`{m['id']}`](https://huggingface.co/{m['hf']}) ({why})")
     out += ["", f"{NOT_RUN} " + "; ".join(missing) + ". MedGemma few-shot and LoRA runs are not done yet "
             "(LoRA needs a GPU)."]
