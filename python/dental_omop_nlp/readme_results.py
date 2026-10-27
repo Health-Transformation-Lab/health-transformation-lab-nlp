@@ -40,7 +40,11 @@ END = "<!-- results:end -->"
 PHENOTYPE_TITLE = "### Phenotyping: periodontal status per chart"
 DEID_TITLE = "### De-identification"
 NOT_RUN = "**Not run yet:**"
-OTHER_SETS_TITLE = "#### The same best methods on the other note sets"
+OTHER_SETS_TITLE = "#### The other note sets"
+DEID_SETS = {"unseen": "#### Synthetic dental notes, hardest tier only",
+             "jsl48": "#### John Snow Labs benchmark",
+             "external": "#### ASQ-PHI",
+             "maccrobat": "#### MACCROBAT"}
 COURSE_TITLE = "#### A trained PHI tagger on the University of Michigan course files"
 N_BOOT, SEED = 1000, 0   # as 28_ladder_vs_truth.py, so the CIs match data/datasets/ladder/
 
@@ -71,7 +75,7 @@ _PLAIN = {"algorithm_v0": "Gum measurements first", "algorithm_design": "Exam fo
           "modernbert-base": "ModernBERT", "bio-clinicalbert": "Bio ClinicalBERT", "biomedbert": "BiomedBERT",
           "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT"}
 _PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Presidio", "regex_v2": "patterns",
-               "regex": "patterns (first version)", "guard": "dental-word guard", "routed": "routed by note type"}
+               "regex": "patterns (first version)", "guard": "dental-word guard", "routed": "routed by identifier type"}
 
 
 def plain_system(system: str) -> str:
@@ -115,16 +119,18 @@ def anchor(title: str) -> str:
     return re.sub(r"[^a-z0-9 -]", "", title.lstrip("# ").lower()).replace(" ", "-")
 
 
-def _n_decoys(scores: pd.DataFrame) -> int:
-    """Look-alike dental words in the scored challenge set. scores.csv keeps rates, not this count, so the
-    seeded set is rebuilt (no engine runs) and checked against the scores before use."""
+def _n_decoys(scores: pd.DataFrame) -> dict:
+    """Look-alike dental words in the scored challenge set, per tier and in all. scores.csv keeps rates, not
+    these counts, so the seeded set is rebuilt (no engine runs) and checked against the scores before use."""
     from .phi_challenge import build_challenge
     allt = scores[scores.tier == "all"]
     ch = build_challenge(int(allt["n_notes"].iloc[0]))
-    n = sum(len(r["decoys"]) for r in ch)
     if sum(len(r["phi"]) for r in ch) != int(allt["n_phi"].iloc[0]):
         raise ValueError("rebuilt challenge set doesn't match data/deid/scores.csv: rerun 26_deid_benchmark.py")
-    return n
+    by_tier = {}
+    for r in ch:
+        by_tier[r["tier"]] = by_tier.get(r["tier"], 0) + len(r["decoys"])
+    return {**by_tier, "all": sum(by_tier.values())}
 
 
 def _course(runs: pd.DataFrame) -> dict:
@@ -147,7 +153,8 @@ def load_inputs() -> dict:
             "by_diff": pd.read_csv(lad / "medgemma_vs_bert_by_difficulty.csv"),
             "key": pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id"),
             "registry": yaml.safe_load(MODELS_YAML.read_text()),
-            "deid": deid, "n_decoys": _n_decoys(deid),
+            "maccrobat_not_run": pd.read_csv(DEID_DIR / "maccrobat_not_run.csv"),
+            "deid": deid, "n_decoys": _n_decoys(deid)["all"], "n_decoys_by_tier": _n_decoys(deid),
             "maccrobat_clinical": (pd.read_csv(DEID_DIR / "maccrobat_by_type.csv").query("role == 'clinical'")
                                    .groupby("method")[["n", "n_touched"]].sum()),
             "course": _course(pd.read_csv(DEID_DIR / "maccrobat_tagger_runs.csv")),
@@ -344,36 +351,56 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
     ranks = interval_rank_range(allt["lo"], allt["hi"])
     n_notes, n_phi = int(allt["n_notes"].iloc[0]), int(allt["n_phi"].iloc[0])
 
+    n_words, by_tier = inp["n_decoys"], inp["n_decoys_by_tier"]
+    clin = inp["maccrobat_clinical"]
+
+    def of(k, n):
+        return f"{round(k):,} of {int(n):,}"
+
+    def leaked(t, m):
+        return of(t.loc[m, "n_phi"] * (1 - t.loc[m, "entity_recall"]), t.loc[m, "n_phi"])
+
     out = [DEID_TITLE, "",
-           f"Every method on the {n_notes} synthetic dental notes with fake PHI ({n_phi:,} identifiers, all tiers), "
-           "ranked by sensitive text leaked (fewest first), with a Wilson 95% CI. Per-identifier results aren't saved, so there is "
-           "no paired bootstrap: **Rank** is the range the intervals allow, from only the methods clearly above "
-           "counting to every method whose interval reaches this one's counting.", "",
-           "Numbers are per 100. " + DEID_KEY + " Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note "
-           "the AI reads, so read them together. *Unseen tier*: the notes no method was written against. "
-           "**John Snow Labs**: their published 48-note benchmark (1,479 identifiers; it labels no look-alike "
-           "text, so there is no scrubbed column). "
-           "**ASQ-PHI**: 1,051 synthetic clinical queries (MIT); its text that is not sensitive is the queries with "
-           "no PHI, out of 100 queries. **MACCROBAT**: 200 real, published case reports (CC BY 4.0); its sensitive "
-           "text is the dates, its text that is not sensitive the clinical terms. "
+           "Counts on each note set. " + DEID_KEY + " Leaking sensitive text risks patients; scrubbing text that "
+           "isn't sensitive damages the note the AI reads, so read them together. "
            "[More on these numbers](deidentification.md#how-to-read-the-numbers).", "",
-           f"| Rank | Method | {COL_LEAKED} (95% CI) | {COL_LEAKED}, unseen tier | {COL_SCRUBBED} | "
-           f"John Snow Labs: {COL_LEAKED} | ASQ-PHI: {COL_LEAKED} | ASQ-PHI: {COL_SCRUBBED} | "
-           f"MACCROBAT: {COL_LEAKED} | MACCROBAT: {COL_SCRUBBED} |",
-           "|---|---|---|---:|---:|---:|---:|---:|---:|---:|"]
-
-    def left(t, m):
-        return _n(1 - t.loc[m, "entity_recall"], 0) if m in t.index else "–"
-
-    def scrub(t, m, c, d=0):
-        return _n(t.loc[m, c], d) if m in t.index else "–"
-
+           f"**Synthetic dental notes**: {n_notes} notes with fake PHI, {n_phi:,} identifiers and {n_words:,} "
+           "look-alike dental words. Ranked by sensitive text leaked, fewest first. The 95% range is the likely "
+           "true leak rate (Wilson interval); per-identifier results aren't saved, so **Rank** is the range those "
+           "intervals allow.", "",
+           f"| Rank | Code name | Method | {COL_LEAKED} | {COL_SCRUBBED} |",
+           "|---|---|---|---|---:|"]
     for rank, (m, r) in zip(ranks, allt.iterrows()):
-        out.append(f"| {_rank(rank)} | `{m}` | {_ci100(1 - r['entity_recall'], 1 - r['hi'], 1 - r['lo'])} | "
-                   f"{left(unseen, m)} | {scrub(allt, m, 'decoy_damage')} | {left(jsl, m)} | {left(asq, m)} | "
-                   f"{scrub(asq, m, 'hard_negative_damage')} | {left(mac, m)} | {scrub(mac, m, 'decoy_damage', 1)} |")
+        out.append(f"| {_rank(rank)} | `{m}` | {plain_tool(m)} | {leaked(allt, m)} (95% range "
+                   f"{100 * (1 - r['hi']):.1f}–{100 * (1 - r['lo']):.1f}%) | "
+                   f"{of(n_words * r['decoy_damage'], n_words)} |")
     out += ["", f"{NOT_RUN} " + ", ".join(f"`{m}`" for m in inp["deid_not_run"]["method"]) +
             " (cloud and LLM methods; each needs its service's credentials)."]
+    blurbs = {"unseen": f"The {int(unseen['n_notes'].iloc[0])} synthetic notes whose identifier shapes no method "
+                        f"was written for: {int(unseen['n_phi'].iloc[0]):,} identifiers, {by_tier['unseen']:,} "
+                        "look-alike dental words.",
+              "jsl48": f"John Snow Labs' published benchmark: {int(jsl['n_notes'].iloc[0])} clinical notes, "
+                       f"{int(jsl['n_phi'].iloc[0]):,} identifiers. It labels no look-alike text, so nothing to count "
+                       "as incorrectly scrubbed.",
+              "external": f"ASQ-PHI (MIT): {int(asq['n_notes'].iloc[0]):,} synthetic clinical search queries, "
+                          f"{int(asq['n_phi'].iloc[0]):,} identifiers. Text that is not sensitive: the "
+                          f"{int(asq['n_hard_negatives'].iloc[0])} queries with no PHI; a changed query counts.",
+              "maccrobat": f"MACCROBAT (CC BY 4.0): {int(mac['n_notes'].iloc[0])} real, published case reports. "
+                           f"Sensitive text: their {int(mac['n_phi'].iloc[0])} dates. Text that is not sensitive: "
+                           f"their {int(clin['n'].iloc[0]):,} clinical terms."}
+    for key, title in DEID_SETS.items():
+        t = mac if key == "maccrobat" else d[d.tier == key].set_index("method")
+        t = t.sort_values("entity_recall", ascending=False, kind="stable")
+        out += ["", title, "", blurbs[key], "",
+                f"| Code name | Method | {COL_LEAKED} | {COL_SCRUBBED} |", "|---|---|---|---:|"]
+        for m, r in t.iterrows():
+            scrub = {"unseen": lambda: of(by_tier["unseen"] * r["decoy_damage"], by_tier["unseen"]),
+                     "jsl48": lambda: "not labelled",
+                     "external": lambda: of(r["n_hard_negatives"] * r["hard_negative_damage"], r["n_hard_negatives"]),
+                     "maccrobat": lambda: of(clin.loc[m, "n_touched"], clin.loc[m, "n"])}[key]()
+            out.append(f"| `{m}` | {plain_tool(m)} | {leaked(t, m)} | {scrub} |")
+        if key == "maccrobat" and len(inp["maccrobat_not_run"]):
+            out += [""] + [f"{NOT_RUN} `{r['method']}`: {r['reason']}." for _, r in inp["maccrobat_not_run"].iterrows()]
     c = inp["course"]
     out += ["", COURSE_TITLE, "",
             "MACCROBAT case reports split and labelled for a University of Michigan course assignment (de-identification "
@@ -465,22 +492,25 @@ def results_markdown(inp: dict) -> str:
         return of(t.loc[m, "n_phi"] * (1 - t.loc[m, "entity_recall"]), t.loc[m, "n_phi"]) if m in t.index else "not run"
 
     out += ["", OTHER_SETS_TITLE, "",
-            "**John Snow Labs**: their published benchmark, 48 clinical notes. **ASQ-PHI**: 1,051 synthetic "
-            "clinical queries; the not-sensitive text is the 219 queries with no PHI. **MACCROBAT**: 200 real, "
-            "published case reports; the sensitive text is their dates, the not-sensitive text their clinical terms.", "",
-            f"| Best method | John Snow Labs: {COL_LEAKED} | ASQ-PHI: {COL_LEAKED} | ASQ-PHI: {COL_SCRUBBED} | "
-            f"MACCROBAT: {COL_LEAKED} | MACCROBAT: {COL_SCRUBBED} |",
-            "|---|---:|---:|---:|---:|---:|"]
-    for g in _by_best(de, DEID_GROUPS, "entity_recall"):
-        m = de[de.group == g].index[0]
-        scrub_mac = of(clin.loc[m, "n_touched"], clin.loc[m, "n"]) if m in mac.index else "not run"
-        out.append(f"| {plain_tool(m)} | {leaked(jsl, m)} | {leaked(asq, m)} | "
-                   f"{of(asq.loc[m, 'n_hard_negatives'] * asq.loc[m, 'hard_negative_damage'], asq.loc[m, 'n_hard_negatives'])} | "
-                   f"{leaked(mac, m)} | {scrub_mac} |")
+            "The best method on each of the other note sets; the link opens that set's full table.", "",
+            f"| Note set | Best method on it | {COL_LEAKED} | {COL_SCRUBBED} | Details |",
+            "|---|---|---:|---:|---|"]
+    names = {"jsl48": "John Snow Labs benchmark (48 clinical notes)",
+             "external": "ASQ-PHI (1,051 synthetic clinical queries)",
+             "maccrobat": "MACCROBAT (200 real, published case reports)"}
+    for key in ("jsl48", "external", "maccrobat"):
+        t = mac if key == "maccrobat" else d[d.tier == key].set_index("method")
+        m = t.sort_values("entity_recall", ascending=False, kind="stable").index[0]
+        scrub = {"jsl48": "not labelled",
+                 "external": of(asq.loc[m, "n_hard_negatives"] * asq.loc[m, "hard_negative_damage"],
+                                asq.loc[m, "n_hard_negatives"]),
+                 "maccrobat": of(clin.loc[m, "n_touched"], clin.loc[m, "n"]) if m in clin.index else "–"}[key]
+        out.append(f"| {names[key]} | {plain_tool(m)} | {leaked(t, m)} | {scrub} | "
+                   f"[{DEID_SETS[key].lstrip('# ')}](docs/results.md#{anchor(DEID_SETS[key])}) |")
     c = inp["course"]
-    out += ["", f"**University of Michigan course files** (MACCROBAT, split for a course assignment): a separately trained "
-            f"PHI tagger found {c['found']} of {c['total']} identifiers exactly "
-            f"([details](docs/results.md#{anchor(COURSE_TITLE)}))."]
+    out.append(f"| University of Michigan course files (40 MACCROBAT test reports) | A trained PHI tagger "
+               f"(exact matches only) | {c['missed']} of {c['total']} missed or only partly found | "
+               f"{c['wrong_tags']} tagged wrongly | [Course tagger](docs/results.md#{anchor(COURSE_TITLE)}) |")
     return "\n".join(out)
 
 

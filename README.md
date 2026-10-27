@@ -73,17 +73,16 @@ Best method in each group, counted on the 400 synthetic notes; groups ordered by
 
 All 15 methods, per 100 with 95% CIs, on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
 
-#### The same best methods on the other note sets
+#### The other note sets
 
-**John Snow Labs**: their published benchmark, 48 clinical notes. **ASQ-PHI**: 1,051 synthetic clinical queries; the not-sensitive text is the 219 queries with no PHI. **MACCROBAT**: 200 real, published case reports; the sensitive text is their dates, the not-sensitive text their clinical terms.
+The best method on each of the other note sets; the link opens that set's full table.
 
-| Best method | John Snow Labs: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is not sensitive incorrectly scrubbed | MACCROBAT: Text that is sensitive (PHI) incorrectly leaked | MACCROBAT: Text that is not sensitive incorrectly scrubbed |
-|---|---:|---:|---:|---:|---:|
-| Stanford AI + OBI AI + patterns + dental-word guard | 89 of 1,479 | 71 of 2,975 | 195 of 219 | not run | not run |
-| Stanford AI + dental-word guard | 181 of 1,479 | 153 of 2,975 | 59 of 219 | 2 of 105 | 38 of 22,272 |
-| Patterns | 698 of 1,479 | 1,393 of 2,975 | 21 of 219 | 77 of 105 | 90 of 22,272 |
-
-**University of Michigan course files** (MACCROBAT, split for a course assignment): a separately trained PHI tagger found 162 of 195 identifiers exactly ([details](docs/results.md#a-trained-phi-tagger-on-the-university-of-michigan-course-files)).
+| Note set | Best method on it | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Details |
+|---|---|---:|---:|---|
+| John Snow Labs benchmark (48 clinical notes) | Routed by identifier type + dental-word guard | 44 of 1,479 | not labelled | [John Snow Labs benchmark](docs/results.md#john-snow-labs-benchmark) |
+| ASQ-PHI (1,051 synthetic clinical queries) | Routed by identifier type + dental-word guard | 48 of 2,975 | 201 of 219 | [ASQ-PHI](docs/results.md#asq-phi) |
+| MACCROBAT (200 real, published case reports) | Stanford AI + Presidio + patterns + dental-word guard | 0 of 105 | 820 of 22,272 | [MACCROBAT](docs/results.md#maccrobat) |
+| University of Michigan course files (40 MACCROBAT test reports) | A trained PHI tagger (exact matches only) | 33 of 195 missed or only partly found | 45 tagged wrongly | [Course tagger](docs/results.md#a-trained-phi-tagger-on-the-university-of-michigan-course-files) |
 <!-- results:end -->
 
 ## What it does, step by step

@@ -176,31 +176,27 @@ def test_dental_word_count_matches_the_scored_challenge_set(inp):
 
 def _other_sets_rows(summary):
     sec = _section(summary, rr.OTHER_SETS_TITLE)
-    return [r for r in sec.splitlines() if r.startswith("| ") and not r.startswith("| Best method")]
+    return [r for r in sec.splitlines() if r.startswith("| ") and not r.startswith("| Note set")]
 
 
-def test_readme_shows_the_best_methods_on_every_outside_note_set(inp, summary, md):
+def test_readme_has_one_row_per_other_note_set_linking_to_its_table(inp, summary):
     rows = _other_sets_rows(summary)
-    best = _best_by_group(_rows(_section(md, rr.DEID_TITLE)), rr.deid_group)
-    d = inp["deid"]
-    jsl, asq = (d[d.tier == t].set_index("method") for t in ("jsl48", "external"))
-    clin = inp["maccrobat_clinical"]
-    mac = inp["maccrobat"].set_index("method")
-    assert len(rows) == len(rr.DEID_GROUPS)
-    for r in rows:
-        m = next(best[g] for g in rr.DEID_GROUPS if rr.plain_tool(best[g]) == _cell(r, 1))
+    d, mac, clin = inp["deid"], inp["maccrobat"].set_index("method"), inp["maccrobat_clinical"]
 
-        def of(k, n):
-            return f"{round(k):,} of {int(n):,}"
-        assert _cell(r, 2) == of(jsl.loc[m, "n_phi"] * (1 - jsl.loc[m, "entity_recall"]), jsl.loc[m, "n_phi"])
-        assert _cell(r, 3) == of(asq.loc[m, "n_phi"] * (1 - asq.loc[m, "entity_recall"]), asq.loc[m, "n_phi"])
-        assert _cell(r, 4) == of(asq.loc[m, "n_hard_negatives"] * asq.loc[m, "hard_negative_damage"],
-                                 asq.loc[m, "n_hard_negatives"])
-        if m in mac.index:
-            assert _cell(r, 5) == of(mac.loc[m, "n_phi"] * (1 - mac.loc[m, "entity_recall"]), mac.loc[m, "n_phi"])
-            assert _cell(r, 6) == of(clin.loc[m, "n_touched"], clin.loc[m, "n"])
-        else:
-            assert _cell(r, 5) == _cell(r, 6) == "not run"
+    def of(k, n):
+        return f"{round(k):,} of {int(n):,}"
+    assert len(rows) == 4                                  # John Snow Labs, ASQ-PHI, MACCROBAT, Michigan course
+    for key in ("jsl48", "external", "maccrobat"):
+        t = mac if key == "maccrobat" else d[d.tier == key].set_index("method")
+        best = t.sort_values("entity_recall", ascending=False, kind="stable").index[0]
+        row = next(r for r in rows if f"docs/results.md#{rr.anchor(rr.DEID_SETS[key])}" in r)
+        assert _cell(row, 2) == rr.plain_tool(best), key
+        assert _cell(row, 3) == of(t.loc[best, "n_phi"] * (1 - t.loc[best, "entity_recall"]), t.loc[best, "n_phi"])
+    for r in rows:                                         # every row drills down
+        assert "docs/results.md#" in _cell(r, 5), r
+    course = next(r for r in rows if "Michigan" in _cell(r, 1))
+    c = inp["course"]
+    assert f"{c['missed']} of {c['total']}" in _cell(course, 3)
 
 
 def test_course_tagger_counts(inp, md):
@@ -216,9 +212,50 @@ def test_readme_mentions_the_course_files(summary):
     assert "University of Michigan course files" in _section(summary, rr.OTHER_SETS_TITLE)
 
 
-def test_full_deid_table_has_john_snow_labs(md):
-    header = next(x for x in _section(md, rr.DEID_TITLE).splitlines() if x.startswith("| Rank"))
-    assert f"John Snow Labs: {rr.COL_LEAKED}" in header
+def test_readme_other_sets_table_is_narrow(summary):
+    header = next(x for x in _section(summary, rr.OTHER_SETS_TITLE).splitlines() if x.startswith("| Note set"))
+    assert header.count("|") - 1 == 5
+
+
+def test_full_page_has_one_table_per_note_set_in_x_of_n(inp, md):
+    d, mac, clin = inp["deid"], inp["maccrobat"].set_index("method"), inp["maccrobat_clinical"]
+
+    def of(k, n):
+        return f"{round(k):,} of {int(n):,}"
+    for key, title in rr.DEID_SETS.items():
+        sec = _section(md, title)
+        header = next(x for x in sec.splitlines() if x.startswith("| Code name"))
+        assert rr.COL_LEAKED in header and rr.COL_SCRUBBED in header, title
+        rows = {_cell(r, 1).strip("`"): r for r in sec.splitlines()
+                if r.startswith("| `")}
+        t = mac if key == "maccrobat" else d[d.tier == key].set_index("method")
+        assert set(rows) == set(t.index), title
+        for m, r in rows.items():
+            assert _cell(r, 2) == rr.plain_tool(m)
+            assert _cell(r, 3) == of(t.loc[m, "n_phi"] * (1 - t.loc[m, "entity_recall"]), t.loc[m, "n_phi"]), (title, m)
+            want = {"unseen": lambda: of(inp["n_decoys_by_tier"]["unseen"] * t.loc[m, "decoy_damage"],
+                                         inp["n_decoys_by_tier"]["unseen"]),
+                    "jsl48": lambda: "not labelled",
+                    "external": lambda: of(t.loc[m, "n_hard_negatives"] * t.loc[m, "hard_negative_damage"],
+                                           t.loc[m, "n_hard_negatives"]),
+                    "maccrobat": lambda: of(clin.loc[m, "n_touched"], clin.loc[m, "n"])}[key]()
+            assert _cell(r, 4) == want, (title, m)
+
+
+def test_maccrobat_table_says_which_methods_were_not_recorded_and_why(inp, md):
+    sec = _section(md, rr.DEID_SETS["maccrobat"])
+    for _, r in inp["maccrobat_not_run"].iterrows():
+        assert f"`{r['method']}`" in sec and r["reason"] in sec, r["method"]
+
+
+def test_full_synthetic_table_is_counts_with_the_95_range(inp, md):
+    allt = inp["deid"].query("tier == 'all'").set_index("method")
+    for r in _rows(_section(md, rr.DEID_TITLE)):
+        m = _cell(r, 2).strip("`")
+        n, k = int(allt.loc[m, "n_phi"]), round(allt.loc[m, "n_phi"] * (1 - allt.loc[m, "entity_recall"]))
+        assert _cell(r, 4).startswith(f"{k:,} of {n:,} (95% range "), r
+        assert _cell(r, 3) == rr.plain_tool(m)
+        assert _cell(r, 5) == f"{round(inp['n_decoys'] * allt.loc[m, 'decoy_damage']):,} of {inp['n_decoys']:,}"
 
 
 def test_breakdown_buckets():
@@ -287,12 +324,6 @@ def test_full_table_uses_the_same_two_column_names(md):
     assert cols[6:8] == [rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED]
 
 
-def test_full_deid_table_names_every_pair_the_same_way(md):
-    header = next(line for line in _section(md, rr.DEID_TITLE).splitlines() if line.startswith("| Rank"))
-    for prefix in ("", "ASQ-PHI: ", "MACCROBAT: "):
-        assert f"{prefix}{rr.COL_LEAKED}" in header and f"{prefix}{rr.COL_SCRUBBED}" in header, prefix
-
-
 def test_readme_deid_rows_are_counts_with_their_totals(inp, summary, md):
     allt = inp["deid"].query("tier == 'all'").set_index("method")
     best = _best_by_group(_rows(_section(md, rr.DEID_TITLE)), rr.deid_group)
@@ -325,7 +356,8 @@ def test_deid_leaderboard_has_every_engine_and_the_external_sets(inp, md):
     rows = _rows(sec)
     engines = list(inp["deid"].query("tier == 'all'")["method"])
     assert sorted(_cell(r, 2).strip("`") for r in rows) == sorted(engines)
-    assert "ASQ-PHI" in sec and "MACCROBAT" in sec
+    rest = md.split(rr.DEID_TITLE, 1)[1]
+    assert "ASQ-PHI" in rest and "MACCROBAT" in rest
     for e in inp["deid_not_run"]["method"]:
         assert f"`{e}`" in sec, e
 
