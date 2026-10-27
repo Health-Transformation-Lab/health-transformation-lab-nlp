@@ -63,9 +63,9 @@ All 38 systems, with the 95% CIs, unsafe errors, results by note difficulty, and
 
 ### De-identification
 
-Best tool in each group on the synthetic notes, groups ordered by their best. Rank: where it plausibly ranks among all 15 tools. Out of 100. **PHI incorrectly left in**: patient names, dates and IDs the tool should have removed (one character left counts). **Valid text incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the tool removed.
+Best tool in each group on the synthetic notes, groups ordered by their best. Rank: where it plausibly ranks among all 15 tools. Out of 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the tool should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the tool removed.
 
-| Group | Best tool | PHI incorrectly left in | Valid text incorrectly scrubbed | Rank | Tools |
+| Group | Best tool | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Tools |
 |---|---|---:|---:|---|---:|
 | Combined: ML + regex + guard | `hf_stanford+hf_obi+regex_v2+guard` | 4 | 2 | 1–2 | 6 |
 | Single ML engine | `hf_stanford+guard` | 21 | 2 | 7–8 | 5 |

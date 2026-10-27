@@ -75,3 +75,7 @@ Second revision, same day: "incorrect diagnosis" was still vague, so the README 
 both directions: **Periodontitis incorrectly assigned (not present)** and **Periodontitis
 incorrectly not assigned (present)**, next to Correct, Incorrect stage and No answer (five columns
 adding to 100).
+
+Third revision: de-identification follows the same pattern, **Text that is sensitive (PHI) incorrectly
+leaked** and **Text that is not sensitive incorrectly scrubbed** (was "PHI incorrectly left in" and
+"Valid text incorrectly scrubbed"), in the README and in every pair of the full table.

@@ -174,8 +174,11 @@ PHENOTYPE_KEY = ("Out of 100 charts. **Correct**: the right status (healthy, gin
                  "**Periodontitis incorrectly not assigned**: the patient has it, the system didn't say so. **Incorrect "
                  "stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or "
                  "healthy and gingivitis mixed up. **No answer**: the system gave no status.")
-DEID_KEY = ("Out of 100. **PHI incorrectly left in**: patient names, dates and IDs the tool should have removed "
-            "(one character left counts). **Valid text incorrectly scrubbed**: dental words that look like a name "
+COL_LEAKED = "Text that is sensitive (PHI) incorrectly leaked"
+COL_SCRUBBED = "Text that is not sensitive incorrectly scrubbed"
+DEID_KEY = ("Out of 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the tool should "
+            "have removed but left in (one character left counts). **Text that is not sensitive incorrectly "
+            "scrubbed**: dental words that look like a name "
             "or code (Glickman, Gracey 11/12, 6-5-6) that the tool removed.")
 
 
@@ -282,17 +285,17 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
 
     out = [DEID_TITLE, "",
            f"Every engine on the {n_notes} synthetic dental notes with fake PHI ({n_phi:,} identifiers, all tiers), "
-           "ranked by PHI incorrectly left in (fewest first), with a Wilson 95% CI. Per-identifier results aren't saved, so there is "
+           "ranked by sensitive text leaked (fewest first), with a Wilson 95% CI. Per-identifier results aren't saved, so there is "
            "no paired bootstrap: **Rank** is the range the intervals allow, from only the engines clearly above "
            "counting to every engine whose interval reaches this one's counting.", "",
-           DEID_KEY + " Leaving PHI in risks patients; scrubbing valid text damages the note the AI reads, so read "
-           "them together. *Unseen tier*: the notes no engine was written against. **ASQ-PHI**: 1,051 synthetic "
-           "clinical queries (MIT); its valid text is the queries with no PHI, out of 100 queries. **MACCROBAT**: "
-           "200 real, published case reports (CC BY 4.0); its PHI is the dates, its valid text the clinical terms. "
+           DEID_KEY + " Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note "
+           "the AI reads, so read them together. *Unseen tier*: the notes no engine was written against. "
+           "**ASQ-PHI**: 1,051 synthetic clinical queries (MIT); its text that is not sensitive is the queries with "
+           "no PHI, out of 100 queries. **MACCROBAT**: 200 real, published case reports (CC BY 4.0); its sensitive "
+           "text is the dates, its text that is not sensitive the clinical terms. "
            "[More on these numbers](deidentification.md#how-to-read-the-numbers).", "",
-           "| Rank | Engine | PHI incorrectly left in (95% CI) | PHI incorrectly left in, unseen tier | "
-           "Valid text incorrectly scrubbed | ASQ-PHI: PHI incorrectly left in | ASQ-PHI: valid text incorrectly "
-           "scrubbed | MACCROBAT: PHI incorrectly left in | MACCROBAT: valid text incorrectly scrubbed |",
+           f"| Rank | Engine | {COL_LEAKED} (95% CI) | {COL_LEAKED}, unseen tier | {COL_SCRUBBED} | "
+           f"ASQ-PHI: {COL_LEAKED} | ASQ-PHI: {COL_SCRUBBED} | MACCROBAT: {COL_LEAKED} | MACCROBAT: {COL_SCRUBBED} |",
            "|---|---|---|---:|---:|---:|---:|---:|---:|"]
 
     def left(t, m):
@@ -355,7 +358,7 @@ def results_markdown(inp: dict) -> str:
             DEID_TITLE, "",
             "Best tool in each group on the synthetic notes, groups ordered by their best. Rank: where it plausibly "
             f"ranks among all {len(de)} tools. " + DEID_KEY, "",
-            "| Group | Best tool | PHI incorrectly left in | Valid text incorrectly scrubbed | Rank | Tools |",
+            f"| Group | Best tool | {COL_LEAKED} | {COL_SCRUBBED} | Rank | Tools |",
             "|---|---|---:|---:|---|---:|"]
     for g in _by_best(de, DEID_GROUPS, "entity_recall"):
         sub = de[de.group == g]

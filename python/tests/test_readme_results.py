@@ -144,8 +144,9 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
         for col in ("Correct", rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED, "Incorrect stage", "No answer"):
             assert col in ph, col
         assert "Incorrect diagnosis" not in ph
-        for col in ("PHI incorrectly left in", "Valid text incorrectly scrubbed"):
+        for col in (rr.COL_LEAKED, rr.COL_SCRUBBED):
             assert col in de, col
+        assert "left in" not in de and "Valid text" not in de
 
 
 def test_breakdown_buckets():
@@ -179,6 +180,12 @@ def test_full_table_uses_the_same_two_column_names(md):
     header = next(line for line in _section(md, rr.PHENOTYPE_TITLE).splitlines() if line.startswith("| Rank"))
     cols = [c.strip() for c in header.split("|")]
     assert cols[6:8] == [rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED]
+
+
+def test_full_deid_table_names_every_pair_the_same_way(md):
+    header = next(line for line in _section(md, rr.DEID_TITLE).splitlines() if line.startswith("| Rank"))
+    for prefix in ("", "ASQ-PHI: ", "MACCROBAT: "):
+        assert f"{prefix}{rr.COL_LEAKED}" in header and f"{prefix}{rr.COL_SCRUBBED}" in header, prefix
 
 
 def test_readme_deid_rows_are_out_of_100(inp, summary):
