@@ -100,3 +100,89 @@ def test_openai_judge_status_call_sends_no_answer_and_gates_the_reply(monkeypatc
     assert sent["body"]["messages"][0]["content"] == judge.STATUS_SYSTEM
     assert "Predicted" not in sent["body"]["messages"][1]["content"]
     assert (v.verdict, v.supported_status, v.quote_ok, v.input_tokens) == ("status", "periodontitis_stage_2", True, 900)
+
+
+JUDGMENT_COLS = ["visit_id", "kind", "answer", "verdict", "judge_status", "quote", "gate_ok", "gate_reason",
+                 "endpoint", "prompt_version", "prompt_tokens", "completion_tokens", "simulated", "api_error"]
+
+
+def _small_queue(inp, answers, n=12):
+    q = js.judge_queue(answers, inp["key"])
+    return q[q["visit_id"].isin(sorted(q["visit_id"].unique())[:n])].reset_index(drop=True)
+
+
+def test_run_judge_returns_one_judgment_per_queue_row(inp, answers):
+    from dental_omop_nlp import judge
+    q = _small_queue(inp, answers)
+    sim = judge.SimulatedJudge(inp["key"]["truth_status"].to_dict(), seed=1)
+    out = js.run_judge(q, sim, endpoint="sim:judge")
+    assert list(out.columns) == JUDGMENT_COLS and len(out) == len(q)
+    assert out["simulated"].all() and (out["endpoint"] == "sim:judge").all()
+    st, vd = out[out.kind == "status"], out[out.kind == "verdict"]
+    assert st["verdict"].isna().all() and set(st["judge_status"].dropna()) <= set(LABELS)
+    assert set(vd["verdict"]) <= {"correct", "incorrect", "not_determinable"} and vd["judge_status"].isna().all()
+    assert set(out["prompt_version"]) == {judge.STATUS_PROMPT_VERSION, judge.PROMPT_VERSION}
+
+
+def test_a_failed_gate_counts_as_not_determinable_and_no_status(inp, answers):
+    from dental_omop_nlp.judge import Verdict
+
+    class Liar:
+        simulated = False
+
+        def __call__(self, note, pred):
+            return Verdict("correct", pred, "not in the note", "", False, 1, 1, 0.0, "quote not in note")
+
+        def status(self, note):
+            return Verdict("status", "healthy", "not in the note", "", False, 1, 1, 0.0, "quote not in note")
+
+    out = js.run_judge(_small_queue(inp, answers, 2), Liar(), endpoint="x")
+    assert not out["gate_ok"].any() and (out["gate_reason"] == "quote not in note").all()
+    assert (out.loc[out.kind == "verdict", "verdict"] == "not_determinable").all()
+    assert out.loc[out.kind == "status", "judge_status"].isna().all()
+
+
+def test_run_judge_resumes_and_skips_rows_already_judged(inp, answers):
+    from dental_omop_nlp import judge
+    q = _small_queue(inp, answers)
+    sim = judge.SimulatedJudge(inp["key"]["truth_status"].to_dict(), seed=1)
+    first = js.run_judge(q.iloc[:5], sim, endpoint="sim:judge")
+    calls = []
+
+    class Counting(judge.SimulatedJudge):
+        def __call__(self, *a, **k):
+            calls.append(1)
+            return super().__call__(*a, **k)
+
+        def status(self, *a, **k):
+            calls.append(1)
+            return super().status(*a, **k)
+
+    rest = js.run_judge(q, Counting(inp["key"]["truth_status"].to_dict(), seed=1), endpoint="sim:judge", done=first)
+    assert len(calls) == len(q) - 5 and len(rest) == len(q)
+    pd.testing.assert_frame_equal(rest.iloc[:5].reset_index(drop=True), first.reset_index(drop=True))
+
+
+def test_calls_that_failed_on_the_network_are_retried_on_resume(inp, answers):
+    """An endpoint error isn't a judgment: it's recorded as such and asked again on the next run."""
+    from dental_omop_nlp import judge
+    q = _small_queue(inp, answers, 2)
+
+    class Down:
+        simulated = False
+
+        def __call__(self, note, pred):
+            return judge.Verdict("", None, "", "", False, 0, 0, 0.0, "URLError: rate limited")
+
+        def status(self, note):
+            return self(note, None)
+
+    failed = js.run_judge(q, Down(), endpoint="e")
+    assert failed["api_error"].all()
+
+    class Up(Down):
+        def __call__(self, note, pred):
+            return judge.Verdict("not_determinable", None, "", "", True, 5, 5, 0.0, "")
+
+    again = js.run_judge(q, Up(), endpoint="e", done=failed)
+    assert not again["api_error"].any() and (again["prompt_tokens"] == 5).all()

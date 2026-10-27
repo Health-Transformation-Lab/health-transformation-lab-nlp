@@ -34,8 +34,8 @@ Unique on (visit_id, kind, answer).
 | gate_reason | str | why not |
 | endpoint, prompt_version | str | |
 | prompt_tokens, completion_tokens | int | |
-| judged_at | timestamp | |
 | simulated | bool | true for the simulated judge |
+| api_error | bool | the endpoint failed after retries; not a judgment, asked again on the next run |
 
 Validation: `judge_status` ∈ six statuses or null; a row with `gate_ok = false` counts as
 not determinable / no answer.

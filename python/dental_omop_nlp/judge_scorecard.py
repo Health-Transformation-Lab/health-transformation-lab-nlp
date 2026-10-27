@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import pandas as pd
 
+from . import judge as jg
 from . import readme_results as rr
 
 # Rough token counts for the cost estimate printed before a run (judge.SYSTEM is ~1,000 tokens).
@@ -56,3 +57,46 @@ def estimate_cost(queue: pd.DataFrame, usd_per_1m_in: float, usd_per_1m_out: flo
     tok_out = float(out_tokens * len(queue))
     return {"calls": len(queue), "input_tokens": tok_in, "output_tokens": tok_out,
             "usd": tok_in / 1e6 * usd_per_1m_in + tok_out / 1e6 * usd_per_1m_out}
+
+
+JUDGMENT_COLS = ["visit_id", "kind", "answer", "verdict", "judge_status", "quote", "gate_ok", "gate_reason",
+                 "endpoint", "prompt_version", "prompt_tokens", "completion_tokens", "simulated", "api_error"]
+
+
+def _key(r) -> tuple:
+    return (int(r.visit_id), r.kind, "" if pd.isna(r.answer) else r.answer)
+
+
+def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | None = None,
+              trace=None) -> pd.DataFrame:
+    """One judgment per queue row, in queue order. Rows already in `done` are kept, not re-asked, so a
+    run cut short by rate limits resumes. A failed gate counts as not determinable (verdict) or no
+    status; an endpoint error is kept with api_error=True and retried. `trace(row, verdict)` is called after each new call (MLflow on Databricks)."""
+    have = {_key(r): r._asdict() for r in (done.itertuples(index=False) if done is not None else [])
+            if not r.api_error}                       # an endpoint error isn't a judgment: ask again
+    sim = bool(getattr(judge, "simulated", False))
+    extra = (lambda r: {"visit_id": int(r.visit_id)}) if sim else (lambda r: {})
+    rows = []
+    for r in queue.itertuples(index=False):
+        k = _key(r)
+        if k in have:
+            rows.append({c: have[k][c] for c in JUDGMENT_COLS})
+            continue
+        if r.kind == "status":
+            v = judge.status(r.note_text, **extra(r))
+            version = jg.STATUS_PROMPT_VERSION
+        else:
+            v = judge(r.note_text, r.answer, **extra(r))
+            version = jg.PROMPT_VERSION
+        ok = bool(v.quote_ok)
+        api_error = bool(v.error) and not ok and v.input_tokens == 0   # judge.py's retry loop gave up
+        rows.append({"visit_id": int(r.visit_id), "kind": r.kind, "answer": None if pd.isna(r.answer) else r.answer,
+                     "verdict": None if r.kind == "status" else (v.verdict if ok else "not_determinable"),
+                     "judge_status": (v.supported_status if ok else None) if r.kind == "status" else None,
+                     "quote": v.quote, "gate_ok": ok, "gate_reason": v.error, "endpoint": endpoint,
+                     "prompt_version": version, "prompt_tokens": int(v.input_tokens),
+                     "completion_tokens": int(v.output_tokens), "simulated": sim,
+                     "api_error": api_error})
+        if trace is not None:
+            trace(r, v)
+    return pd.DataFrame(rows, columns=JUDGMENT_COLS)
