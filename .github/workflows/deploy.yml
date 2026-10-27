@@ -67,10 +67,12 @@ jobs:
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle validate -t "$TARGET"
       # unity_catalog.yml's catalog resource deploys only with the direct engine. A target deployed
-      # before with Terraform moves its state over once; afterwards (or if never deployed) this is a no-op.
+      # before with Terraform moves its state over once. --noplancheck: the migrate command's Terraform
+      # plan check can't pass once the config has a catalog. Already direct or never deployed: it fails
+      # harmlessly and the deploy below decides.
       - name: Migrate Terraform state to the direct engine (once)
         if: env.DATABRICKS_CLIENT_SECRET != ''
-        run: databricks bundle deployment migrate -t "$TARGET" || echo "nothing to migrate (already direct, or never deployed)"
+        run: databricks bundle deployment migrate -t "$TARGET" --noplancheck || echo "migrate did not run (see above): the deploy below uses the direct engine either way"
       - name: Deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
