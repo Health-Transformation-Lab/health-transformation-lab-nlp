@@ -1,4 +1,5 @@
-"""The README's results leaderboards (one per capability) are generated from committed results and stay in sync."""
+"""Results leaderboards (one per capability) are generated from committed results and stay in sync:
+a short summary in the README (best system per group) and the full tables in docs/results.md."""
 
 import numpy as np
 import pandas as pd
@@ -15,11 +16,18 @@ def inp():
 
 @pytest.fixture(scope="module")
 def md(inp):
+    """The full tables (docs/results.md)."""
+    return rr.details_markdown(inp)
+
+
+@pytest.fixture(scope="module")
+def summary(inp):
+    """The README block."""
     return rr.results_markdown(inp)
 
 
 def _rows(section):
-    return [r for r in section.splitlines() if r.startswith("| ") and not r.startswith("| Rank")]
+    return [r for r in section.splitlines() if r.startswith("| ") and not r.startswith(("| Rank", "| Group"))]
 
 
 def _section(md, title):
@@ -30,15 +38,47 @@ def _cell(row, i):
     return row.split("|")[i].strip()
 
 
-def test_readme_block_matches_the_committed_results(md):
+def test_readme_and_results_page_match_the_committed_results(summary, md):
     readme = (REPO_ROOT / "README.md").read_text()
     assert readme.count(rr.START) == 1 and readme.count(rr.END) == 1
-    assert rr.update_readme(readme, md) == readme, "README results are stale: run python scripts/35_readme_results.py"
+    stale = "results are stale: run python scripts/35_readme_results.py"
+    assert rr.update_readme(readme, summary) == readme, stale
+    assert rr.RESULTS_DOC.read_text() == md, stale
 
 
-def test_one_leaderboard_per_capability_and_no_overall_rank(md):
-    assert [line for line in md.splitlines() if line.startswith("### ")] == [rr.PHENOTYPE_TITLE, rr.DEID_TITLE]
-    assert "overall" not in md.lower()
+def test_one_leaderboard_per_capability_and_no_overall_rank(summary, md):
+    for text in (summary, md):
+        assert [line for line in text.splitlines() if line.startswith("### ")] == [rr.PHENOTYPE_TITLE, rr.DEID_TITLE]
+        assert "overall" not in text.lower()
+
+
+def test_readme_summary_is_short(summary):
+    assert len(summary.splitlines()) <= 30
+
+
+def _best_by_group(full_rows, group_of):
+    best = {}
+    for r in full_rows:        # full tables are sorted best first
+        name = _cell(r, 2).split("]")[0].strip("[`")
+        best.setdefault(group_of(name), name)
+    return best
+
+
+@pytest.mark.parametrize("title, groups, group_of", [
+    (rr.PHENOTYPE_TITLE, rr.PHENOTYPE_GROUPS, rr.phenotype_group),
+    (rr.DEID_TITLE, rr.DEID_GROUPS, rr.deid_group)])
+def test_summary_shows_the_best_system_of_each_group_and_links_the_full_table(summary, md, title, groups, group_of):
+    rows = _rows(_section(summary, title))
+    assert sorted(_cell(r, 1) for r in rows) == sorted(groups)
+    scores = [float(_cell(r, 3).split("**")[1].rstrip("%")) for r in rows]
+    assert scores == sorted(scores, reverse=True)
+    best = _best_by_group(_rows(_section(md, title)), group_of)
+    assert set(best) == set(groups)
+    for r in rows:
+        assert f"`{best[_cell(r, 1)]}`" in _cell(r, 2), r
+    link = f"docs/results.md#{rr.anchor(title)}"
+    assert link in _section(summary, title)
+    assert f"\n{title}\n" in "\n" + md
 
 
 def test_paired_rank_range():
