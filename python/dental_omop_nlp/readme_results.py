@@ -354,7 +354,7 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
 
 _HEAD = ("> **Synthetic data, scored against the generator's truth: not clinical performance.** Real model "
          "runs (CPU, 2026-10-26), not simulated; agreement with *simulated* reviewers is a dry run and isn't "
-         "shown here. One leaderboard per capability; systems aren't ranked across them.")
+         "shown here. One leaderboard per capability; methods aren't ranked across them.")
 
 
 def _by_best(tab: pd.DataFrame, groups, score: str) -> list[str]:
