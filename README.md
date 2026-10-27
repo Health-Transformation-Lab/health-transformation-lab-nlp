@@ -65,11 +65,11 @@ All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note diff
 
 Best method in each group, counted on the 400 synthetic notes; groups ordered by their best. Rank: where it plausibly ranks among all 15 methods. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed.
 
-| Group | Best method | Text that is sensitive (PHI) incorrectly leaked | Total PHI items | Text that is not sensitive incorrectly scrubbed | Total look-alike dental words | Rank | Methods in group |
-|---|---|---:|---:|---:|---:|---|---:|
-| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 | 2,714 | 41 | 2,462 | 1–2 | 6 |
-| One AI tool | Stanford AI + dental-word guard | 560 | 2,714 | 41 | 2,462 | 7–8 | 5 |
-| Pattern matching only | Patterns | 645 | 2,714 | 0 | 2,462 | 9–10 | 4 |
+| Group | Best method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Methods in group |
+|---|---|---:|---:|---|---:|
+| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 | 41 of 2,462 | 1–2 | 6 |
+| One AI tool | Stanford AI + dental-word guard | 560 of 2,714 | 41 of 2,462 | 7–8 | 5 |
+| Pattern matching only | Patterns | 645 of 2,714 | 0 of 2,462 | 9–10 | 4 |
 
 All 15 methods, per 100 with 95% CIs, on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
 
