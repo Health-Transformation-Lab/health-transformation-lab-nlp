@@ -48,16 +48,16 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 ### Phenotyping: periodontal status per chart
 
-Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it plausibly ranks among all 38 systems. Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the system gave no status.
+Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it plausibly ranks among all 38 systems. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the system gave no status.
 
 | Group | Best system | Correct | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer | Rank | Systems |
 |---|---|---:|---:|---:|---:|---:|---|---:|
-| Rule phenotype, whole record | `algorithm_v0` | 98 | 0 | 0 | 2 | 0 | 1 | 2 |
-| Fine-tuned note model + rules for stage IV | `modernbert-base+cw+s2+rules4` | 91 | 2 | 0 | 7 | 0 | 2–10 | 11 |
-| Note baselines (rules, TF-IDF) | `fusion_tfidf_rad+rules4` | 87 | 3 | 1 | 9 | 0 | 7–16 | 5 |
-| Fine-tuned note model | `modernbert-base+cw` | 84 | 1 | 1 | 14 | 0 | 12–18 | 11 |
-| One evidence type alone | `probing_chart` | 80 | 0 | 0 | 1 | 19 | 14–31 | 7 |
-| Zero-shot LLM on the note | `medgemma-1.5-4b-it+rules4` | 77 | 3 | 4 | 16 | 0 | 17–31 | 2 |
+| Rules on the whole record | Gum measurements first | 98 | 0 | 0 | 2 | 0 | 1 | 2 |
+| Trained AI on the note + stage 4 rule | ModernBERT | 91 | 2 | 0 | 7 | 0 | 2–10 | 11 |
+| Simple text methods on the note | Word counts + X-ray reading | 87 | 3 | 1 | 9 | 0 | 7–16 | 5 |
+| Trained AI on the note | ModernBERT | 84 | 1 | 1 | 14 | 0 | 12–18 | 11 |
+| One part of the record alone | Gum measurements (probing chart) | 80 | 0 | 0 | 1 | 19 | 14–31 | 7 |
+| Untrained medical AI on the note (MedGemma) | MedGemma | 77 | 3 | 4 | 16 | 0 | 17–31 | 2 |
 
 All 38 systems, with the 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
@@ -67,9 +67,9 @@ Best tool in each group on the synthetic notes, groups ordered by their best. Ra
 
 | Group | Best tool | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Tools |
 |---|---|---:|---:|---|---:|
-| Combined: ML + regex + guard | `hf_stanford+hf_obi+regex_v2+guard` | 4 | 2 | 1–2 | 6 |
-| Single ML engine | `hf_stanford+guard` | 21 | 2 | 7–8 | 5 |
-| Regex only | `regex_v2` | 24 | 0 | 9–10 | 4 |
+| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 4 | 2 | 1–2 | 6 |
+| One AI tool | Stanford AI + dental-word guard | 21 | 2 | 7–8 | 5 |
+| Pattern matching only | Patterns | 24 | 0 | 9–10 | 4 |
 
 All 15 tools, with 95% CIs and two outside test sets (ASQ-PHI, and MACCROBAT's real case reports), and the tools not run yet: [full de-identification table](docs/results.md#de-identification).
 <!-- results:end -->
