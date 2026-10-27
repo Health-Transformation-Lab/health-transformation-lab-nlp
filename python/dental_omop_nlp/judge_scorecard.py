@@ -121,6 +121,8 @@ STATUS_NAMES = {"healthy": "Healthy", "gingivitis": "Gingivitis", "periodontitis
 
 def _point(ref: pd.Series, p: pd.Series, level: pd.Series, score) -> dict:
     """Every README phenotyping metric for one system against one reference, on ref's charts."""
+    if ref.empty:                                    # no judge run: nothing to score against
+        return dict.fromkeys(METRIC_LABELS, np.nan)
     p, level = p.reindex(ref.index), level.reindex(ref.index)
     ok = (p == ref)                                  # no status is wrong, as in the README
     s4 = ref == STAGE4
@@ -142,10 +144,11 @@ def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_b
     n_judged. exact_status rows also carry judge-corrected accuracy among answered charts
     (Rogan-Gladen from verdicts, judge calibrated on the same charts' truth) with a 95% range."""
     truth, pred, level = rr.phenotype_predictions(inp)
-    js_ = _judge_status(judgments)
+    js_ = _judge_status(judgments) if len(judgments) else pd.Series(dtype=object)
     judged = truth.index.intersection(js_.index)
     score = rr._shared_scorer()
     vd = judgments[judgments["kind"] == "verdict"].copy()
+    vd["verdict"] = vd["verdict"].astype(object)
     vd["truly_correct"] = (vd["answer"].to_numpy() == truth.reindex(vd["visit_id"]).to_numpy())
     vd["gate_ok"] = vd["gate_ok"].astype(bool)
     by_pair = vd.set_index(["visit_id", "answer"])
@@ -157,7 +160,7 @@ def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_b
         a = answers[(answers["system"] == s)].dropna(subset=["answer"])
         sample = by_pair.reindex(pd.MultiIndex.from_frame(a[["visit_id", "answer"]]))[["verdict", "gate_ok"]]
         ca = (corrected_accuracy(sample.reset_index(drop=True), vd.reset_index(drop=True), n_boot=n_boot, seed=seed)
-              if len(sample) else {"accuracy_est": np.nan, "ci_low": np.nan, "ci_high": np.nan})
+              if len(sample) and len(vd) else {"accuracy_est": np.nan, "ci_low": np.nan, "ci_high": np.nan})
         for k in t_all:
             rows.append({"system": s, "metric": k, "vs_truth": t_all[k], "vs_truth_judged": t_j[k],
                          "vs_judge": j[k], "difference": j[k] - t_j[k], "n_judged": len(judged),
@@ -174,7 +177,7 @@ def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed
     """The judge's own status against the truth, overall and per truth status and note difficulty: n
     charts, coverage (share it gave a status for), agreement where it did (95% bootstrap range), kappa."""
     truth, _, level = rr.phenotype_predictions(inp)
-    js_ = _judge_status(judgments).reindex(truth.index)
+    js_ = (_judge_status(judgments) if len(judgments) else pd.Series(dtype=object)).reindex(truth.index)
     rng = np.random.default_rng(seed)
     groups = [("all", "all", truth.index == truth.index)]
     groups += [("truth_status", v, (truth == v).to_numpy()) for v in sorted(truth.unique())]

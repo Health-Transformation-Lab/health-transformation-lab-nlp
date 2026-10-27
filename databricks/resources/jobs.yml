@@ -38,6 +38,24 @@ resources:
               lakebase_schema: ${var.lakebase_schema}
               secret_scope: ${var.hf_secret_scope}
 
+    judge_scorecard:
+      name: dental-omop-nlp judge scorecard (${bundle.target})
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: scorecard
+          notebook_task:
+            notebook_path: ../notebooks/07_judge_scorecard.py
+            base_parameters:
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
+              judge_endpoint: ${var.judge_endpoint}
+              experiment_id: ${resources.experiments.dental_experiment.id}
+              usd_per_million_in: ${var.judge_usd_per_million_in}
+              usd_per_million_out: ${var.judge_usd_per_million_out}
+              max_usd: "5"
+
     llm_judge:
       name: dental-omop-nlp LLM judge via ai_query (${bundle.target})
       tags:

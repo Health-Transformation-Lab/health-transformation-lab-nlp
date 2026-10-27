@@ -1,0 +1,110 @@
+# Databricks notebook source
+# MAGIC %md
+# MAGIC # Judge scorecard (spec 012)
+# MAGIC
+# MAGIC Every README phenotyping metric for every system, against the generator's truth and against an
+# MAGIC LLM judge's own reading of the same 240 synthetic review charts, plus how often the judge agrees
+# MAGIC with the truth. Metrics are computed in code (`dental_omop_nlp.judge_scorecard`), never by the LLM.
+# MAGIC
+# MAGIC * Notes: `data/datasets/answer_key/review_key.csv`: synthetic, de-identified, through the leak gate.
+# MAGIC * Judge: `judge_endpoint` (a pay-per-token serving endpoint; `none` skips the judge and publishes
+# MAGIC   the truth-based metrics only). The job prints the token cost first and stops above `max_usd`.
+# MAGIC * Resumes: rows already in the `judgments` table aren't asked again (endpoint errors are).
+# MAGIC * Writes to the gold schema: `chart_answers`, `judgments`, `judge_metrics`, `judge_agreement`,
+# MAGIC   `deid_scores` (for the dashboard's de-identification page). One MLflow trace per judge call.
+
+# COMMAND ----------
+
+import subprocess, sys
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "-e", "../../python[track]"])
+
+# COMMAND ----------
+
+dbutils.library.restartPython()
+
+# COMMAND ----------
+
+dbutils.widgets.text("catalog", "dental_omop")
+dbutils.widgets.text("schema", "gold_dental_omop_perio")
+dbutils.widgets.text("judge_endpoint", "none")
+dbutils.widgets.text("experiment_id", "")
+dbutils.widgets.text("usd_per_million_in", "")    # the endpoint's list price; required to call it
+dbutils.widgets.text("usd_per_million_out", "")
+dbutils.widgets.text("max_usd", "5")
+catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")
+endpoint = dbutils.widgets.get("judge_endpoint").strip()
+experiment_id = dbutils.widgets.get("experiment_id")
+
+# COMMAND ----------
+
+import mlflow
+import pandas as pd
+
+from dental_omop_nlp import judge as jg
+from dental_omop_nlp import judge_scorecard as js
+from dental_omop_nlp import readme_results as rr
+from dental_omop_nlp.paths import DEID_DIR
+
+inp = rr.load_inputs()
+answers = js.chart_answers(inp)
+queue = js.judge_queue(answers, inp["key"])
+table = lambda name: f"{catalog}.{schema}.{name}"  # noqa: E731
+
+done = None
+if spark.catalog.tableExists(table("judgments")):
+    done = spark.table(table("judgments")).toPandas()
+    done = done[done["endpoint"] == endpoint] if endpoint != "none" else None
+
+if endpoint in ("", "none"):
+    print("judge_endpoint is none: publishing truth-based metrics only")
+    judgments = pd.DataFrame(columns=js.JUDGMENT_COLS)
+else:
+    usd_in, usd_out = dbutils.widgets.get("usd_per_million_in"), dbutils.widgets.get("usd_per_million_out")
+    if not usd_in or not usd_out:
+        raise ValueError("set usd_per_million_in and usd_per_million_out to the endpoint's current list prices")
+    judged = set() if done is None else {js._key(d) for d in done[~done["api_error"].astype(bool)].itertuples()}
+    todo = queue[[js._key(r) not in judged for r in queue.itertuples()]]
+    est = js.estimate_cost(todo, float(usd_in), float(usd_out))
+    print(f"{est['calls']} calls to judge on {endpoint}, ~{est['input_tokens']:,.0f} input tokens, ~US${est['usd']:.2f}")
+    if est["usd"] > float(dbutils.widgets.get("max_usd")):
+        raise ValueError(f"estimated cost over max_usd; not calling {endpoint}")
+
+    from databricks.sdk import WorkspaceClient
+    w = WorkspaceClient()
+    token = w.config.authenticate()["Authorization"].split(" ", 1)[1]
+    judge = jg.OpenAIJudge(model=endpoint, base_url=f"{w.config.host.rstrip('/')}/serving-endpoints", api_key=token)
+
+    if experiment_id:
+        mlflow.set_experiment(experiment_id=experiment_id)
+
+    def trace(r, v):
+        with mlflow.start_span(name=f"judge_{r.kind}") as span:
+            span.set_inputs({"visit_id": int(r.visit_id), "kind": r.kind, "answer": r.answer,
+                             "note_text": r.note_text, "endpoint": endpoint})
+            span.set_outputs({"verdict": v.verdict, "judge_status": v.supported_status, "quote": v.quote,
+                              "gate_ok": v.quote_ok, "error": v.error})
+            span.set_attributes({"data": "synthetic", "kind": "LLM judgment"})
+
+    judgments = js.run_judge(queue, judge, endpoint=endpoint, done=done, trace=trace if experiment_id else None)
+
+metrics = js.judge_metrics(inp, answers, judgments)
+agreement = js.judge_agreement(inp, judgments)
+
+# COMMAND ----------
+
+def save(pdf: pd.DataFrame, name: str):
+    spark.createDataFrame(pdf.astype(object).where(pdf.notna(), None)).write.mode("overwrite") \
+         .option("overwriteSchema", "true").saveAsTable(table(name))
+
+save(answers, "chart_answers")
+if len(judgments):
+    save(judgments, "judgments")
+save(metrics, "judge_metrics")
+save(agreement, "judge_agreement")
+save(pd.read_csv(DEID_DIR / "scores.csv").assign(group=lambda d: d["method"].map(rr.deid_group)), "deid_scores")
+
+label = "LLM judgment" if len(judgments) else "no judge run"
+print(f"{label}: {len(judgments)} calls; tables written to {catalog}.{schema}")
+display(agreement)
+display(metrics[metrics.metric == "exact_status"].sort_values("vs_truth", ascending=False))

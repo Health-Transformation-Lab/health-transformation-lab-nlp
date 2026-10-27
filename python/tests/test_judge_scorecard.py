@@ -270,3 +270,12 @@ def test_tables_use_the_readme_names(inp, answers):
     assert (m["group"] == m["system"].map(rr.phenotype_group)).all()
     a = js.judge_agreement(inp, _perfect_judgments(inp, answers), n_boot=20)
     assert set(a.loc[a.group == "difficulty", "label"]) == {"Easy note", "Medium note", "Hard note"}
+
+
+def test_without_a_judge_the_truth_metrics_still_publish(inp, answers):
+    """judge_endpoint = none: no judgments; vs_truth is filled, the judge columns are empty."""
+    empty = pd.DataFrame(columns=JUDGMENT_COLS)
+    m = js.judge_metrics(inp, answers, empty, n_boot=20)
+    assert m["vs_truth"].notna().any() and m["vs_judge"].isna().all() and (m["n_judged"] == 0).all()
+    a = js.judge_agreement(inp, empty, n_boot=20)
+    assert (a["coverage"] == 0).all() and a["agreement"].isna().all()

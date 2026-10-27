@@ -34,8 +34,8 @@
 - [x] T013 [US2] Implement `judge_metrics` and `judge_agreement` (judge status vs truth: overall, per truth status, per difficulty; n, agreement, kappa, 95% range) in `python/dental_omop_nlp/judge_scorecard.py`, reusing `eval/score.py`, `harm.unsafe_rates`, `cost_effectiveness.corrected_accuracy`, `phenotype.cohen_kappa`
 - [x] T014 [US2] R twin `r/R/11_judge_scorecard.R` for the difference and judge agreement; parity section in `r/tests/test_parity.R` (1e-9 on point values)
 - [x] T015 [US2] Script `python/scripts/36_judge_scorecard.py` (`--simulated`, `--endpoint`, `--export`); writes `data/datasets/judge/{simulated_,}{chart_answers,judgments,judge_metrics,judge_agreement}.csv`; add the simulated run to `python/scripts/make_parity_inputs.sh`
-- [ ] T016 [US2] Notebook `databricks/notebooks/07_judge_scorecard.py` and job `judge_scorecard` in `databricks/resources/jobs.yml`: widgets catalog, schema, judge_endpoint, experiment_id; prints queue size and estimated cost; skips when endpoint is `none`; writes the five tables to the gold schema
-- [ ] T017 [US2] `judge_endpoint` dev default `databricks-meta-llama-3-3-70b-instruct` in `databricks.yml`; bundle test in `python/tests/test_bundle.py`
+- [x] T016 [US2] Notebook `databricks/notebooks/07_judge_scorecard.py` and job `judge_scorecard` in `databricks/resources/jobs.yml`: widgets catalog, schema, judge_endpoint, experiment_id; prints queue size and estimated cost; skips when endpoint is `none`; writes the five tables to the gold schema
+- [x] T017 [US2] `judge_endpoint` dev default `databricks-meta-llama-3-3-70b-instruct` in `databricks.yml`; bundle test in `python/tests/test_bundle.py`
 
 ## Phase 5: User Story 3 - Two-page dashboard (P2)
 

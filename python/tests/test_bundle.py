@@ -187,3 +187,18 @@ def test_benchmark_notebook_installs_cpu_torch_only_for_the_encoder():
 def test_deploy_does_not_wait_for_the_benchmark_run():
     wf = (ROOT / ".github/workflows/deploy.yml").read_text()
     assert "bundle run -t \"$TARGET\" --no-wait study_benchmark" in wf
+
+
+def test_judge_scorecard_job_and_dev_judge_endpoint():
+    """Spec 012: the scorecard job writes to the gold schema with the bundle's judge endpoint; dev
+    defaults to a pay-per-token endpoint, other targets to none (skip)."""
+    root, jobs = _load()
+    job, _ = jobs["judge_scorecard"]
+    p = job["tasks"][0]["notebook_task"]["base_parameters"]
+    assert p["judge_endpoint"] == "${var.judge_endpoint}"
+    assert p["catalog"] == "${resources.schemas.gold.catalog_name}" and p["schema"] == "${resources.schemas.gold.name}"
+    assert p["experiment_id"] == "${resources.experiments.dental_experiment.id}"
+    assert root["variables"]["judge_endpoint"]["default"] == "none"
+    assert root["targets"]["dev"]["variables"]["judge_endpoint"] == "databricks-meta-llama-3-3-70b-instruct"
+    deploy = (ROOT / ".github" / "workflows" / "deploy.yml").read_text()
+    assert "JUDGE_ENDPOINT || 'none'" not in deploy     # CI must not mask the dev default
