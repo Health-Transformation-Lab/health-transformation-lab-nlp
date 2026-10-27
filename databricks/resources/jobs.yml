@@ -77,10 +77,10 @@ resources:
       tags:
         project: dental-omop-nlp
         data: synthetic
-      environments:             # the Jobs API requires one for a task with task-level compute
+      environments:          # required with task-level compute on serverless
         - environment_key: gpu
           spec:
-            environment_version: "4"   # the notebook %pip installs the repo's own extras
+            environment_version: ${var.gpu_environment_version}
       tasks:
         - task_key: read_notes
           environment_key: gpu
@@ -101,10 +101,10 @@ resources:
       tags:
         project: dental-omop-nlp
         data: synthetic
-      environments:             # the Jobs API requires one for a task with task-level compute
+      environments:          # required with task-level compute on serverless
         - environment_key: gpu
           spec:
-            environment_version: "4"   # the notebook %pip installs the repo's own extras
+            environment_version: ${var.gpu_environment_version}
       tasks:
         - task_key: fine_tune_and_predict
           environment_key: gpu

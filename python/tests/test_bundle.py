@@ -103,6 +103,14 @@ def test_gpu_jobs_run_on_serverless_gpu_in_every_target():
         for env, tgt in root["targets"].items():
             assert name not in tgt.get("resources", {}).get("jobs", {}), (name, env)
     assert root["variables"]["gpu_accelerator"]["default"] == "GPU_1xA10"
+    # A serverless task with task-level compute needs an environment (400 INVALID_PARAMETER_VALUE otherwise)
+    for name in ("medgemma_reader", "encoder_gpu"):
+        j = jobs[name][0]
+        envs = {e["environment_key"]: e["spec"] for e in j["environments"]}
+        for t in j["tasks"]:
+            assert t["environment_key"] in envs, name
+            assert envs[t["environment_key"]]["environment_version"] == "${var.gpu_environment_version}"
+    assert root["variables"]["gpu_environment_version"]["default"].isdigit()
     assert not {"gpu_node_type", "gpu_spark_version"} & set(root["variables"])
 
 
@@ -245,18 +253,6 @@ def test_dev_catalog_states_its_default_storage_root():
 
 GPU_ENCODERS = {"modernbert-large", "bioclinical-modernbert-large", "longformer-base", "clinical-longformer",
                 "gatortron-base"}
-
-
-def test_every_serverless_gpu_task_names_a_job_environment():
-    """The Jobs API rejects a task with task-level `compute` unless it names an environment
-    ("An environment is required for serverless task ... when `compute` is set on task level")."""
-    _, jobs = _load()
-    for name, (j, _) in jobs.items():
-        envs = {e["environment_key"]: e for e in j.get("environments", [])}
-        for t in j["tasks"]:
-            if "compute" in t:
-                assert t.get("environment_key") in envs, (name, t["task_key"])
-                assert envs[t["environment_key"]]["spec"].get("environment_version"), name
 
 
 def test_encoder_gpu_job_runs_the_gpu_encoders():
