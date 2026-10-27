@@ -79,3 +79,6 @@ adding to 100).
 Third revision: de-identification follows the same pattern, **Text that is sensitive (PHI) incorrectly
 leaked** and **Text that is not sensitive incorrectly scrubbed** (was "PHI incorrectly left in" and
 "Valid text incorrectly scrubbed"), in the README and in every pair of the full table.
+
+Fourth revision: "Periodontitis incorrectly not assigned (present)" becomes **Periodontitis
+incorrectly ruled out (present)**.
