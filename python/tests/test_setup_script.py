@@ -119,3 +119,17 @@ def test_merge_to_main_deploys_dev_and_uat_and_a_manual_run_only_its_target():
     assert job["strategy"]["fail-fast"] is False          # dev failing mustn't cancel uat
     assert job["environment"] == "${{ matrix.target }}" and job["env"]["TARGET"] == "${{ matrix.target }}"
     assert "deploy-${{ matrix.target }}" in str(job.get("concurrency", ""))
+
+
+def test_deploy_uses_the_direct_engine_and_migrates_terraform_state_once():
+    """unity_catalog.yml's catalog resource deploys only with the direct engine; a target deployed
+    earlier with Terraform migrates its state first (a no-op once migrated or never deployed)."""
+    doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
+    steps = doc["jobs"]["deploy"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    mig = next(i for i, n in enumerate(names) if "direct" in n.lower() and "migrat" in n.lower())
+    dep = names.index("Deploy")
+    assert mig < dep and "bundle deployment migrate" in steps[mig]["run"]
+    for i, s in enumerate(steps):
+        if "bundle validate" in s.get("run", "") or "bundle deploy " in s.get("run", "") or "bundle run" in s.get("run", ""):
+            assert s.get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct", names[i]

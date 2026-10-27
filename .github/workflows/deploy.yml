@@ -64,11 +64,19 @@ jobs:
         run: pip install -e "./python[dev]" matplotlib && (cd python && pytest -q tests)
       - name: Validate
         if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle validate -t "$TARGET"
+      # unity_catalog.yml's catalog resource deploys only with the direct engine. A target deployed
+      # before with Terraform moves its state over once; afterwards (or if never deployed) this is a no-op.
+      - name: Migrate Terraform state to the direct engine (once)
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+        run: databricks bundle deployment migrate -t "$TARGET" || echo "nothing to migrate (already direct, or never deployed)"
       - name: Deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle deploy -t "$TARGET"
       - name: Run benchmark job
         if: env.DATABRICKS_CLIENT_SECRET != '' && github.event.inputs.run_benchmark == 'true'
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Returns once Databricks has started the run; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait study_benchmark
