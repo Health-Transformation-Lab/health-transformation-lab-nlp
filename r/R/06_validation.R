@@ -92,3 +92,21 @@ transition_pairs <- function(visits, status_col = "status", min_days = 365, max_
   }
   if (length(rows)) do.call(rbind, rows) else data.frame()
 }
+
+# Spec 013 G7: twin of completeness.complete_cases and prevalence_by_scale.
+CHART_INPUTS <- c("rec_max_cal_mm", "rec_bop_pct", "rec_max_probing_depth_mm", "rec_teeth_lost_perio")
+is_missing <- function(x) is.na(x) | as.character(x) %in% c("unknown", "")
+complete_cases <- function(v) {
+  charted <- v$charted == TRUE | v$charted == "True"
+  chart_ok <- charted & !Reduce(`|`, lapply(CHART_INPUTS, function(c) is_missing(v[[c]])))
+  v[!is_missing(v$exam_form) & !is_missing(v$proc_codes_planned) & chart_ok & !is_missing(v$notes), ]
+}
+prevalence_by_scale <- function(v, status_col) {
+  rev <- v$in_review == TRUE | v$in_review == "True"
+  scales <- list(all_visits = v, complete_cases = complete_cases(v), reference_set = v[rev, ])
+  do.call(rbind, lapply(names(scales), function(nm) {
+    s <- scales[[nm]][[status_col]]; k <- s[!is_missing(s)]
+    data.frame(scale = nm, status_col = status_col, n_visits = length(s), n_known = length(k),
+               periodontitis = mean(k %in% PERIO_LABELS6[3:6]), stage3_4 = mean(k %in% PERIO_LABELS6[5:6]))
+  }))
+}

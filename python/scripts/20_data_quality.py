@@ -9,6 +9,7 @@ temporal checks catch. Writes data/datasets/data_quality/.
 
 import pandas as pd
 
+from dental_omop_nlp.completeness import CHART_INPUTS, column_completeness, prevalence_by_scale, row_completeness
 from dental_omop_nlp.dq import run_checks
 from dental_omop_nlp.paths import DATASETS_DIR
 from dental_omop_nlp.plausibility import check_history, transition_pairs, transition_summary
@@ -46,6 +47,14 @@ for m in ("algorithm_design", "algorithm_v0", "notes", "probing_chart", "exam_fo
         pairs.to_csv(out / "transition_pairs_algorithm_design.csv", index=False)   # read by the R parity test
 pd.DataFrame(trans).to_csv(out / "transitions_by_method.csv", index=False)
 
+# completeness after Zozus et al. (spec 013 G7): column values, rows, and prevalence on three scales
+METHODS = ["algorithm_design", "notes", "exam_form", "proc_dx_planned", "probing_chart"]
+column_completeness(v, METHODS + CHART_INPUTS).to_csv(out / "completeness_columns.csv", index=False)
+row = row_completeness(v, CHART_INPUTS)
+pd.DataFrame([{"calculation": "probing_chart_algorithm", **row}]).to_csv(out / "completeness_rows.csv", index=False)
+scales = pd.concat([prevalence_by_scale(v, m) for m in METHODS], ignore_index=True)
+scales.to_csv(out / "prevalence_by_scale.csv", index=False)       # also read by the R parity test
+
 # injected errors caught (synthetic only: the error flag lives in the answer key)
 f = check_history(hist, status_col="probing_chart")
 f.to_csv(out / "flags_probing_chart.csv", index=False)      # also read by the R parity test
@@ -61,5 +70,7 @@ print("\ntemporal plausibility of each method's calls (share of follow-up visits
 print(pd.DataFrame(rates).round(3).to_string(index=False))
 print("\nphenotype 1-2 years later, untreated (share of pairs better / same / worse):")
 print(pd.DataFrame(trans).round(3).to_string(index=False))
+print(f"\nchart rows with every input: {row['pct_complete']:.1f}% of {row['n_rows']} charted visits")
+print(scales.pivot(index="status_col", columns="scale", values="periodontitis").round(3).to_string())
 print(f"\nSYNTHETIC check: {inj.sum()} injected charting errors, {caught:.0%} flagged; "
       f"{false_alarm:.1%} of other visits flagged")

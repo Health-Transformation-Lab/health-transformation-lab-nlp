@@ -324,6 +324,17 @@ if (file.exists(vs) && file.exists(tp)) {
   stopifnot(nrow(m) == nrow(py), nrow(r) == nrow(py), bad == 0)
 } else cat("transitions: skipped (run 20_data_quality.py)\n")
 
+ps <- "data/datasets/data_quality/prevalence_by_scale.csv"
+if (file.exists(vs) && file.exists(ps)) {
+  v <- read.csv(vs, stringsAsFactors = FALSE)
+  py <- read.csv(ps, stringsAsFactors = FALSE)
+  r <- do.call(rbind, lapply(unique(py$status_col), function(m) prevalence_by_scale(v, m)))
+  num <- c("n_visits", "n_known", "periodontitis", "stage3_4")
+  d <- max(abs(as.matrix(r[num]) - as.matrix(py[num])), na.rm = TRUE)
+  cat(sprintf("scales:       max |R - Python| = %.2e over %d rows\n", d, nrow(py)))
+  stopifnot(nrow(r) == nrow(py), all(r$scale == py$scale), d < 1e-9)
+} else cat("scales: skipped (run 20_data_quality.py)\n")
+
 pp <- "data/datasets/prevalence/prevalence_by_clinic.csv"
 if (file.exists(vs) && file.exists(pp)) {
   v <- read.csv(vs, stringsAsFactors = FALSE)
