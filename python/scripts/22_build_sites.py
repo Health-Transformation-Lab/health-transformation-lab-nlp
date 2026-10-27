@@ -24,6 +24,7 @@ OUT = REPO_ROOT / "data" / "sites"
 OUT.mkdir(parents=True, exist_ok=True)
 v = pd.read_csv(DATASETS_DIR / "visits_structured.csv")
 v = v[v["charted"].astype(str).str.lower() == "true"]
+assert v["visit_id"].is_unique, "derive_all groups by visit_id: duplicate visits would merge"
 
 # column lists for all visits, one table each at the end (thousands of small tables are slow)
 site_cols = {c: [] for c in ("tooth", "site", "pd_mm", "cal_mm", "bop", "visit_id", "person_id")}

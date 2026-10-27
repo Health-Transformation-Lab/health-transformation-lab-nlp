@@ -33,6 +33,7 @@ def check_history(visits: pd.DataFrame, status_col: str = "status") -> pd.DataFr
     teeth_lost_perio, <status_col>. Returns visit_id, person_id, the FLAGS and any_flag."""
     rows = []
     pid = object()   # one pass over the sorted visits; state resets at each new person
+    visits = visits.dropna(subset=["person_id"])   # no person, no history (as groupby did)
     for r in visits.sort_values(["person_id", "visit_date", "visit_id"]).itertuples():
         if r.person_id != pid:
             pid, last_chart, best_rank = r.person_id, None, None
