@@ -35,7 +35,7 @@ dbutils.widgets.text("schema", "dental")
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
 dbutils.widgets.text("experiment_id", "")   # set per target by the bundle (resources/jobs.yml)
-dbutils.widgets.dropdown("train_encoder", "true", ["true", "false"])   # off in dev (databricks.yml)
+dbutils.widgets.dropdown("train_encoder", "false", ["true", "false"])   # uat/prod jobs set "true" (databricks.yml)
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
