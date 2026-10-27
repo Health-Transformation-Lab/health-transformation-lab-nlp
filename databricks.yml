@@ -58,6 +58,18 @@ variables:
   reader_limit:
     description: Review notes the reader job processes (0 = all)
     default: "40"
+  reader_shots:
+    description: Few-shot examples per status in the MedGemma reader's prompt (0 = zero-shot)
+    default: "0"
+  reader_lora_train:
+    description: LoRA fine-tune MedGemma on this many training notes first (0 = no fine-tune)
+    default: "0"
+  deid_ai_engines:
+    description: De-identification methods the De-id AI methods job runs (the ones that need Databricks services)
+    default: llm,llm+regex_v2+guard,ai_mask,ai_mask+regex_v2+guard
+  deid_llm_endpoint:
+    description: Pay-per-token chat endpoint for the llm de-identification method
+    default: databricks-meta-llama-3-3-70b-instruct
   hf_secret_scope:
     description: Secret scope holding hf_token (Hugging Face read token; HAI-DEF terms accepted)
     default: dental

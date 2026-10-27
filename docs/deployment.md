@@ -79,6 +79,8 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
+| `reader_shots`, `reader_lora_train` | `0`, `0` | MedGemma reader: few-shot examples per status, and LoRA fine-tune size (0 = off). Change these, or `reader_rung` (e.g. `medgemma-4b-it`), for one run with *Run now with different parameters* |
+| `deid_ai_engines`, `deid_llm_endpoint` | `llm`, `ai_mask` and their `+regex_v2+guard` versions; `databricks-meta-llama-3-3-70b-instruct` | De-id AI methods job |
 | `hf_secret_scope` | `dental` | secret scope with `hf_token` |
 | `gpu_accelerator` | `GPU_1xA10` | serverless GPU for the GPU jobs (Free Edition offers A10) |
 | `gpu_environment_version` | `4` | serverless environment for the GPU jobs; Databricks requires one when a task sets `compute` |
@@ -99,6 +101,7 @@ Override any variable with `--var name=value`, or the environment variable
 | `load_lakebase` | `04_load_lakebase.py`: OMOP CDM 5.4 + dental extension into Lakebase (Postgres) | serverless |
 | `medgemma_reader` | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | serverless GPU |
 | `encoder_gpu` | `08_encoder_gpu.py`: fine-tunes the encoders that need a GPU (large ModernBERTs, Longformers, GatorTron-base at a lower learning rate; spec 002 T017); predictions to the landing volume and `encoder_gpu_predictions` | serverless GPU |
+| `deid_ai` (De-id AI methods) | `06_deid_benchmark.py` with the de-identification methods that need Databricks services: `llm` (serving endpoint `deid_llm_endpoint`) and `ai_mask` (the SQL warehouse), each alone and with patterns + guard; result CSVs to the landing volume (`deid_ai/`) | serverless |
 
 ## Run in dev from your laptop
 

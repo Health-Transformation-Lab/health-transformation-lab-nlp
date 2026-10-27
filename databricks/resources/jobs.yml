@@ -93,7 +93,8 @@ resources:
               schema: ${resources.schemas.gold.name}
               rung: ${var.reader_rung}
               limit: ${var.reader_limit}
-              shots: "0"
+              shots: ${var.reader_shots}
+              lora_train: ${var.reader_lora_train}
               hf_secret_scope: ${var.hf_secret_scope}
 
     encoder_gpu:
@@ -118,3 +119,21 @@ resources:
               catalog: ${resources.schemas.gold.catalog_name}
               schema: ${resources.schemas.gold.name}
               landing_schema: ${resources.volumes.data.schema_name}
+
+    # De-identification methods that need Databricks services (spec 007 T012b, T016): the LLM via a
+    # serving endpoint and ai_mask via the SQL warehouse. Serverless CPU; results to the landing volume.
+    deid_ai:
+      name: De-id AI methods
+      tags:
+        project: dental-omop-nlp
+        data: synthetic
+      tasks:
+        - task_key: score
+          notebook_task:
+            notebook_path: ../notebooks/06_deid_benchmark.py
+            base_parameters:
+              engines: ${var.deid_ai_engines}
+              llm_endpoint: ${var.deid_llm_endpoint}
+              sql_warehouse_id: ${var.warehouse_id}
+              save_to_repo: "no"
+              out_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/deid_ai

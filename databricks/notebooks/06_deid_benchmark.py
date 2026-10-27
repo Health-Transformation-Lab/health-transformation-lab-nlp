@@ -59,11 +59,13 @@ dbutils.widgets.text("sql_warehouse_id", "")
 # Empty = the script's default engine set (every engine; the ones without credentials are reported as not run).
 dbutils.widgets.text("engines", "")
 dbutils.widgets.text("n_notes", "400")
-# ASQ-PHI as downloaded (synthetic_clinical_queries.txt), e.g. /Volumes/<catalog>/<schema>/<volume>/synthetic_clinical_queries.txt
+# ASQ-PHI as downloaded (synthetic_clinical_queries.txt), e.g. /Volumes/dental_omop/landing_dental_omop_perio/data/synthetic_clinical_queries.txt
 dbutils.widgets.text("external_path", "")
 # John Snow Labs' 48-note benchmark CSV, on a volume (tier jsl48); empty = skip that tier.
 dbutils.widgets.text("jsl48_path", "")
 dbutils.widgets.dropdown("save_to_repo", "yes", ["yes", "no"])
+# A volume folder to copy the result CSVs to (the De-id AI methods job sets it); empty = don't.
+dbutils.widgets.text("out_dir", "")
 
 # COMMAND ----------
 
@@ -122,6 +124,12 @@ display(pd.read_csv(deid_dir / "cost_effectiveness.csv"))
 
 # Copy the result CSVs (never the notes) into this Git folder's data/deid, ready to commit.
 import shutil
+
+out_dir = dbutils.widgets.get("out_dir").strip()
+if out_dir:
+    Path(out_dir).mkdir(parents=True, exist_ok=True)
+    print("copied to", out_dir, ":", ", ".join(Path(shutil.copy(p, Path(out_dir) / p.name)).name
+                                              for p in sorted(deid_dir.glob("*.csv"))))
 
 if dbutils.widgets.get("save_to_repo") == "yes":
     repo_deid = (Path.cwd() / "../../data/deid").resolve()
