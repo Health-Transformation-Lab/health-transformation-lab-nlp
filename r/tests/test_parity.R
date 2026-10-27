@@ -368,5 +368,16 @@ for (pfx in c("", "simulated_")) {
   cat(sprintf("%sjudge scorecard: %d system x metric rows, max |R - Python| = %.2e; agreement %d rows, %.2e\n",
               pfx, nrow(m), d, nrow(ma), da))
   stopifnot(nrow(m) == nrow(py), d < 1e-9, same_na(m, cols), nrow(ma) == nrow(pa), da < 1e-9, same_na(ma, acols))
+  rf <- sprintf("data/datasets/judge/%sjudge_run.csv", pfx)
+  if (file.exists(rf)) {   # priced at the list price the script used (judge_scorecard.LIST_USD_PER_1M_*)
+    pr <- read.csv(rf, stringsAsFactors = FALSE)
+    rr <- judge_run_summary(inp$judgments, 0.50, 1.50)
+    mr <- merge(rr, pr, by = "kind", suffixes = c(".r", ".p"))
+    rcols <- c("calls", "charts", "endpoint_errors", "gate_failures", "usd", "usd_per_chart", "latency_mean_s",
+               "latency_p50_s", "latency_p95_s")
+    dr <- max(sapply(rcols, function(k) gap(mr, k)))
+    cat(sprintf("%sjudge run cost and speed: max |R - Python| = %.2e\n", pfx, dr))
+    stopifnot(nrow(mr) == nrow(pr), dr < 1e-9)
+  }
 }
 cat("parity OK (spec 012)\n")

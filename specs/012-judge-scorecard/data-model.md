@@ -34,6 +34,7 @@ Unique on (visit_id, kind, answer).
 | gate_reason | str | why not |
 | endpoint, prompt_version | str | |
 | prompt_tokens, completion_tokens | int | |
+| latency_s | float | seconds for the call |
 | simulated | bool | true for the simulated judge |
 | api_error | bool | the endpoint failed after retries; not a judgment, asked again on the next run |
 
@@ -46,7 +47,7 @@ One row per system and metric.
 | Column | Type | Notes |
 |---|---|---|
 | system | str | |
-| metric | str | exact_status, sensitivity, specificity, ppv, npv, stage4_caught, unsafe_rate, exact_L1/L2/L3 |
+| metric | str | correct, incorrectly_assigned, incorrectly_ruled_out, incorrect_stage, no_answer, unsafe_rate, sensitivity, specificity, ppv, npv, stage4_correct, correct_L1/L2/L3 (README names in metric_label) |
 | vs_truth | float | as in the README |
 | vs_judge | float | same metric, judge's status as reference |
 | difference | float | vs_judge − vs_truth |
@@ -55,3 +56,7 @@ One row per system and metric.
 ## judge_agreement
 The judge's own status against the truth: overall and per truth status and difficulty: n,
 agreement, kappa, 95% range.
+
+## judge_run
+Cost and speed per call type (status, verdict, all): calls, charts, endpoint_errors, gate_failures,
+prompt_tokens, completion_tokens, usd, usd_per_chart, latency_mean_s, latency_p50_s, latency_p95_s.

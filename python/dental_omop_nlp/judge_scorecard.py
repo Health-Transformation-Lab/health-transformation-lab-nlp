@@ -31,6 +31,11 @@ from .phenotype import cohen_kappa
 SYSTEM_TOKENS = 1000
 OUT_TOKENS = 100
 CHARS_PER_TOKEN = 4
+# databricks-meta-llama-3-3-70b-instruct pay-per-token list price: 7.143 / 21.429 DBU per 1M input / output
+# tokens at US$0.07 per DBU (Databricks Foundation Model Serving pricing, checked 2026-10-27). Same as
+# databricks.yml's judge_usd_per_million_in/out; a real run passes the endpoint's own price.
+LIST_USD_PER_1M_IN = 0.50
+LIST_USD_PER_1M_OUT = 1.50
 
 
 def chart_answers(inp: dict) -> pd.DataFrame:
@@ -65,7 +70,8 @@ def estimate_cost(queue: pd.DataFrame, usd_per_1m_in: float, usd_per_1m_out: flo
 
 
 JUDGMENT_COLS = ["visit_id", "kind", "answer", "verdict", "judge_status", "quote", "gate_ok", "gate_reason",
-                 "endpoint", "prompt_version", "prompt_tokens", "completion_tokens", "simulated", "api_error"]
+                 "endpoint", "prompt_version", "prompt_tokens", "completion_tokens", "latency_s", "simulated",
+                 "api_error"]
 
 
 def _key(r) -> tuple:
@@ -85,7 +91,7 @@ def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | No
     for r in queue.itertuples(index=False):
         k = _key(r)
         if k in have:
-            rows.append({c: have[k][c] for c in JUDGMENT_COLS})
+            rows.append({c: have[k].get(c) for c in JUDGMENT_COLS})
             continue
         if r.kind == "status":
             v = judge.status(r.note_text, **extra(r))
@@ -100,7 +106,7 @@ def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | No
                      "judge_status": (v.supported_status if ok else None) if r.kind == "status" else None,
                      "quote": v.quote, "gate_ok": ok, "gate_reason": v.error, "endpoint": endpoint,
                      "prompt_version": version, "prompt_tokens": int(v.input_tokens),
-                     "completion_tokens": int(v.output_tokens), "simulated": sim,
+                     "completion_tokens": int(v.output_tokens), "latency_s": float(v.latency_s), "simulated": sim,
                      "api_error": api_error})
         if trace is not None:
             trace(r, v)
@@ -198,4 +204,25 @@ def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed
         rows.append({"group": g, "value": v, "label": label, "n": int(mask.sum()), "coverage": float(has.mean()),
                      "agreement": float(ok.mean()) if len(ok) else np.nan, "ci_low": float(lo), "ci_high": float(hi),
                      "kappa": cohen_kappa(t[has], j[has]) if len(ok) else np.nan})
+    return pd.DataFrame(rows)
+
+
+def judge_run_summary(judgments: pd.DataFrame, usd_per_1m_in: float, usd_per_1m_out: float) -> pd.DataFrame:
+    """What a judge run cost and how fast it was, per call type (status, verdict) and overall: calls,
+    endpoint errors, quote-gate failures, tokens, US$ at the endpoint's list price (also per chart), and
+    latency (mean, median, 95th percentile) over calls the endpoint answered."""
+    rows = []
+    for kind, g in [*judgments.groupby("kind", sort=True), ("all", judgments)]:
+        err = g["api_error"].astype(bool)
+        lat = g.loc[~err, "latency_s"].astype(float)
+        tin, tout = float(g["prompt_tokens"].sum()), float(g["completion_tokens"].sum())
+        usd = tin / 1e6 * usd_per_1m_in + tout / 1e6 * usd_per_1m_out
+        charts = g["visit_id"].nunique()
+        rows.append({"kind": kind, "calls": len(g), "charts": charts, "endpoint_errors": int(err.sum()),
+                     "gate_failures": int((~g["gate_ok"].astype(bool) & ~err).sum()),
+                     "prompt_tokens": tin, "completion_tokens": tout, "usd": usd,
+                     "usd_per_chart": usd / charts if charts else np.nan,
+                     "latency_mean_s": lat.mean() if len(lat) else np.nan,
+                     "latency_p50_s": lat.quantile(0.5) if len(lat) else np.nan,
+                     "latency_p95_s": lat.quantile(0.95) if len(lat) else np.nan})
     return pd.DataFrame(rows)

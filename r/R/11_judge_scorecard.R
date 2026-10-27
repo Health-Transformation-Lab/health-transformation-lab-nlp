@@ -77,6 +77,20 @@ judge_agreement_point <- function(judgments, truth, level) {
   }))
 }
 
+# Cost and speed of a judge run (twin of judge_scorecard.judge_run_summary): per call type and overall.
+judge_run_summary <- function(judgments, usd_in, usd_out) {
+  parts <- c(split(judgments, judgments$kind)[sort(unique(judgments$kind))], list(all = judgments))
+  do.call(rbind, lapply(names(parts), function(k) {
+    g <- parts[[k]]; err <- as.logical(g$api_error); lat <- as.numeric(g$latency_s[!err])
+    tin <- sum(g$prompt_tokens); tout <- sum(g$completion_tokens); usd <- tin / 1e6 * usd_in + tout / 1e6 * usd_out
+    charts <- length(unique(g$visit_id))
+    q <- function(p) if (length(lat)) unname(quantile(lat, p, type = 7)) else NA_real_
+    data.frame(kind = k, calls = nrow(g), charts = charts, endpoint_errors = sum(err),
+               gate_failures = sum(!as.logical(g$gate_ok) & !err), usd = usd, usd_per_chart = usd / charts,
+               latency_mean_s = if (length(lat)) mean(lat) else NA_real_, latency_p50_s = q(0.5), latency_p95_s = q(0.95))
+  }))
+}
+
 read_judge_inputs <- function(prefix = "") {
   dir <- "data/datasets/judge/"
   na <- c("", "NA")

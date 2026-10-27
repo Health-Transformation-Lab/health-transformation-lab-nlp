@@ -103,7 +103,7 @@ def test_openai_judge_status_call_sends_no_answer_and_gates_the_reply(monkeypatc
 
 
 JUDGMENT_COLS = ["visit_id", "kind", "answer", "verdict", "judge_status", "quote", "gate_ok", "gate_reason",
-                 "endpoint", "prompt_version", "prompt_tokens", "completion_tokens", "simulated", "api_error"]
+                 "endpoint", "prompt_version", "prompt_tokens", "completion_tokens", "latency_s", "simulated", "api_error"]
 
 
 def _small_queue(inp, answers, n=12):
@@ -289,3 +289,19 @@ def test_without_a_judge_the_truth_metrics_still_publish(inp, answers):
 def test_chart_answers_carry_the_truth_for_the_drill_down(inp, answers):
     truth, _, _ = rr.phenotype_predictions(inp)
     assert (answers["truth"].to_numpy() == truth.reindex(answers["visit_id"]).to_numpy()).all()
+
+
+def test_run_summary_reports_cost_and_speed_per_call_type():
+    """Out-of-box cost and performance: tokens and US$ at the endpoint's list price, latency, failures."""
+    j = pd.DataFrame({"visit_id": [1, 1, 2, 2], "kind": ["status", "verdict", "status", "verdict"],
+                      "prompt_tokens": [1000, 1200, 800, 0], "completion_tokens": [100, 80, 60, 0],
+                      "latency_s": [1.0, 2.0, 3.0, 0.0], "gate_ok": [True, True, False, False],
+                      "api_error": [False, False, False, True]})
+    r = js.judge_run_summary(j, usd_per_1m_in=0.5, usd_per_1m_out=1.5).set_index("kind")
+    assert list(r.index) == ["status", "verdict", "all"]
+    a = r.loc["all"]
+    assert (a["calls"], a["endpoint_errors"], a["gate_failures"], a["charts"]) == (4, 1, 1, 2)
+    assert a["usd"] == pytest.approx((3000 * 0.5 + 240 * 1.5) / 1e6)
+    assert a["usd_per_chart"] == pytest.approx(a["usd"] / 2)
+    assert a["latency_mean_s"] == pytest.approx(2.0)            # endpoint errors carry no latency
+    assert r.loc["status", "latency_p95_s"] == pytest.approx(2.9)

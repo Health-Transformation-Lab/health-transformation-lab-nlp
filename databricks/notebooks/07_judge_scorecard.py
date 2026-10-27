@@ -10,7 +10,7 @@
 # MAGIC * Judge: `judge_endpoint` (a pay-per-token serving endpoint; `none` skips the judge and publishes
 # MAGIC   the truth-based metrics only). The job prints the token cost first and stops above `max_usd`.
 # MAGIC * Resumes: rows already in the `judgments` table aren't asked again (endpoint errors are).
-# MAGIC * Writes to the gold schema: `chart_answers`, `judgments`, `judge_metrics`, `judge_agreement`,
+# MAGIC * Writes to the gold schema: `chart_answers`, `judgments`, `judge_metrics`, `judge_agreement`, `judge_run`,
 # MAGIC   `deid_scores` (for the dashboard's de-identification page). One MLflow trace per judge call.
 
 # COMMAND ----------
@@ -90,6 +90,17 @@ else:
 
 metrics = js.judge_metrics(inp, answers, judgments)
 agreement = js.judge_agreement(inp, judgments)
+usd_in_, usd_out_ = (float(dbutils.widgets.get(k) or d) for k, d in
+                     (("usd_per_million_in", js.LIST_USD_PER_1M_IN), ("usd_per_million_out", js.LIST_USD_PER_1M_OUT)))
+run = js.judge_run_summary(judgments, usd_in_, usd_out_)
+if len(judgments) and experiment_id:      # cost and speed next to the traces, as MLflow metrics
+    with mlflow.start_run(run_name=f"judge_scorecard {endpoint}"):
+        mlflow.set_tags({"data": "synthetic", "kind": "LLM judgment", "endpoint": endpoint})
+        t = run.set_index("kind").loc["all"]
+        mlflow.log_metrics({k: float(t[k]) for k in ("usd", "usd_per_chart", "calls", "endpoint_errors",
+                                                     "gate_failures", "latency_mean_s", "latency_p95_s")})
+        a = agreement.set_index(["group", "value"]).loc[("all", "all")]
+        mlflow.log_metrics({"judge_agreement": float(a["agreement"]), "judge_kappa": float(a["kappa"])})
 
 # COMMAND ----------
 
@@ -102,6 +113,7 @@ if len(judgments):
     save(judgments, "judgments")
 save(metrics, "judge_metrics")
 save(agreement, "judge_agreement")
+save(run, "judge_run")
 save(pd.read_csv(DEID_DIR / "scores.csv").assign(group=lambda d: d["method"].map(rr.deid_group)), "deid_scores")
 
 label = "LLM judgment" if len(judgments) else "no judge run"

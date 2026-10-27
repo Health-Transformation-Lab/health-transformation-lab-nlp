@@ -254,9 +254,10 @@ def test_judge_section_reports_agreement_and_the_gap_when_a_real_run_exists(tmp_
     import shutil
 
     from dental_omop_nlp.paths import JUDGE_DIR
-    for n in ("judge_metrics", "judge_agreement", "judgments"):
+    for n in ("judge_metrics", "judge_agreement", "judgments", "judge_run"):
         shutil.copy(JUDGE_DIR / f"simulated_{n}.csv", tmp_path / f"{n}.csv")   # stand-in for a real run
     monkeypatch.setattr(rr, "JUDGE_DIR", tmp_path)
     inp = rr.load_inputs()
     sec = rr.details_markdown(inp).split(rr.JUDGE_TITLE)[1]
     assert "Judge agrees with truth" in sec and "Correct, vs truth" in sec and "vs judge" in sec
+    assert "Cost and speed" in sec and "latency median" in sec

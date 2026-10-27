@@ -37,6 +37,15 @@
    ]
   },
   {
+   "name": "ph_run",
+   "displayName": "ph_run",
+   "queryLines": [
+    "SELECT kind, calls, charts, endpoint_errors, gate_failures, ROUND(usd, 4) AS usd,\n",
+    "  ROUND(usd_per_chart, 5) AS usd_per_chart, ROUND(latency_p50_s, 2) AS latency_p50_s, ROUND(latency_p95_s, 2) AS latency_p95_s,\n",
+    "  CAST(prompt_tokens AS BIGINT) AS prompt_tokens, CAST(completion_tokens AS BIGINT) AS completion_tokens FROM dental_omop.gold_dental_omop_perio.judge_run\n"
+   ]
+  },
+  {
    "name": "deid",
    "displayName": "deid",
    "queryLines": [
@@ -350,9 +359,133 @@
      },
      "position": {
       "x": 0,
-      "y": 12,
+      "y": 16,
       "width": 6,
       "height": 5
+     }
+    },
+    {
+     "widget": {
+      "name": "p_t_run",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "ph_run",
+         "fields": [
+          {
+           "name": "kind",
+           "expression": "`kind`"
+          },
+          {
+           "name": "calls",
+           "expression": "`calls`"
+          },
+          {
+           "name": "charts",
+           "expression": "`charts`"
+          },
+          {
+           "name": "usd",
+           "expression": "`usd`"
+          },
+          {
+           "name": "usd_per_chart",
+           "expression": "`usd_per_chart`"
+          },
+          {
+           "name": "latency_p50_s",
+           "expression": "`latency_p50_s`"
+          },
+          {
+           "name": "latency_p95_s",
+           "expression": "`latency_p95_s`"
+          },
+          {
+           "name": "gate_failures",
+           "expression": "`gate_failures`"
+          },
+          {
+           "name": "endpoint_errors",
+           "expression": "`endpoint_errors`"
+          },
+          {
+           "name": "prompt_tokens",
+           "expression": "`prompt_tokens`"
+          },
+          {
+           "name": "completion_tokens",
+           "expression": "`completion_tokens`"
+          }
+         ],
+         "disaggregated": true
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "table",
+       "encodings": {
+        "columns": [
+         {
+          "fieldName": "kind",
+          "displayName": "Call"
+         },
+         {
+          "fieldName": "calls",
+          "displayName": "Calls"
+         },
+         {
+          "fieldName": "charts",
+          "displayName": "Charts"
+         },
+         {
+          "fieldName": "usd",
+          "displayName": "Cost (US$)"
+         },
+         {
+          "fieldName": "usd_per_chart",
+          "displayName": "Cost per chart (US$)"
+         },
+         {
+          "fieldName": "latency_p50_s",
+          "displayName": "Latency, median (s)"
+         },
+         {
+          "fieldName": "latency_p95_s",
+          "displayName": "Latency, 95th percentile (s)"
+         },
+         {
+          "fieldName": "gate_failures",
+          "displayName": "Failed the quote gate"
+         },
+         {
+          "fieldName": "endpoint_errors",
+          "displayName": "Endpoint errors"
+         },
+         {
+          "fieldName": "prompt_tokens",
+          "displayName": "Input tokens"
+         },
+         {
+          "fieldName": "completion_tokens",
+          "displayName": "Output tokens"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Judge cost and speed",
+        "showDescription": true,
+        "description": "Tokens priced at the endpoint's list price (job parameters); latency per call. status: the judge's own reading; verdict: is an answer right"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 12,
+      "width": 6,
+      "height": 4
      }
     },
     {
@@ -434,7 +567,7 @@
      },
      "position": {
       "x": 0,
-      "y": 17,
+      "y": 21,
       "width": 6,
       "height": 8
      }
@@ -542,7 +675,7 @@
      },
      "position": {
       "x": 0,
-      "y": 25,
+      "y": 29,
       "width": 6,
       "height": 10
      }

@@ -38,7 +38,8 @@ answers = js.chart_answers(inp)
 queue = js.judge_queue(answers, inp["key"])
 prefix = "simulated_" if a.simulated else ""
 a.out.mkdir(parents=True, exist_ok=True)
-path = {n: a.out / f"{prefix}{n}.csv" for n in ("chart_answers", "judgments", "judge_metrics", "judge_agreement")}
+path = {n: a.out / f"{prefix}{n}.csv"
+        for n in ("chart_answers", "judgments", "judge_metrics", "judge_agreement", "judge_run")}
 
 if a.simulated:
     judge, endpoint, done = jg.SimulatedJudge(inp["key"]["truth_status"].to_dict(), seed=11), "sim:judge", None
@@ -61,14 +62,19 @@ else:
 judgments = js.run_judge(queue, judge, endpoint=endpoint, done=done)
 metrics = js.judge_metrics(inp, answers, judgments, n_boot=a.n_boot)
 agreement = js.judge_agreement(inp, judgments, n_boot=a.n_boot)
+run = js.judge_run_summary(judgments, a.usd_in or js.LIST_USD_PER_1M_IN, a.usd_out or js.LIST_USD_PER_1M_OUT)
 answers.to_csv(path["chart_answers"], index=False)
 judgments.to_csv(path["judgments"], index=False)
 metrics.to_csv(path["judge_metrics"], index=False)
 agreement.to_csv(path["judge_agreement"], index=False)
+run.to_csv(path["judge_run"], index=False)
 
 label = "SIMULATED judge" if a.simulated else f"LLM judgment ({endpoint})"
 print(f"{label}: {len(judgments)} calls, {int(judgments['api_error'].sum())} endpoint errors, "
       f"{int((~judgments['gate_ok']).sum())} failed the quote gate")
+t = run.set_index("kind").loc["all"]
+print(f"cost US${t['usd']:.2f} (US${t['usd_per_chart']:.4f} per chart); latency median {t['latency_p50_s']:.2f} s, "
+      f"95th percentile {t['latency_p95_s']:.2f} s")
 print(agreement[agreement.group == "all"].round(3).to_string(index=False))
 ex = metrics[metrics.metric == "correct"].sort_values("vs_truth", ascending=False)
 print(ex[["system", "vs_truth", "vs_judge", "difference", "corrected_accuracy"]].head(10).round(3).to_string(index=False))

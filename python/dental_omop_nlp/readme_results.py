@@ -105,7 +105,8 @@ def _load_judge() -> dict | None:
     """A real LLM judge run (spec 012), if one is committed; simulated dry runs are never shown."""
     if not (JUDGE_DIR / "judge_metrics.csv").exists():
         return None
-    return {n: pd.read_csv(JUDGE_DIR / f"{n}.csv") for n in ("judge_metrics", "judge_agreement", "judgments")}
+    return {n: pd.read_csv(JUDGE_DIR / f"{n}.csv") for n in ("judge_metrics", "judge_agreement", "judgments", "judge_run")
+            if (JUDGE_DIR / f"{n}.csv").exists()}
 
 
 def base_id(method: str) -> str:
@@ -380,8 +381,15 @@ def _judge(inp) -> tuple[str, str]:
         corr = "–" if pd.isna(r.corrected_accuracy) else _ci(r.corrected_accuracy, r.ci_low, r.ci_high)
         sec.append(f"| `{r.system}` | {r.group} | {_pct(r.vs_truth, 1)} | {_pct(r.vs_judge, 1)} | "
                    f"{r.difference * 100:+.1f} pts | {corr} |")
-    sec += ["", ("Every metric (sensitivity, specificity, PPV, NPV, stage IV caught, unsafe errors, by note "
-                 "difficulty) both ways: `data/datasets/judge/judge_metrics.csv`.")]
+    sec += ["", ("Every metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe "
+                 "errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty) both ways: "
+                 "`data/datasets/judge/judge_metrics.csv`.")]
+    if "judge_run" in j:
+        t = j["judge_run"].set_index("kind").loc["all"]
+        sec += ["", (f"**Cost and speed**: {int(t['calls'])} calls, US${t['usd']:.2f} at the endpoint's list price "
+                     f"(US${t['usd_per_chart']:.4f} per chart); latency median {t['latency_p50_s']:.1f} s, 95th "
+                     f"percentile {t['latency_p95_s']:.1f} s; {int(t['gate_failures'])} answers failed the quote gate, "
+                     f"{int(t['endpoint_errors'])} endpoint errors.")]
     line = (f"**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against "
             f"the truth): it agrees with the truth on {_pct(allr['agreement'])} of the charts it reads; {link}, "
             f"and the *{DASHBOARD}* dashboard in Databricks.")

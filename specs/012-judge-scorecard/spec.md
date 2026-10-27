@@ -130,7 +130,10 @@ readers with workspace access) and noting where judge-based metrics live.
   `databricks-meta-llama-3-3-70b-instruct`; `none` skips the judge.
 - **FR-006** Each status is judged once per chart (the judge's own status doesn't depend on which
   system's answer it was shown); the verdict is per chart and system.
-- **FR-007** For each system, every README phenotyping metric is computed against the truth and
+- **FR-007** For each system, every README phenotyping metric (as of 2026-10-27: correct, periodontitis
+  incorrectly assigned (when not present), periodontitis incorrectly ruled out (when present), incorrect
+  stage, no answer, unsafe errors, sensitivity, specificity, PPV, NPV, stage 4 correct, correct by note
+  difficulty; same names and same code as the README) is computed against the truth and
   against the judge's status, with the difference; judge-corrected accuracy (Rogan-Gladen) with a
   95% bootstrap range; and the judge's own agreement with the truth (overall, per status, per note
   difficulty). Computed in code, never by the LLM. Python and R agree to 1e-9.
@@ -144,6 +147,10 @@ readers with workspace access) and noting where judge-based metrics live.
 - **FR-011** Judge calls are logged as MLflow traces in the bundle's experiment.
 - **FR-012** The README summary links to the dashboard and says judge metrics are LLM judgments
   checked against the truth.
+- **FR-014** Each judge run reports what the platform measures anyway: calls, endpoint errors,
+  quote-gate failures, input and output tokens, US$ at the endpoint's list price (total and per
+  chart) and latency per call (mean, median, 95th percentile), per call type and overall; as a table,
+  as MLflow metrics next to the traces, on the dashboard and in the results doc. Python and R agree.
 - **FR-013** Every name follows the repo's Databricks naming rule: identical in every target, no
   per-environment prefix or suffix.
 
