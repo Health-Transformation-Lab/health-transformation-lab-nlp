@@ -71,7 +71,19 @@ Best method in each group, counted on the 400 synthetic notes; groups ordered by
 | One AI tool | Stanford AI + dental-word guard | 560 | 2,714 | 41 | 2,462 | 7–8 | 5 |
 | Pattern matching only | Patterns | 645 | 2,714 | 0 | 2,462 | 9–10 | 4 |
 
-All 15 methods, per 100 with 95% CIs, two outside test sets (ASQ-PHI, and MACCROBAT's real case reports), and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
+All 15 methods, per 100 with 95% CIs, on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
+
+#### The same best methods on the other note sets
+
+**John Snow Labs**: their published benchmark, 48 clinical notes. **ASQ-PHI**: 1,051 synthetic clinical queries; the not-sensitive text is the 219 queries with no PHI. **MACCROBAT**: 200 real, published case reports; the sensitive text is their dates, the not-sensitive text their clinical terms.
+
+| Best method | John Snow Labs: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is not sensitive incorrectly scrubbed | MACCROBAT: Text that is sensitive (PHI) incorrectly leaked | MACCROBAT: Text that is not sensitive incorrectly scrubbed |
+|---|---:|---:|---:|---:|---:|
+| Stanford AI + OBI AI + patterns + dental-word guard | 89 of 1,479 | 71 of 2,975 | 195 of 219 | not run | not run |
+| Stanford AI + dental-word guard | 181 of 1,479 | 153 of 2,975 | 59 of 219 | 2 of 105 | 38 of 22,272 |
+| Patterns | 698 of 1,479 | 1,393 of 2,975 | 21 of 219 | 77 of 105 | 90 of 22,272 |
+
+**University of Michigan course files** (MACCROBAT, split for a course assignment): a separately trained PHI tagger found 162 of 195 identifiers exactly ([details](docs/results.md#a-trained-phi-tagger-on-the-university-of-michigan-course-files)).
 <!-- results:end -->
 
 ## What it does, step by step

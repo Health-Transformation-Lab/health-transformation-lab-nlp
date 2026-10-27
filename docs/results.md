@@ -57,24 +57,32 @@ Numbers are per 100 charts. **Correct**: the right status (healthy, gingivitis, 
 
 Every method on the 400 synthetic dental notes with fake PHI (2,714 identifiers, all tiers), ranked by sensitive text leaked (fewest first), with a Wilson 95% CI. Per-identifier results aren't saved, so there is no paired bootstrap: **Rank** is the range the intervals allow, from only the methods clearly above counting to every method whose interval reaches this one's counting.
 
-Numbers are per 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note the AI reads, so read them together. *Unseen tier*: the notes no engine was written against. **ASQ-PHI**: 1,051 synthetic clinical queries (MIT); its text that is not sensitive is the queries with no PHI, out of 100 queries. **MACCROBAT**: 200 real, published case reports (CC BY 4.0); its sensitive text is the dates, its text that is not sensitive the clinical terms. [More on these numbers](deidentification.md#how-to-read-the-numbers).
+Numbers are per 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note the AI reads, so read them together. *Unseen tier*: the notes no method was written against. **John Snow Labs**: their published 48-note benchmark (1,479 identifiers; it labels no look-alike text, so there is no scrubbed column). **ASQ-PHI**: 1,051 synthetic clinical queries (MIT); its text that is not sensitive is the queries with no PHI, out of 100 queries. **MACCROBAT**: 200 real, published case reports (CC BY 4.0); its sensitive text is the dates, its text that is not sensitive the clinical terms. [More on these numbers](deidentification.md#how-to-read-the-numbers).
 
-| Rank | Method | Text that is sensitive (PHI) incorrectly leaked (95% CI) | Text that is sensitive (PHI) incorrectly leaked, unseen tier | Text that is not sensitive incorrectly scrubbed | ASQ-PHI: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is not sensitive incorrectly scrubbed | MACCROBAT: Text that is sensitive (PHI) incorrectly leaked | MACCROBAT: Text that is not sensitive incorrectly scrubbed |
-|---|---|---|---:|---:|---:|---:|---:|---:|
-| 1–2 | `hf_stanford+hf_obi+regex_v2+guard` | **4.2** (3.5–5.1) | 13 | 2 | 2 | 89 | – | – |
-| 1–3 | `routed+guard` | **4.8** (4.0–5.6) | 12 | 6 | 2 | 92 | – | – |
-| 2–4 | `hf_stanford+presidio+regex_v2+guard` | **6.4** (5.5–7.4) | 20 | 6 | 2 | 91 | 0 | 3.7 |
-| 3–4 | `hf_stanford+regex_v2+guard` | **8.3** (7.3–9.4) | 26 | 2 | 4 | 35 | 2 | 0.5 |
-| 5–6 | `hf_obi+regex_v2+guard` | **12.2** (11.1–13.5) | 38 | 1 | 31 | 89 | 2 | 0.8 |
-| 5–6 | `presidio+regex_v2+guard` | **13.9** (12.6–15.2) | 43 | 5 | 24 | 91 | 1 | 3.6 |
-| 7–8 | `hf_stanford+guard` | **20.6** (19.2–22.2) | 29 | 2 | 5 | 27 | 2 | 0.2 |
-| 7–8 | `hf_stanford` | **20.6** (19.2–22.2) | 29 | 17 | 5 | 27 | 2 | 0.2 |
-| 9–10 | `regex_v2` | **23.8** (22.2–25.4) | 73 | 0 | 47 | 10 | 73 | 0.4 |
-| 9–10 | `regex_v2+guard` | **23.8** (22.2–25.4) | 73 | 0 | 47 | 10 | 73 | 0.4 |
-| 11–13 | `presidio+guard` | **31.3** (29.6–33.1) | 47 | 5 | 46 | 90 | 3 | 3.4 |
-| 11–13 | `presidio` | **31.3** (29.6–33.1) | 47 | 37 | 46 | 90 | 3 | 3.4 |
-| 11–13 | `hf_obi` | **31.7** (30.0–33.5) | 42 | 17 | 34 | 89 | 3 | 0.5 |
-| 14–15 | `regex` | **52.8** (51.0–54.7) | 80 | 0 | 69 | 10 | 78 | 0.4 |
-| 14–15 | `regex+guard` | **52.8** (51.0–54.7) | 80 | 0 | 69 | 10 | 78 | 0.4 |
+| Rank | Method | Text that is sensitive (PHI) incorrectly leaked (95% CI) | Text that is sensitive (PHI) incorrectly leaked, unseen tier | Text that is not sensitive incorrectly scrubbed | John Snow Labs: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is not sensitive incorrectly scrubbed | MACCROBAT: Text that is sensitive (PHI) incorrectly leaked | MACCROBAT: Text that is not sensitive incorrectly scrubbed |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 1–2 | `hf_stanford+hf_obi+regex_v2+guard` | **4.2** (3.5–5.1) | 13 | 2 | 6 | 2 | 89 | – | – |
+| 1–3 | `routed+guard` | **4.8** (4.0–5.6) | 12 | 6 | 3 | 2 | 92 | – | – |
+| 2–4 | `hf_stanford+presidio+regex_v2+guard` | **6.4** (5.5–7.4) | 20 | 6 | 5 | 2 | 91 | 0 | 3.7 |
+| 3–4 | `hf_stanford+regex_v2+guard` | **8.3** (7.3–9.4) | 26 | 2 | 8 | 4 | 35 | 2 | 0.5 |
+| 5–6 | `hf_obi+regex_v2+guard` | **12.2** (11.1–13.5) | 38 | 1 | 18 | 31 | 89 | 2 | 0.8 |
+| 5–6 | `presidio+regex_v2+guard` | **13.9** (12.6–15.2) | 43 | 5 | 24 | 24 | 91 | 1 | 3.6 |
+| 7–8 | `hf_stanford+guard` | **20.6** (19.2–22.2) | 29 | 2 | 12 | 5 | 27 | 2 | 0.2 |
+| 7–8 | `hf_stanford` | **20.6** (19.2–22.2) | 29 | 17 | 11 | 5 | 27 | 2 | 0.2 |
+| 9–10 | `regex_v2` | **23.8** (22.2–25.4) | 73 | 0 | 47 | 47 | 10 | 73 | 0.4 |
+| 9–10 | `regex_v2+guard` | **23.8** (22.2–25.4) | 73 | 0 | 47 | 47 | 10 | 73 | 0.4 |
+| 11–13 | `presidio+guard` | **31.3** (29.6–33.1) | 47 | 5 | 33 | 46 | 90 | 3 | 3.4 |
+| 11–13 | `presidio` | **31.3** (29.6–33.1) | 47 | 37 | 33 | 46 | 90 | 3 | 3.4 |
+| 11–13 | `hf_obi` | **31.7** (30.0–33.5) | 42 | 17 | 25 | 34 | 89 | 3 | 0.5 |
+| 14–15 | `regex` | **52.8** (51.0–54.7) | 80 | 0 | 53 | 69 | 10 | 78 | 0.4 |
+| 14–15 | `regex+guard` | **52.8** (51.0–54.7) | 80 | 0 | 53 | 69 | 10 | 78 | 0.4 |
 
 **Not run yet:** `llm`, `llm+regex_v2+guard`, `ai_mask`, `ai_mask+regex_v2+guard`, `azure_deid`, `azure_deid+regex_v2+guard`, `azure_language`, `azure_language+regex_v2+guard`, `aws_comprehend`, `aws_comprehend+regex_v2+guard` (cloud and LLM methods; each needs its service's credentials).
+
+#### A trained PHI tagger on the University of Michigan course files
+
+MACCROBAT case reports split and labelled for a University of Michigan course assignment (de-identification as sequence labelling: ages, sexes and dates). Not one of the methods above: a model trained on the course's training files, the run chosen on validation (`course_lr5e-5_e3`), scored on the 40 test reports. An identifier counts as found only if the span and type match exactly. [Details](deidentification.md#the-same-exercise-on-the-courses-own-files).
+
+| Identifiers found exactly | Missed or only partly found | Tagged wrongly (not an identifier, or wrong span) | Total identifiers |
+|---:|---:|---:|---:|
+| 162 | 33 | 45 | 195 |
