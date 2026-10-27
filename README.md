@@ -61,6 +61,8 @@ Best system in each group on the 240 review charts, groups ordered by their best
 
 All 38 systems with NPV, coverage, stage IV, unsafe errors and results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
+**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against the truth): not run yet; [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading), then the *dental-omop-nlp scorecard* dashboard in Databricks.
+
 ### De-identification
 
 Best engine in each group on the synthetic notes, groups ordered by their best. Rank: range among all 15 engines (Wilson intervals). **Identifiers caught**: the share of names, dates and IDs removed; the rest are *missed* and leak (one character left counts). **Removals that were identifiers**: of everything removed, the share that really was an identifier; the rest is ordinary text removed by mistake, the *false alarms*. The damage columns count the same false alarms on dental terms, clinical text and clean queries.

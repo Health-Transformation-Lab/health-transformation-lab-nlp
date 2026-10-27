@@ -179,3 +179,28 @@ def test_block_says_synthetic_and_not_clinical(md):
 def test_update_readme_replaces_only_the_block():
     text = f"intro\n{rr.START}\nold\n{rr.END}\noutro\n"
     assert rr.update_readme(text, "new") == f"intro\n{rr.START}\nnew\n{rr.END}\noutro\n"
+
+
+def test_readme_points_to_the_judge_scorecard_and_dashboard():
+    """Spec 012 US4: one line in the README, a judge section in docs/results.md (real runs only)."""
+    inp = rr.load_inputs()
+    md = rr.results_markdown(inp)
+    assert "dental-omop-nlp scorecard" in md and f"docs/results.md#{rr.anchor(rr.JUDGE_TITLE)}" in md
+    assert "LLM judgment" in md
+    details = rr.details_markdown(inp)
+    assert rr.JUDGE_TITLE in details
+    if inp["judge"] is None:                                # no real judge run committed yet
+        assert "not run yet" in details.split(rr.JUDGE_TITLE)[1].lower()
+    assert "simulated" not in details.split(rr.JUDGE_TITLE)[1].split("\n#")[0].lower().replace("not simulated", "")
+
+
+def test_judge_section_reports_agreement_and_the_gap_when_a_real_run_exists(tmp_path, monkeypatch):
+    import shutil
+
+    from dental_omop_nlp.paths import JUDGE_DIR
+    for n in ("judge_metrics", "judge_agreement", "judgments"):
+        shutil.copy(JUDGE_DIR / f"simulated_{n}.csv", tmp_path / f"{n}.csv")   # stand-in for a real run
+    monkeypatch.setattr(rr, "JUDGE_DIR", tmp_path)
+    inp = rr.load_inputs()
+    sec = rr.details_markdown(inp).split(rr.JUDGE_TITLE)[1]
+    assert "Judge agrees with truth" in sec and "Exact status right, vs truth" in sec and "vs judge" in sec

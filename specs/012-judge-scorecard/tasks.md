@@ -46,12 +46,12 @@
 
 ## Phase 6: User Story 4 - README link (P3)
 
-- [ ] T020 [US4] Failing test in `python/tests/test_readme_results.py`: the README block links to the dashboard and to `docs/results.md#judge`, and says judge metrics are LLM judgments checked against the truth
-- [ ] T021 [US4] Implement in `python/dental_omop_nlp/readme_results.py` (+ judge section in `docs/results.md` from `judge_metrics.csv` when present); run `scripts/35_readme_results.py`
+- [x] T020 [US4] Failing test in `python/tests/test_readme_results.py`: the README block links to the dashboard and to `docs/results.md#judge`, and says judge metrics are LLM judgments checked against the truth
+- [x] T021 [US4] Implement in `python/dental_omop_nlp/readme_results.py` (+ judge section in `docs/results.md` from `judge_metrics.csv` when present); run `scripts/35_readme_results.py`
 
 ## Phase 7: Polish
 
-- [ ] T022 Check the endpoint's current pay-per-token price; record it with source and date in `data/datasets/judge/README.md`; confirm estimate < US$5 before the first real run
+- [x] T022 Check the endpoint's current pay-per-token price; record it with source and date in `data/datasets/judge/README.md`; confirm estimate < US$5 before the first real run
 - [ ] T023 Run the judge in dev, export, commit `data/datasets/judge/*.csv`, refresh README
 - [ ] T024 `pytest -q tests`, `ruff`, parity; `/create-pr`
 

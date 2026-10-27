@@ -53,6 +53,10 @@ Every system that assigns one of the six periodontal statuses, on the same 240 s
 
 **Not run yet:** [`modernbert-large`](https://huggingface.co/answerdotai/ModernBERT-large) (needs a GPU); [`longformer-base`](https://huggingface.co/allenai/longformer-base-4096) (needs a GPU); [`gatortron-base`](https://huggingface.co/UFNLP/gatortron-base) (not scheduled yet); [`sapbert`](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) (not a classifier; scored on its own task); [`bioclinical-modernbert-large`](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-large) (needs a GPU); [`clinical-longformer`](https://huggingface.co/yikuan8/Clinical-Longformer) (needs a GPU); [`gte-moderncolbert`](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) (not a classifier; scored on its own task); [`medgemma-4b-it`](https://huggingface.co/google/medgemma-4b-it) (not scheduled yet); [`medgemma-27b-text-it`](https://huggingface.co/google/medgemma-27b-text-it) (needs a GPU). MedGemma few-shot and LoRA runs are not done yet (LoRA needs a GPU).
 
+#### LLM judge: every system against an LLM's reading
+
+**Not run yet.** Every system's answers scored against an LLM judge's own reading of each note, next to the truth, once `python/scripts/36_judge_scorecard.py --endpoint ...` or the `judge_scorecard` job in dev has run; then also the *dental-omop-nlp scorecard* dashboard in Databricks.
+
 ### De-identification
 
 Every engine on the 400 synthetic dental notes with fake PHI (2,714 identifiers, all tiers), ranked by identifiers caught, with a Wilson 95% CI. Per-identifier results aren't saved, so there is no paired bootstrap: **Rank** is the range the intervals allow, from only the engines clearly above counting to every engine whose interval reaches this one's counting.
