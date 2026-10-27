@@ -55,18 +55,22 @@ Numbers are per 100 charts. **Correct**: the right status (healthy, gingivitis, 
 
 #### LLM judge: every system against an LLM's reading
 
-The same 240 charts, each system's answers scored against the truth and against an LLM judge's own reading of each note (**LLM judgment**: `databricks-meta-llama-3-3-70b-instruct`, prompts `judge-status-v1`, `judge-v2`). The judge's agreement with the truth says how far it could stand in for an answer key on real notes; every number is computed in code, never by the LLM. In Databricks: the *dental-omop-nlp scorecard* dashboard.
+Could an LLM stand in for the answer key on real notes? A general-purpose LLM (`databricks-meta-llama-3-3-70b-instruct`; prompts `judge-status-v1`, `judge-v2`) read each of the 240 synthetic notes and did two things: gave its own status for the chart, and said whether each method's answer was right. Both are compared with the truth below (**LLM judgment**; every number is computed in code, not by the LLM). In Databricks: the *dental-omop-nlp scorecard* dashboard.
 
-| Charts | Judge gave a status | Judge agrees with truth (95% CI) | Kappa |
+**How often the LLM's status matches the truth**
+
+| Charts | LLM gave a status | LLM's status matches the truth (95% CI) | Kappa |
 |---|---:|---|---:|
 | All charts (240) | 98% | **82.9%** (77.8%–87.6%) | 0.79 |
 | Easy note (141) | 98% | **95.7%** (92.0%–98.6%) | 0.95 |
 | Medium note (31) | 97% | **90.0%** (76.7%–100.0%) | 0.87 |
 | Hard note (68) | 97% | **53.0%** (40.9%–66.7%) | 0.43 |
 
-The judge reads only the note, like the note models; the truth and the rule phenotypes also use the exam form, codes and chart, so the judge can't know what a note leaves out (see hard notes). It caught between 26% and 90% of each system's wrong answers: the better the system, the subtler its mistakes and the more the judge misses. Correcting accuracy for the judge's errors (Rogan-Gladen) assumes one error rate for every system, so it isn't shown as a result; on real notes, check the judge on reviewed charts first.
+It does well on easy notes and badly on hard ones (53%). The LLM reads only the note; the truth also comes from the exam form, procedure codes and chart, which hard notes leave out.
 
-| Method | Group | Correct, vs truth | vs judge | Difference | Judge called it correct | Wrong answers the judge caught |
+**It misses the mistakes good methods make.** Asked whether an answer was right, it flagged 90% of the wrong answers from `proc_codes_planned`, but only 26% of those from `modernbert-base+cw+s2+rules4` (91% right by the truth), which are mostly one step off (21 of 21; most often stage 3 called stage 4). So it can tell a weak method from a strong one, but not two strong ones apart. This also rules out the usual fix of adjusting each method's score for the judge's own error rate (the Rogan-Gladen correction): that fix assumes the judge misses the same share of every method's mistakes, and here it would put the top methods at about 100%, so it isn't shown. Before trusting a judge on real notes, measure how many of each method's mistakes it catches on charts a person has reviewed.
+
+| Method | Group | Right, by the truth | Right, by the LLM's status | Gap | LLM said right | Wrong answers the LLM flagged |
 |---|---|---:|---:|---:|---:|---:|
 | `algorithm_v0` | Rules on the whole record | 97.5% | 83.3% | -14.1 pts | 83% | 60% |
 | `modernbert-base+cw+s2+rules4` | Trained AI on the note + stage 4 rule | 91.2% | 88.5% | -2.6 pts | 87% | 26% |
@@ -107,7 +111,7 @@ The judge reads only the note, like the note models; the truth and the rule phen
 | `proc_dx_completed` | One part of the record alone | 45.0% | 38.9% | -6.8 pts | 58% | 87% |
 | `radiograph_ai` | One part of the record alone | 17.5% | 16.7% | -0.9 pts | 62% | 77% |
 
-Every metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty) both ways: `data/datasets/judge/judge_metrics.csv`.
+*Right, by the LLM's status*: the method's answer matches the LLM's own status (on the charts the LLM gave one). *LLM said right*: share of the method's answers the LLM called right. *Wrong answers the LLM flagged*: of the method's wrong answers, the share the LLM called wrong. Every other metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty) both ways: `data/datasets/judge/judge_metrics.csv`.
 
 **Cost and speed**: 742 calls, US$0.37 at the endpoint's list price (US$0.0016 per chart); latency median 1.3 s, 95th percentile 2.8 s; 42 answers failed the quote gate, 0 endpoint errors.
 

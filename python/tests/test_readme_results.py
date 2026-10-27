@@ -398,10 +398,26 @@ def test_judge_section_reports_agreement_and_the_gap_when_a_real_run_exists(tmp_
     import shutil
 
     from dental_omop_nlp.paths import JUDGE_DIR
-    for n in ("judge_metrics", "judge_agreement", "judgments", "judge_run"):
+    for n in ("judge_metrics", "judge_agreement", "judgments", "judge_run", "chart_answers"):
         shutil.copy(JUDGE_DIR / f"simulated_{n}.csv", tmp_path / f"{n}.csv")   # stand-in for a real run
     monkeypatch.setattr(rr, "JUDGE_DIR", tmp_path)
     inp = rr.load_inputs()
     sec = rr.details_markdown(inp).split(rr.JUDGE_TITLE)[1]
-    assert "Judge agrees with truth" in sec and "Correct, vs truth" in sec and "vs judge" in sec
+    assert "LLM's status matches the truth" in sec and "Right, by the truth" in sec and "Right, by the LLM" in sec
     assert "Cost and speed" in sec and "latency median" in sec
+
+
+def test_judge_section_says_in_plain_words_whose_mistakes_the_judge_misses():
+    """The catch rate is stated per method with the kind of mistake, and the correction it rules out is explained."""
+    inp = rr.load_inputs()
+    if inp["judge"] is None:
+        return
+    sec = rr.details_markdown(inp).split(rr.JUDGE_TITLE)[1].split("\n#")[0]
+    m = inp["judge"]["judge_metrics"]
+    ex = m[m.metric == "correct"].dropna(subset=["verdict_specificity"])
+    lo, hi = ex.loc[ex.verdict_specificity.idxmin()], ex.loc[ex.verdict_specificity.idxmax()]
+    para = sec.split("**It misses the mistakes good methods make.**")[1].split("\n")[0]
+    assert f"`{lo.system}`" in para and f"`{hi.system}`" in para
+    assert "one step off" in para                  # what the missed mistakes look like
+    assert "about 100%" in sec                     # what the usual correction would have said
+    assert "Rogan-Gladen" not in rr.results_markdown(inp)   # no jargon in the README line

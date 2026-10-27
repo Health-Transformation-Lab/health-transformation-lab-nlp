@@ -210,7 +210,8 @@ def _load_judge() -> dict | None:
     """A real LLM judge run (spec 012), if one is committed; simulated dry runs are never shown."""
     if not (JUDGE_DIR / "judge_metrics.csv").exists():
         return None
-    return {n: pd.read_csv(JUDGE_DIR / f"{n}.csv") for n in ("judge_metrics", "judge_agreement", "judgments", "judge_run")
+    return {n: pd.read_csv(JUDGE_DIR / f"{n}.csv")
+            for n in ("judge_metrics", "judge_agreement", "judgments", "judge_run", "chart_answers")
             if (JUDGE_DIR / f"{n}.csv").exists()}
 
 
@@ -491,6 +492,20 @@ def _by_best(tab: pd.DataFrame, groups, score: str) -> list[str]:
     return sorted(groups, key=lambda g: -best[g])
 
 
+def _near_miss(j: dict, system: str) -> str:
+    """', mostly one step off (...)' for a system's wrong answers, from the committed chart answers."""
+    if "chart_answers" not in j:
+        return ""
+    c = j["chart_answers"]
+    c = c[(c["system"] == system) & c["answer"].notna() & (c["answer"] != c["truth"])]
+    if not len(c):
+        return ""
+    step = (c["answer"].map(LABELS.index) - c["truth"].map(LABELS.index)).abs() == 1
+    t, a = (c["truth"] + "|" + c["answer"]).value_counts().index[0].split("|")
+    name = lambda x: x.replace("periodontitis_", "").replace("_", " ")
+    return f", which are mostly one step off ({int(step.sum())} of {len(c)}; most often {name(t)} called {name(a)})"
+
+
 def _judge(inp) -> tuple[str, str]:
     """docs/results.md section and the README line for the LLM judge scorecard (spec 012)."""
     link = f"[judge results](docs/results.md#{anchor(JUDGE_TITLE)})"
@@ -504,33 +519,46 @@ def _judge(inp) -> tuple[str, str]:
                 f"against the truth): not run yet; {link}, then the *{DASHBOARD}* dashboard in Databricks.")
         return "\n".join(sec), line
     m, a, jd = j["judge_metrics"], j["judge_agreement"].set_index(["group", "value"]), j["judgments"]
-    allr = a.loc[("all", "all")]
+    allr, hard = a.loc[("all", "all")], a.loc[("difficulty", "L3")]
     who = ", ".join(f"`{e}`" for e in sorted(jd["endpoint"].unique()))
     sec = [JUDGE_TITLE, "",
-           (f"The same {int(allr['n'])} charts, each system's answers scored against the truth and against an LLM "
-            f"judge's own reading of each note (**LLM judgment**: {who}, prompts "
-            + ", ".join(f"`{v}`" for v in sorted(jd["prompt_version"].unique())) + "). The judge's agreement with "
-            "the truth says how far it could stand in for an answer key on real notes; every number is computed in "
-            f"code, never by the LLM. In Databricks: the *{DASHBOARD}* dashboard."), "",
-           "| Charts | Judge gave a status | Judge agrees with truth (95% CI) | Kappa |", "|---|---:|---|---:|"]
+           (f"Could an LLM stand in for the answer key on real notes? A general-purpose LLM ({who}; prompts "
+            + ", ".join(f"`{v}`" for v in sorted(jd["prompt_version"].unique())) + f") read each of the "
+            f"{int(allr['n'])} synthetic notes and did two things: gave its own status for the chart, and said "
+            "whether each method's answer was right. Both are compared with the truth below (**LLM judgment**; "
+            f"every number is computed in code, not by the LLM). In Databricks: the *{DASHBOARD}* dashboard."), "",
+           "**How often the LLM's status matches the truth**", "",
+           "| Charts | LLM gave a status | LLM's status matches the truth (95% CI) | Kappa |", "|---|---:|---|---:|"]
     for (g, v), r in a.iterrows():
         if g in ("all", "difficulty"):
             sec.append(f"| {r['label']} ({int(r['n'])}) | {_pct(r['coverage'])} | {_ci(r['agreement'], r['ci_low'], r['ci_high'])} | "
                        f"{r['kappa']:.2f} |")
+    sec += ["", (f"It does well on easy notes and badly on hard ones ({_pct(hard['agreement'])}). The LLM reads only "
+                 "the note; the truth also comes from the exam form, procedure codes and chart, which hard notes "
+                 "leave out.")]
     ex = m[m.metric == "correct"].sort_values("vs_truth", ascending=False)
-    spec = ex["verdict_specificity"]
-    sec += ["", ("The judge reads only the note, like the note models; the truth and the rule phenotypes also use "
-                 "the exam form, codes and chart, so the judge can't know what a note leaves out (see hard notes). "
-                 f"It caught between {_pct(spec.min())} and {_pct(spec.max())} of each system's wrong answers: "
-                 "the better the system, the subtler its mistakes and the more the judge misses. Correcting "
-                 "accuracy for the judge's errors (Rogan-Gladen) assumes one error rate for every system, so it "
-                 "isn't shown as a result; on real notes, check the judge on reviewed charts first."), "",
-            ("| Method | Group | Correct, vs truth | vs judge | Difference | Judge called it correct | "
-             "Wrong answers the judge caught |"), "|---|---|---:|---:|---:|---:|---:|"]
+    lo = ex.loc[ex["verdict_specificity"].idxmin()]
+    hi = ex.loc[ex["verdict_specificity"].idxmax()]
+    top = ex[ex["vs_truth"] >= ex["vs_truth"].quantile(0.75)]
+    sec += ["", (f"**It misses the mistakes good methods make.** Asked whether an answer was right, it flagged "
+                 f"{_pct(hi['verdict_specificity'])} of the wrong answers from `{hi['system']}`, but only "
+                 f"{_pct(lo['verdict_specificity'])} of those from `{lo['system']}` "
+                 f"({_pct(lo['vs_truth'])} right by the truth)" + _near_miss(j, lo["system"]) + ". So it can tell a "
+                 "weak method from a strong one, but not two strong ones apart. This also rules out the usual fix "
+                 "of adjusting each method's score for the judge's own error rate (the Rogan-Gladen correction): "
+                 "that fix assumes the judge misses the same share of every method's mistakes, and here it would "
+                 f"put the top methods at about {_pct(top['corrected_accuracy'].median())}, so it isn't shown. "
+                 "Before trusting a judge on real notes, measure how many of each method's mistakes it catches on "
+                 "charts a person has reviewed."), "",
+            ("| Method | Group | Right, by the truth | Right, by the LLM's status | Gap | LLM said right | "
+             "Wrong answers the LLM flagged |"), "|---|---|---:|---:|---:|---:|---:|"]
     for r in ex.itertuples():
         sec.append(f"| `{r.system}` | {r.group} | {_pct(r.vs_truth, 1)} | {_pct(r.vs_judge, 1)} | "
                    f"{r.difference * 100:+.1f} pts | {_pct(r.judged_correct)} | {_pct(r.verdict_specificity)} |")
-    sec += ["", ("Every metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe "
+    sec += ["", ("*Right, by the LLM's status*: the method's answer matches the LLM's own status (on the charts the "
+                 "LLM gave one). *LLM said right*: share of the method's answers the LLM called right. *Wrong answers "
+                 "the LLM flagged*: of the method's wrong answers, the share the LLM called wrong. Every other "
+                 "metric (periodontitis incorrectly assigned or ruled out, incorrect stage, no answer, unsafe "
                  "errors, sensitivity, specificity, PPV, NPV, stage 4 correct, by note difficulty) both ways: "
                  "`data/datasets/judge/judge_metrics.csv`.")]
     if "judge_run" in j:
@@ -539,10 +567,10 @@ def _judge(inp) -> tuple[str, str]:
                      f"(US${t['usd_per_chart']:.4f} per chart); latency median {t['latency_p50_s']:.1f} s, 95th "
                      f"percentile {t['latency_p95_s']:.1f} s; {int(t['gate_failures'])} answers failed the quote gate, "
                      f"{int(t['endpoint_errors'])} endpoint errors.")]
-    line = (f"**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against "
-            f"the truth): it agrees with the truth on {_pct(allr['agreement'])} of the charts it reads "
-            f"({_pct(a.loc[('difficulty', 'L3'), 'agreement'])} on hard notes); {link}, "
-            f"and the *{DASHBOARD}* dashboard in Databricks.")
+    line = (f"**LLM judge** (could an LLM replace the answer key?): its own reading matches the truth on "
+            f"{_pct(allr['agreement'])} of charts ({_pct(hard['agreement'])} on hard notes), and it flags most "
+            f"mistakes of weak methods but only {_pct(lo['verdict_specificity'])} of the best note model's, so it "
+            f"can't yet rank good methods (LLM judgment); {link}, and the *{DASHBOARD}* dashboard in Databricks.")
     return "\n".join(sec), line
 
 
