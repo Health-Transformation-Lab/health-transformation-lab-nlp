@@ -21,7 +21,7 @@ def answers(inp):
 
 
 def test_chart_answers_cover_every_readme_system_on_every_review_chart(inp, answers):
-    truth, pred, level = rr.phenotype_predictions(inp)
+    truth, pred, _ = rr.phenotype_predictions(inp)
     assert set(answers["system"]) == set(pred)
     assert len(answers) == 240 * len(pred) and not answers.duplicated(["visit_id", "system"]).any()
     assert set(answers["answer"].dropna()) <= set(LABELS)
