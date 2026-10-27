@@ -55,29 +55,115 @@ Numbers are per 100 charts. **Correct**: the right status (healthy, gingivitis, 
 
 ### De-identification
 
-Every method on the 400 synthetic dental notes with fake PHI (2,714 identifiers, all tiers), ranked by sensitive text leaked (fewest first), with a Wilson 95% CI. Per-identifier results aren't saved, so there is no paired bootstrap: **Rank** is the range the intervals allow, from only the methods clearly above counting to every method whose interval reaches this one's counting.
+Counts on each note set. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note the AI reads, so read them together. [More on these numbers](deidentification.md#how-to-read-the-numbers).
 
-Numbers are per 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note the AI reads, so read them together. *Unseen tier*: the notes no method was written against. **John Snow Labs**: their published 48-note benchmark (1,479 identifiers; it labels no look-alike text, so there is no scrubbed column). **ASQ-PHI**: 1,051 synthetic clinical queries (MIT); its text that is not sensitive is the queries with no PHI, out of 100 queries. **MACCROBAT**: 200 real, published case reports (CC BY 4.0); its sensitive text is the dates, its text that is not sensitive the clinical terms. [More on these numbers](deidentification.md#how-to-read-the-numbers).
+**Synthetic dental notes**: 400 notes with fake PHI, 2,714 identifiers and 2,462 look-alike dental words. Ranked by sensitive text leaked, fewest first. The 95% range is the likely true leak rate (Wilson interval); per-identifier results aren't saved, so **Rank** is the range those intervals allow.
 
-| Rank | Method | Text that is sensitive (PHI) incorrectly leaked (95% CI) | Text that is sensitive (PHI) incorrectly leaked, unseen tier | Text that is not sensitive incorrectly scrubbed | John Snow Labs: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is sensitive (PHI) incorrectly leaked | ASQ-PHI: Text that is not sensitive incorrectly scrubbed | MACCROBAT: Text that is sensitive (PHI) incorrectly leaked | MACCROBAT: Text that is not sensitive incorrectly scrubbed |
-|---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| 1–2 | `hf_stanford+hf_obi+regex_v2+guard` | **4.2** (3.5–5.1) | 13 | 2 | 6 | 2 | 89 | – | – |
-| 1–3 | `routed+guard` | **4.8** (4.0–5.6) | 12 | 6 | 3 | 2 | 92 | – | – |
-| 2–4 | `hf_stanford+presidio+regex_v2+guard` | **6.4** (5.5–7.4) | 20 | 6 | 5 | 2 | 91 | 0 | 3.7 |
-| 3–4 | `hf_stanford+regex_v2+guard` | **8.3** (7.3–9.4) | 26 | 2 | 8 | 4 | 35 | 2 | 0.5 |
-| 5–6 | `hf_obi+regex_v2+guard` | **12.2** (11.1–13.5) | 38 | 1 | 18 | 31 | 89 | 2 | 0.8 |
-| 5–6 | `presidio+regex_v2+guard` | **13.9** (12.6–15.2) | 43 | 5 | 24 | 24 | 91 | 1 | 3.6 |
-| 7–8 | `hf_stanford+guard` | **20.6** (19.2–22.2) | 29 | 2 | 12 | 5 | 27 | 2 | 0.2 |
-| 7–8 | `hf_stanford` | **20.6** (19.2–22.2) | 29 | 17 | 11 | 5 | 27 | 2 | 0.2 |
-| 9–10 | `regex_v2` | **23.8** (22.2–25.4) | 73 | 0 | 47 | 47 | 10 | 73 | 0.4 |
-| 9–10 | `regex_v2+guard` | **23.8** (22.2–25.4) | 73 | 0 | 47 | 47 | 10 | 73 | 0.4 |
-| 11–13 | `presidio+guard` | **31.3** (29.6–33.1) | 47 | 5 | 33 | 46 | 90 | 3 | 3.4 |
-| 11–13 | `presidio` | **31.3** (29.6–33.1) | 47 | 37 | 33 | 46 | 90 | 3 | 3.4 |
-| 11–13 | `hf_obi` | **31.7** (30.0–33.5) | 42 | 17 | 25 | 34 | 89 | 3 | 0.5 |
-| 14–15 | `regex` | **52.8** (51.0–54.7) | 80 | 0 | 53 | 69 | 10 | 78 | 0.4 |
-| 14–15 | `regex+guard` | **52.8** (51.0–54.7) | 80 | 0 | 53 | 69 | 10 | 78 | 0.4 |
+| Rank | Code name | Method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed |
+|---|---|---|---|---:|
+| 1–2 | `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 (95% range 3.5–5.1%) | 41 of 2,462 |
+| 1–3 | `routed+guard` | Routed by identifier type + dental-word guard | 129 of 2,714 (95% range 4.0–5.6%) | 154 of 2,462 |
+| 2–4 | `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 2,714 (95% range 5.5–7.4%) | 154 of 2,462 |
+| 3–4 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 2,714 (95% range 7.3–9.4%) | 41 of 2,462 |
+| 5–6 | `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 332 of 2,714 (95% range 11.1–13.5%) | 34 of 2,462 |
+| 5–6 | `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 376 of 2,714 (95% range 12.6–15.2%) | 122 of 2,462 |
+| 7–8 | `hf_stanford+guard` | Stanford AI + dental-word guard | 560 of 2,714 (95% range 19.2–22.2%) | 41 of 2,462 |
+| 7–8 | `hf_stanford` | Stanford AI | 560 of 2,714 (95% range 19.2–22.2%) | 415 of 2,462 |
+| 9–10 | `regex_v2` | Patterns | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
+| 9–10 | `regex_v2+guard` | Patterns + dental-word guard | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
+| 11–13 | `presidio+guard` | Presidio + dental-word guard | 849 of 2,714 (95% range 29.6–33.1%) | 122 of 2,462 |
+| 11–13 | `presidio` | Presidio | 849 of 2,714 (95% range 29.6–33.1%) | 921 of 2,462 |
+| 11–13 | `hf_obi` | OBI AI | 860 of 2,714 (95% range 30.0–33.5%) | 414 of 2,462 |
+| 14–15 | `regex` | Patterns (first version) | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
+| 14–15 | `regex+guard` | Patterns (first version) + dental-word guard | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
 
 **Not run yet:** `llm`, `llm+regex_v2+guard`, `ai_mask`, `ai_mask+regex_v2+guard`, `azure_deid`, `azure_deid+regex_v2+guard`, `azure_language`, `azure_language+regex_v2+guard`, `aws_comprehend`, `aws_comprehend+regex_v2+guard` (cloud and LLM methods; each needs its service's credentials).
+
+#### Synthetic dental notes, hardest tier only
+
+The 120 synthetic notes whose identifier shapes no method was written for: 879 identifiers, 739 look-alike dental words.
+
+| Code name | Method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed |
+|---|---|---|---:|
+| `routed+guard` | Routed by identifier type + dental-word guard | 109 of 879 | 34 of 739 |
+| `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 879 | 4 of 739 |
+| `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 879 | 34 of 739 |
+| `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 879 | 4 of 739 |
+| `hf_stanford` | Stanford AI | 251 of 879 | 126 of 739 |
+| `hf_stanford+guard` | Stanford AI + dental-word guard | 251 of 879 | 4 of 739 |
+| `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 330 of 879 | 0 of 739 |
+| `hf_obi` | OBI AI | 369 of 879 | 119 of 739 |
+| `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 376 of 879 | 30 of 739 |
+| `presidio` | Presidio | 410 of 879 | 294 of 739 |
+| `presidio+guard` | Presidio + dental-word guard | 410 of 879 | 30 of 739 |
+| `regex_v2` | Patterns | 642 of 879 | 0 of 739 |
+| `regex_v2+guard` | Patterns + dental-word guard | 642 of 879 | 0 of 739 |
+| `regex` | Patterns (first version) | 706 of 879 | 0 of 739 |
+| `regex+guard` | Patterns (first version) + dental-word guard | 706 of 879 | 0 of 739 |
+
+#### John Snow Labs benchmark
+
+John Snow Labs' published benchmark: 48 clinical notes, 1,479 identifiers. It labels no look-alike text, so nothing to count as incorrectly scrubbed.
+
+| Code name | Method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed |
+|---|---|---|---:|
+| `routed+guard` | Routed by identifier type + dental-word guard | 44 of 1,479 | not labelled |
+| `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 69 of 1,479 | not labelled |
+| `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 89 of 1,479 | not labelled |
+| `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 120 of 1,479 | not labelled |
+| `hf_stanford` | Stanford AI | 159 of 1,479 | not labelled |
+| `hf_stanford+guard` | Stanford AI + dental-word guard | 181 of 1,479 | not labelled |
+| `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 259 of 1,479 | not labelled |
+| `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 354 of 1,479 | not labelled |
+| `hf_obi` | OBI AI | 370 of 1,479 | not labelled |
+| `presidio` | Presidio | 481 of 1,479 | not labelled |
+| `presidio+guard` | Presidio + dental-word guard | 484 of 1,479 | not labelled |
+| `regex_v2` | Patterns | 698 of 1,479 | not labelled |
+| `regex_v2+guard` | Patterns + dental-word guard | 698 of 1,479 | not labelled |
+| `regex` | Patterns (first version) | 789 of 1,479 | not labelled |
+| `regex+guard` | Patterns (first version) + dental-word guard | 789 of 1,479 | not labelled |
+
+#### ASQ-PHI
+
+ASQ-PHI (MIT): 1,051 synthetic clinical search queries, 2,975 identifiers. Text that is not sensitive: the 219 queries with no PHI; a changed query counts.
+
+| Code name | Method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed |
+|---|---|---|---:|
+| `routed+guard` | Routed by identifier type + dental-word guard | 48 of 2,975 | 201 of 219 |
+| `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 71 of 2,975 | 195 of 219 |
+| `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 72 of 2,975 | 200 of 219 |
+| `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 115 of 2,975 | 77 of 219 |
+| `hf_stanford` | Stanford AI | 153 of 2,975 | 59 of 219 |
+| `hf_stanford+guard` | Stanford AI + dental-word guard | 153 of 2,975 | 59 of 219 |
+| `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 722 of 2,975 | 199 of 219 |
+| `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 920 of 2,975 | 194 of 219 |
+| `hf_obi` | OBI AI | 1,018 of 2,975 | 196 of 219 |
+| `presidio` | Presidio | 1,379 of 2,975 | 198 of 219 |
+| `presidio+guard` | Presidio + dental-word guard | 1,379 of 2,975 | 198 of 219 |
+| `regex_v2` | Patterns | 1,393 of 2,975 | 21 of 219 |
+| `regex_v2+guard` | Patterns + dental-word guard | 1,393 of 2,975 | 21 of 219 |
+| `regex` | Patterns (first version) | 2,046 of 2,975 | 21 of 219 |
+| `regex+guard` | Patterns (first version) + dental-word guard | 2,046 of 2,975 | 21 of 219 |
+
+#### MACCROBAT
+
+MACCROBAT (CC BY 4.0): 200 real, published case reports. Sensitive text: their 105 dates. Text that is not sensitive: their 22,272 clinical terms.
+
+| Code name | Method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed |
+|---|---|---|---:|
+| `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 0 of 105 | 820 of 22,272 |
+| `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 1 of 105 | 807 of 22,272 |
+| `hf_stanford` | Stanford AI | 2 of 105 | 38 of 22,272 |
+| `hf_stanford+guard` | Stanford AI + dental-word guard | 2 of 105 | 38 of 22,272 |
+| `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 2 of 105 | 114 of 22,272 |
+| `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 2 of 105 | 173 of 22,272 |
+| `presidio` | Presidio | 3 of 105 | 756 of 22,272 |
+| `presidio+guard` | Presidio + dental-word guard | 3 of 105 | 756 of 22,272 |
+| `hf_obi` | OBI AI | 3 of 105 | 119 of 22,272 |
+| `regex_v2` | Patterns | 77 of 105 | 90 of 22,272 |
+| `regex_v2+guard` | Patterns + dental-word guard | 77 of 105 | 90 of 22,272 |
+| `regex` | Patterns (first version) | 82 of 105 | 88 of 22,272 |
+| `regex+guard` | Patterns (first version) + dental-word guard | 82 of 105 | 88 of 22,272 |
 
 #### A trained PHI tagger on the University of Michigan course files
 
