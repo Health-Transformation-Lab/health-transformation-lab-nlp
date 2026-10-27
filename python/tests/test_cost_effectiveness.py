@@ -57,3 +57,32 @@ def test_frontier_dominance_and_icer():
     assert abs(f.loc["mid", "icer_usd_per_extra_correct_note"] - 1.0) < 1e-9     # 100 $ / 100 notes
     assert abs(f.loc["best", "icer_usd_per_extra_correct_note"] - 20.0) < 1e-9   # 1000 $ / 50 notes
     assert f.loc["best", "compared_to"] == "mid"
+
+
+def test_corrected_accuracy_bootstrap_is_unchanged_by_the_array_speedup():
+    """corrected_accuracy resamples with numpy arrays; it must give exactly what resampling the
+    DataFrames gave (reference copied from the earlier implementation)."""
+    import numpy as np
+
+    from dental_omop_nlp import cost_effectiveness as ce
+
+    def reference(sample, gold, n_boot, seed):
+        rng = np.random.default_rng(seed)
+        boots = []
+        for _ in range(n_boot):
+            s = sample.iloc[rng.integers(0, len(sample), len(sample))]
+            g = gold.iloc[rng.integers(0, len(gold), len(gold))]
+            c = ce.calibrate_judge(g)
+            boots.append(ce.rogan_gladen(ce._p_judged_correct(s), c["sensitivity"], c["specificity"]))
+        return np.nanpercentile(boots, [2.5, 97.5])
+
+    rng = np.random.default_rng(7)
+    verdicts = [ce.CORRECT, ce.INCORRECT, ce.ND]
+    for n_s, n_g in ((40, 60), (200, 150), (5, 8)):
+        sample = pd.DataFrame({"verdict": pd.Series(rng.choice(verdicts, n_s, p=[.6, .3, .1]), dtype="string"),
+                               "gate_ok": rng.random(n_s) < 0.95})
+        gold = pd.DataFrame({"verdict": pd.Series(rng.choice(verdicts, n_g, p=[.6, .3, .1]), dtype="string"),
+                             "gate_ok": rng.random(n_g) < 0.95, "truly_correct": rng.random(n_g) < 0.7})
+        got = ce.corrected_accuracy(sample, gold, n_boot=200, seed=3)
+        lo, hi = reference(sample, gold, 200, 3)
+        assert (got["ci_low"], got["ci_high"]) == (float(lo), float(hi))

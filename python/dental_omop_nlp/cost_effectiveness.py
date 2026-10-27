@@ -123,13 +123,25 @@ def corrected_accuracy(sample: pd.DataFrame, gold: pd.DataFrame, n_boot: int = 1
     cal = calibrate_judge(gold)
     p = _p_judged_correct(sample)
     est = rogan_gladen(p, cal["sensitivity"], cal["specificity"])
+    # Resample yes/no arrays, not DataFrames (8 methods x 1,000 draws): same draws, same means.
+    s_judged = (sample["verdict"].isin([CORRECT, INCORRECT]) & sample["gate_ok"]).to_numpy(bool)
+    s_correct = (sample["verdict"] == CORRECT).to_numpy(bool)
+    g_ok = (gold["verdict"].isin([CORRECT, INCORRECT]) & gold["gate_ok"]).to_numpy(bool)
+    g_true = gold["truly_correct"].to_numpy(bool)
+    g_correct = (gold["verdict"] == CORRECT).to_numpy(bool)
+    g_incorrect = (gold["verdict"] == INCORRECT).to_numpy(bool)
+
+    def share(x: np.ndarray, keep: np.ndarray) -> float:
+        return float(x[keep].mean()) if keep.any() else float("nan")
+
     rng = np.random.default_rng(seed)
     boots = []
     for _ in range(n_boot):
-        s = sample.iloc[rng.integers(0, len(sample), len(sample))]
-        g = gold.iloc[rng.integers(0, len(gold), len(gold))]
-        c = calibrate_judge(g)
-        boots.append(rogan_gladen(_p_judged_correct(s), c["sensitivity"], c["specificity"]))
+        i = rng.integers(0, len(sample), len(sample))
+        j = rng.integers(0, len(gold), len(gold))
+        ok, tc = g_ok[j], g_true[j]
+        sens, spec = share(g_correct[j], ok & tc), share(g_incorrect[j], ok & ~tc)
+        boots.append(rogan_gladen(share(s_correct[i], s_judged[i]), sens, spec))
     lo, hi = np.nanpercentile(boots, [2.5, 97.5]) if np.isfinite(boots).any() else (np.nan, np.nan)
     return {"p_judged_correct": p, "accuracy_est": est, "ci_low": float(lo), "ci_high": float(hi),
             "n_judged": int(sample["verdict"].isin([CORRECT, INCORRECT]).sum()),
