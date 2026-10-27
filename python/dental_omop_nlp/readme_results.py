@@ -308,9 +308,10 @@ def _judge(inp) -> tuple[str, str]:
     link = f"[judge results](docs/results.md#{anchor(JUDGE_TITLE)})"
     j = inp.get("judge")
     if j is None:
-        sec = [JUDGE_TITLE, "", "**Not run yet.** Every system's answers scored against an LLM judge's own reading of "
-               "each note, next to the truth, once `python/scripts/36_judge_scorecard.py --endpoint ...` or the "
-               f"`judge_scorecard` job in dev has run; then also the *{DASHBOARD}* dashboard in Databricks."]
+        sec = [JUDGE_TITLE, "", ("**Not run yet.** Every system's answers scored against an LLM judge's own reading of "
+                                 "each note, next to the truth, once `python/scripts/36_judge_scorecard.py --endpoint ...` "
+                                 f"or the `judge_scorecard` job in dev has run; then also the *{DASHBOARD}* dashboard in "
+                                 "Databricks.")]
         line = (f"**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked "
                 f"against the truth): not run yet; {link}, then the *{DASHBOARD}* dashboard in Databricks.")
         return "\n".join(sec), line
@@ -318,25 +319,25 @@ def _judge(inp) -> tuple[str, str]:
     allr = a.loc[("all", "all")]
     who = ", ".join(f"`{e}`" for e in sorted(jd["endpoint"].unique()))
     sec = [JUDGE_TITLE, "",
-           f"The same {int(allr['n'])} charts, each system's answers scored against the truth and against an LLM "
-           f"judge's own reading of each note (**LLM judgment**: {who}, prompts "
-           + ", ".join(f"`{v}`" for v in sorted(jd["prompt_version"].unique())) + "). The judge's agreement with the "
-           "truth says how far it could stand in for an answer key on real notes; every number is computed in "
-           f"code, never by the LLM. In Databricks: the *{DASHBOARD}* dashboard.", "",
+           (f"The same {int(allr['n'])} charts, each system's answers scored against the truth and against an LLM "
+            f"judge's own reading of each note (**LLM judgment**: {who}, prompts "
+            + ", ".join(f"`{v}`" for v in sorted(jd["prompt_version"].unique())) + "). The judge's agreement with "
+            "the truth says how far it could stand in for an answer key on real notes; every number is computed in "
+            f"code, never by the LLM. In Databricks: the *{DASHBOARD}* dashboard."), "",
            "| Charts | Judge gave a status | Judge agrees with truth (95% CI) | Kappa |", "|---|---:|---|---:|"]
     for (g, v), r in a.iterrows():
         if g in ("all", "difficulty"):
             sec.append(f"| {r['label']} ({int(r['n'])}) | {_pct(r['coverage'])} | {_ci(r['agreement'], r['ci_low'], r['ci_high'])} | "
                        f"{r['kappa']:.2f} |")
     ex = m[m.metric == "exact_status"].sort_values("vs_truth", ascending=False)
-    sec += ["", "| System | Group | Exact status right, vs truth | vs judge | Difference | "
-            "Judge-corrected accuracy where it answers (95% CI) |", "|---|---|---:|---:|---:|---|"]
+    sec += ["", ("| System | Group | Exact status right, vs truth | vs judge | Difference | "
+                 "Judge-corrected accuracy where it answers (95% CI) |"), "|---|---|---:|---:|---:|---|"]
     for r in ex.itertuples():
         corr = "–" if pd.isna(r.corrected_accuracy) else _ci(r.corrected_accuracy, r.ci_low, r.ci_high)
         sec.append(f"| `{r.system}` | {r.group} | {_pct(r.vs_truth, 1)} | {_pct(r.vs_judge, 1)} | "
                    f"{r.difference * 100:+.1f} pts | {corr} |")
-    sec += ["", "Every metric (sensitivity, specificity, PPV, NPV, stage IV caught, unsafe errors, by note difficulty) "
-            "both ways: `data/datasets/judge/judge_metrics.csv`."]
+    sec += ["", ("Every metric (sensitivity, specificity, PPV, NPV, stage IV caught, unsafe errors, by note "
+                 "difficulty) both ways: `data/datasets/judge/judge_metrics.csv`.")]
     line = (f"**LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against "
             f"the truth): it agrees with the truth on {_pct(allr['agreement'])} of the charts it reads; {link}, "
             f"and the *{DASHBOARD}* dashboard in Databricks.")
