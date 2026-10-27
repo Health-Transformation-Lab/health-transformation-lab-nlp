@@ -176,6 +176,11 @@ def test_readme_phenotype_rows_add_to_100_and_match_the_predictions(inp, summary
         assert nums == rr.out_of_100([b["correct"], b["dx_said_yes"], b["dx_said_no"], b["stage"], b["no_answer"]])
 
 
+def test_periodontitis_column_names():
+    assert rr.COL_ASSIGNED == "Periodontitis incorrectly assigned (not present)"
+    assert rr.COL_NOT_ASSIGNED == "Periodontitis incorrectly ruled out (present)"
+
+
 def test_full_table_uses_the_same_two_column_names(md):
     header = next(line for line in _section(md, rr.PHENOTYPE_TITLE).splitlines() if line.startswith("| Rank"))
     cols = [c.strip() for c in header.split("|")]
