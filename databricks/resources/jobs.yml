@@ -84,6 +84,9 @@ resources:
       tasks:
         - task_key: read_notes
           environment_key: gpu
+          max_retries: 2                    # serverless GPU can fail to start or to restart Python
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
           compute:
             hardware_accelerator: ${var.gpu_accelerator}
           notebook_task:
@@ -109,6 +112,9 @@ resources:
       tasks:
         - task_key: fine_tune_and_predict
           environment_key: gpu
+          max_retries: 2                    # serverless GPU can fail to start or to restart Python
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
           compute:
             hardware_accelerator: ${var.gpu_accelerator}
           notebook_task:
