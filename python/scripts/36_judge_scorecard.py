@@ -47,8 +47,8 @@ if a.simulated:
 else:
     if a.usd_in is None or a.usd_out is None:
         sys.exit("--usd-in and --usd-out are required: check the endpoint's current price list")
-    done = pd.read_csv(path["judgments"]) if path["judgments"].exists() else None
-    judged = set() if done is None else {js._key(d) for d in done[~done["api_error"]].itertuples()}
+    done = js.reusable(pd.read_csv(path["judgments"]), a.endpoint) if path["judgments"].exists() else None
+    judged = set() if done is None else {js._key(d) for d in done.itertuples()}
     todo = queue[[js._key(r) not in judged for r in queue.itertuples()]]
     est = js.estimate_cost(todo, a.usd_in, a.usd_out)
     print(f"{est['calls']} calls to judge, ~{est['input_tokens']:,.0f} input tokens, ~US${est['usd']:.2f}")

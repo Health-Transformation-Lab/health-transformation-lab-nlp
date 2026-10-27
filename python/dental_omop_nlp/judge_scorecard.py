@@ -74,6 +74,50 @@ JUDGMENT_COLS = ["visit_id", "kind", "answer", "verdict", "judge_status", "quote
                  "api_error"]
 
 
+_JUDGMENT_DTYPES = {"visit_id": "int64", "gate_ok": "bool", "prompt_tokens": "int64", "completion_tokens": "int64",
+                    "latency_s": "float64", "simulated": "bool", "api_error": "bool"}
+
+
+def empty_judgments() -> pd.DataFrame:
+    """A judgments table with no rows but typed columns (judge_endpoint=none)."""
+    return pd.DataFrame({c: pd.Series(dtype=_JUDGMENT_DTYPES.get(c, "object")) for c in JUDGMENT_COLS})
+
+
+def _spark_type(col: pd.Series) -> str:
+    if pd.api.types.is_bool_dtype(col):
+        return "BOOLEAN"
+    if pd.api.types.is_integer_dtype(col):
+        return "BIGINT"
+    if pd.api.types.is_float_dtype(col):
+        return "DOUBLE"
+    vals = col.dropna()
+    if len(vals) and all(isinstance(v, bool) for v in vals):
+        return "BOOLEAN"
+    if len(vals) and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in vals):
+        return "DOUBLE" if any(isinstance(v, float) for v in vals) else "BIGINT"
+    return "STRING"
+
+
+def spark_ddl(pdf: pd.DataFrame) -> str:
+    """Spark schema for a table, from pandas dtypes, so all-empty columns (no judge run) keep their type."""
+    return ", ".join(f"`{c}` {_spark_type(pdf[c])}" for c in pdf.columns)
+
+
+def spark_rows(pdf: pd.DataFrame) -> list[tuple]:
+    """Rows as plain Python values, NaN as null."""
+    return [tuple(None if pd.isna(v) else (v.item() if hasattr(v, "item") else v) for v in r)
+            for r in pdf.itertuples(index=False, name=None)]
+
+
+def reusable(done: pd.DataFrame | None, endpoint: str) -> pd.DataFrame | None:
+    """Earlier judgments a rerun can keep: same endpoint, the current prompt for their kind, no endpoint error."""
+    if done is None:
+        return None
+    current = done["kind"].map({"status": jg.STATUS_PROMPT_VERSION, "verdict": jg.PROMPT_VERSION})
+    keep = (done["endpoint"] == endpoint) & (done["prompt_version"] == current) & ~done["api_error"].astype(bool)
+    return done[keep]
+
+
 def _key(r) -> tuple:
     return (int(r.visit_id), r.kind, "" if pd.isna(r.answer) else r.answer)
 
@@ -83,8 +127,8 @@ def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | No
     """One judgment per queue row, in queue order. Rows already in `done` are kept, not re-asked, so a
     run cut short by rate limits resumes. A failed gate counts as not determinable (verdict) or no
     status; an endpoint error is kept with api_error=True and retried. `trace(row, verdict)` is called after each new call (MLflow on Databricks)."""
-    have = {_key(r): r._asdict() for r in (done.itertuples(index=False) if done is not None else [])
-            if not r.api_error}                       # an endpoint error isn't a judgment: ask again
+    done = reusable(done, endpoint)                   # an endpoint error isn't a judgment: ask again
+    have = {_key(r): r._asdict() for r in (done.itertuples(index=False) if done is not None else [])}
     sim = bool(getattr(judge, "simulated", False))
     extra = (lambda r: {"visit_id": int(r.visit_id)}) if sim else (lambda r: {})
     rows = []

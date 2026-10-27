@@ -2,6 +2,8 @@
 queue, a resumable judge run (simulated here, no network), and every README phenotyping metric
 against the truth and against the judge."""
 
+import math
+
 import pandas as pd
 import pytest
 
@@ -330,3 +332,39 @@ def test_correct_rows_show_how_well_the_judge_caught_each_systems_answers(inp, a
     lenient = j.assign(verdict=j["verdict"].where(j["kind"] != "verdict", "correct"))
     r2 = js.judge_metrics(inp, answers, lenient, n_boot=20).set_index(["system", "metric"]).loc[("note_rules", "correct")]
     assert r2["judged_correct"] == 1 and r2["verdict_specificity"] == 0
+
+
+def test_tables_keep_their_column_types_when_no_judge_ran():
+    """judge_endpoint=none (uat/prod default): every judge column is empty, yet each table keeps typed
+    columns, so Spark can write it and the dashboard's queries still find every column."""
+    inp = rr.load_inputs()
+    answers = js.chart_answers(inp)
+    empty = js.empty_judgments()
+    assert list(empty.columns) == js.JUDGMENT_COLS and len(empty) == 0
+    metrics = js.judge_metrics(inp, answers, empty, n_boot=10)
+    ddl = dict(c.rsplit(" ", 1) for c in js.spark_ddl(metrics).split(", "))
+    assert ddl["`vs_judge`"] == "DOUBLE" and ddl["`verdict_specificity`"] == "DOUBLE" and ddl["`system`"] == "STRING"
+    jd = dict(c.rsplit(" ", 1) for c in js.spark_ddl(empty).split(", "))
+    assert jd["`gate_ok`"] == "BOOLEAN" and jd["`visit_id`"] == "BIGINT" and jd["`latency_s`"] == "DOUBLE"
+    assert jd["`quote`"] == "STRING"
+    rows = js.spark_rows(metrics)
+    assert not any(isinstance(v, float) and math.isnan(v) for r in rows for v in r)   # NaN → null
+
+
+def test_a_rerun_only_reuses_judgments_from_the_same_endpoint_and_prompt():
+    """Resuming must not mix in judgments made with another endpoint or an older prompt."""
+    from dental_omop_nlp import judge as jg
+    base = {"visit_id": 1, "answer": None, "verdict": None, "judge_status": "healthy", "quote": "q", "gate_ok": True,
+            "gate_reason": "", "prompt_tokens": 1, "completion_tokens": 1, "latency_s": 0.1, "simulated": False}
+    done = pd.DataFrame([
+        {**base, "kind": "status", "endpoint": "e1", "prompt_version": jg.STATUS_PROMPT_VERSION, "api_error": False},
+        {**base, "visit_id": 2, "kind": "status", "endpoint": "e2", "prompt_version": jg.STATUS_PROMPT_VERSION,
+         "api_error": False},
+        {**base, "visit_id": 3, "kind": "status", "endpoint": "e1", "prompt_version": "judge-status-v0", "api_error": False},
+        {**base, "visit_id": 4, "kind": "status", "endpoint": "e1", "prompt_version": jg.STATUS_PROMPT_VERSION,
+         "api_error": True},
+        {**base, "visit_id": 5, "kind": "verdict", "answer": "healthy", "verdict": "correct", "endpoint": "e1",
+         "prompt_version": jg.PROMPT_VERSION, "api_error": False},
+    ])[js.JUDGMENT_COLS]
+    assert sorted(js.reusable(done, "e1")["visit_id"]) == [1, 5]
+    assert js.reusable(None, "e1") is None

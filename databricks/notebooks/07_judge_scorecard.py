@@ -53,17 +53,16 @@ table = lambda name: f"{catalog}.{schema}.{name}"  # noqa: E731
 
 done = None
 if spark.catalog.tableExists(table("judgments")):
-    done = spark.table(table("judgments")).toPandas()
-    done = done[done["endpoint"] == endpoint] if endpoint != "none" else None
+    done = js.reusable(spark.table(table("judgments")).toPandas(), endpoint) if endpoint != "none" else None
 
 if endpoint in ("", "none"):
     print("judge_endpoint is none: publishing truth-based metrics only")
-    judgments = pd.DataFrame(columns=js.JUDGMENT_COLS)
+    judgments = js.empty_judgments()
 else:
     usd_in, usd_out = dbutils.widgets.get("usd_per_million_in"), dbutils.widgets.get("usd_per_million_out")
     if not usd_in or not usd_out:
         raise ValueError("set usd_per_million_in and usd_per_million_out to the endpoint's current list prices")
-    judged = set() if done is None else {js._key(d) for d in done[~done["api_error"].astype(bool)].itertuples()}
+    judged = set() if done is None else {js._key(d) for d in done.itertuples()}
     todo = queue[[js._key(r) not in judged for r in queue.itertuples()]]
     est = js.estimate_cost(todo, float(usd_in), float(usd_out))
     print(f"{est['calls']} calls to judge on {endpoint}, ~{est['input_tokens']:,.0f} input tokens, ~US${est['usd']:.2f}")
@@ -105,11 +104,12 @@ if len(judgments) and experiment_id:      # cost and speed next to the traces, a
 # COMMAND ----------
 
 def save(pdf: pd.DataFrame, name: str):
-    spark.createDataFrame(pdf.astype(object).where(pdf.notna(), None)).write.mode("overwrite") \
+    # typed schema from pandas: with no judge run the judge columns are all empty and Spark can't infer them
+    spark.createDataFrame(js.spark_rows(pdf), schema=js.spark_ddl(pdf)).write.mode("overwrite") \
          .option("overwriteSchema", "true").saveAsTable(table(name))
 
 save(answers, "chart_answers")
-if len(judgments):
+if len(judgments) or not spark.catalog.tableExists(table("judgments")):   # keep an earlier run's judgments
     save(judgments, "judgments")
 save(metrics, "judge_metrics")
 save(agreement, "judge_agreement")
