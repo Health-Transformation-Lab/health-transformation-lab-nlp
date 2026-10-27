@@ -21,8 +21,11 @@ def test_script_is_valid_bash_and_strict():
 def test_script_grants_what_a_deploy_as_the_principal_needs():
     text = SCRIPT.read_text()
     for need in ("workspace-access", "databricks-sql-access",   # workspace APIs; warehouse lookup
-                 "CREATE_CATALOG", "ALL_PRIVILEGES", "put-acl"):
+                 "CREATE_CATALOG", "put-acl"):
         assert need in text, need
+    # the bundle creates the catalog, schemas and volume (unity_catalog.yml); a catalog
+    # made here first would make the deploy fail on "already exists"
+    assert "catalogs create" not in text and "schemas create" not in text
     # the secret is made by hand and goes straight into GitHub: the script only prints the command
     code, printed = text.split("cat <<EOF")
     assert "service-principal-secrets-proxy" not in code and "service-principal-secrets-proxy create" in printed
@@ -30,7 +33,7 @@ def test_script_grants_what_a_deploy_as_the_principal_needs():
 
 @pytest.mark.skipif(not shutil.which("bash"), reason="no bash")
 @pytest.mark.parametrize("target", ["dev", "uat", "prod"])
-def test_script_reads_catalog_schema_and_scope_from_the_bundle(target):
+def test_script_reads_names_and_scope_from_the_bundle(target):
     """--print-config prints what the script would use for a target, without a workspace."""
     out = subprocess.run(["bash", str(SCRIPT), target, "--print-config"],
                          capture_output=True, text=True, check=True).stdout.split()
@@ -38,7 +41,7 @@ def test_script_reads_catalog_schema_and_scope_from_the_bundle(target):
     v = {k: x.get("default") for k, x in b["variables"].items()}
     v.update(b["targets"][target].get("variables", {}))
     assert out == [f"dental_omop_nlp_{target}_sp", f"dental_omop_nlp_{target}_admin",
-                   v["catalog"], v["schema"], v["hf_secret_scope"]]
+                   v["catalog"], v["hf_secret_scope"]]
 
 
 def test_unknown_target_is_refused():

@@ -1,0 +1,65 @@
+# Unity Catalog objects the bundle owns (docs/deployment.md): one catalog, one
+# schema per layer, and the landing volume the jobs write files to.
+#
+#   dental_omop                       catalog
+#     landing_dental_omop_perio       volumes (data: generated CSV/parquet, run files)
+#     bronze_dental_omop_perio        raw tables       (empty for now)
+#     silver_dental_omop_perio        cleaned tables   (empty for now)
+#     gold_dental_omop_perio          study tables, results, perio_note_classifier
+#
+# Each target is its own workspace, so the names are the same everywhere, with no
+# dev_ prefix (the dev target is not in development mode). Jobs reference these
+# resources so a deploy creates them before anything writes to them.
+#
+# prevent_destroy: `bundle destroy` must never drop a catalog, schema or volume
+# with data in it. Remove one by hand if you really mean to.
+# Needs Databricks CLI >= 0.288 (catalogs resource), CREATE CATALOG on the
+# metastore for whoever deploys, and the target's admin group: both come from
+# databricks/setup/create_service_principal.sh.
+
+resources:
+  catalogs:
+    dental_omop:
+      name: ${var.catalog}
+      comment: Dental OMOP. Synthetic data only.
+      grants:   # the group databricks/setup/create_service_principal.sh makes (you and the principal)
+        - principal: dental_omop_nlp_${bundle.target}_admin
+          privileges: [ALL_PRIVILEGES]
+      lifecycle:
+        prevent_destroy: true
+
+  schemas:
+    landing:
+      catalog_name: ${resources.catalogs.dental_omop.name}
+      name: landing_${var.domain}
+      comment: Landing zone (volumes) for ${var.domain}. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    bronze:
+      catalog_name: ${resources.catalogs.dental_omop.name}
+      name: bronze_${var.domain}
+      comment: Raw tables for ${var.domain}. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    silver:
+      catalog_name: ${resources.catalogs.dental_omop.name}
+      name: silver_${var.domain}
+      comment: Cleaned tables for ${var.domain}. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    gold:
+      catalog_name: ${resources.catalogs.dental_omop.name}
+      name: gold_${var.domain}
+      comment: Study tables, results and perio_note_classifier for ${var.domain}. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+
+  volumes:
+    data:
+      catalog_name: ${resources.schemas.landing.catalog_name}
+      schema_name: ${resources.schemas.landing.name}
+      name: data
+      volume_type: MANAGED
+      comment: Files the pipeline writes (DENTAL_DATA_ROOT). Synthetic data only.
+      lifecycle:
+        prevent_destroy: true

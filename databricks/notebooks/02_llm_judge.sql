@@ -13,8 +13,8 @@
 
 -- COMMAND ----------
 
-CREATE WIDGET TEXT catalog DEFAULT 'workspace';
-CREATE WIDGET TEXT schema DEFAULT 'dental';
+CREATE WIDGET TEXT catalog DEFAULT 'dental_omop';
+CREATE WIDGET TEXT schema DEFAULT 'gold_dental_omop_perio';
 CREATE WIDGET TEXT judge_endpoint DEFAULT '<your-judge-endpoint>';  -- a Model Serving endpoint approved for this data
 
 -- COMMAND ----------

@@ -47,7 +47,7 @@ jobs:
       - name: Stop if this environment isn't configured
         if: env.DATABRICKS_CLIENT_SECRET == ''
         run: echo "No service principal sign-in (DATABRICKS_CLIENT_SECRET) for $TARGET; skipping." && exit 0
-      - uses: databricks/setup-cli@v0.297.2
+      - uses: databricks/setup-cli@v0.297.2   # >= 0.288 for the catalogs resource
         if: env.DATABRICKS_CLIENT_SECRET != ''
       - name: Python tests before deploying
         if: env.DATABRICKS_CLIENT_SECRET != ''
@@ -60,4 +60,5 @@ jobs:
         run: databricks bundle deploy -t "$TARGET"
       - name: Run benchmark job
         if: env.DATABRICKS_CLIENT_SECRET != '' && github.event.inputs.run_benchmark == 'true'
-        run: databricks bundle run -t "$TARGET" study_benchmark
+        # Returns once Databricks has started the run; follow it from the Run URL in the log.
+        run: databricks bundle run -t "$TARGET" --no-wait study_benchmark
