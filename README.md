@@ -48,7 +48,23 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 ### Phenotyping: periodontal status per chart
 
-Counted on the 240 review charts, by what is available to read: **1.** the whole dental record; **2.** only the chart note (where structured data is missing), comparing the best trained AI with simple keyword rules and a medical AI used as is; **3.** one part of the record by itself. *Stage 4 rule*: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from). Rank: where it plausibly ranks among all 38 methods. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken. **Specificity**: of the 84 charts without periodontitis, the share correctly called "no"; periodontitis incorrectly assigned is what lowers it. **Sensitivity**: of the 156 charts with periodontitis, the share correctly called "yes"; periodontitis incorrectly ruled out lowers it, and so does no answer.
+Counted on the 240 review charts, by what is available to read:
+
+1. **The whole dental record**
+2. **Only the chart note** (where structured data is missing): the best trained AI, simple keyword rules, and a medical AI used as is
+3. **One part of the record by itself**
+
+What the columns mean:
+
+- **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4).
+- **Periodontitis incorrectly assigned**: said periodontitis, but the patient doesn't have it.
+- **Specificity**: of the 84 charts without periodontitis, the share correctly called "no". Periodontitis incorrectly assigned is what lowers it.
+- **Periodontitis incorrectly ruled out**: the patient has periodontitis, but the method said they don't.
+- **Sensitivity**: of the 156 charts with periodontitis, the share correctly called "yes". Periodontitis incorrectly ruled out lowers it, and so does no answer.
+- **Incorrect stage**: right that it is or isn't periodontitis, but the wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up.
+- **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken.
+- **Rank**: where it plausibly ranks among all 38 methods.
+- **Stage 4 rule**: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from).
 
 | Question | Method | Correct | Periodontitis incorrectly assigned (when not present) | Specificity | Periodontitis incorrectly ruled out (when present) | Sensitivity | Incorrect stage | No answer (evidence not available) | Total charts | Rank |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -63,7 +79,11 @@ All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note diff
 
 ### De-identification
 
-Best method in each group, counted on the 400 synthetic notes; groups ordered by their best. Rank: where it plausibly ranks among all 15 methods. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed.
+Best method in each group, counted on the 400 synthetic notes; groups ordered by their best. What the columns mean:
+
+- **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). This risks patients.
+- **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. This damages the note the AI reads.
+- **Rank**: where it plausibly ranks among all 15 methods.
 
 | Group | Best method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Methods in group |
 |---|---|---:|---:|---|---:|

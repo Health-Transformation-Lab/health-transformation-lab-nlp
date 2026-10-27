@@ -8,7 +8,17 @@
 
 Every method that assigns one of the six periodontal statuses, on the same 240 synthetic review charts against the generator's truth: models that read only the chart note, the rule phenotypes that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the method's rank by exact status, over the same chart resamples as its CI (paired bootstrap): "1–3" means it plausibly ranks anywhere from 1st to 3rd.
 
-Numbers are per 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the method said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken. *Unsafe errors*: incorrect answers that could harm a patient if acted on, e.g. a missed stage 3–4. *Stage 4 correct*: of the stage 4 patients, how many it called stage 4. Easy / medium / hard: correct, out of 100, when the note states the 2017 diagnosis (L1), states it in older terms (L2), or leaves it to be inferred from the findings (L3). For statisticians: sensitivity, specificity, PPV and NPV for periodontitis yes/no, with no answer counted as no.
+Numbers are per 100 charts. What the columns mean:
+
+- **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4).
+- **Periodontitis incorrectly assigned**: said periodontitis, but the patient doesn't have it.
+- **Periodontitis incorrectly ruled out**: the patient has periodontitis, but the method said they don't.
+- **Incorrect stage**: right that it is or isn't periodontitis, but the wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up.
+- **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken.
+- **Unsafe errors**: incorrect answers that could harm a patient if acted on, e.g. a missed stage 3–4.
+- **Stage 4 correct**: of the stage 4 patients, how many it called stage 4.
+- **Easy / medium / hard**: correct, out of 100, when the note states the 2017 diagnosis (L1), states it in older terms (L2), or leaves it to be inferred from the findings (L3).
+- **Sensitivity, specificity, PPV, NPV**: for statisticians: periodontitis yes/no, with no answer counted as no.
 
 | Rank | Method | Input | Approach | Correct (95% CI) | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer (evidence not available) | Unsafe errors | Sensitivity | Specificity | PPV | NPV | Stage 4 correct | Easy / medium / hard |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -117,7 +127,12 @@ It does well on easy notes and badly on hard ones (53%). The LLM reads only the 
 
 ### De-identification
 
-Counts on each note set. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note the AI reads, so read them together. [More on these numbers](deidentification.md#how-to-read-the-numbers).
+Counts on each note set. What the columns mean (read them together):
+
+- **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). This risks patients.
+- **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. This damages the note the AI reads.
+
+[More on these numbers](deidentification.md#how-to-read-the-numbers).
 
 **Synthetic dental notes**: 400 notes with fake PHI, 2,714 identifiers and 2,462 look-alike dental words. Ranked by sensitive text leaked, fewest first. The 95% range is the likely true leak rate (Wilson interval); per-identifier results aren't saved, so **Rank** is the range those intervals allow.
 

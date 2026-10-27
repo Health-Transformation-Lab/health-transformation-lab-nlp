@@ -56,7 +56,7 @@ def test_one_leaderboard_per_capability_and_no_overall_rank(summary, md):
 
 
 def test_readme_summary_is_short(summary):
-    assert len(summary.splitlines()) <= 40
+    assert len(summary.splitlines()) <= 70
 
 
 def _best_by_group(full_rows, group_of):
@@ -430,3 +430,29 @@ def test_not_run_reasons_are_accurate(md):
     for m in ("sapbert", "gte-moderncolbert"):
         reason = not_run.split(f"`{m}`", 1)[1].split(";", 1)[0]
         assert "no scorer" in reason and "scored on its own task" not in reason, m
+
+
+def test_readme_explains_the_questions_and_columns_as_lists(summary):
+    ph = _section(summary, rr.PHENOTYPE_TITLE)
+    numbered = [x for x in ph.splitlines() if re.match(r"[123]\. \*\*", x)]
+    assert len(numbered) == 3
+    bullets = [x for x in ph.splitlines() if x.startswith("- **")]
+    for term in ("Correct", "Periodontitis incorrectly assigned", "Specificity", "Periodontitis incorrectly ruled out",
+                 "Sensitivity", "Incorrect stage", "No answer (evidence not available)", "Rank", "Stage 4 rule"):
+        assert sum(x.startswith(f"- **{term}**") for x in bullets) == 1, term
+    de = _section(summary, rr.DEID_TITLE)
+    for term in (rr.COL_LEAKED, rr.COL_SCRUBBED, "Rank"):
+        assert sum(x.startswith(f"- **{term}**") for x in de.splitlines()) == 1, term
+    # no definition left inline in a paragraph
+    for sec in (ph, de):
+        for x in sec.splitlines():
+            if not x.startswith(("- **", "|")):
+                assert "**Correct**" not in x and f"**{rr.COL_LEAKED}**" not in x, x
+
+
+def test_full_page_explains_columns_as_lists(md):
+    ph = _section(md, rr.PHENOTYPE_TITLE)
+    for term in ("Correct", "Incorrect stage", "Unsafe errors", "Stage 4 correct", "Easy / medium / hard"):
+        assert sum(x.startswith(f"- **{term}**") for x in ph.splitlines()) == 1, term
+    de = md.split(rr.DEID_TITLE, 1)[1]
+    assert sum(x.startswith(f"- **{rr.COL_LEAKED}**") for x in de.splitlines()) >= 1
