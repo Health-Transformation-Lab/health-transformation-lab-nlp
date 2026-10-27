@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from dental_omop_nlp import telemetry
 from dental_omop_nlp.nhanes import (
     CYCLES,
     classify_people,
@@ -29,6 +30,8 @@ ap.add_argument("--data-dir", type=Path, required=True)
 ap.add_argument("--download", action="store_true")
 ap.add_argument("--out", type=Path, default=DATASETS_DIR / "nhanes")
 args = ap.parse_args()
+telemetry.setup()
+telemetry.start_script("38_nhanes_perio", data_label="public")
 if args.download:
     download(args.data_dir)
 args.out.mkdir(parents=True, exist_ok=True)

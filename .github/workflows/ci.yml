@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with: {python-version: "3.12", cache: pip, cache-dependency-path: python/pyproject.toml}
-      - run: pip install -e "./python[dev,track]" matplotlib
+      - run: pip install -e "./python[dev,track,azure]" matplotlib
       - run: cd python && pytest -q tests
 
   postgres:
@@ -53,6 +53,13 @@ jobs:
       - name: Regenerate the Python outputs parity compares against
         run: python/scripts/make_parity_inputs.sh
       - run: Rscript r/tests/test_parity.R
+
+  azure-infra:
+    # Compile the telemetry Bicep (spec 014); the runner's Azure CLI fetches Bicep itself.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: az bicep build --file infra/azure/main.bicep --stdout > /dev/null
 
   bundle:
     # Validate needs a workspace; runs only once dev has the service principal's secret.

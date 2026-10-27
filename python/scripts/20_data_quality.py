@@ -9,11 +9,19 @@ temporal checks catch. Writes data/datasets/data_quality/.
 
 import pandas as pd
 
-from dental_omop_nlp.completeness import CHART_INPUTS, column_completeness, prevalence_by_scale, row_completeness
+from dental_omop_nlp import telemetry
+from dental_omop_nlp.completeness import (
+    CHART_INPUTS,
+    column_completeness,
+    prevalence_by_scale,
+    row_completeness,
+)
 from dental_omop_nlp.dq import run_checks
 from dental_omop_nlp.paths import DATASETS_DIR
 from dental_omop_nlp.plausibility import check_history, transition_pairs, transition_summary
 
+telemetry.setup()
+telemetry.start_script("20_data_quality", data_label="synthetic")
 TODAY = "2026-10-25"   # fixed so reruns match; use the extract date on real data
 v = pd.read_csv(DATASETS_DIR / "visits_structured.csv")
 truth = pd.read_csv(DATASETS_DIR / "answer_key" / "visits_truth.csv")[["visit_id", "record_error"]]
@@ -24,6 +32,8 @@ overall = run_checks(v, TODAY)
 clinic = run_checks(v, TODAY, by="clinic_id")
 overall.to_csv(out / "dq_overall.csv", index=False)
 clinic.to_csv(out / "dq_by_clinic.csv", index=False)
+for r in overall.itertuples():                       # one point per check per run: trend and anomaly input
+    telemetry.record_value("data_quality.pass_rate", r.pass_rate, check=r.check, category=r.category)
 
 # temporal plausibility of each method's calls over time
 rates = []

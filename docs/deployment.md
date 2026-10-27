@@ -80,6 +80,7 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
 | `reader_shots`, `reader_lora_train` | `0`, `0` | MedGemma reader: few-shot examples per status, and LoRA fine-tune size (0 = off). Change these, or `reader_rung` (e.g. `medgemma-4b-it`), for one run with *Run now with different parameters* |
+| `telemetry_exporter` | `azure` | Pipeline telemetry for the GPU and NHANES jobs (spec 014): `azure` sends to Application Insights with the connection string from secret `dental/appinsights_connection_string` (telemetry off if the secret is missing), or `otlp`, `console`, `off`. Setup: [telemetry.md](telemetry.md) |
 | `deid_ai_engines`, `deid_llm_endpoint` | `llm`, `ai_mask` and their `+regex_v2+guard` versions; `databricks-meta-llama-3-3-70b-instruct` | De-id AI methods job |
 | `hf_secret_scope` | `dental` | secret scope with `hf_token` |
 | `gpu_accelerator` | `GPU_1xA10` | serverless GPU for the GPU jobs (Free Edition offers A10) |

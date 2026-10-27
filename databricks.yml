@@ -73,6 +73,9 @@ variables:
   hf_secret_scope:
     description: Secret scope holding hf_token (Hugging Face read token; HAI-DEF terms accepted)
     default: dental
+  telemetry_exporter:
+    description: "Pipeline telemetry (spec 014): azure (Application Insights; connection string from secret dental/appinsights_connection_string, off if missing), otlp, console or off"
+    default: azure
   lakebase_instance:
     description: Lakebase (managed Postgres) instance or project for this environment
     default: dental-dev

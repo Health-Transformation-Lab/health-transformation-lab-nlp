@@ -353,3 +353,17 @@ def test_gpu_jobs_keep_retrying_long_enough_to_outlast_a_gpu_shortage():
             span = t["max_retries"] * t["min_retry_interval_millis"] + (t["max_retries"] + 1) * start_wait
             assert span >= 4 * 3_600_000, name
             assert t["min_retry_interval_millis"] >= 20 * 60_000, name     # spaced out, not back to back
+
+
+def test_pipeline_jobs_send_telemetry_from_the_secret_scope():
+    """Spec 014: the jobs that start scripts pass the telemetry switch; the notebook reads the Application
+    Insights connection string from the secret scope (never a job parameter)."""
+    root, jobs = _load()
+    assert root["variables"]["telemetry_exporter"]["default"] == "azure"
+    for name, nb in (("medgemma_reader", "03_medgemma_reader.py"), ("encoder_gpu", "08_encoder_gpu.py"),
+                     ("nhanes_perio", "09_nhanes_perio.py")):
+        p = jobs[name][0]["tasks"][0]["notebook_task"]["base_parameters"]
+        assert p["telemetry"] == "${var.telemetry_exporter}", name
+        assert not any("InstrumentationKey" in str(v) for v in p.values()), name
+        text = (ROOT / "databricks/notebooks" / nb).read_text()
+        assert "telemetry.use_databricks_secret(dbutils" in text and 'widgets.text("telemetry"' in text, nb

@@ -16,6 +16,7 @@ import random
 
 import pandas as pd
 
+from dental_omop_nlp import telemetry
 from dental_omop_nlp.aces import AcesRules, aces_all
 from dental_omop_nlp.labels import PerioChart
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
@@ -23,6 +24,8 @@ from dental_omop_nlp.sites import aap_from_derived, cdc_aap, derive_all, draw_mo
 
 OUT = REPO_ROOT / "data" / "sites"
 OUT.mkdir(parents=True, exist_ok=True)
+telemetry.setup()
+telemetry.start_script("22_build_sites", data_label="synthetic")
 v = pd.read_csv(DATASETS_DIR / "visits_structured.csv")
 v = v[v["charted"].astype(str).str.lower() == "true"]
 assert v["visit_id"].is_unique, "derive_all groups by visit_id: duplicate visits would merge"

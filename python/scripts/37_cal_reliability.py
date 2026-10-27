@@ -13,6 +13,7 @@ import argparse
 
 import pandas as pd
 
+from dental_omop_nlp import telemetry
 from dental_omop_nlp.paths import DATASETS_DIR
 from dental_omop_nlp.reliability_cal import (
     CalParams,
@@ -28,6 +29,8 @@ ap.add_argument("--patients", type=int, default=100)
 ap.add_argument("--teeth", type=int, default=12)
 ap.add_argument("--visits", type=int, default=3)
 args = ap.parse_args()
+telemetry.setup()
+telemetry.start_script("37_cal_reliability", data_label="simulated")
 out = DATASETS_DIR / "reliability_cal"
 out.mkdir(exist_ok=True)
 

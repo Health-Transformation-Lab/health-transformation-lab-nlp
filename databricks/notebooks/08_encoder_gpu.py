@@ -14,7 +14,7 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -q -e ../../python[models]
+# MAGIC %pip install -q -e ../../python[models,azure]
 
 # COMMAND ----------
 
@@ -39,6 +39,9 @@ dbutils.widgets.text("max_len", "256")                                  # noqa: 
 dbutils.widgets.text("catalog", "dental_omop")                          # noqa: F821  set by databricks.yml
 dbutils.widgets.text("schema", "gold_dental_omop_perio")                # noqa: F821
 dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")     # noqa: F821
+dbutils.widgets.text("telemetry", "azure")                              # noqa: F821  spec 014
+from dental_omop_nlp import telemetry  # noqa: E402
+telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"))  # noqa: F821  scripts inherit it
 w = {k: dbutils.widgets.get(k) for k in ("rungs", "lr_overrides", "epochs", "max_len", "catalog",  # noqa: F821
                                           "schema", "landing_schema")}
 
