@@ -77,3 +77,16 @@ def test_fast_kappa_matches_pandas_reference_exactly():
             fa = fa.iloc[:len(fb)]
             r2, g2 = _kappa_reference(fa, fb), cohen_kappa(fa, fb)
             assert (np.isnan(r2) and np.isnan(g2)) or r2 == g2
+
+
+def test_kappa_on_label_codes_equals_kappa_on_labels_exactly():
+    """The bootstrap runs kappa ~40,000 times on integer codes; it must give the very same floats."""
+    from dental_omop_nlp.reliability import _kappa_codes, _label_codes
+    rng = random.Random(3)
+    pool = [*LABELS, "healthy_gingivitis", "unknown", None, float("nan")]
+    for _ in range(300):
+        n = rng.randint(0, 60)
+        a = pd.Series([rng.choice(pool) for _ in range(n)], dtype=object)
+        b = pd.Series([rng.choice(pool) for _ in range(n)], dtype=object)
+        want, got = _kappa_where_both(a, b), _kappa_codes(_label_codes(a), _label_codes(b))
+        assert (np.isnan(want) and np.isnan(got)) or want == got
