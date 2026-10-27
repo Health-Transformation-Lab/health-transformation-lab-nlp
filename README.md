@@ -58,22 +58,24 @@ What the columns mean:
 
 - **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4).
 - **Periodontitis incorrectly assigned**: said periodontitis, but the patient doesn't have it.
-- **Specificity**: of the 84 charts without periodontitis, the share correctly called "no". Periodontitis incorrectly assigned is what lowers it.
+- **Specificity**: (in brackets) of the 84 charts without periodontitis, the share correctly called "no". Periodontitis incorrectly assigned is what lowers it.
 - **Periodontitis incorrectly ruled out**: the patient has periodontitis, but the method said they don't.
-- **Sensitivity**: of the 156 charts with periodontitis, the share correctly called "yes". Periodontitis incorrectly ruled out lowers it, and so does no answer.
+- **Sensitivity**: (in brackets) of the 156 charts with periodontitis, the share correctly called "yes". Periodontitis incorrectly ruled out lowers it, and so does no answer.
 - **Incorrect stage**: right that it is or isn't periodontitis, but the wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up.
 - **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken.
 - **Rank**: where it plausibly ranks among all 38 methods.
 - **Stage 4 rule**: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from).
 
-| Question | Method | Correct | Periodontitis incorrectly assigned (when not present) | Specificity | Periodontitis incorrectly ruled out (when present) | Sensitivity | Incorrect stage | No answer (evidence not available) | Total charts | Rank |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| 1. Whole record available | Rules, gum measurements first | 234 | 0 | 100% | 0 | 100% | 6 | 0 | 240 | 1 |
-| 2. Only the note available | Trained AI (ModernBERT) + stage 4 rule | 219 | 4 | 95% | 1 | 99% | 16 | 0 | 240 | 2–10 |
-|  | Keyword rules (simple baseline) | 189 | 10 | 88% | 8 | 95% | 33 | 0 | 240 | 15–30 |
-|  | Medical AI, untrained (MedGemma 1.5 4B) + stage 4 rule | 185 | 8 | 90% | 10 | 94% | 37 | 0 | 240 | 17–31 |
-| 3. One part of the record alone | Gum measurements (probing chart) | 193 | 0 | 100% | 0 | 80% | 2 | 45 | 240 | 14–31 |
-|  | Exam form | 149 | 10 | 88% | 0 | 87% | 48 | 33 | 240 | 33 |
+Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned (out of the 84 without it) + incorrectly ruled out (out of the 156 with it) + incorrect stage + no answer.
+
+| Question | Method | Correct | Periodontitis incorrectly assigned | Periodontitis incorrectly ruled out | Incorrect stage | No answer | Rank |
+|---|---|---:|---:|---:|---:|---:|---|
+| 1. Whole record available | Rules, gum measurements first | 234 of 240 | 0 of 84 (specificity 100%) | 0 of 156 (sensitivity 100%) | 6 of 240 | 0 of 240 | 1 |
+| 2. Only the note available | Trained AI (ModernBERT) + stage 4 rule | 219 of 240 | 4 of 84 (specificity 95%) | 1 of 156 (sensitivity 99%) | 16 of 240 | 0 of 240 | 2–10 |
+|  | Keyword rules (simple baseline) | 189 of 240 | 10 of 84 (specificity 88%) | 8 of 156 (sensitivity 95%) | 33 of 240 | 0 of 240 | 15–30 |
+|  | Medical AI, untrained (MedGemma 1.5 4B) + stage 4 rule | 185 of 240 | 8 of 84 (specificity 90%) | 10 of 156 (sensitivity 94%) | 37 of 240 | 0 of 240 | 17–31 |
+| 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (specificity 100%) | 0 of 156 (sensitivity 80%) | 2 of 240 | 45 of 240 | 14–31 |
+|  | Exam form | 149 of 240 | 10 of 84 (specificity 88%) | 0 of 156 (sensitivity 87%) | 48 of 240 | 33 of 240 | 33 |
 
 All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart). **LLM judge** (could an LLM replace the answer key?): its own reading matches the truth on 83% of charts (53% on hard notes), and it flags most mistakes of weak methods but only 26% of the best note model's, so it can't yet rank good methods (LLM judgment); [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading), and the *Scorecard* dashboard in Databricks.
 
