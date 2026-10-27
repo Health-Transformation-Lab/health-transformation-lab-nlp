@@ -18,28 +18,36 @@ import pandas as pd
 
 from dental_omop_nlp.labels import PerioChart
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
-from dental_omop_nlp.sites import aap_from_derived, cdc_aap, derive, draw_mouth
+from dental_omop_nlp.sites import aap_from_derived, cdc_aap, derive_all, draw_mouth_columns
 
 OUT = REPO_ROOT / "data" / "sites"
 OUT.mkdir(parents=True, exist_ok=True)
 v = pd.read_csv(DATASETS_DIR / "visits_structured.csv")
 v = v[v["charted"].astype(str).str.lower() == "true"]
 
-site_parts, tooth_parts, rows = [], [], []
+# column lists for all visits, one table each at the end (thousands of small tables are slow)
+site_cols = {c: [] for c in ("tooth", "site", "pd_mm", "cal_mm", "bop", "visit_id", "person_id")}
+tooth_cols = {c: [] for c in ("tooth", "present", "missing_reason", "furcation_class", "mobility_degree",
+                              "visit_id", "person_id")}
 for r in v.itertuples():
     rng = random.Random(r.visit_id * 104729 + 7)
     chart = PerioChart(r.rec_max_probing_depth_mm, r.rec_bop_pct, r.rec_max_cal_mm, r.rec_rbl_pct,
                        int(r.rec_teeth_lost_perio))
-    sites, teeth = draw_mouth(chart, r.rec_pct_teeth_involved, rng)
-    ids = {"visit_id": r.visit_id, "person_id": r.person_id}
-    site_parts.append(sites.assign(**ids))
-    tooth_parts.append(teeth.assign(**ids))
-    d = derive(sites, teeth)
-    rows.append({**ids, "clinic_id": r.clinic_id, "age": r.age, **d,
-                 "aap_2017": aap_from_derived(d, r.rec_rbl_pct), "cdc_aap_2012": cdc_aap(d)})
+    s, t = draw_mouth_columns(chart, r.rec_pct_teeth_involved, rng)
+    for cols, part in ((site_cols, s), (tooth_cols, t)):
+        n = len(part["tooth"])
+        for c, x in part.items():
+            cols[c].extend(x)
+        cols["visit_id"].extend([r.visit_id] * n)
+        cols["person_id"].extend([r.person_id] * n)
 
-sites = pd.concat(site_parts, ignore_index=True)
-teeth = pd.concat(tooth_parts, ignore_index=True)
+sites = pd.DataFrame(site_cols)
+teeth = pd.DataFrame(tooth_cols)
+d = derive_all(sites, teeth).to_dict("index")   # all visits in one pass, keyed by visit_id
+rows = [{"visit_id": r.visit_id, "person_id": r.person_id, "clinic_id": r.clinic_id, "age": r.age,
+         **d[r.visit_id], "aap_2017": aap_from_derived(d[r.visit_id], r.rec_rbl_pct),
+         "cdc_aap_2012": cdc_aap(d[r.visit_id])}
+        for r in v.itertuples()]
 derived = pd.DataFrame(rows)
 sites.to_parquet(OUT / "sites.parquet")
 teeth.to_parquet(OUT / "teeth.parquet")
