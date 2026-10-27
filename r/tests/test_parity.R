@@ -313,6 +313,17 @@ if (file.exists(vs) && file.exists(pf)) {
   stopifnot(nrow(m) == nrow(py), bad == 0)
 } else cat("plausibility: skipped (run 20_data_quality.py)\n")
 
+tp <- "data/datasets/data_quality/transition_pairs_algorithm_design.csv"
+if (file.exists(vs) && file.exists(tp)) {
+  v <- read.csv(vs, stringsAsFactors = FALSE)
+  r <- transition_pairs(v, "algorithm_design")
+  py <- read.csv(tp, stringsAsFactors = FALSE)
+  m <- merge(py, r, by = "visit_id", suffixes = c(".py", ".r"))
+  bad <- sum(m$next_visit_id.py != m$next_visit_id.r | m$change.py != m$change.r | m$to_status.py != m$to_status.r)
+  cat(sprintf("transitions:  %d pairs, %d mismatches\n", nrow(m), bad))
+  stopifnot(nrow(m) == nrow(py), nrow(r) == nrow(py), bad == 0)
+} else cat("transitions: skipped (run 20_data_quality.py)\n")
+
 pp <- "data/datasets/prevalence/prevalence_by_clinic.csv"
 if (file.exists(vs) && file.exists(pp)) {
   v <- read.csv(vs, stringsAsFactors = FALSE)

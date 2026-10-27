@@ -11,7 +11,7 @@ import pandas as pd
 
 from dental_omop_nlp.dq import run_checks
 from dental_omop_nlp.paths import DATASETS_DIR
-from dental_omop_nlp.plausibility import check_history
+from dental_omop_nlp.plausibility import check_history, transition_pairs, transition_summary
 
 TODAY = "2026-10-25"   # fixed so reruns match; use the extract date on real data
 v = pd.read_csv(DATASETS_DIR / "visits_structured.csv")
@@ -35,6 +35,17 @@ for m in ("algorithm_design", "algorithm_v0", "notes", "probing_chart", "exam_fo
                   **{k: float(later[k].mean()) for k in ("perio_resolved", "stage_drop")}})
 pd.DataFrame(rates).to_csv(out / "temporal_by_method.csv", index=False)
 
+# transitions 1-2 years on, untreated people only (spec 013 G8): improvement is implausible
+trans = []
+for m in ("algorithm_design", "algorithm_v0", "notes", "probing_chart", "exam_form", "proc_dx_completed"):
+    pairs = transition_pairs(v, status_col=m)
+    matrix, shares = transition_summary(pairs)
+    trans.append({"method": m, **shares})
+    if m == "algorithm_design":
+        matrix.to_csv(out / "transitions_algorithm_design.csv")      # Sankey input
+        pairs.to_csv(out / "transition_pairs_algorithm_design.csv", index=False)   # read by the R parity test
+pd.DataFrame(trans).to_csv(out / "transitions_by_method.csv", index=False)
+
 # injected errors caught (synthetic only: the error flag lives in the answer key)
 f = check_history(hist, status_col="probing_chart")
 f.to_csv(out / "flags_probing_chart.csv", index=False)      # also read by the R parity test
@@ -48,5 +59,7 @@ pd.DataFrame([{"injected_errors": int(inj.sum()), "caught_share": caught, "flag_
 print(overall.round(3).to_string(index=False))
 print("\ntemporal plausibility of each method's calls (share of follow-up visits flagged):")
 print(pd.DataFrame(rates).round(3).to_string(index=False))
+print("\nphenotype 1-2 years later, untreated (share of pairs better / same / worse):")
+print(pd.DataFrame(trans).round(3).to_string(index=False))
 print(f"\nSYNTHETIC check: {inj.sum()} injected charting errors, {caught:.0%} flagged; "
       f"{false_alarm:.1%} of other visits flagged")

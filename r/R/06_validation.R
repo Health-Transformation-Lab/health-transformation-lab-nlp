@@ -65,3 +65,30 @@ prevalence_by <- function(visits, status_col, by = NULL) {
   if (!is.null(by)) names(out)[1] <- by
   out
 }
+
+# Spec 013 G8: twin of plausibility.transition_pairs (five categories; first visit 365-730 days later;
+# pairs with therapy in between dropped).
+PERIO_FIVE <- c("healthy_gingivitis", PERIO_LABELS6[3:6])
+transition_pairs <- function(visits, status_col = "status", min_days = 365, max_days = 730) {
+  v <- visits[visits[[status_col]] %in% PERIO_LABELS6, ]
+  v$date <- as.Date(v$visit_date)
+  v$five <- ifelse(v[[status_col]] %in% c("healthy", "gingivitis"), "healthy_gingivitis", v[[status_col]])
+  v$treated <- v$treated_before == TRUE | v$treated_before == "True"
+  v <- v[order(v$person_id, v$date, v$visit_id), ]
+  rows <- list()
+  for (g in split(v, factor(v$person_id, levels = unique(v$person_id)))) {
+    n <- nrow(g)
+    for (i in seq_len(n)) for (j in seq_len(n)[seq_len(n) > i]) {
+      d <- as.numeric(g$date[j] - g$date[i])
+      if (d > max_days) break
+      if (d < min_days) next
+      if (g$treated[j] && !g$treated[i]) break
+      ra <- match(g$five[i], PERIO_FIVE); rb <- match(g$five[j], PERIO_FIVE)
+      rows[[length(rows) + 1]] <- data.frame(person_id = g$person_id[i], visit_id = g$visit_id[i],
+        next_visit_id = g$visit_id[j], days = d, from_status = g$five[i], to_status = g$five[j],
+        change = if (rb < ra) "better" else if (rb > ra) "worse" else "same")
+      break
+    }
+  }
+  if (length(rows)) do.call(rbind, rows) else data.frame()
+}
