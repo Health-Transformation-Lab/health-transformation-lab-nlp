@@ -144,7 +144,8 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
             for jargon in ("accuracy", "recall", "precision", "macro", "f1", "false alarm"):
                 assert jargon not in h.lower(), (jargon, h)
         ph, de = headers
-        for col in ("Correct", rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED, "Incorrect stage", rr.COL_NO_ANSWER):
+        for col in ("Correct", "Periodontitis incorrectly assigned", "Periodontitis incorrectly ruled out",
+                    "Incorrect stage", "No answer"):
             assert col in ph, col
         assert "Incorrect diagnosis" not in ph
         for h in headers:
@@ -154,15 +155,31 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
         assert "left in" not in de and "Valid text" not in de
 
 
-def test_sensitivity_and_specificity_sit_next_to_the_counts_they_summarise(summary):
-    header = next(x for x in _section(summary, rr.PHENOTYPE_TITLE).splitlines() if x.startswith("| Question"))
-    cols = [c.strip() for c in header.split("|")]
-    assert cols[4:8] == [rr.COL_ASSIGNED, "Specificity", rr.COL_NOT_ASSIGNED, "Sensitivity"]
+def test_readme_phenotyping_table_is_narrow_and_each_cell_carries_its_total(summary):
+    """Eight columns, so it fits a laptop screen; every count says what it is out of ("219 of 240"), the
+    yes/no errors carry their specificity and sensitivity, and each row adds up to the charts counted."""
+    sec = _section(summary, rr.PHENOTYPE_TITLE)
+    lines = sec.splitlines()
+    i = next(k for k, x in enumerate(lines) if x.startswith("| Question"))
+    cols = [c.strip() for c in lines[i].split("|")[1:-1]]
+    assert cols == ["Question", "Method", "Correct", "Periodontitis incorrectly assigned",
+                    "Periodontitis incorrectly ruled out", "Incorrect stage", "No answer", "Rank"]
+    rows = [[c.strip() for c in x.split("|")[1:-1]] for x in lines[i + 2:] if x.startswith("|")]
+    assert rows
+    of = re.compile(r"^(\d+) of (\d+)")
+    for r in rows:
+        right, yes, no, stage, na = (of.match(c) for c in r[2:7])
+        assert all((right, yes, no, stage, na)), r
+        n = int(right.group(2))
+        assert int(yes.group(2)) + int(no.group(2)) == n                      # without + with periodontitis
+        assert sum(int(m.group(1)) for m in (right, yes, no, stage, na)) == n, r
+        assert "specificity" in r[3] and "sensitivity" in r[4], r
+    assert f"adds up to the {n}" in sec
 
 
 def test_readme_says_method_in_both_tables(summary):
     ph = next(x for x in _section(summary, rr.PHENOTYPE_TITLE).splitlines() if x.startswith("| Question"))
-    assert "| Method |" in ph and "| Total charts |" in ph
+    assert "| Method |" in ph and "Total" not in ph                # totals sit in the cells ("219 of 240")
     de = next(x for x in _section(summary, rr.DEID_TITLE).splitlines() if x.startswith("| Group"))
     assert "| Best method |" in de and "| Methods in group |" in de
     assert "Total" not in de                                   # totals sit in the cells ("115 of 2,714")
@@ -289,14 +306,15 @@ def test_readme_phenotype_table_answers_three_questions(inp, summary):
     preds, key = inp["preds"], inp["key"].reindex(inp["preds"].index)
     for r, s in zip(rows, systems):
         assert _cell(r, 2) == rr.readme_label(s)
-        nums = [int(_cell(r, i)) for i in (3, 4, 6, 8, 9)]
-        total = int(_cell(r, 10))
+        nums = [int(_cell(r, i).split(" of ")[0]) for i in (3, 4, 5, 6, 7)]   # "219 of 240", "4 of 84 (...)"
+        total = int(_cell(r, 3).split(" of ")[1])
         assert total == len(preds) == 240 and sum(nums) == total, r
         pred = preds[s] if s in preds else key[s]
         b = rr.breakdown(preds["truth"], pred.where(pred.isin(rr.LABELS)))
         assert nums == [round(total * b[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage", "no_answer")]
         yn = rr.yes_no(preds["truth"], pred.where(pred.isin(rr.LABELS)))
-        assert (_cell(r, 5), _cell(r, 7)) == (rr._pct(yn["specificity"]), rr._pct(yn["sensitivity"])), r
+        assert f"(specificity {rr._pct(yn['specificity'])})" in _cell(r, 4), r
+        assert f"(sensitivity {rr._pct(yn['sensitivity'])})" in _cell(r, 5), r
 
 
 def test_plain_names():
