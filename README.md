@@ -57,7 +57,7 @@ Best method in each group, counted on the 240 review charts; groups ordered by t
 | Simple text methods on the note | Word counts + X-ray reading | 209 | 6 | 3 | 22 | 0 | 240 | 7–16 | 5 |
 | Trained AI on the note | ModernBERT | 201 | 4 | 2 | 33 | 0 | 240 | 12–18 | 11 |
 | One part of the record alone | Gum measurements (probing chart) | 193 | 0 | 0 | 2 | 45 | 240 | 14–31 | 7 |
-| Untrained medical AI on the note (MedGemma) | MedGemma | 185 | 8 | 10 | 37 | 0 | 240 | 17–31 | 2 |
+| Untrained medical AI on the note (MedGemma 1.5 4B) | MedGemma 1.5 4B | 185 | 8 | 10 | 37 | 0 | 240 | 17–31 | 2 |
 
 All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
@@ -85,7 +85,7 @@ step, with links to the code; the Databricks notebook
 | 1 | Generate synthetic patients over time (8 clinics): notes, exam forms, procedure codes and diagnoses, probing chart; fake PHI in notes | [1](docs/code_walkthrough.md#1-generate-the-synthetic-study) |
 | 2 | Remove names, dates and other identifiers; a final check holds back any note with one left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
 | 3 | Read and compare the diagnostic evidence; build the rule-based phenotype | [3–5](docs/code_walkthrough.md#3-read-the-diagnostic-evidence) |
-| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
+| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma 1.5 4B | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
 | 5 | Periodontists label the same 240 charts, each on their own, in a labeling tool (Label Studio) | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
 | 6 | Does the AI agree with the periodontists as often as they agree with each other? Also: which order of checking the evidence agrees best | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
 | 7 | Over time: catch impossible changes and bad data; compare clinics; predict who gets worse | [10–12](docs/code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
