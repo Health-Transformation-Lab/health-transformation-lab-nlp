@@ -71,7 +71,7 @@ def _best_by_group(full_rows, group_of):
 def test_summary_shows_the_best_system_of_each_group_and_links_the_full_table(summary, md, title, groups, group_of):
     rows = _rows(_section(summary, title))
     assert sorted(_cell(r, 1) for r in rows) == sorted(groups)
-    scores = [int(_cell(r, 3)) for r in rows]   # correct (higher first), or PHI left in (lower first)
+    scores = [int(_cell(r, 3).split(" of ")[0].replace(",", "")) for r in rows]   # fewest leaked first
     assert scores == sorted(scores, reverse=title == rr.PHENOTYPE_TITLE)
     best = _best_by_group(_rows(_section(md, title)), group_of)
     assert set(best) == set(groups)
@@ -164,7 +164,8 @@ def test_readme_says_method_in_both_tables(summary):
     ph = next(x for x in _section(summary, rr.PHENOTYPE_TITLE).splitlines() if x.startswith("| Question"))
     assert "| Method |" in ph and "| Total charts |" in ph
     de = next(x for x in _section(summary, rr.DEID_TITLE).splitlines() if x.startswith("| Group"))
-    assert "| Best method |" in de and "| Methods in group |" in de and "| Total " in de
+    assert "| Best method |" in de and "| Methods in group |" in de
+    assert "Total" not in de                                   # totals sit in the cells ("115 of 2,714")
 
 
 def test_dental_word_count_matches_the_scored_challenge_set(inp):
@@ -339,8 +340,8 @@ def test_readme_deid_rows_are_counts_with_their_totals(inp, summary, md):
     for r in _rows(_section(summary, rr.DEID_TITLE)):
         m = best[_cell(r, 1)]
         n_phi, n_words = int(allt.loc[m, "n_phi"]), inp["n_decoys"]
-        assert int(_cell(r, 3)) == round(n_phi * (1 - allt.loc[m, "entity_recall"])) and _cell(r, 4) == f"{n_phi:,}"
-        assert int(_cell(r, 5)) == round(n_words * allt.loc[m, "decoy_damage"]) and _cell(r, 6) == f"{n_words:,}"
+        assert _cell(r, 3) == f"{round(n_phi * (1 - allt.loc[m, 'entity_recall'])):,} of {n_phi:,}"
+        assert _cell(r, 4) == f"{round(n_words * allt.loc[m, 'decoy_damage']):,} of {n_words:,}"
 
 
 def test_difficulty_levels_match_the_medgemma_comparison(inp, md):

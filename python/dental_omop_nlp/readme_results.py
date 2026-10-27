@@ -513,16 +513,15 @@ def results_markdown(inp: dict) -> str:
             DEID_TITLE, "",
             f"Best method in each group, counted on the {int(de['n_notes'].iloc[0])} synthetic notes; groups ordered "
             f"by their best. Rank: where it plausibly ranks among all {len(de)} methods. " + DEID_KEY, "",
-            f"| Group | Best method | {COL_LEAKED} | Total PHI items | {COL_SCRUBBED} | Total look-alike dental words | "
-            "Rank | Methods in group |",
-            "|---|---|---:|---:|---:|---:|---|---:|"]
+            f"| Group | Best method | {COL_LEAKED} | {COL_SCRUBBED} | Rank | Methods in group |",
+            "|---|---|---:|---:|---|---:|"]
     n_words = inp["n_decoys"]
     for g in _by_best(de, DEID_GROUPS, "entity_recall"):
         sub = de[de.group == g]
         m, r = sub.index[0], sub.iloc[0]
         n_phi = int(r["n_phi"])
-        out.append(f"| {g} | {plain_tool(m)} | {round(n_phi * (1 - r['entity_recall']))} | {n_phi:,} | "
-                   f"{round(n_words * r['decoy_damage'])} | {n_words:,} | {r['rank']} | {len(sub)} |")
+        out.append(f"| {g} | {plain_tool(m)} | {round(n_phi * (1 - r['entity_recall'])):,} of {n_phi:,} | "
+                   f"{round(n_words * r['decoy_damage']):,} of {n_words:,} | {r['rank']} | {len(sub)} |")
     out += ["", f"All {len(de)} methods, per 100 with 95% CIs, on every note set, and the methods not run yet: "
             f"[full de-identification table](docs/results.md#{anchor(DEID_TITLE)})."]
     d = inp["deid"]
