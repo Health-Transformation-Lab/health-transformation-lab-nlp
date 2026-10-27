@@ -54,10 +54,34 @@ EVIDENCE = {"probing_chart": ("probing chart", "staged from the measurements"),
             "radiograph_ai": ("radiograph AI", "bone-loss reading mapped to stage")}
 
 
-PHENOTYPE_GROUPS = ("Rule phenotype, whole record", "Fine-tuned note model + rules for stage IV",
-                    "Fine-tuned note model", "Zero-shot LLM on the note", "Note baselines (rules, TF-IDF)",
-                    "One evidence type alone")
-DEID_GROUPS = ("Combined: ML + regex + guard", "Single ML engine", "Regex only")
+PHENOTYPE_GROUPS = ("Rules on the whole record", "Trained AI on the note + stage 4 rule", "Trained AI on the note",
+                    "Untrained medical AI on the note (MedGemma)", "Simple text methods on the note",
+                    "One part of the record alone")
+DEID_GROUPS = ("Several tools combined", "One AI tool", "Pattern matching only")
+
+# Plain names for the README; the full table keeps the code names.
+_PLAIN = {"algorithm_v0": "Gum measurements first", "algorithm_design": "Exam form first",
+          "probing_chart": "Gum measurements (probing chart)", "exam_form": "Exam form",
+          "proc_dx_planned": "Diagnosis codes, planned treatment", "proc_dx_completed": "Diagnosis codes, done treatment",
+          "proc_codes_planned": "Procedure codes, planned", "proc_codes_completed": "Procedure codes, done",
+          "radiograph_ai": "X-ray AI reading", "note_rules": "Keyword rules", "tfidf_logreg": "Word counts",
+          "fusion_tfidf_rad": "Word counts + X-ray reading", "bert-base": "BERT", "distilbert-base": "DistilBERT",
+          "modernbert-base": "ModernBERT", "bio-clinicalbert": "Bio ClinicalBERT", "biomedbert": "BiomedBERT",
+          "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT"}
+_PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Presidio", "regex_v2": "patterns",
+               "regex": "patterns (first version)", "guard": "dental-word guard", "routed": "routed by note type"}
+
+
+def plain_system(system: str) -> str:
+    """'modernbert-base+cw+s2+rules4' -> 'ModernBERT' (the group says what the variants add)."""
+    b = base_id(system)
+    return "MedGemma" if b.startswith("medgemma") else _PLAIN[b]
+
+
+def plain_tool(engine: str) -> str:
+    """'hf_stanford+hf_obi+regex_v2+guard' -> 'Stanford AI + OBI AI + patterns + dental-word guard'."""
+    name = " + ".join(_PLAIN_TOOL[p] for p in engine.split("+"))
+    return name[0].upper() + name[1:]
 _BASELINES = ("note_rules", "tfidf_logreg", "fusion_tfidf_rad")
 
 
@@ -343,7 +367,8 @@ def results_markdown(inp: dict) -> str:
     de = de.assign(group=[deid_group(m) for m in de.index])
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
            "Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it "
-           f"plausibly ranks among all {len(ph)} systems. " + PHENOTYPE_KEY, "",
+           f"plausibly ranks among all {len(ph)} systems. *Stage 4 rule*: keyword rules decide stage 4, which the "
+           "trained AI rarely learned (few stage 4 notes to learn from). " + PHENOTYPE_KEY, "",
            f"| Group | Best system | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | No answer | "
            "Rank | Systems |",
            "|---|---|---:|---:|---:|---:|---:|---|---:|"]
@@ -351,7 +376,7 @@ def results_markdown(inp: dict) -> str:
         sub = ph[ph.group == g]
         s, r = sub.index[0], sub.iloc[0]
         nums = out_of_100([r["correct"], r["dx_said_yes"], r["dx_said_no"], r["stage"], r["no_answer"]])
-        out.append(f"| {g} | `{s}` | " + " | ".join(map(str, nums)) + f" | {r['rank']} | {len(sub)} |")
+        out.append(f"| {g} | {plain_system(s)} | " + " | ".join(map(str, nums)) + f" | {r['rank']} | {len(sub)} |")
     out += ["", f"All {len(ph)} systems, with the 95% CIs, unsafe errors, "
             f"results by note difficulty, and the {int(ph['n_missing'].iloc[0])} models not run yet: "
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "",
@@ -363,7 +388,7 @@ def results_markdown(inp: dict) -> str:
     for g in _by_best(de, DEID_GROUPS, "entity_recall"):
         sub = de[de.group == g]
         m, r = sub.index[0], sub.iloc[0]
-        out.append(f"| {g} | `{m}` | {round(100 * (1 - r['entity_recall']))} | {round(100 * r['decoy_damage'])} | "
+        out.append(f"| {g} | {plain_tool(m)} | {round(100 * (1 - r['entity_recall']))} | {round(100 * r['decoy_damage'])} | "
                    f"{r['rank']} | {len(sub)} |")
     out += ["", f"All {len(de)} tools, with 95% CIs and two outside test sets (ASQ-PHI, and MACCROBAT's real case "
             f"reports), and the tools not run yet: [full de-identification table](docs/results.md#{anchor(DEID_TITLE)})."]

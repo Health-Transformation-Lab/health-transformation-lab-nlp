@@ -74,8 +74,10 @@ def test_summary_shows_the_best_system_of_each_group_and_links_the_full_table(su
     assert scores == sorted(scores, reverse=title == rr.PHENOTYPE_TITLE)
     best = _best_by_group(_rows(_section(md, title)), group_of)
     assert set(best) == set(groups)
+    plain = rr.plain_system if title == rr.PHENOTYPE_TITLE else rr.plain_tool
     for r in rows:
-        assert f"`{best[_cell(r, 1)]}`" in _cell(r, 2), r
+        assert _cell(r, 2) == plain(best[_cell(r, 1)]), r
+        assert not any(c in _cell(r, i) for c in "`_" for i in (1, 2)), r     # no code names in the README
     link = f"docs/results.md#{rr.anchor(title)}"
     assert link in _section(summary, title)
     assert f"\n{title}\n" in "\n" + md
@@ -164,16 +166,34 @@ def test_out_of_100_adds_to_100():
     assert sum(rr.out_of_100([1 / 3, 1 / 3, 1 / 3])) == 100
 
 
-def test_readme_phenotype_rows_add_to_100_and_match_the_predictions(inp, summary):
+def test_readme_phenotype_rows_add_to_100_and_match_the_predictions(inp, summary, md):
     rows = _rows(_section(summary, rr.PHENOTYPE_TITLE))
+    best = _best_by_group(_rows(_section(md, rr.PHENOTYPE_TITLE)), rr.phenotype_group)
     preds, key = inp["preds"], inp["key"].reindex(inp["preds"].index)
     for r in rows:
-        s = _cell(r, 2).strip("`")
+        s = best[_cell(r, 1)]
         nums = [int(_cell(r, i)) for i in (3, 4, 5, 6, 7)]
         assert sum(nums) == 100, r
         pred = preds[s] if s in preds else key[s]
         b = rr.breakdown(preds["truth"], pred.where(pred.isin(rr.LABELS)))
         assert nums == rr.out_of_100([b["correct"], b["dx_said_yes"], b["dx_said_no"], b["stage"], b["no_answer"]])
+
+
+def test_plain_names():
+    assert rr.plain_system("algorithm_v0") == "Gum measurements first"
+    assert rr.plain_system("modernbert-base+cw+s2+rules4") == "ModernBERT"
+    assert rr.plain_system("fusion_tfidf_rad+rules4") == "Word counts + X-ray reading"
+    assert rr.plain_system("probing_chart") == "Gum measurements (probing chart)"
+    assert rr.plain_system("medgemma-1.5-4b-it+rules4") == "MedGemma"
+    assert rr.plain_tool("hf_stanford+hf_obi+regex_v2+guard") == "Stanford AI + OBI AI + patterns + dental-word guard"
+    assert rr.plain_tool("regex_v2") == "Patterns"
+
+
+def test_every_system_and_tool_has_a_plain_name(inp):
+    for s in [*inp["ladder"]["method"], *rr.PHENOTYPES, *rr.EVIDENCE]:
+        assert rr.plain_system(s) and "_" not in rr.plain_system(s), s
+    for m in inp["deid"]["method"].unique():
+        assert rr.plain_tool(m) and "_" not in rr.plain_tool(m), m
 
 
 def test_periodontitis_column_names():
@@ -193,10 +213,11 @@ def test_full_deid_table_names_every_pair_the_same_way(md):
         assert f"{prefix}{rr.COL_LEAKED}" in header and f"{prefix}{rr.COL_SCRUBBED}" in header, prefix
 
 
-def test_readme_deid_rows_are_out_of_100(inp, summary):
+def test_readme_deid_rows_are_out_of_100(inp, summary, md):
     allt = inp["deid"].query("tier == 'all'").set_index("method")
+    best = _best_by_group(_rows(_section(md, rr.DEID_TITLE)), rr.deid_group)
     for r in _rows(_section(summary, rr.DEID_TITLE)):
-        m = _cell(r, 2).strip("`")
+        m = best[_cell(r, 1)]
         assert int(_cell(r, 3)) == round(100 * (1 - allt.loc[m, "entity_recall"]))
         assert int(_cell(r, 4)) == round(100 * allt.loc[m, "decoy_damage"])
 
