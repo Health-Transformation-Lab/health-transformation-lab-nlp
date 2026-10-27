@@ -73,6 +73,9 @@ variables:
   gpu_accelerator:
     description: Serverless GPU for the GPU jobs (MedGemma reader, encoders); Free Edition offers A10
     default: GPU_1xA10
+  gpu_environment_version:
+    description: Serverless environment version for the GPU jobs (a task with task-level compute needs one)
+    default: "4"
   encoder_gpu_rungs:
     description: Encoders the GPU job fine-tunes (spec 002 T017)
     default: modernbert-large,bioclinical-modernbert-large,longformer-base,clinical-longformer,gatortron-base

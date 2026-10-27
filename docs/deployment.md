@@ -81,6 +81,7 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
 | `hf_secret_scope` | `dental` | secret scope with `hf_token` |
 | `gpu_accelerator` | `GPU_1xA10` | serverless GPU for the GPU jobs (Free Edition offers A10) |
+| `gpu_environment_version` | `4` | serverless environment for the GPU jobs; Databricks requires one when a task sets `compute` |
 | `encoder_gpu_rungs`, `encoder_gpu_lr` | the five GPU encoders; `gatortron-base=2e-5` | what the encoder GPU job fine-tunes, and learning-rate overrides |
 | `lakebase_instance`, `lakebase_database`, `lakebase_schema` | `dental-dev` / `-uat` / `-prod`, `databricks_postgres`, `cdm_dev` / `cdm` | where the OMOP CDM goes in Lakebase |
 | `service_principal` | placeholder id | who runs uat/prod jobs |
