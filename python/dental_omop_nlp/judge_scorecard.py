@@ -17,10 +17,15 @@ any system; a *verdict* call is the existing judge.py prompt.
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 from . import judge as jg
 from . import readme_results as rr
+from .cost_effectiveness import corrected_accuracy
+from .harm import unsafe_rates
+from .ladder_eval import STAGE4
+from .phenotype import cohen_kappa
 
 # Rough token counts for the cost estimate printed before a run (judge.SYSTEM is ~1,000 tokens).
 SYSTEM_TOKENS = 1000
@@ -100,3 +105,76 @@ def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | No
         if trace is not None:
             trace(r, v)
     return pd.DataFrame(rows, columns=JUDGMENT_COLS)
+
+
+LEVELS = ("L1", "L2", "L3")
+
+
+def _point(ref: pd.Series, p: pd.Series, level: pd.Series, score) -> dict:
+    """Every README phenotyping metric for one system against one reference, on ref's charts."""
+    p, level = p.reindex(ref.index), level.reindex(ref.index)
+    ok = (p == ref)                                  # no status is wrong, as in the README
+    s4 = ref == STAGE4
+    return {"exact_status": ok.mean(), **rr.yes_no(ref, p, score),
+            "stage4_caught": ok[s4].mean() if s4.any() else np.nan,
+            "unsafe_rate": unsafe_rates(ref, p)["unsafe_rate"],
+            **{f"exact_{lv}": ok[level == lv].mean() if (level == lv).any() else np.nan for lv in LEVELS}}
+
+
+def _judge_status(judgments: pd.DataFrame) -> pd.Series:
+    st = judgments[(judgments["kind"] == "status") & judgments["gate_ok"].astype(bool)]
+    return st.set_index("visit_id")["judge_status"].dropna()
+
+
+def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_boot: int = 1000,
+                  seed: int = 0) -> pd.DataFrame:
+    """One row per (system, metric): vs_truth (the README number, all 240 charts), vs_truth_judged and
+    vs_judge (the charts the judge gave a status for), difference = vs_judge - vs_truth_judged, and
+    n_judged. exact_status rows also carry judge-corrected accuracy among answered charts
+    (Rogan-Gladen from verdicts, judge calibrated on the same charts' truth) with a 95% range."""
+    truth, pred, level = rr.phenotype_predictions(inp)
+    js_ = _judge_status(judgments)
+    judged = truth.index.intersection(js_.index)
+    score = rr._shared_scorer()
+    vd = judgments[judgments["kind"] == "verdict"].copy()
+    vd["truly_correct"] = (vd["answer"].to_numpy() == truth.reindex(vd["visit_id"]).to_numpy())
+    vd["gate_ok"] = vd["gate_ok"].astype(bool)
+    by_pair = vd.set_index(["visit_id", "answer"])
+    rows = []
+    for s, p in pred.items():
+        t_all = _point(truth, p, level, score)
+        t_j = _point(truth.loc[judged], p, level, score)
+        j = _point(js_.loc[judged], p, level, score)
+        a = answers[(answers["system"] == s)].dropna(subset=["answer"])
+        sample = by_pair.reindex(pd.MultiIndex.from_frame(a[["visit_id", "answer"]]))[["verdict", "gate_ok"]]
+        ca = (corrected_accuracy(sample.reset_index(drop=True), vd.reset_index(drop=True), n_boot=n_boot, seed=seed)
+              if len(sample) else {"accuracy_est": np.nan, "ci_low": np.nan, "ci_high": np.nan})
+        for k in t_all:
+            rows.append({"system": s, "metric": k, "vs_truth": t_all[k], "vs_truth_judged": t_j[k],
+                         "vs_judge": j[k], "difference": j[k] - t_j[k], "n_judged": len(judged),
+                         **({"corrected_accuracy": ca["accuracy_est"], "ci_low": ca["ci_low"], "ci_high": ca["ci_high"]}
+                            if k == "exact_status" else {})})
+    return pd.DataFrame(rows, columns=["system", "metric", "vs_truth", "vs_truth_judged", "vs_judge", "difference",
+                                       "n_judged", "corrected_accuracy", "ci_low", "ci_high"])
+
+
+def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed: int = 0) -> pd.DataFrame:
+    """The judge's own status against the truth, overall and per truth status and note difficulty: n
+    charts, coverage (share it gave a status for), agreement where it did (95% bootstrap range), kappa."""
+    truth, _, level = rr.phenotype_predictions(inp)
+    js_ = _judge_status(judgments).reindex(truth.index)
+    rng = np.random.default_rng(seed)
+    groups = [("all", "all", truth.index == truth.index)]
+    groups += [("truth_status", v, (truth == v).to_numpy()) for v in sorted(truth.unique())]
+    groups += [("difficulty", v, (level == v).to_numpy()) for v in LEVELS]
+    rows = []
+    for g, v, mask in groups:
+        t, j = truth[mask], js_[mask]
+        has = j.notna()
+        ok = (j[has] == t[has]).to_numpy()
+        boot = [ok[rng.integers(0, len(ok), len(ok))].mean() for _ in range(n_boot)] if len(ok) else []
+        lo, hi = np.percentile(boot, [2.5, 97.5]) if boot else (np.nan, np.nan)
+        rows.append({"group": g, "value": v, "n": int(mask.sum()), "coverage": float(has.mean()),
+                     "agreement": float(ok.mean()) if len(ok) else np.nan, "ci_low": float(lo), "ci_high": float(hi),
+                     "kappa": cohen_kappa(t[has], j[has]) if len(ok) else np.nan})
+    return pd.DataFrame(rows)

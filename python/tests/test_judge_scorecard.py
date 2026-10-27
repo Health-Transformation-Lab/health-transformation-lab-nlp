@@ -186,3 +186,56 @@ def test_calls_that_failed_on_the_network_are_retried_on_resume(inp, answers):
 
     again = js.run_judge(q, Up(), endpoint="e", done=failed)
     assert not again["api_error"].any() and (again["prompt_tokens"] == 5).all()
+
+
+METRICS = ["exact_status", "sensitivity", "specificity", "ppv", "npv", "stage4_caught", "unsafe_rate",
+           "exact_L1", "exact_L2", "exact_L3"]
+
+
+def _perfect_judgments(inp, answers):
+    """A judge that always knows the truth: its status is the truth, its verdict is right."""
+    q = js.judge_queue(answers, inp["key"])
+    truth = inp["key"]["truth_status"]
+    t = truth.reindex(q["visit_id"]).to_numpy()
+    out = q[["visit_id", "kind", "answer"]].copy()
+    out["verdict"] = [None if k == "status" else ("correct" if a == x else "incorrect")
+                      for k, a, x in zip(q["kind"], q["answer"], t)]
+    out["judge_status"] = [x if k == "status" else None for k, x in zip(q["kind"], t)]
+    out["gate_ok"], out["api_error"] = True, False
+    return out
+
+
+def test_metrics_against_the_truth_are_the_readme_numbers(inp, answers):
+    truth, pred, level = rr.phenotype_predictions(inp)
+    m = js.judge_metrics(inp, answers, _perfect_judgments(inp, answers), n_boot=50).set_index(["system", "metric"])
+    assert set(m.index.get_level_values("metric")) == set(METRICS)
+    lad = rr.ladder_eval.ladder_table(truth, pred, n_boot=1, reference="").set_index("method")
+    for s in ("algorithm_v0", "modernbert-base+cw", "note_rules", "medgemma-1.5-4b-it"):
+        yn = rr.yes_no(truth, pred[s])
+        assert m.loc[(s, "exact_status"), "vs_truth"] == pytest.approx(lad.loc[s, "accuracy"], abs=1e-12)
+        assert m.loc[(s, "stage4_caught"), "vs_truth"] == pytest.approx(lad.loc[s, "stage4_recall"], abs=1e-12)
+        assert m.loc[(s, "unsafe_rate"), "vs_truth"] == pytest.approx(lad.loc[s, "unsafe_rate"], abs=1e-12)
+        for k in ("sensitivity", "specificity", "ppv", "npv"):
+            assert m.loc[(s, k), "vs_truth"] == pytest.approx(yn[k], abs=1e-12, nan_ok=True)
+        ok = pred[s] == truth
+        assert m.loc[(s, "exact_L3"), "vs_truth"] == pytest.approx(ok[level == "L3"].mean(), abs=1e-12)
+
+
+def test_a_judge_that_knows_the_truth_scores_every_system_exactly_as_the_truth(inp, answers):
+    m = js.judge_metrics(inp, answers, _perfect_judgments(inp, answers), n_boot=50)
+    both = m.dropna(subset=["vs_truth"])
+    assert (both["vs_judge"] - both["vs_truth"]).abs().max() < 1e-12
+    assert both["difference"].abs().max() < 1e-12 and (m["n_judged"] == 240).all()
+    ex = m[m.metric == "exact_status"].set_index("system")
+    answered = answers.dropna(subset=["answer"]).groupby("system").size()
+    right = answers.assign(ok=answers["answer"] == inp["key"]["truth_status"].reindex(answers["visit_id"]).to_numpy()
+                           ).groupby("system")["ok"].sum()
+    assert ex["corrected_accuracy"].to_numpy() == pytest.approx((right / answered).reindex(ex.index).to_numpy())
+    assert (ex["ci_low"] <= ex["corrected_accuracy"] + 1e-12).all() and (ex["corrected_accuracy"] <= ex["ci_high"] + 1e-12).all()
+
+
+def test_judge_agreement_with_the_truth(inp, answers):
+    a = js.judge_agreement(inp, _perfect_judgments(inp, answers), n_boot=50).set_index(["group", "value"])
+    assert a.loc[("all", "all"), "agreement"] == 1 and a.loc[("all", "all"), "kappa"] == 1
+    assert a.loc[("all", "all"), "coverage"] == 1 and a.loc[("all", "all"), "n"] == 240
+    assert {"truth_status", "difficulty"} <= set(a.index.get_level_values("group"))
