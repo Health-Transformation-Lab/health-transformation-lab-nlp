@@ -167,10 +167,9 @@ def derive_all(sites: pd.DataFrame, teeth: pd.DataFrame, key: str = "visit_id") 
         "max_furcation_class": p["furcation_class"].max(),
         "max_mobility_degree": p["mobility_degree"].max(),
     })
-    ints = [c for c in DERIVED if c.startswith("n_") or c.startswith("max_f") or c.startswith("max_m")
-            or c == "teeth_lost_perio"]
-    out[ints] = out[ints].fillna(0).astype(int)
     floats = ["max_probing_depth_mm", "max_cal_mm", "bop_pct", "pct_teeth_ip_cal1"]
+    ints = [c for c in DERIVED if c not in floats]
+    out[ints] = out[ints].fillna(0).astype(int)
     out[floats] = out[floats].fillna(0.0)
     out.index.name = key
     return out[DERIVED]
