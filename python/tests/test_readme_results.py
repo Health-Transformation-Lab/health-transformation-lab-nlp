@@ -143,7 +143,7 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
             for jargon in ("accuracy", "recall", "precision", "macro", "f1", "false alarm"):
                 assert jargon not in h.lower(), (jargon, h)
         ph, de = headers
-        for col in ("Correct", rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED, "Incorrect stage", "No answer"):
+        for col in ("Correct", rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED, "Incorrect stage", rr.COL_NO_ANSWER):
             assert col in ph, col
         assert "Incorrect diagnosis" not in ph
         for h in headers:
@@ -214,6 +214,7 @@ def test_every_system_and_tool_has_a_plain_name(inp):
 def test_periodontitis_column_names():
     assert rr.COL_ASSIGNED == "Periodontitis incorrectly assigned (when not present)"
     assert rr.COL_NOT_ASSIGNED == "Periodontitis incorrectly ruled out (when present)"
+    assert rr.COL_NO_ANSWER == "No answer (evidence not available)"
 
 
 def test_full_table_uses_the_same_two_column_names(md):
