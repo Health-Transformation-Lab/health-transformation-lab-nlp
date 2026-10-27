@@ -381,7 +381,8 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
            "charts against the generator's truth: models that read only the chart note, the rule phenotypes "
            "that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the "
            "method's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
-           "means it plausibly ranks anywhere from 1st to 3rd.", "",
+           "means it plausibly ranks anywhere from 1st to 3rd. How each part of the record is turned into a "
+           "status, with worked examples: [rules for each evidence type](evidence_rules.md).", "",
            "Numbers are per 100 charts. What the columns mean:", "",
            PHENOTYPE_KEY + "\n" + _bullets([
                ("Unsafe errors", "incorrect answers that could harm a patient if acted on, e.g. a missed stage 3–4."),
@@ -621,27 +622,35 @@ def results_markdown(inp: dict) -> str:
            "2. **Only the chart note** (where structured data is missing): the best trained AI, simple keyword rules, "
            "and a medical AI used as is",
            "3. **One part of the record by itself**", "",
+           ("How each part of the record (gum measurements, chart note, exam form, codes, X-ray) is turned into a "
+            "status: [rules for each evidence type](docs/evidence_rules.md)."), "",
            "What the columns mean:", "",
            _bullets(PHENOTYPE_TERMS[:2] + [
-               ("Specificity", f"of the {n_neg} charts without periodontitis, the share correctly called \"no\". "
-                               "Periodontitis incorrectly assigned is what lowers it.")]
+               ("Specificity", f"(in brackets) of the {n_neg} charts without periodontitis, the share correctly "
+                               "called \"no\". Periodontitis incorrectly assigned is what lowers it.")]
                + PHENOTYPE_TERMS[2:3] + [
-               ("Sensitivity", f"of the {n_charts - n_neg} charts with periodontitis, the share correctly called "
-                               "\"yes\". Periodontitis incorrectly ruled out lowers it, and so does no answer.")]
+               ("Sensitivity", f"(in brackets) of the {n_charts - n_neg} charts with periodontitis, the share "
+                               "correctly called \"yes\". Periodontitis incorrectly ruled out lowers it, and so does no "
+                               "answer.")]
                + PHENOTYPE_TERMS[3:] + [
                ("Rank", f"where it plausibly ranks among all {len(ph)} methods."),
                ("Stage 4 rule", "keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 "
                                 "notes to learn from).")]), "",
-           f"| Question | Method | Correct | {COL_ASSIGNED} | Specificity | {COL_NOT_ASSIGNED} | Sensitivity | "
-           f"Incorrect stage | {COL_NO_ANSWER} | Total charts | Rank |",
-           "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
+           f"Each row adds up to the {n_charts} charts: correct + periodontitis incorrectly assigned (out of the "
+           f"{n_neg} without it) + incorrectly ruled out (out of the {n_charts - n_neg} with it) + incorrect stage + "
+           "no answer.", "",
+           "| Question | Method | Correct | Periodontitis incorrectly assigned | Periodontitis incorrectly ruled out | "
+           "Incorrect stage | No answer | Rank |",
+           "|---|---|---:|---:|---:|---:|---:|---|"]
     last_q = None
     for q, s in readme_phenotype_rows(inp):
         r = ph.loc[s]
         c, yes, no, st, na = [round(n_charts * r[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage",
                                                                 "no_answer")]
-        out.append(f"| {q if q != last_q else ''} | {readme_label(s)} | {c} | {yes} | {_pct(r['specificity'])} | "
-                   f"{no} | {_pct(r['sensitivity'])} | {st} | {na} | {n_charts} | {r['rank']} |")
+        out.append(f"| {q if q != last_q else ''} | {readme_label(s)} | {c} of {n_charts} | "
+                   f"{yes} of {n_neg} (specificity {_pct(r['specificity'])}) | "
+                   f"{no} of {n_charts - n_neg} (sensitivity {_pct(r['sensitivity'])}) | {st} of {n_charts} | "
+                   f"{na} of {n_charts} | {r['rank']} |")
         last_q = q
     out += ["", f"All {len(ph)} methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, "
             f"and the {int(ph['n_missing'].iloc[0])} models not run yet: "

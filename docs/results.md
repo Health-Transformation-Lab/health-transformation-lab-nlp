@@ -6,7 +6,7 @@
 
 ### Phenotyping: periodontal status per chart
 
-Every method that assigns one of the six periodontal statuses, on the same 240 synthetic review charts against the generator's truth: models that read only the chart note, the rule phenotypes that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the method's rank by exact status, over the same chart resamples as its CI (paired bootstrap): "1–3" means it plausibly ranks anywhere from 1st to 3rd.
+Every method that assigns one of the six periodontal statuses, on the same 240 synthetic review charts against the generator's truth: models that read only the chart note, the rule phenotypes that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the method's rank by exact status, over the same chart resamples as its CI (paired bootstrap): "1–3" means it plausibly ranks anywhere from 1st to 3rd. How each part of the record is turned into a status, with worked examples: [rules for each evidence type](evidence_rules.md).
 
 Numbers are per 100 charts. What the columns mean:
 
