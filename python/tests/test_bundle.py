@@ -247,6 +247,18 @@ GPU_ENCODERS = {"modernbert-large", "bioclinical-modernbert-large", "longformer-
                 "gatortron-base"}
 
 
+def test_every_serverless_gpu_task_names_a_job_environment():
+    """The Jobs API rejects a task with task-level `compute` unless it names an environment
+    ("An environment is required for serverless task ... when `compute` is set on task level")."""
+    _, jobs = _load()
+    for name, (j, _) in jobs.items():
+        envs = {e["environment_key"]: e for e in j.get("environments", [])}
+        for t in j["tasks"]:
+            if "compute" in t:
+                assert t.get("environment_key") in envs, (name, t["task_key"])
+                assert envs[t["environment_key"]]["spec"].get("environment_version"), name
+
+
 def test_encoder_gpu_job_runs_the_gpu_encoders():
     """spec 002 T017: the encoders that need a GPU, and GatorTron-base at a lower learning rate."""
     root, jobs = _load()
