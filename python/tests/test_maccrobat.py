@@ -148,3 +148,24 @@ def test_load_brat_folder_keeps_windows_line_endings_so_offsets_hold(tmp_path):
     (tmp_path / "1.ann").write_bytes(b"T1\tDate 9 18\tJune 2014\n")
     [r] = maccrobat.load_brat(tmp_path)
     assert [s["text"] for s in r["phi"]] == ["June 2014"]
+
+
+def test_routes_from_table_keeps_only_precise_types():
+    import pandas as pd
+    from dental_omop_nlp import deid_eval
+    table = pd.DataFrame({"engine": ["a", "a", "b", "c"], "type": ["DATE", "NAME", "ID", "AGE"],
+                          "chars": [10, 10, 10, 10], "precision": [1.0, 0.5, 0.9, 0.1],
+                          "kept": [True, False, True, False]})
+    assert deid_eval.routes_from_table(table) == {"a": {"DATE"}, "b": {"ID"}}
+
+
+def test_maccrobat_runs_every_method_scored_on_the_synthetic_notes():
+    """Its engine list once lagged the synthetic benchmark's, leaving the two best methods unscored."""
+    import ast
+    import pandas as pd
+    from dental_omop_nlp.paths import DEID_DIR, REPO_ROOT
+    src = (REPO_ROOT / "python" / "scripts" / "32_maccrobat_deid.py").read_text()
+    default = next(ast.literal_eval(n.value) for n in ast.walk(ast.parse(src))
+                   if isinstance(n, ast.Assign) and getattr(n.targets[0], "id", "") == "DEFAULT")
+    scored = set(pd.read_csv(DEID_DIR / "scores.csv").query("tier == 'all'")["method"])
+    assert scored <= set(default), scored - set(default)

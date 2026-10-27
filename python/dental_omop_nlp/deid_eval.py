@@ -121,6 +121,13 @@ def choose_routes(records: list[dict], engines: dict, min_precision: float = 0.8
     return {e: t for e, t in routes.items() if t}, table.sort_values(["engine", "type"]).reset_index(drop=True)
 
 
+def routes_from_table(table: pd.DataFrame) -> dict:
+    """The routes choose_routes picked, read back from its table (data/deid/routes.csv), so another test
+    set is scored with the routes chosen on the challenge set's training tiers."""
+    kept = table[table["kept"].astype(bool)]
+    return {e: set(g["type"]) for e, g in kept.groupby("engine")}
+
+
 def measure_throughput(records: list[dict], detect, min_seconds: float = 0.5) -> float:
     """Notes per second on this machine (local engines)."""
     n, t0 = 0, time.perf_counter()
