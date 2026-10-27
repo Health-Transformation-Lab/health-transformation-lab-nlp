@@ -274,3 +274,15 @@ def test_every_model_that_can_be_scored_has_a_plain_name():
         if m["role"] in ("classifier", "long_context", "llm"):
             assert "_" not in rr.plain_system(m["id"]) and rr.plain_system(m["id"] + "+lr2e-05"), m["id"]
     assert "learning rate" in rr._model_method("gatortron-base+lr2e-05")
+
+
+def test_job_and_dashboard_names_are_short_and_the_same_in_every_target():
+    """Readable on a phone; no per-target suffix (CLAUDE.md: names identical in every target)."""
+    root, jobs = _load()
+    names = [j["name"] for j, _ in jobs.values()]
+    names += [j["name"] for t in root["targets"].values() for j in t.get("resources", {}).get("jobs", {}).values()]
+    for f in (ROOT / "databricks" / "resources").glob("*.yml"):
+        names += [d["display_name"] for d in (yaml.safe_load(f.read_text())["resources"].get("dashboards") or {}).values()]
+    assert len(names) >= 8
+    for n in names:
+        assert len(n) <= 20 and "${bundle.target}" not in n and "dental-omop-nlp" not in n, n

@@ -65,7 +65,7 @@ Numbers are per 100 charts. What the columns mean:
 
 #### LLM judge: every system against an LLM's reading
 
-Could an LLM stand in for the answer key on real notes? A general-purpose LLM (`databricks-meta-llama-3-3-70b-instruct`; prompts `judge-status-v1`, `judge-v2`) read each of the 240 synthetic notes and did two things: gave its own status for the chart, and said whether each method's answer was right. Both are compared with the truth below (**LLM judgment**; every number is computed in code, not by the LLM). In Databricks: the *dental-omop-nlp scorecard* dashboard.
+Could an LLM stand in for the answer key on real notes? A general-purpose LLM (`databricks-meta-llama-3-3-70b-instruct`; prompts `judge-status-v1`, `judge-v2`) read each of the 240 synthetic notes and did two things: gave its own status for the chart, and said whether each method's answer was right. Both are compared with the truth below (**LLM judgment**; every number is computed in code, not by the LLM). In Databricks: the *Scorecard* dashboard.
 
 **How often the LLM's status matches the truth**
 

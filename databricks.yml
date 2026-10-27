@@ -122,7 +122,7 @@ targets:
     resources:
       jobs:
         judge_monitoring: &judge_monitoring_job
-          name: dental-omop-nlp LLM judge monitoring (${bundle.target})
+          name: Judge monitoring
           tags:
             project: dental-omop-nlp
             data: synthetic

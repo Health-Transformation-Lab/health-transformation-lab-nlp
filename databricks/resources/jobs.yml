@@ -5,7 +5,7 @@
 resources:
   jobs:
     study_benchmark:
-      name: dental-omop-nlp study + benchmark (${bundle.target})
+      name: Benchmark
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -23,7 +23,7 @@ resources:
               experiment_id: ${resources.experiments.dental_experiment.id}
 
     load_lakebase:
-      name: dental-omop-nlp load OMOP into Lakebase (${bundle.target})
+      name: Load Lakebase
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -38,7 +38,7 @@ resources:
               secret_scope: ${var.hf_secret_scope}
 
     judge_scorecard:
-      name: dental-omop-nlp judge scorecard (${bundle.target})
+      name: Judge scorecard
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -56,7 +56,7 @@ resources:
               max_usd: "5"
 
     llm_judge:
-      name: dental-omop-nlp LLM judge via ai_query (${bundle.target})
+      name: LLM judge
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -73,7 +73,7 @@ resources:
     # GPU jobs on serverless GPU (Free Edition has it; one A10 by default, var.gpu_accelerator).
     # Run on demand: no schedule.
     medgemma_reader:
-      name: dental-omop-nlp medgemma reader (${bundle.target})
+      name: MedGemma reader
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -92,7 +92,7 @@ resources:
               hf_secret_scope: ${var.hf_secret_scope}
 
     encoder_gpu:
-      name: dental-omop-nlp encoders on GPU (${bundle.target})
+      name: Encoders on GPU
       tags:
         project: dental-omop-nlp
         data: synthetic

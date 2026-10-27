@@ -385,7 +385,7 @@ def test_readme_points_to_the_judge_scorecard_and_dashboard():
     """Spec 012 US4: one line in the README, a judge section in docs/results.md (real runs only)."""
     inp = rr.load_inputs()
     md = rr.results_markdown(inp)
-    assert "dental-omop-nlp scorecard" in md and f"docs/results.md#{rr.anchor(rr.JUDGE_TITLE)}" in md
+    assert f"*{rr.DASHBOARD}*" in md or rr.DASHBOARD in md and f"docs/results.md#{rr.anchor(rr.JUDGE_TITLE)}" in md
     assert "LLM judgment" in md
     details = rr.details_markdown(inp)
     assert rr.JUDGE_TITLE in details
