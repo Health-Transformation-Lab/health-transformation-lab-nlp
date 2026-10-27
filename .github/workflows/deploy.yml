@@ -73,6 +73,13 @@ jobs:
       - name: Migrate Terraform state to the direct engine (once)
         if: env.DATABRICKS_CLIENT_SECRET != ''
         run: databricks bundle deployment migrate -t "$TARGET" --noplancheck || echo "migrate did not run (see above); the deploy below uses the direct engine either way"
+      # A workspace with Default Storage can't create a catalog through the API the bundle uses, so
+      # dental_omop is made once with SQL CREATE CATALOG (docs/deployment.md); adopt it into the bundle.
+      # Already bound, or not made by hand: this fails harmlessly and the deploy below decides.
+      - name: Adopt the dental_omop catalog if it was made by hand (once)
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
+        run: databricks bundle deployment bind dental_omop dental_omop -t "$TARGET" --auto-approve || echo "bind did not run (see above); the deploy below decides"
       - name: Deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}

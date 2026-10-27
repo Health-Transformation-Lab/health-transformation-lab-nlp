@@ -47,6 +47,16 @@ The dev target keeps schedules paused with `presets.trigger_pause_status`.
 Resources an earlier development-mode deploy created under `dev_` names are not
 removed by this; drop them by hand once nothing uses them.
 
+**Workspaces with Default Storage** (no metastore storage root) can't create a catalog through the
+API the bundle uses ("Metastore storage root URL does not exist"). Create it once with SQL, as a
+workspace admin, owned by the target's admin group; the deploy workflow then adopts it
+(`bundle deployment bind`) and manages its schemas, volume and grants:
+
+```sql
+CREATE CATALOG IF NOT EXISTS dental_omop COMMENT 'Dental OMOP. Synthetic data only.';
+ALTER CATALOG dental_omop OWNER TO `dental_omop_nlp_dev_admin`;
+```
+
 If a catalog, schema or volume already exists in a workspace (made by hand, or
 deployed by someone else's copy of the bundle), deploy fails rather than take it
 over. Adopt it once with, e.g.,

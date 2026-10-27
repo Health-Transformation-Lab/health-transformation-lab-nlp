@@ -133,3 +133,14 @@ def test_deploy_uses_the_direct_engine_and_migrates_terraform_state_once():
     for i, s in enumerate(steps):
         if "bundle validate" in s.get("run", "") or "bundle deploy " in s.get("run", "") or "bundle run" in s.get("run", ""):
             assert s.get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct", names[i]
+
+
+def test_deploy_adopts_a_catalog_made_by_hand_before_deploying():
+    """Default Storage workspaces can't create a catalog through the API the bundle uses, so it's made
+    with SQL CREATE CATALOG (docs/deployment.md) and the deploy binds it, once, with the direct engine."""
+    doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
+    steps = doc["jobs"]["deploy"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    bind = next(i for i, s in enumerate(steps) if "bundle deployment bind dental_omop dental_omop" in s.get("run", ""))
+    assert bind < names.index("Deploy") and "--auto-approve" in steps[bind]["run"]
+    assert steps[bind].get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct"
