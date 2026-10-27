@@ -75,7 +75,9 @@ _PLAIN = {"algorithm_v0": "Gum measurements first", "algorithm_design": "Exam fo
           "radiograph_ai": "X-ray AI reading", "note_rules": "Keyword rules", "tfidf_logreg": "Word counts",
           "fusion_tfidf_rad": "Word counts + X-ray reading", "bert-base": "BERT", "distilbert-base": "DistilBERT",
           "modernbert-base": "ModernBERT", "bio-clinicalbert": "Bio ClinicalBERT", "biomedbert": "BiomedBERT",
-          "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT"}
+          "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT",
+          "modernbert-large": "ModernBERT large", "bioclinical-modernbert-large": "BioClinical ModernBERT large",
+          "longformer-base": "Longformer", "clinical-longformer": "Clinical-Longformer", "gatortron-base": "GatorTron"}
 _PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Presidio", "regex_v2": "patterns",
                "regex": "patterns (first version)", "guard": "dental-word guard", "routed": "routed by identifier type"}
 
@@ -334,7 +336,8 @@ def _model_method(method: str) -> str:
          "TF-IDF + radiograph features" if b == "fusion_tfidf_rad" else
          "zero-shot LLM" if b.startswith("medgemma") else "fine-tuned encoder")
     mods = {"cw": "class-weighted", "s1": "seed 1", "s2": "seed 2", "rules4": "+ rules for stage IV"}
-    return ", ".join([s, *[mods[m] for m in method.split("+")[1:] if m in mods]])
+    extra = [mods.get(m) or (f"learning rate {m[2:]}" if m.startswith("lr") else None) for m in method.split("+")[1:]]
+    return ", ".join([s, *[e for e in extra if e]])
 
 
 def phenotype_systems(inp) -> dict:

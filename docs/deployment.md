@@ -96,6 +96,7 @@ Override any variable with `--var name=value`, or the environment variable
 | `llm_judge` | `02_llm_judge.sql`: judge with `ai_query` | SQL warehouse |
 | `load_lakebase` | `04_load_lakebase.py`: OMOP CDM 5.4 + dental extension into Lakebase (Postgres) | serverless |
 | `medgemma_reader` (uat/prod) | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | single-node GPU |
+| `encoder_gpu` (uat/prod) | `08_encoder_gpu.py`: fine-tunes the encoders that need a GPU (large ModernBERTs, Longformers, GatorTron-base at a lower learning rate; spec 002 T017); predictions to the landing volume and `encoder_gpu_predictions` | single-node GPU |
 
 ## Run in dev from your laptop
 

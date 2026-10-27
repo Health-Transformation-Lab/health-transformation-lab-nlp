@@ -70,6 +70,12 @@ variables:
   lakebase_schema:
     description: Schema for the OMOP CDM + dental extension in Lakebase
     default: cdm_dev
+  encoder_gpu_rungs:
+    description: Encoders the GPU job fine-tunes (spec 002 T017)
+    default: modernbert-large,bioclinical-modernbert-large,longformer-base,clinical-longformer,gatortron-base
+  encoder_gpu_lr:
+    description: Learning-rate overrides for the GPU job, rung=rate (GatorTron-base diverged at 5e-5 on CPU)
+    default: gatortron-base=2e-5
   gpu_node_type:
     description: GPU node type for the MedGemma job (uat/prod only)
     default: g5.2xlarge
@@ -157,6 +163,34 @@ targets:
                   limit: ${var.reader_limit}
                   shots: "0"
                   hf_secret_scope: ${var.hf_secret_scope}
+        encoder_gpu: &encoder_gpu_job
+          name: dental-omop-nlp encoders on GPU (${bundle.target})
+          tags:
+            project: dental-omop-nlp
+            data: synthetic
+          job_clusters:
+            - job_cluster_key: gpu
+              new_cluster:
+                spark_version: ${var.gpu_spark_version}
+                node_type_id: ${var.gpu_node_type}
+                num_workers: 0
+                spark_conf:
+                  spark.databricks.cluster.profile: singleNode
+                  spark.master: local[*]
+                custom_tags:
+                  ResourceClass: SingleNode
+                  project: dental-omop-nlp
+          tasks:
+            - task_key: fine_tune_and_predict
+              job_cluster_key: gpu
+              notebook_task:
+                notebook_path: databricks/notebooks/08_encoder_gpu.py
+                base_parameters:
+                  rungs: ${var.encoder_gpu_rungs}
+                  lr_overrides: ${var.encoder_gpu_lr}
+                  catalog: ${resources.schemas.gold.catalog_name}
+                  schema: ${resources.schemas.gold.name}
+                  landing_schema: ${resources.volumes.data.schema_name}
 
   # Production. Manual deploy from a tagged commit, approval required in CI.
   prod:
@@ -178,3 +212,4 @@ targets:
       jobs:
         judge_monitoring: *judge_monitoring_job
         medgemma_reader: *medgemma_job
+        encoder_gpu: *encoder_gpu_job

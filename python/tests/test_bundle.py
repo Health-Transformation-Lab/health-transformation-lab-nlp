@@ -233,3 +233,42 @@ def test_dev_catalog_states_its_default_storage_root():
     assert dev["storage_root"].startswith("s3://") and "/uc/" in dev["storage_root"]
     for env in ("uat", "prod"):
         assert "catalogs" not in root["targets"][env].get("resources", {})
+
+
+GPU_ENCODERS = {"modernbert-large", "bioclinical-modernbert-large", "longformer-base", "clinical-longformer",
+                "gatortron-base"}
+
+
+def test_encoder_gpu_job_runs_the_gpu_encoders_in_uat_and_prod_only():
+    """spec 002 T017: the encoders that need a GPU, and GatorTron-base at a lower learning rate."""
+    root, jobs = _load()
+    assert "encoder_gpu" not in jobs and "encoder_gpu" not in root["targets"]["dev"].get("resources", {}).get("jobs", {})
+    for env in ("uat", "prod"):
+        j = root["targets"][env]["resources"]["jobs"]["encoder_gpu"]
+        cluster = j["job_clusters"][0]["new_cluster"]
+        assert cluster["node_type_id"] == "${var.gpu_node_type}" and "gpu" in root["variables"]["gpu_spark_version"]["default"]
+        t = j["tasks"][0]
+        assert t["job_cluster_key"] == j["job_clusters"][0]["job_cluster_key"]
+        p = t["notebook_task"]["base_parameters"]
+        assert p["rungs"] == "${var.encoder_gpu_rungs}" and p["lr_overrides"] == "${var.encoder_gpu_lr}"
+        assert p["landing_schema"] == "${resources.volumes.data.schema_name}"
+    assert set(root["variables"]["encoder_gpu_rungs"]["default"].split(",")) == GPU_ENCODERS
+    lr = dict(x.split("=") for x in root["variables"]["encoder_gpu_lr"]["default"].split(","))
+    assert set(lr) == {"gatortron-base"} and 1e-5 <= float(lr["gatortron-base"]) <= 2e-5
+
+
+def test_encoder_gpu_notebook_runs_the_script_and_keeps_the_predictions():
+    nb = (ROOT / "databricks/notebooks/08_encoder_gpu.py").read_text()
+    assert "scripts/11_ai_predict.py" in nb and "--lr" in nb
+    assert "/Volumes/" in nb and "encoder_gpu" in nb          # predictions copied to the landing volume
+    assert "saveAsTable" in nb                                # and kept as a table
+
+
+def test_every_model_that_can_be_scored_has_a_plain_name():
+    import yaml
+    from dental_omop_nlp import readme_results as rr
+    reg = yaml.safe_load((ROOT / "models.yaml").read_text())
+    for m in reg["models"]:
+        if m["role"] in ("classifier", "long_context", "llm"):
+            assert "_" not in rr.plain_system(m["id"]) and rr.plain_system(m["id"] + "+lr2e-05"), m["id"]
+    assert "learning rate" in rr._model_method("gatortron-base+lr2e-05")

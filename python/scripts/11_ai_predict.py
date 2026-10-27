@@ -6,6 +6,7 @@ The AI model reads ONLY the de-identified note. Reviewers see every evidence typ
     python scripts/11_ai_predict.py --rung distilbert-base --epochs 2 --max-len 256
     python scripts/11_ai_predict.py --rung bioclinical-modernbert-base --label stated_status
     python scripts/11_ai_predict.py --rung modernbert-base --class-weight sqrt --seed 1   # -> ..._modernbert-base+cw+s1.csv
+    python scripts/11_ai_predict.py --rung gatortron-base --lr 2e-5                        # -> ..._gatortron-base+lr2e-05.csv
 
 LLM note readers (MedGemma, spec 004):
 
@@ -41,6 +42,7 @@ ap.add_argument("--max-len", type=int, default=256)
 ap.add_argument("--class-weight", choices=["sqrt"], default=None,
                 help="encoders: weight the loss by inverse class frequency (square root); output tagged +cw")
 ap.add_argument("--seed", type=int, default=42, help="encoders: training seed; a non-default seed tags the output +s<seed>")
+ap.add_argument("--lr", type=float, default=5e-5, help="encoders: learning rate; a non-default rate tags the output +lr<rate>")
 llm = ap.add_argument_group("LLM readers")
 llm.add_argument("--backend", choices=["hf", "openai", "simulated"], default="hf")
 llm.add_argument("--shots", type=int, default=0, help="few-shot examples per status from train.csv")
@@ -75,7 +77,7 @@ if is_llm:
 elif a.rung in ("rules_baseline", "note_rules", "tfidf_logreg", "fusion_tfidf_rad"):
     kw = {}
 else:
-    kw = {"epochs": a.epochs, "max_len": a.max_len, "class_weight": a.class_weight, "seed": a.seed}
+    kw = {"epochs": a.epochs, "max_len": a.max_len, "class_weight": a.class_weight, "seed": a.seed, "lr": a.lr}
 
 model = make_rung(a.rung, reg, **kw).fit(train)
 pred, proba = model.predict(review)
@@ -84,7 +86,7 @@ if proba is not None:
     for i, lab in enumerate(LABELS):
         out[f"p_{lab}"] = proba[:, i]
 tag = (output_tag(adapter=a.adapter, shots=a.shots, variant=a.variant) if is_llm
-       else output_tag(class_weight=a.class_weight, seed=a.seed))
+       else output_tag(class_weight=a.class_weight, seed=a.seed, lr=a.lr))
 path = DATASETS_DIR / f"{prefix}ai_predictions_{a.rung}{tag}.csv"
 out.to_csv(path, index=False)
 print(f"wrote {path} ({len(out)} visits)")

@@ -44,3 +44,10 @@ def test_gated_model_accepts_a_cached_cli_login(monkeypatch, tmp_path):
     (tmp_path / "token").write_text("cached")                   # what `huggingface-cli login` writes
     entry = {"hf": "google/medgemma-1.5-4b-it", "gated": True}
     assert llm_reader.make_backend(entry, "hf").hf_id == "google/medgemma-1.5-4b-it"
+
+
+def test_output_tag_marks_a_non_default_learning_rate():
+    from dental_omop_nlp.rungs import output_tag
+    assert output_tag(lr=5e-5) == ""
+    assert output_tag(lr=2e-5) == "+lr2e-05"
+    assert output_tag(class_weight="sqrt", seed=1, lr=1e-5) == "+cw+s1+lr1e-05"
