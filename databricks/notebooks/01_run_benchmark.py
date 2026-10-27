@@ -22,7 +22,7 @@
 
 # COMMAND ----------
 
-dbutils.widgets.dropdown("run_encoder", "true", ["true", "false"])
+dbutils.widgets.dropdown("run_encoder", "false", ["true", "false"])   # uat/prod jobs set "true" (databricks.yml)
 
 # COMMAND ----------
 
@@ -126,7 +126,8 @@ results = [run(r) for r in ["rules_baseline", "structured_baseline", "tfidf_logr
 
 # COMMAND ----------
 
-# One encoder rung. CPU, so keep it small: ~600 notes x 2 epochs x 192 tokens is a few minutes.
+# One encoder rung, small for CPU (~600 notes x 2 epochs x 192 tokens). On serverless CPU this took
+# over 16 minutes, so the bundle turns it off in dev and on in uat and prod.
 if run_encoder:
     results.append(run("distilbert-base", epochs=2, max_len=192, batch_size=16))
 

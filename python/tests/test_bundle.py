@@ -115,6 +115,13 @@ def test_study_benchmark_passes_experiment_id_not_name():
     assert "experiment" not in params
 
 
+def test_encoder_is_off_when_the_notebook_runs_by_hand():
+    """DistilBERT on serverless CPU took over 16 minutes in dev; the baselines take about 3.
+    Per-target settings: test_encoder_rung_off_in_dev_on_in_uat_and_prod."""
+    nb = (ROOT / "databricks/notebooks/01_run_benchmark.py").read_text()
+    assert 'dbutils.widgets.dropdown("run_encoder", "false"' in nb
+
+
 def test_judge_monitoring_job_only_in_uat_and_prod():
     """Production monitoring scores live traces, so it exists where there is live traffic."""
     root, jobs = _load()

@@ -19,6 +19,7 @@ variables.
 | Workspace | your dev workspace | the UAT workspace | the prod workspace |
 | Catalog | `dental_omop` (schemas below) | same | same |
 | `n_people` | 300 | 1,500 | 1,500 |
+| DistilBERT in the benchmark job (`run_encoder`) | no (baselines only, ~3 min; no torch install) | yes | yes |
 | MedGemma GPU job | no (run notebook 03 on serverless GPU) | yes, single-node GPU cluster | yes, all review notes |
 
 Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
@@ -58,6 +59,7 @@ over. Adopt it once with, e.g.,
 |---|---|---|
 | `catalog`, `domain` | `dental_omop`, `dental_omop_perio` | the catalog, and the suffix of the `landing_`/`bronze_`/`silver_`/`gold_` schemas |
 | `n_people` | `300` | synthetic people in the benchmark job |
+| `run_encoder` | `false` (uat/prod `true`) | install CPU-only torch and train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
@@ -149,6 +151,8 @@ its own workspace: names are the same in all three, so they can't share one.
    Lakebase instance; the script doesn't set that up.
 
 Until those secrets exist, the workflows skip the Databricks steps and still run the tests.
+Every workflow signs in through `.github/actions/databricks-signin`, which strips spaces and
+Windows line endings from the three values first, so a pasted `\r\n` can't break sign-in.
 
 ## Checked here, and not
 

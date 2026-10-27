@@ -17,10 +17,12 @@ jobs:
   whoami:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.target }}
-    env:
-      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
-      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
-      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
     steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/databricks-signin
+        with:
+          host: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
+          client_id: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
+          client_secret: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
       - uses: databricks/setup-cli@v0.297.2
       - run: databricks current-user me

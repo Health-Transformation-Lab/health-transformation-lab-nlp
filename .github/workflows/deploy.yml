@@ -34,16 +34,18 @@ jobs:
     environment: ${{ github.event.inputs.target || 'uat' }}
     env:
       TARGET: ${{ github.event.inputs.target || 'uat' }}
-      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
-      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
-      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
       BUNDLE_VAR_service_principal: ${{ vars.SERVICE_PRINCIPAL }}
       BUNDLE_VAR_judge_endpoint: ${{ vars.JUDGE_ENDPOINT || 'none' }}
       BUNDLE_VAR_warehouse_name: ${{ vars.WAREHOUSE_NAME || 'Serverless Starter Warehouse' }}
       BUNDLE_VAR_gpu_node_type: ${{ vars.GPU_NODE_TYPE || 'g5.2xlarge' }}
       BUNDLE_VAR_users_group: ${{ vars.USERS_GROUP || 'users' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/databricks-signin
+        with:
+          host: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
+          client_id: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
+          client_secret: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
       - name: Stop if this environment isn't configured
         if: env.DATABRICKS_CLIENT_SECRET == ''
         run: echo "No service principal sign-in (DATABRICKS_CLIENT_SECRET) for $TARGET; skipping." && exit 0
