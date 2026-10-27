@@ -55,11 +55,13 @@ jobs:
       - run: Rscript r/tests/test_parity.R
 
   azure-infra:
-    # Compile the telemetry Bicep (spec 014); the runner's Azure CLI fetches Bicep itself.
+    # Check the telemetry Terraform (spec 014): formatting, then validate without a backend or Azure sign-in.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - run: az bicep build --file infra/azure/main.bicep --stdout > /dev/null
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=infra/azure fmt -check -recursive
+      - run: terraform -chdir=infra/azure init -backend=false && terraform -chdir=infra/azure validate
 
   bundle:
     # Validate needs a workspace; runs only once dev has the service principal's secret.

@@ -12,7 +12,7 @@ One switch, `DENTAL_TELEMETRY`, picks where traces, metrics and logs go:
     memory   in-process, for tests
 
 Cost guards for the Azure free allowance (5 GB/month per billing account): the workspace daily cap
-in infra/azure/main.bicep, `DENTAL_TELEMETRY_SAMPLING` (default 1.0: a batch run is a few hundred
+in infra/azure/main.tf (Terraform), `DENTAL_TELEMETRY_SAMPLING` (default 1.0: a batch run is a few hundred
 spans, and a sampled-away failure is the one you needed), and only INFO and above from the package
 logger. Telemetry never carries note text or row-level data: step names, counts, durations, rates
 and error types only.

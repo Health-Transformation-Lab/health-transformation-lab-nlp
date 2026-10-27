@@ -258,3 +258,10 @@ mlruns/
 # Encoder fine-tuning output and checkpoints (rungs.HFEncoder)
 python/runs/
 
+
+# Terraform: providers, and state (it holds the Application Insights connection string)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
