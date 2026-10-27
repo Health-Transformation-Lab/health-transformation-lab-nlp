@@ -154,20 +154,55 @@ def yes_no(truth: pd.Series, pred: pd.Series, score=None) -> dict:
     return {k: m[k] for k in ("sensitivity", "specificity", "ppv", "npv")}
 
 
-PHENOTYPE_KEY = ("**Exact status right**: the share of charts given the right one of six statuses (healthy, "
-                 "gingivitis, stage I–IV); no status counts as wrong. The next four ask the yes/no question *does "
-                 "this patient have periodontitis?*: **Sensitivity**, of the patients who have it, the share flagged "
-                 "(the rest are *missed cases*); **Specificity**, of those who don't, the share correctly cleared "
-                 "(the rest are *false alarms*); **PPV**, when it says yes, how often that's right; **NPV**, when "
-                 "it says no, how often that's right. No status counts as \"no\".")
-DEID_KEY = ("**Identifiers caught**: the share of names, dates and IDs removed; the rest are *missed* and leak "
-            "(one character left counts). **Removals that were identifiers**: of everything removed, the share "
-            "that really was an identifier; the rest is ordinary text removed by mistake, the *false alarms*. "
-            "The damage columns count the same false alarms on dental terms, clinical text and clean queries.")
+def breakdown(truth: pd.Series, pred: pd.Series) -> dict:
+    """Share of charts in each box (they add to 1): correct; incorrect diagnosis, i.e. wrong about
+    periodontitis yes/no, split by what the system said; incorrect stage (right about periodontitis,
+    wrong status otherwise: stage, or healthy vs gingivitis); no answer."""
+    answered = pred.notna()
+    perio_t = truth.str.startswith("periodontitis")
+    perio_p = pred.fillna("").str.startswith("periodontitis")
+    right = answered & (pred == truth)
+    said_no = answered & perio_t & ~perio_p
+    said_yes = answered & ~perio_t & perio_p
+    return {"correct": right.mean(), "dx_said_no": said_no.mean(), "dx_said_yes": said_yes.mean(),
+            "stage": (answered & ~right & ~said_no & ~said_yes).mean(), "no_answer": (~answered).mean()}
+
+
+def out_of_100(shares) -> list[int]:
+    """Whole numbers out of 100 that add to 100 (largest remainder)."""
+    raw = [100 * x for x in shares]
+    out = [math.floor(x) for x in raw]
+    for i in sorted(range(len(raw)), key=lambda i: raw[i] - out[i], reverse=True)[:100 - sum(out)]:
+        out[i] += 1
+    return out
+
+
+COL_ASSIGNED = "Periodontitis incorrectly assigned (when not present)"
+COL_NOT_ASSIGNED = "Periodontitis incorrectly ruled out (when present)"
+PHENOTYPE_KEY = ("Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage "
+                 "1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. "
+                 "**Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect "
+                 "stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or "
+                 "healthy and gingivitis mixed up. **No answer**: the system gave no status.")
+COL_LEAKED = "Text that is sensitive (PHI) incorrectly leaked"
+COL_SCRUBBED = "Text that is not sensitive incorrectly scrubbed"
+DEID_KEY = ("Out of 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the tool should "
+            "have removed but left in (one character left counts). **Text that is not sensitive incorrectly "
+            "scrubbed**: dental words that look like a name "
+            "or code (Glickman, Gracey 11/12, 6-5-6) that the tool removed.")
 
 
 def _pct(x, d=0) -> str:
     return "–" if pd.isna(x) else f"{x:.{d}%}"
+
+
+def _n(x, d=1) -> str:
+    """A share as a number out of 100."""
+    return "–" if pd.isna(x) else f"{100 * x:.{d}f}"
+
+
+def _ci100(x, lo, hi, d=1) -> str:
+    return f"**{100 * x:.{d}f}** ({100 * lo:.{d}f}–{100 * hi:.{d}f})"
 
 
 def _ci(x, lo, hi, d=1) -> str:
@@ -212,6 +247,7 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
     ranks = paired_rank_range({s: (pred[s] == truth).to_numpy() for s in systems})
     score = _shared_scorer()
     yn = {s: yes_no(truth, pred[s], score) for s in systems}
+    bd = {s: breakdown(truth, pred[s]) for s in systems}
     links = {m["id"]: f"https://huggingface.co/{m['hf']}" for m in reg["models"] if m.get("hf")}
     out = [PHENOTYPE_TITLE, "",
            "Every system that assigns one of the six periodontal statuses, on the same 240 synthetic review "
@@ -219,23 +255,28 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
            "that combine the whole record, and each evidence type alone. **Rank** is the 95% range of the "
            "system's rank by exact status, over the same chart resamples as its CI (paired bootstrap): \"1–3\" "
            "means it plausibly ranks anywhere from 1st to 3rd.", "",
-           PHENOTYPE_KEY + " *Coverage*: share of charts it gives a status for. *Stage IV caught*: share of "
-           "stage IV patients called stage IV. *Unsafe errors*: mistakes that could harm a patient if acted on, "
-           "e.g. a missed stage III–IV. Easy / medium / hard: exact status right when the note states the 2017 "
-           "diagnosis (L1), states it in older terms (L2), or leaves it to be inferred from the findings (L3).", "",
-           "| Rank | System | Input | Method | Exact status right (95% CI) | Sensitivity | Specificity | PPV | NPV | "
-           "Coverage | Stage IV caught | Unsafe errors | Easy / medium / hard |",
-           "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|"]
+           PHENOTYPE_KEY + " *Unsafe errors*: incorrect answers that could harm a patient "
+           "if acted on, e.g. a missed stage 3–4. *Stage 4 correct*: of the stage 4 patients, how many it called "
+           "stage 4. Easy / medium / hard: correct, out of 100, when the note states the 2017 diagnosis (L1), "
+           "states it in older terms (L2), or leaves it to be inferred from the findings (L3). For statisticians: "
+           "sensitivity, specificity, PPV and NPV for periodontitis yes/no, with no answer counted as no.", "",
+           f"| Rank | System | Input | Method | Correct (95% CI) | {COL_ASSIGNED} | "
+           f"{COL_NOT_ASSIGNED} | Incorrect stage | No answer | Unsafe errors | Sensitivity | Specificity | "
+           "PPV | NPV | Stage 4 correct | Easy / medium / hard |",
+           "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     tab = tab.sort_values("accuracy", ascending=False, kind="stable")
     for s, r in tab.iterrows():
         b = base_id(s)
         name = f"[`{s}`]({links[b]})" if b in links else f"`{s}`"
         ok = pred[s] == truth
-        levels = " / ".join(_pct(ok[level == lv].mean()) for lv in ("L1", "L2", "L3"))
+        levels = " / ".join(_n(ok[level == lv].mean(), 0) for lv in ("L1", "L2", "L3"))
+        bx = bd[s]
         out.append(f"| {_rank(ranks[s])} | {name} | {systems[s][0]} | {systems[s][1]} | "
-                   f"{_ci(r['accuracy'], r['acc_lo'], r['acc_hi'])} | "
+                   f"{_ci100(r['accuracy'], r['acc_lo'], r['acc_hi'])} | "
+                   + " | ".join(_n(bx[k]) for k in ("dx_said_yes", "dx_said_no", "stage", "no_answer")) +
+                   f" | {_n(r['unsafe_rate'])} | "
                    + " | ".join(_pct(yn[s][k]) for k in ("sensitivity", "specificity", "ppv", "npv")) +
-                   f" | {_pct(pred[s].notna().mean())} | {_pct(r['stage4_recall'])} | {_pct(r['unsafe_rate'])} | {levels} |")
+                   f" | {_pct(r['stage4_recall'])} | {levels} |")
     scored = {base_id(m) for m in inp["ladder"]["method"]}
     missing = []
     for m in reg["models"]:
@@ -247,7 +288,8 @@ def _phenotyping(inp) -> tuple[str, pd.DataFrame]:
     out += ["", f"{NOT_RUN} " + "; ".join(missing) + ". MedGemma few-shot and LoRA runs are not done yet "
             "(LoRA needs a GPU)."]
     summary = tab.assign(rank=[_rank(ranks[s]) for s in tab.index], n_missing=len(missing),
-                         **{k: [yn[s][k] for s in tab.index] for k in ("sensitivity", "specificity", "ppv")})
+                         **{k: [bd[s][k] for s in tab.index] for k in ("correct", "dx_said_no", "dx_said_yes",
+                                                                         "stage", "no_answer")})
     return "\n".join(out), summary
 
 
@@ -263,29 +305,31 @@ def _deid(inp) -> tuple[str, pd.DataFrame]:
     ranks = interval_rank_range(allt["lo"], allt["hi"])
     n_notes, n_phi = int(allt["n_notes"].iloc[0]), int(allt["n_phi"].iloc[0])
 
-    def col(t, m, c, dec=0):
-        return _pct(t.loc[m, c], dec) if m in t.index else "–"
-
     out = [DEID_TITLE, "",
            f"Every engine on the {n_notes} synthetic dental notes with fake PHI ({n_phi:,} identifiers, all tiers), "
-           "ranked by identifiers caught, with a Wilson 95% CI. Per-identifier results aren't saved, so there is "
+           "ranked by sensitive text leaked (fewest first), with a Wilson 95% CI. Per-identifier results aren't saved, so there is "
            "no paired bootstrap: **Rank** is the range the intervals allow, from only the engines clearly above "
            "counting to every engine whose interval reaches this one's counting.", "",
-           DEID_KEY + " Catching identifiers protects patients; the false-alarm columns protect the text the AI "
-           "reads, so read them together. *Unseen tier*: the notes no engine was written against. **ASQ-PHI**: "
-           "1,051 synthetic clinical queries (MIT); *clean queries changed* = identifier-free queries altered. "
-           "**MACCROBAT**: 200 real, published case reports (CC BY 4.0); its dates are the identifiers, and "
-           "*clinical text damaged* = share of clinical terms cut. "
+           DEID_KEY + " Leaking sensitive text risks patients; scrubbing text that isn't sensitive damages the note "
+           "the AI reads, so read them together. *Unseen tier*: the notes no engine was written against. "
+           "**ASQ-PHI**: 1,051 synthetic clinical queries (MIT); its text that is not sensitive is the queries with "
+           "no PHI, out of 100 queries. **MACCROBAT**: 200 real, published case reports (CC BY 4.0); its sensitive "
+           "text is the dates, its text that is not sensitive the clinical terms. "
            "[More on these numbers](deidentification.md#how-to-read-the-numbers).", "",
-           "| Rank | Engine | Identifiers caught (95% CI) | Caught, unseen tier | Removals that were identifiers | "
-           "Dental terms damaged | ASQ-PHI: caught | ASQ-PHI: clean queries changed | MACCROBAT: dates caught | "
-           "MACCROBAT: clinical text damaged |",
-           "|---|---|---|---:|---:|---:|---:|---:|---:|---:|"]
+           f"| Rank | Engine | {COL_LEAKED} (95% CI) | {COL_LEAKED}, unseen tier | {COL_SCRUBBED} | "
+           f"ASQ-PHI: {COL_LEAKED} | ASQ-PHI: {COL_SCRUBBED} | MACCROBAT: {COL_LEAKED} | MACCROBAT: {COL_SCRUBBED} |",
+           "|---|---|---|---:|---:|---:|---:|---:|---:|"]
+
+    def left(t, m):
+        return _n(1 - t.loc[m, "entity_recall"], 0) if m in t.index else "–"
+
+    def scrub(t, m, c, d=0):
+        return _n(t.loc[m, c], d) if m in t.index else "–"
+
     for rank, (m, r) in zip(ranks, allt.iterrows()):
-        out.append(f"| {_rank(rank)} | `{m}` | {_ci(r['entity_recall'], r['lo'], r['hi'])} | "
-                   f"{col(unseen, m, 'entity_recall')} | {_pct(r['char_precision'])} | {_pct(r['decoy_damage'])} | "
-                   f"{col(asq, m, 'entity_recall')} | {col(asq, m, 'hard_negative_damage')} | "
-                   f"{col(mac, m, 'entity_recall')} | {col(mac, m, 'decoy_damage', 1)} |")
+        out.append(f"| {_rank(rank)} | `{m}` | {_ci100(1 - r['entity_recall'], 1 - r['hi'], 1 - r['lo'])} | "
+                   f"{left(unseen, m)} | {scrub(allt, m, 'decoy_damage')} | {left(asq, m)} | "
+                   f"{scrub(asq, m, 'hard_negative_damage')} | {left(mac, m)} | {scrub(mac, m, 'decoy_damage', 1)} |")
     out += ["", f"{NOT_RUN} " + ", ".join(f"`{m}`" for m in inp["deid_not_run"]["method"]) +
             " (cloud and LLM engines; each needs its service's credentials)."]
     summary = allt.assign(rank=[_rank(r) for r in ranks],
@@ -361,31 +405,31 @@ def results_markdown(inp: dict) -> str:
     ph = ph.assign(group=[phenotype_group(s) for s in ph.index])
     de = de.assign(group=[deid_group(m) for m in de.index])
     out = [_HEAD, "", PHENOTYPE_TITLE, "",
-           "Best system in each group on the 240 review charts, groups ordered by their best. Rank: 95% range among all "
-           f"{len(ph)} systems (paired bootstrap). " + PHENOTYPE_KEY, "",
-           "| Group | Best system | Exact status right (95% CI) | Rank | Sensitivity | Specificity | PPV | Systems |",
-           "|---|---|---|---|---:|---:|---:|---:|"]
+           "Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it "
+           f"plausibly ranks among all {len(ph)} systems. " + PHENOTYPE_KEY, "",
+           f"| Group | Best system | Correct | {COL_ASSIGNED} | {COL_NOT_ASSIGNED} | Incorrect stage | No answer | "
+           "Rank | Systems |",
+           "|---|---|---:|---:|---:|---:|---:|---|---:|"]
     for g in _by_best(ph, PHENOTYPE_GROUPS, "accuracy"):
         sub = ph[ph.group == g]
         s, r = sub.index[0], sub.iloc[0]
-        out.append(f"| {g} | `{s}` | {_ci(r['accuracy'], r['acc_lo'], r['acc_hi'])} | {r['rank']} | "
-                   f"{_pct(r['sensitivity'])} | {_pct(r['specificity'])} | {_pct(r['ppv'])} | {len(sub)} |")
-    out += ["", f"All {len(ph)} systems with NPV, coverage, stage IV, unsafe errors and results by note difficulty, "
-            f"and the {int(ph['n_missing'].iloc[0])} models not run yet: "
+        nums = out_of_100([r["correct"], r["dx_said_yes"], r["dx_said_no"], r["stage"], r["no_answer"]])
+        out.append(f"| {g} | `{s}` | " + " | ".join(map(str, nums)) + f" | {r['rank']} | {len(sub)} |")
+    out += ["", f"All {len(ph)} systems, with the 95% CIs, unsafe errors, "
+            f"results by note difficulty, and the {int(ph['n_missing'].iloc[0])} models not run yet: "
             f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "", _judge(inp)[1], "",
             DEID_TITLE, "",
-            f"Best engine in each group on the synthetic notes, groups ordered by their best. Rank: range among all {len(de)} engines "
-            "(Wilson intervals). " + DEID_KEY, "",
-            "| Group | Best engine | Identifiers caught (95% CI) | Rank | Removals that were identifiers | "
-            "MACCROBAT: dates caught | Engines |",
-            "|---|---|---|---|---:|---:|---:|"]
+            "Best tool in each group on the synthetic notes, groups ordered by their best. Rank: where it plausibly "
+            f"ranks among all {len(de)} tools. " + DEID_KEY, "",
+            f"| Group | Best tool | {COL_LEAKED} | {COL_SCRUBBED} | Rank | Tools |",
+            "|---|---|---:|---:|---|---:|"]
     for g in _by_best(de, DEID_GROUPS, "entity_recall"):
         sub = de[de.group == g]
         m, r = sub.index[0], sub.iloc[0]
-        out.append(f"| {g} | `{m}` | {_ci(r['entity_recall'], r['lo'], r['hi'])} | {r['rank']} | "
-                   f"{_pct(r['char_precision'])} | {_pct(r['mac'])} | {len(sub)} |")
-    out += ["", f"All {len(de)} engines with the unseen tier, ASQ-PHI and MACCROBAT, and the engines not run yet: "
-            f"[full de-identification table](docs/results.md#{anchor(DEID_TITLE)})."]
+        out.append(f"| {g} | `{m}` | {round(100 * (1 - r['entity_recall']))} | {round(100 * r['decoy_damage'])} | "
+                   f"{r['rank']} | {len(sub)} |")
+    out += ["", f"All {len(de)} tools, with 95% CIs and two outside test sets (ASQ-PHI, and MACCROBAT's real case "
+            f"reports), and the tools not run yet: [full de-identification table](docs/results.md#{anchor(DEID_TITLE)})."]
     return "\n".join(out)
 
 

@@ -70,8 +70,8 @@ def _best_by_group(full_rows, group_of):
 def test_summary_shows_the_best_system_of_each_group_and_links_the_full_table(summary, md, title, groups, group_of):
     rows = _rows(_section(summary, title))
     assert sorted(_cell(r, 1) for r in rows) == sorted(groups)
-    scores = [float(_cell(r, 3).split("**")[1].rstrip("%")) for r in rows]
-    assert scores == sorted(scores, reverse=True)
+    scores = [int(_cell(r, 3)) for r in rows]   # correct (higher first), or PHI left in (lower first)
+    assert scores == sorted(scores, reverse=title == rr.PHENOTYPE_TITLE)
     best = _best_by_group(_rows(_section(md, title)), group_of)
     assert set(best) == set(groups)
     for r in rows:
@@ -108,7 +108,7 @@ def test_phenotype_leaderboard_has_every_system_best_first(inp, md):
     names = [_cell(r, 2) for r in rows]
     for s in systems:
         assert sum(f"`{s}`" == n or n.startswith(f"[`{s}`]") for n in names) == 1, s
-    acc = [float(_cell(r, 5).split("**")[1].rstrip("%")) for r in rows]   # exact status right
+    acc = [float(_cell(r, 5).split("**")[1]) for r in rows]   # correct, out of 100
     assert acc == sorted(acc, reverse=True)
     assert _cell(rows[0], 1).startswith("1")
 
@@ -117,7 +117,7 @@ def test_note_model_accuracy_and_ci_match_the_ladder_file(inp, md):
     rows = _rows(_section(md, rr.PHENOTYPE_TITLE))
     for _, r in inp["ladder"].iterrows():
         row = next(x for x in rows if _cell(x, 2) in (f"`{r['method']}`",) or _cell(x, 2).startswith(f"[`{r['method']}`]"))
-        assert f"**{r['accuracy']:.1%}** ({r['acc_lo']:.1%}–{r['acc_hi']:.1%})" in row, r["method"]
+        assert f"**{100 * r['accuracy']:.1f}** ({100 * r['acc_lo']:.1f}–{100 * r['acc_hi']:.1f})" in row, r["method"]
 
 
 def test_periodontitis_yes_no_columns_match_the_shared_scorer(inp, md):
@@ -130,19 +130,75 @@ def test_periodontitis_yes_no_columns_match_the_shared_scorer(inp, md):
         res = score(inp["preds"]["truth"], pred.where(pred.isin(rr.LABELS)).fillna("none"), None, s)
         m = res[res["class"] == ""].set_index("metric")["value"]
         row = next(r for r in rows if _cell(r, 2) == f"`{s}`" or _cell(r, 2).startswith(f"[`{s}`]"))
-        assert [_cell(row, i) for i in (6, 7, 8, 9)] == [rr._pct(m[k]) for k in ("sensitivity", "specificity", "ppv", "npv")], s
+        assert [_cell(row, i) for i in (11, 12, 13, 14)] == [rr._pct(m[k]) for k in ("sensitivity", "specificity", "ppv", "npv")], s
 
 
-def test_plain_column_names_and_a_key_for_false_alarms(summary, md):
+def test_plain_column_names_say_correct_or_incorrect(summary, md):
     for text in (summary, md):
-        headers = [line.lower() for line in text.splitlines() if line.startswith(("| Rank", "| Group"))]
+        headers = [line for line in text.splitlines() if line.startswith(("| Rank", "| Group"))]
         assert len(headers) == 2
         for h in headers:
-            for jargon in ("accuracy", "recall", "precision", "macro", "f1"):
-                assert jargon not in h, (jargon, h)
-        for title in (rr.PHENOTYPE_TITLE, rr.DEID_TITLE):
-            sec = _section(text, title)
-            assert "missed" in sec and "false alarm" in sec, title
+            for jargon in ("accuracy", "recall", "precision", "macro", "f1", "false alarm"):
+                assert jargon not in h.lower(), (jargon, h)
+        ph, de = headers
+        for col in ("Correct", rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED, "Incorrect stage", "No answer"):
+            assert col in ph, col
+        assert "Incorrect diagnosis" not in ph
+        for col in (rr.COL_LEAKED, rr.COL_SCRUBBED):
+            assert col in de, col
+        assert "left in" not in de and "Valid text" not in de
+
+
+def test_breakdown_buckets():
+    truth = pd.Series(["periodontitis_stage_2", "periodontitis_stage_2", "healthy", "periodontitis_stage_3",
+                       "gingivitis", "healthy"])
+    pred = pd.Series(["periodontitis_stage_2", "healthy", "periodontitis_stage_1", "periodontitis_stage_4",
+                      "healthy", None])
+    b = rr.breakdown(truth, pred)
+    assert b == pytest.approx({"correct": 1 / 6, "dx_said_no": 1 / 6, "dx_said_yes": 1 / 6,
+                               "stage": 2 / 6, "no_answer": 1 / 6})
+
+
+def test_out_of_100_adds_to_100():
+    assert rr.out_of_100([0.912, 0.004, 0.017, 0.067]) == [91, 0, 2, 7]
+    assert sum(rr.out_of_100([1 / 3, 1 / 3, 1 / 3])) == 100
+
+
+def test_readme_phenotype_rows_add_to_100_and_match_the_predictions(inp, summary):
+    rows = _rows(_section(summary, rr.PHENOTYPE_TITLE))
+    preds, key = inp["preds"], inp["key"].reindex(inp["preds"].index)
+    for r in rows:
+        s = _cell(r, 2).strip("`")
+        nums = [int(_cell(r, i)) for i in (3, 4, 5, 6, 7)]
+        assert sum(nums) == 100, r
+        pred = preds[s] if s in preds else key[s]
+        b = rr.breakdown(preds["truth"], pred.where(pred.isin(rr.LABELS)))
+        assert nums == rr.out_of_100([b["correct"], b["dx_said_yes"], b["dx_said_no"], b["stage"], b["no_answer"]])
+
+
+def test_periodontitis_column_names():
+    assert rr.COL_ASSIGNED == "Periodontitis incorrectly assigned (when not present)"
+    assert rr.COL_NOT_ASSIGNED == "Periodontitis incorrectly ruled out (when present)"
+
+
+def test_full_table_uses_the_same_two_column_names(md):
+    header = next(line for line in _section(md, rr.PHENOTYPE_TITLE).splitlines() if line.startswith("| Rank"))
+    cols = [c.strip() for c in header.split("|")]
+    assert cols[6:8] == [rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED]
+
+
+def test_full_deid_table_names_every_pair_the_same_way(md):
+    header = next(line for line in _section(md, rr.DEID_TITLE).splitlines() if line.startswith("| Rank"))
+    for prefix in ("", "ASQ-PHI: ", "MACCROBAT: "):
+        assert f"{prefix}{rr.COL_LEAKED}" in header and f"{prefix}{rr.COL_SCRUBBED}" in header, prefix
+
+
+def test_readme_deid_rows_are_out_of_100(inp, summary):
+    allt = inp["deid"].query("tier == 'all'").set_index("method")
+    for r in _rows(_section(summary, rr.DEID_TITLE)):
+        m = _cell(r, 2).strip("`")
+        assert int(_cell(r, 3)) == round(100 * (1 - allt.loc[m, "entity_recall"]))
+        assert int(_cell(r, 4)) == round(100 * allt.loc[m, "decoy_damage"])
 
 
 def test_difficulty_levels_match_the_medgemma_comparison(inp, md):
@@ -150,7 +206,7 @@ def test_difficulty_levels_match_the_medgemma_comparison(inp, md):
     lv = inp["by_diff"].pivot(index="method", columns="difficulty", values="accuracy")
     for m in lv.index:
         row = next(x for x in rows if _cell(x, 2).startswith(f"[`{m}`]") or _cell(x, 2) == f"`{m}`")
-        assert f"{lv.loc[m, 'L1']:.0%} / {lv.loc[m, 'L2']:.0%} / {lv.loc[m, 'L3']:.0%}" in row, m
+        assert " / ".join(f"{100 * lv.loc[m, k]:.0f}" for k in ("L1", "L2", "L3")) in row, m
     assert "zero-shot" in next(x for x in rows if "`medgemma-1.5-4b-it`" in x)
 
 

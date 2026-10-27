@@ -48,32 +48,32 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 ### Phenotyping: periodontal status per chart
 
-Best system in each group on the 240 review charts, groups ordered by their best. Rank: 95% range among all 38 systems (paired bootstrap). **Exact status right**: the share of charts given the right one of six statuses (healthy, gingivitis, stage I–IV); no status counts as wrong. The next four ask the yes/no question *does this patient have periodontitis?*: **Sensitivity**, of the patients who have it, the share flagged (the rest are *missed cases*); **Specificity**, of those who don't, the share correctly cleared (the rest are *false alarms*); **PPV**, when it says yes, how often that's right; **NPV**, when it says no, how often that's right. No status counts as "no".
+Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it plausibly ranks among all 38 systems. Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly ruled out**: the patient has it, the system said they don't. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the system gave no status.
 
-| Group | Best system | Exact status right (95% CI) | Rank | Sensitivity | Specificity | PPV | Systems |
-|---|---|---|---|---:|---:|---:|---:|
-| Rule phenotype, whole record | `algorithm_v0` | **97.5%** (95.4%–99.2%) | 1 | 100% | 100% | 100% | 2 |
-| Fine-tuned note model + rules for stage IV | `modernbert-base+cw+s2+rules4` | **91.2%** (87.5%–94.6%) | 2–10 | 99% | 95% | 97% | 11 |
-| Note baselines (rules, TF-IDF) | `fusion_tfidf_rad+rules4` | **87.1%** (82.9%–90.8%) | 7–16 | 98% | 93% | 96% | 5 |
-| Fine-tuned note model | `modernbert-base+cw` | **83.8%** (79.6%–88.3%) | 12–18 | 99% | 95% | 97% | 11 |
-| One evidence type alone | `probing_chart` | **80.4%** (75.0%–85.4%) | 14–31 | 80% | 100% | 100% | 7 |
-| Zero-shot LLM on the note | `medgemma-1.5-4b-it+rules4` | **77.1%** (71.2%–82.5%) | 17–31 | 94% | 90% | 95% | 2 |
+| Group | Best system | Correct | Periodontitis incorrectly assigned (when not present) | Periodontitis incorrectly ruled out (when present) | Incorrect stage | No answer | Rank | Systems |
+|---|---|---:|---:|---:|---:|---:|---|---:|
+| Rule phenotype, whole record | `algorithm_v0` | 98 | 0 | 0 | 2 | 0 | 1 | 2 |
+| Fine-tuned note model + rules for stage IV | `modernbert-base+cw+s2+rules4` | 91 | 2 | 0 | 7 | 0 | 2–10 | 11 |
+| Note baselines (rules, TF-IDF) | `fusion_tfidf_rad+rules4` | 87 | 3 | 1 | 9 | 0 | 7–16 | 5 |
+| Fine-tuned note model | `modernbert-base+cw` | 84 | 1 | 1 | 14 | 0 | 12–18 | 11 |
+| One evidence type alone | `probing_chart` | 80 | 0 | 0 | 1 | 19 | 14–31 | 7 |
+| Zero-shot LLM on the note | `medgemma-1.5-4b-it+rules4` | 77 | 3 | 4 | 16 | 0 | 17–31 | 2 |
 
-All 38 systems with NPV, coverage, stage IV, unsafe errors and results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
+All 38 systems, with the 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
 **LLM judge**: the same metrics against an LLM's reading of each note (LLM judgment, checked against the truth): not run yet; [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading), then the *dental-omop-nlp scorecard* dashboard in Databricks.
 
 ### De-identification
 
-Best engine in each group on the synthetic notes, groups ordered by their best. Rank: range among all 15 engines (Wilson intervals). **Identifiers caught**: the share of names, dates and IDs removed; the rest are *missed* and leak (one character left counts). **Removals that were identifiers**: of everything removed, the share that really was an identifier; the rest is ordinary text removed by mistake, the *false alarms*. The damage columns count the same false alarms on dental terms, clinical text and clean queries.
+Best tool in each group on the synthetic notes, groups ordered by their best. Rank: where it plausibly ranks among all 15 tools. Out of 100. **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the tool should have removed but left in (one character left counts). **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the tool removed.
 
-| Group | Best engine | Identifiers caught (95% CI) | Rank | Removals that were identifiers | MACCROBAT: dates caught | Engines |
-|---|---|---|---|---:|---:|---:|
-| Combined: ML + regex + guard | `hf_stanford+hf_obi+regex_v2+guard` | **95.8%** (94.9%–96.5%) | 1–2 | 89% | – | 6 |
-| Single ML engine | `hf_stanford+guard` | **79.4%** (77.8%–80.8%) | 7–8 | 92% | 98% | 5 |
-| Regex only | `regex_v2` | **76.2%** (74.6%–77.8%) | 9–10 | 96% | 27% | 4 |
+| Group | Best tool | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Tools |
+|---|---|---:|---:|---|---:|
+| Combined: ML + regex + guard | `hf_stanford+hf_obi+regex_v2+guard` | 4 | 2 | 1–2 | 6 |
+| Single ML engine | `hf_stanford+guard` | 21 | 2 | 7–8 | 5 |
+| Regex only | `regex_v2` | 24 | 0 | 9–10 | 4 |
 
-All 15 engines with the unseen tier, ASQ-PHI and MACCROBAT, and the engines not run yet: [full de-identification table](docs/results.md#de-identification).
+All 15 tools, with 95% CIs and two outside test sets (ASQ-PHI, and MACCROBAT's real case reports), and the tools not run yet: [full de-identification table](docs/results.md#de-identification).
 <!-- results:end -->
 
 ## What it does, step by step
