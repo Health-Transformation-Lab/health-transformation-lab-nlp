@@ -1,6 +1,8 @@
 """Results leaderboards (one per capability) are generated from committed results and stay in sync:
 a short summary in the README (best system per group) and the full tables in docs/results.md."""
 
+import re
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -31,7 +33,8 @@ def _rows(section):
 
 
 def _section(md, title):
-    return md.split(title, 1)[1].split("\n### ", 1)[0]
+    """From a heading to the next heading (### or ####)."""
+    return re.split(r"\n#{3,4} ", md.split(title, 1)[1], maxsplit=1)[0]
 
 
 def _cell(row, i):
@@ -53,7 +56,7 @@ def test_one_leaderboard_per_capability_and_no_overall_rank(summary, md):
 
 
 def test_readme_summary_is_short(summary):
-    assert len(summary.splitlines()) <= 30
+    assert len(summary.splitlines()) <= 40
 
 
 def _best_by_group(full_rows, group_of):
@@ -169,6 +172,53 @@ def test_dental_word_count_matches_the_scored_challenge_set(inp):
     allt = inp["deid"].query("tier == 'all'")
     damaged = allt["decoy_damage"] * inp["n_decoys"]
     assert (damaged - damaged.round()).abs().max() < 1e-9     # the scored set: every rate is k / n_decoys
+
+
+def _other_sets_rows(summary):
+    sec = _section(summary, rr.OTHER_SETS_TITLE)
+    return [r for r in sec.splitlines() if r.startswith("| ") and not r.startswith("| Best method")]
+
+
+def test_readme_shows_the_best_methods_on_every_outside_note_set(inp, summary, md):
+    rows = _other_sets_rows(summary)
+    best = _best_by_group(_rows(_section(md, rr.DEID_TITLE)), rr.deid_group)
+    d = inp["deid"]
+    jsl, asq = (d[d.tier == t].set_index("method") for t in ("jsl48", "external"))
+    clin = inp["maccrobat_clinical"]
+    mac = inp["maccrobat"].set_index("method")
+    assert len(rows) == len(rr.DEID_GROUPS)
+    for r in rows:
+        m = next(best[g] for g in rr.DEID_GROUPS if rr.plain_tool(best[g]) == _cell(r, 1))
+
+        def of(k, n):
+            return f"{round(k):,} of {int(n):,}"
+        assert _cell(r, 2) == of(jsl.loc[m, "n_phi"] * (1 - jsl.loc[m, "entity_recall"]), jsl.loc[m, "n_phi"])
+        assert _cell(r, 3) == of(asq.loc[m, "n_phi"] * (1 - asq.loc[m, "entity_recall"]), asq.loc[m, "n_phi"])
+        assert _cell(r, 4) == of(asq.loc[m, "n_hard_negatives"] * asq.loc[m, "hard_negative_damage"],
+                                 asq.loc[m, "n_hard_negatives"])
+        if m in mac.index:
+            assert _cell(r, 5) == of(mac.loc[m, "n_phi"] * (1 - mac.loc[m, "entity_recall"]), mac.loc[m, "n_phi"])
+            assert _cell(r, 6) == of(clin.loc[m, "n_touched"], clin.loc[m, "n"])
+        else:
+            assert _cell(r, 5) == _cell(r, 6) == "not run"
+
+
+def test_course_tagger_counts(inp, md):
+    c = inp["course"]
+    assert c["total"] == 195 and c["tag"] == "course_lr5e-5_e3"          # chosen on validation
+    assert (c["missed"], c["wrong_tags"]) == (33, 45)
+    assert c["found"] == c["total"] - c["missed"]
+    sec = _section(md, rr.COURSE_TITLE)
+    assert "University of Michigan" in sec and "162" in sec and "195" in sec
+
+
+def test_readme_mentions_the_course_files(summary):
+    assert "University of Michigan course files" in _section(summary, rr.OTHER_SETS_TITLE)
+
+
+def test_full_deid_table_has_john_snow_labs(md):
+    header = next(x for x in _section(md, rr.DEID_TITLE).splitlines() if x.startswith("| Rank"))
+    assert f"John Snow Labs: {rr.COL_LEAKED}" in header
 
 
 def test_breakdown_buckets():
