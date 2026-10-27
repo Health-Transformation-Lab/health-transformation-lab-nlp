@@ -108,6 +108,15 @@ def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | No
 
 
 LEVELS = ("L1", "L2", "L3")
+LEVEL_NAMES = {"L1": "easy", "L2": "medium", "L3": "hard"}   # the README's Easy / medium / hard
+
+# The README's own names (readme_results), so tables and the dashboard read like the README.
+METRIC_LABELS = {"exact_status": "Exact status right", "sensitivity": "Sensitivity", "specificity": "Specificity",
+                 "ppv": "PPV", "npv": "NPV", "stage4_caught": "Stage IV caught", "unsafe_rate": "Unsafe errors",
+                 **{f"exact_{lv}": f"Exact status right: {n} note" for lv, n in LEVEL_NAMES.items()}}
+STATUS_NAMES = {"healthy": "Healthy", "gingivitis": "Gingivitis", "periodontitis_stage_1": "Stage I",
+                "periodontitis_stage_2": "Stage II", "periodontitis_stage_3": "Stage III",
+                "periodontitis_stage_4": "Stage IV"}
 
 
 def _point(ref: pd.Series, p: pd.Series, level: pd.Series, score) -> dict:
@@ -154,8 +163,11 @@ def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_b
                          "vs_judge": j[k], "difference": j[k] - t_j[k], "n_judged": len(judged),
                          **({"corrected_accuracy": ca["accuracy_est"], "ci_low": ca["ci_low"], "ci_high": ca["ci_high"]}
                             if k == "exact_status" else {})})
-    return pd.DataFrame(rows, columns=["system", "metric", "vs_truth", "vs_truth_judged", "vs_judge", "difference",
-                                       "n_judged", "corrected_accuracy", "ci_low", "ci_high"])
+    out = pd.DataFrame(rows, columns=["system", "metric", "vs_truth", "vs_truth_judged", "vs_judge", "difference",
+                                      "n_judged", "corrected_accuracy", "ci_low", "ci_high"])
+    out.insert(1, "group", out["system"].map(rr.phenotype_group))
+    out.insert(3, "metric_label", out["metric"].map(METRIC_LABELS))
+    return out
 
 
 def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed: int = 0) -> pd.DataFrame:
@@ -174,7 +186,9 @@ def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed
         ok = (j[has] == t[has]).to_numpy()
         boot = [ok[rng.integers(0, len(ok), len(ok))].mean() for _ in range(n_boot)] if len(ok) else []
         lo, hi = np.percentile(boot, [2.5, 97.5]) if boot else (np.nan, np.nan)
-        rows.append({"group": g, "value": v, "n": int(mask.sum()), "coverage": float(has.mean()),
+        label = ("All charts" if g == "all" else STATUS_NAMES.get(v, v) if g == "truth_status"
+                 else f"{LEVEL_NAMES[v].capitalize()} note")
+        rows.append({"group": g, "value": v, "label": label, "n": int(mask.sum()), "coverage": float(has.mean()),
                      "agreement": float(ok.mean()) if len(ok) else np.nan, "ci_low": float(lo), "ci_high": float(hi),
                      "kappa": cohen_kappa(t[has], j[has]) if len(ok) else np.nan})
     return pd.DataFrame(rows)

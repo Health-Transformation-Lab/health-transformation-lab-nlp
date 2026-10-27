@@ -346,3 +346,27 @@ if (file.exists("data/sites/parity_sites.csv") && file.exists("data/sites/derive
   stopifnot(nrow(m) == length(unique(s$visit_id)), d < 1e-9, cdc_bad == 0)
 } else cat("sites: skipped (run 22_build_sites.py)\n")
 cat("parity OK (spec 006)\n")
+
+# 12. Spec 012 judge scorecard: R 11_judge_scorecard.R == Python judge_scorecard point estimates
+# (metrics vs truth and vs the judge's status, judge agreement). Real judge if run, and the simulated dry run.
+for (pfx in c("", "simulated_")) {
+  if (!file.exists(sprintf("data/datasets/judge/%sjudge_metrics.csv", pfx))) next
+  source("r/R/11_judge_scorecard.R")
+  inp <- read_judge_inputs(pfx)
+  r <- judge_metrics_point(inp$answers, inp$judgments, inp$truth)
+  py <- read.csv(sprintf("data/datasets/judge/%sjudge_metrics.csv", pfx), stringsAsFactors = FALSE)
+  m <- merge(r, py, by = c("system", "metric"), suffixes = c(".r", ".p"))
+  cols <- c("vs_truth", "vs_truth_judged", "vs_judge", "difference", "n_judged")
+  gap <- function(df, k) { x <- abs(df[[paste0(k, ".r")]] - df[[paste0(k, ".p")]]); max(ifelse(is.na(x), 0, x)) }
+  same_na <- function(df, ks) all(sapply(ks, function(k) all(is.na(df[[paste0(k, ".r")]]) == is.na(df[[paste0(k, ".p")]]))))
+  d <- max(sapply(cols, function(k) gap(m, k)))
+  ra <- judge_agreement_point(inp$judgments, inp$truth, inp$level)
+  pa <- read.csv(sprintf("data/datasets/judge/%sjudge_agreement.csv", pfx), stringsAsFactors = FALSE)
+  ma <- merge(ra, pa, by = c("group", "value"), suffixes = c(".r", ".p"))
+  acols <- c("n", "coverage", "agreement", "kappa")
+  da <- max(sapply(acols, function(k) gap(ma, k)))
+  cat(sprintf("%sjudge scorecard: %d system x metric rows, max |R - Python| = %.2e; agreement %d rows, %.2e\n",
+              pfx, nrow(m), d, nrow(ma), da))
+  stopifnot(nrow(m) == nrow(py), d < 1e-9, same_na(m, cols), nrow(ma) == nrow(pa), da < 1e-9, same_na(ma, acols))
+}
+cat("parity OK (spec 012)\n")

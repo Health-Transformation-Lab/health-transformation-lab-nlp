@@ -255,3 +255,18 @@ def test_script_dry_run_writes_simulated_tables(tmp_path):
         assert (tmp_path / f"simulated_{name}.csv").exists(), name
     j = pd.read_csv(tmp_path / "simulated_judgments.csv")
     assert j["simulated"].all() and (j["endpoint"] == "sim:judge").all()
+
+
+def test_tables_use_the_readme_names(inp, answers):
+    """Metric and group names are the README's own, so the dashboard reads like the README."""
+    from dental_omop_nlp.paths import REPO_ROOT
+    m = js.judge_metrics(inp, answers, _perfect_judgments(inp, answers), n_boot=20)
+    header = next(line for line in (REPO_ROOT / "docs" / "results.md").read_text().splitlines()
+                  if line.startswith("| Rank | System |"))
+    for label in m["metric_label"].unique():
+        assert label.split(":")[0].split(" (")[0] in header, label
+    assert set(m.loc[m.metric == "exact_L3", "metric_label"]) == {"Exact status right: hard note"}
+    assert set(m["group"]) == set(rr.PHENOTYPE_GROUPS)
+    assert (m["group"] == m["system"].map(rr.phenotype_group)).all()
+    a = js.judge_agreement(inp, _perfect_judgments(inp, answers), n_boot=20)
+    assert set(a.loc[a.group == "difficulty", "label"]) == {"Easy note", "Medium note", "Hard note"}
