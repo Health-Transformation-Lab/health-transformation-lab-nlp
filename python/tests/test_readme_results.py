@@ -421,3 +421,12 @@ def test_judge_section_says_in_plain_words_whose_mistakes_the_judge_misses():
     assert "one step off" in para                  # what the missed mistakes look like
     assert "about 100%" in sec                     # what the usual correction would have said
     assert "Rogan-Gladen" not in rr.results_markdown(inp)   # no jargon in the README line
+
+
+def test_not_run_reasons_are_accurate(md):
+    not_run = _section(md, rr.PHENOTYPE_TITLE).split(rr.NOT_RUN, 1)[1]
+    gatortron = not_run.split("`gatortron-base`", 1)[1].split(";", 1)[0]
+    assert "diverged" in gatortron and "not scheduled" not in gatortron      # it ran on CPU and failed
+    for m in ("sapbert", "gte-moderncolbert"):
+        reason = not_run.split(f"`{m}`", 1)[1].split(";", 1)[0]
+        assert "no scorer" in reason and "scored on its own task" not in reason, m
