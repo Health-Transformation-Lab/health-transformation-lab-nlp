@@ -294,3 +294,26 @@ def test_job_and_dashboard_names_are_short_and_the_same_in_every_target():
     assert len(names) >= 8
     for n in names:
         assert len(n) <= 20 and "${bundle.target}" not in n and "dental-omop-nlp" not in n, n
+
+
+def test_medgemma_reader_takes_shots_and_lora_as_settings():
+    """MedGemma few-shot and LoRA runs (and other MedGemma versions via reader_rung) without editing the job."""
+    root, jobs = _load()
+    p = jobs["medgemma_reader"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert p["rung"] == "${var.reader_rung}"
+    assert p["shots"] == "${var.reader_shots}" and p["lora_train"] == "${var.reader_lora_train}"
+    assert root["variables"]["reader_shots"]["default"] == "0" and root["variables"]["reader_lora_train"]["default"] == "0"
+
+
+def test_deid_ai_job_runs_the_databricks_methods_and_keeps_results_on_the_volume():
+    root, jobs = _load()
+    j, _ = jobs["deid_ai"]
+    p = j["tasks"][0]["notebook_task"]["base_parameters"]
+    assert j["tasks"][0]["notebook_task"]["notebook_path"].endswith("06_deid_benchmark.py")
+    assert p["engines"] == "${var.deid_ai_engines}"
+    assert set(root["variables"]["deid_ai_engines"]["default"].split(",")) == {
+        "llm", "llm+regex_v2+guard", "ai_mask", "ai_mask+regex_v2+guard"}
+    assert p["llm_endpoint"] == "${var.deid_llm_endpoint}" and p["sql_warehouse_id"] == "${var.warehouse_id}"
+    assert p["save_to_repo"] == "no" and p["out_dir"].startswith("/Volumes/${resources.volumes.data.catalog_name}/")
+    nb = (ROOT / "databricks/notebooks/06_deid_benchmark.py").read_text()
+    assert 'dbutils.widgets.text("out_dir"' in nb
