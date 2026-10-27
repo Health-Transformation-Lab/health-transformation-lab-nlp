@@ -39,6 +39,8 @@ score_run <- function(y_true, y_pred, proba = NULL, model_id, language = "r", ru
   tp <- sum(t & p); fn <- sum(t & !p); tn <- sum(!t & !p); fp <- sum(!t & p)
   add("sensitivity", if (tp + fn) tp / (tp + fn) else NA_real_)
   add("specificity", if (tn + fp) tn / (tn + fp) else NA_real_)
+  add("ppv", if (tp + fp) tp / (tp + fp) else NA_real_)   # of the "periodontitis" calls, the share right
+  add("npv", if (tn + fn) tn / (tn + fn) else NA_real_)   # of the "no periodontitis" calls, the share right
   add("auroc", if (is.null(proba)) NA_real_ else .auroc(t, rowSums(proba[, 3:6, drop = FALSE])))
   do.call(rbind, rows)
 }
