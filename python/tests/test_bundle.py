@@ -327,3 +327,15 @@ def test_gpu_jobs_retry_a_failed_start():
         for t in jobs[name][0]["tasks"]:
             assert t["max_retries"] >= 1, name
             assert t["min_retry_interval_millis"] >= 60_000 and t["retry_on_timeout"] is True, name
+
+
+def test_gpu_jobs_keep_retrying_long_enough_to_outlast_a_gpu_shortage():
+    """A start that fails because no GPU is free (seen in dev: "failed to start within 900 seconds", twice,
+    two minutes apart) needs retries spread over hours, not minutes: at least 4 hours of retrying."""
+    _, jobs = _load()
+    for name in ("medgemma_reader", "encoder_gpu"):
+        for t in jobs[name][0]["tasks"]:
+            start_wait = 15 * 60_000                                       # each attempt waits up to 15 min for a GPU
+            span = t["max_retries"] * t["min_retry_interval_millis"] + (t["max_retries"] + 1) * start_wait
+            assert span >= 4 * 3_600_000, name
+            assert t["min_retry_interval_millis"] >= 20 * 60_000, name     # spaced out, not back to back
