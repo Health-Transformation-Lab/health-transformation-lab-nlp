@@ -34,8 +34,9 @@ schema names are the same everywhere. One catalog, one schema per layer:
 The bundle creates the catalog, all four schemas and the volume on deploy
 (`databricks/resources/unity_catalog.yml`), each with `prevent_destroy` so
 `bundle destroy` never drops them. Deploying needs Databricks CLI 0.288 or later
-and `CREATE CATALOG` on the metastore. (The old `dental_uat` / `dental_prod`
-catalogs were placeholders the bundle never created; you had to make them by hand.)
+and `CREATE CATALOG` on the metastore. (Older setups used `workspace.dental_dev`,
+`dental_uat.dental` and `dental_prod.dental`, made by hand or by an earlier version of
+the setup script. Nothing uses them now; drop them once the new catalog is deployed.)
 
 No target uses `mode: development`. That mode prefixes every name (`[dev <user>]`
 on jobs, `dev_<user>_` on catalogs, schemas, volumes and registered models, which
@@ -95,23 +96,66 @@ databricks bundle run      -t dev study_benchmark
 - `.github/workflows/deploy.yml`: push to `main` deploys **uat**; run it
   manually to choose dev, uat or prod. Prod waits for approval.
 
-One-time setup in GitHub → Settings → Environments:
+One-time setup, per target (the same steps worked on a Free Edition workspace, which
+has no account console and no AWS account of your own to configure). Each target is
+its own workspace: names are the same in all three, so they can't share one.
 
-1. Create environments `dev`, `uat`, `prod`. Give `prod` required reviewers.
-2. In each, add secrets `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`,
-   `DATABRICKS_CLIENT_SECRET` (a service principal's OAuth M2M credentials), and
-   variables `SERVICE_PRINCIPAL`, `JUDGE_ENDPOINT`, `WAREHOUSE_NAME`,
-   `GPU_NODE_TYPE`, `USERS_GROUP` as needed.
-3. In each workspace: the service principal has `CREATE CATALOG` on the
-   metastore (the bundle creates the catalogs) and can use the
-   warehouse and the serving endpoint; create the `dental` secret scope with
-   `hf_token` for the MedGemma job.
+1. **Create the service principal and its group.** Logged in as a
+   workspace admin:
+
+   ```bash
+   databricks auth login --host https://<workspace>
+   databricks/setup/create_service_principal.sh uat --print-config   # names it will use, no changes
+   databricks/setup/create_service_principal.sh uat [--judge-endpoint <serving endpoint>]
+   ```
+
+   A bundle can't create a service principal, so this script does, with the CLI. It
+   makes `dental_omop_nlp_uat_sp` and the group `dental_omop_nlp_uat_admin` (you and the
+   principal), both at account level through the workspace's SCIM proxy, and assigns
+   them to the workspace. It gives the principal `workspace-access` (every API call
+   needs it) and `databricks-sql-access` (validate looks up the SQL warehouse), and
+   `READ` on the `dental` secret scope (created if missing). It gives the group
+   `CREATE CATALOG` on the metastore and, with `--judge-endpoint`, `CAN_QUERY` on that
+   endpoint. It does not create the catalog: the first deploy creates `dental_omop`,
+   its schemas and the volume, and grants the group `ALL PRIVILEGES` on the catalog.
+   Deploy dev from your laptop only after running this for `dev` too, since the
+   catalog grant names the target's group. It prints the principal's `id` and `applicationId`.
+   Run it once per target; a second run fails at the first step because the
+   principal exists.
+2. **Create its OAuth secret**, here for 90 days. The output shows it once: put it
+   straight into GitHub in step 3, never in a file or a chat.
+   ```bash
+   databricks service-principal-secrets-proxy create <id> --lifetime 7776000s
+   ```
+3. **Create the GitHub environment, its variables and the secret.** Host and client
+   ID are identifiers, so variables; only the client secret is a secret. `gh secret set`
+   prompts for the value, so it stays out of your shell history.
+   ```bash
+   gh api -X PUT repos/<owner>/dental-omop-nlp/environments/uat
+   gh variable set DATABRICKS_HOST      -R <owner>/dental-omop-nlp -e uat -b <workspace url>
+   gh variable set DATABRICKS_CLIENT_ID -R <owner>/dental-omop-nlp -e uat -b <applicationId>
+   gh variable set SERVICE_PRINCIPAL    -R <owner>/dental-omop-nlp -e uat -b <applicationId>
+   gh secret set   DATABRICKS_CLIENT_SECRET -R <owner>/dental-omop-nlp -e uat
+   ```
+   Optional variables: `JUDGE_ENDPOINT`, `WAREHOUSE_NAME` (default
+   `Serverless Starter Warehouse`), `GPU_NODE_TYPE`, `USERS_GROUP` (default `users`).
+   Give `prod` required reviewers (Settings → Environments → prod).
+4. **Check the sign-in:** Actions → `auth_check` → Run workflow, environment `uat`. It
+   should print a `userName` equal to `DATABRICKS_CLIENT_ID`. Before the secret
+   expires, repeat step 2 and `gh secret set`.
+5. **Secrets the jobs read**, in the `dental` scope: `hf_token` (MedGemma job) and
+   `lakebase_url` (Lakebase load), e.g. `databricks secrets put-secret dental hf_token`.
+   The Lakebase load also needs the principal to be able to connect to the target's
+   Lakebase instance; the script doesn't set that up.
 
 Until those secrets exist, the workflows skip the Databricks steps and still run the tests.
 
 ## Checked here, and not
 
-- Both YAML files validate against the bundle schema from Databricks CLI
-  v0.270.0, and the CLI loads all three targets.
+- The YAML was checked against the bundle schema from Databricks CLI v0.270.0,
+  before the catalogs resource (CLI >= 0.288) was added; re-run `bundle validate`.
 - `bundle validate` and `deploy` against a real workspace haven't been run from
   this repo yet (they need workspace credentials). Run `validate -t dev` first.
+- `databricks/setup/create_service_principal.sh` hasn't been run from this repo; its
+  calls are the ones that set up a Free Edition workspace for another bundle. The tests
+  check its syntax, its names per target, and the workflows' sign-in.

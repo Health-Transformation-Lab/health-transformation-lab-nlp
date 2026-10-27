@@ -26,10 +26,15 @@ from dental_omop_nlp.paths import DEID_DIR, EXTERNAL_DIR, REPO_ROOT
 ap = argparse.ArgumentParser()
 ap.add_argument("--tag", required=True)
 ap.add_argument("--zip", default=str(EXTERNAL_DIR / "maccrobat" / "MACCROBAT2020.zip"))
+ap.add_argument("--conll-dir", default=None, help="the run used a course's own train.txt / test.txt")
 a = ap.parse_args()
 
 pred = json.loads((REPO_ROOT / "python" / "runs" / "phi_tagger" / a.tag / "pred.json").read_text())
-docs = {d["note_id"]: d for d in phi_tagger.bio_docs(maccrobat.load_brat(a.zip))}
+if a.conll_dir:
+    from pathlib import Path
+    docs = {d["note_id"]: d for f in ("train", "test") for d in phi_tagger.read_conll(Path(a.conll_dir) / f"{f}.txt")}
+else:
+    docs = {d["note_id"]: d for d in phi_tagger.bio_docs(maccrobat.load_brat(a.zip))}
 
 
 CANDIDATES = [*phi_tagger.DATE_PATTERNS, "trim_function_words"]

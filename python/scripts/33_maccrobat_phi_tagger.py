@@ -2,6 +2,7 @@
 
     python scripts/33_maccrobat_phi_tagger.py                          # Longformer, default settings
     python scripts/33_maccrobat_phi_tagger.py --lr 5e-5 --epochs 6 --tag lr5e-5_e6
+    python scripts/33_maccrobat_phi_tagger.py --conll-dir ../data/external/maccrobat/course --tag course_lr5e-5_e3 --lr 5e-5
 
 Notes are split 80:20 (seeded) into train and test; 20 training notes are held out as a validation
 set, so settings and regex sets are chosen on validation and the test set is read once at the end.
@@ -14,6 +15,7 @@ Writes:
 import argparse
 import json
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -34,6 +36,9 @@ ap.add_argument("--seed", type=int, default=42, help="training seed")
 ap.add_argument("--split-seed", type=int, default=42)
 ap.add_argument("--n-val", type=int, default=20)
 ap.add_argument("--zip", default=str(EXTERNAL_DIR / "maccrobat" / "MACCROBAT2020.zip"))
+ap.add_argument("--conll-dir", default=None,
+                help="use a course's own train.txt / test.txt (word POS tag) instead of rebuilding from brat; "
+                     "n-val notes of its train file are held out for validation")
 ap.add_argument("--tag", default=None)
 a = ap.parse_args()
 tag = a.tag or f"{a.model.split('/')[-1]}_lr{a.lr:g}_e{a.epochs:g}_bs{a.batch_size}_wd{a.weight_decay:g}_s{a.seed}"
@@ -48,12 +53,21 @@ from transformers import (
     set_seed,
 )
 
-docs = {d["note_id"]: d for d in phi_tagger.bio_docs(maccrobat.load_brat(a.zip))}
-train_ids, val_ids, test_ids = phi_tagger.three_way_split(list(docs), 0.2, a.n_val, a.split_seed)
-bio_dir = EXTERNAL_DIR / "maccrobat" / "bio"
-bio_dir.mkdir(parents=True, exist_ok=True)
-for name, ids in (("train", train_ids), ("val", val_ids), ("test", test_ids)):
-    phi_tagger.write_conll([docs[i] for i in ids], bio_dir / f"{name}.txt")
+if a.conll_dir:
+    course_train = phi_tagger.read_conll(Path(a.conll_dir) / "train.txt")
+    course_test = phi_tagger.read_conll(Path(a.conll_dir) / "test.txt")
+    docs = {d["note_id"]: d for d in course_train + course_test}
+    ids = [d["note_id"] for d in course_train]
+    val_ids = phi_tagger.split_docs(ids, a.n_val / len(ids), a.split_seed)[1]
+    train_ids = [i for i in ids if i not in set(val_ids)]
+    test_ids = [d["note_id"] for d in course_test]
+else:
+    docs = {d["note_id"]: d for d in phi_tagger.bio_docs(maccrobat.load_brat(a.zip))}
+    train_ids, val_ids, test_ids = phi_tagger.three_way_split(list(docs), 0.2, a.n_val, a.split_seed)
+    bio_dir = EXTERNAL_DIR / "maccrobat" / "bio"
+    bio_dir.mkdir(parents=True, exist_ok=True)
+    for name, ids in (("train", train_ids), ("val", val_ids), ("test", test_ids)):
+        phi_tagger.write_conll([docs[i] for i in ids], bio_dir / f"{name}.txt")
 print(f"notes: train {len(train_ids)}, val {len(val_ids)}, test {len(test_ids)}")
 
 set_seed(a.seed)
@@ -102,7 +116,7 @@ def predict(ids):
     return preds
 
 
-row = {"tag": tag, "model": a.model, "lr": a.lr, "epochs": a.epochs, "batch_size": a.batch_size,
+row = {"tag": tag, "data": "course" if a.conll_dir else "rebuilt", "model": a.model, "lr": a.lr, "epochs": a.epochs, "batch_size": a.batch_size,
        "weight_decay": a.weight_decay, "warmup": a.warmup, "max_words": a.max_words, "seed": a.seed,
        "split_seed": a.split_seed, "train_minutes": round(minutes, 1)}
 saved = {}

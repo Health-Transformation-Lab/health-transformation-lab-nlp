@@ -81,6 +81,16 @@ def test_notebooks_exist_and_take_the_parameters_passed():
     assert seen >= 3
 
 
+def test_job_notebooks_have_no_placeholders_left():
+    """A literal <catalog>.<schema> in a cell runs as SQL and fails the whole job."""
+    root, jobs = _load()
+    for name, task, base in _tasks(root, jobs):
+        cells = (base / task["notebook_task"]["notebook_path"]).resolve().read_text().split("# COMMAND ----------")
+        code = [c for c in cells
+                if not c.replace("# Databricks notebook source", "").strip().startswith("# MAGIC %md")]
+        assert not any("<catalog>" in c or "<schema>" in c for c in code), name
+
+
 def test_medgemma_gpu_job_only_in_uat_and_prod():
     root, jobs = _load()
     assert "medgemma_reader" not in jobs
@@ -94,6 +104,15 @@ def test_mlflow_experiment_and_uc_model_per_target():
         "${workspace.root_path}" in m["experiments"]["dental_experiment"]["name"]
     rm = m["registered_models"]["perio_note_classifier"]
     assert rm["catalog_name"] == GOLD_CATALOG and rm["schema_name"] == GOLD_SCHEMA
+
+
+def test_study_benchmark_passes_experiment_id_not_name():
+    """MLflow stores /Workspace/Users/... as /Users/..., so passing the name makes Terraform
+    see a changed value mid-apply ("Provider produced inconsistent final plan")."""
+    _, jobs = _load()
+    params = jobs["study_benchmark"][0]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert params.get("experiment_id") == "${resources.experiments.dental_experiment.id}"
+    assert "experiment" not in params
 
 
 def test_judge_monitoring_job_only_in_uat_and_prod():
@@ -118,6 +137,9 @@ def test_bundle_creates_the_catalog_layer_schemas_and_landing_volume():
     vol = uc["volumes"]["data"]
     assert vol["catalog_name"] == "${resources.schemas.landing.catalog_name}"
     assert vol["schema_name"] == "${resources.schemas.landing.name}" and vol["volume_type"] == "MANAGED"
+    # the admin group create_service_principal.sh makes gets the catalog; the deployer owns it
+    assert uc["catalogs"]["dental_omop"]["grants"] == [
+        {"principal": "dental_omop_nlp_${bundle.target}_admin", "privileges": ["ALL_PRIVILEGES"]}]
     for r in [*uc["catalogs"].values(), *uc["schemas"].values(), vol]:
         assert r["lifecycle"]["prevent_destroy"] is True
 

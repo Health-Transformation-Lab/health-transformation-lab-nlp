@@ -13,14 +13,18 @@
 #
 # prevent_destroy: `bundle destroy` must never drop a catalog, schema or volume
 # with data in it. Remove one by hand if you really mean to.
-# Needs Databricks CLI >= 0.288 (catalogs resource) and CREATE CATALOG on the
-# metastore for whoever deploys.
+# Needs Databricks CLI >= 0.288 (catalogs resource), CREATE CATALOG on the
+# metastore for whoever deploys, and the target's admin group: both come from
+# databricks/setup/create_service_principal.sh.
 
 resources:
   catalogs:
     dental_omop:
       name: ${var.catalog}
       comment: Dental OMOP. Synthetic data only.
+      grants:   # the group databricks/setup/create_service_principal.sh makes (you and the principal)
+        - principal: dental_omop_nlp_${bundle.target}_admin
+          privileges: [ALL_PRIVILEGES]
       lifecycle:
         prevent_destroy: true
 

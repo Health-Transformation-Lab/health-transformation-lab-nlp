@@ -1,0 +1,26 @@
+# Can GitHub sign in as the environment's service principal? Run by hand before the first deploy;
+# it prints the principal's application id (docs/deployment.md).
+name: auth_check
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: GitHub environment
+        type: choice
+        options: [dev, uat, prod]
+        default: uat
+
+permissions:
+  contents: read
+
+jobs:
+  whoami:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.target }}
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+    steps:
+      - uses: databricks/setup-cli@v0.297.2
+      - run: databricks current-user me

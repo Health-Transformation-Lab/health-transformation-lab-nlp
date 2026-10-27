@@ -36,6 +36,7 @@ End the body with the attribution lines the session asks for. Create it with the
 
 ## 3. Review it
 
-Run the `/pr-review` flow on the new PR number and write `pull_requests/pr-<n>-review.md`.
+Run the `/pr-review` flow on the new PR number, write `pull_requests/pr-<n>-review.md` and commit it
+to the PR's branch.
 If the verdict is request-changes, fix the 🔴 findings on the branch, push, and re-review.
 Report the PR link and the verdict. Merge only when the user asks and CI is green.

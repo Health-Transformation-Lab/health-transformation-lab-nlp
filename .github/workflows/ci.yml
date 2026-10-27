@@ -55,16 +55,16 @@ jobs:
       - run: Rscript r/tests/test_parity.R
 
   bundle:
-    # Validate needs a workspace; runs only when dev credentials are configured.
+    # Validate needs a workspace; runs only once dev has the service principal's secret.
     runs-on: ubuntu-latest
     environment: dev
     env:
-      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
       DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@v4
-      - uses: databricks/setup-cli@v0.299.2   # >= 0.288 for the catalogs resource
+      - uses: databricks/setup-cli@v0.297.2   # >= 0.288 for the catalogs resource
       - name: bundle validate (all targets)
-        if: env.DATABRICKS_HOST != ''
+        if: env.DATABRICKS_CLIENT_SECRET != ''
         run: for t in dev uat prod; do databricks bundle validate -t $t; done

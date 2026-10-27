@@ -1,9 +1,11 @@
 # Deploy the bundle. dev and uat on demand (uat also on every push to main);
 # prod on demand only, gated by the "prod" GitHub environment (required reviewers).
 #
-# Each GitHub environment (dev, uat, prod) holds its own secrets:
-#   DATABRICKS_HOST, DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET   (service principal, OAuth M2M)
-# and variables passed to the bundle as BUNDLE_VAR_<name>, e.g.
+# Each GitHub environment (dev, uat, prod) holds the service principal's sign-in (OAuth M2M;
+# databricks/setup/create_service_principal.sh makes the principal):
+#   variables DATABRICKS_HOST, DATABRICKS_CLIENT_ID; secret DATABRICKS_CLIENT_SECRET
+# (an older setup with HOST / CLIENT_ID as secrets still works), and variables passed to the
+# bundle as BUNDLE_VAR_<name>, e.g.
 #   SERVICE_PRINCIPAL, JUDGE_ENDPOINT, WAREHOUSE_NAME, GPU_NODE_TYPE, USERS_GROUP
 name: deploy
 on:
@@ -32,8 +34,8 @@ jobs:
     environment: ${{ github.event.inputs.target || 'uat' }}
     env:
       TARGET: ${{ github.event.inputs.target || 'uat' }}
-      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
       DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
       BUNDLE_VAR_service_principal: ${{ vars.SERVICE_PRINCIPAL }}
       BUNDLE_VAR_judge_endpoint: ${{ vars.JUDGE_ENDPOINT || 'none' }}
@@ -43,20 +45,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Stop if this environment isn't configured
-        if: env.DATABRICKS_HOST == ''
-        run: echo "No DATABRICKS_HOST for $TARGET; skipping." && exit 0
-      - uses: databricks/setup-cli@v0.299.2   # >= 0.288 for the catalogs resource
-        if: env.DATABRICKS_HOST != ''
+        if: env.DATABRICKS_CLIENT_SECRET == ''
+        run: echo "No service principal sign-in (DATABRICKS_CLIENT_SECRET) for $TARGET; skipping." && exit 0
+      - uses: databricks/setup-cli@v0.297.2   # >= 0.288 for the catalogs resource
+        if: env.DATABRICKS_CLIENT_SECRET != ''
       - name: Python tests before deploying
-        if: env.DATABRICKS_HOST != ''
+        if: env.DATABRICKS_CLIENT_SECRET != ''
         run: pip install -e "./python[dev]" matplotlib && (cd python && pytest -q tests)
       - name: Validate
-        if: env.DATABRICKS_HOST != ''
+        if: env.DATABRICKS_CLIENT_SECRET != ''
         run: databricks bundle validate -t "$TARGET"
       - name: Deploy
-        if: env.DATABRICKS_HOST != ''
+        if: env.DATABRICKS_CLIENT_SECRET != ''
         run: databricks bundle deploy -t "$TARGET"
       - name: Run benchmark job
-        if: env.DATABRICKS_HOST != '' && github.event.inputs.run_benchmark == 'true'
+        if: env.DATABRICKS_CLIENT_SECRET != '' && github.event.inputs.run_benchmark == 'true'
         # Returns once Databricks has started the run; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait study_benchmark
