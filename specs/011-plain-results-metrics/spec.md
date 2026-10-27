@@ -53,3 +53,20 @@ here *does this patient have periodontitis (any stage)?*, with four numbers:
   the same predictions (test).
 - Neither the README nor `docs/results.md` contains "macro-F1", "accuracy" or "recall" as a column name.
 - R parity passes with the new metrics.
+
+## Revision 2026-10-27: counts out of 100, "Correct" / "Incorrect …"
+
+Reader feedback: "accuracy", "recall", "false alarm", "missed", "wrongly diagnosed" and long column
+names were still unclear. The tables now say what happened to each chart or identifier, out of 100,
+in one consistent pattern:
+
+- **Phenotyping**: Correct | Incorrect diagnosis (wrong about periodontitis yes/no) | Incorrect stage
+  (right about periodontitis, wrong stage, or healthy and gingivitis mixed up) | No answer. The four
+  add to 100 (largest-remainder rounding in the README). The full table splits incorrect diagnosis
+  into *said no* / *said yes*. Sensitivity, specificity, PPV and NPV (FR-001) stay in the full table,
+  labelled for statisticians, not in the README.
+- **De-identification**: PHI incorrectly left in (100 − identifiers caught) | Valid text incorrectly
+  scrubbed (dental words that look like PHI and were removed). The same pair is shown for ASQ-PHI and
+  MACCROBAT in the full table. Precision is no longer shown.
+
+Ranking is unchanged (FR-004).
