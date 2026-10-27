@@ -317,3 +317,13 @@ def test_deid_ai_job_runs_the_databricks_methods_and_keeps_results_on_the_volume
     assert p["save_to_repo"] == "no" and p["out_dir"].startswith("/Volumes/${resources.volumes.data.catalog_name}/")
     nb = (ROOT / "databricks/notebooks/06_deid_benchmark.py").read_text()
     assert 'dbutils.widgets.text("out_dir"' in nb
+
+
+def test_gpu_jobs_retry_a_failed_start():
+    """Serverless GPU can fail to come up or to restart Python after the %pip install (seen: a restart
+    timing out after 15 minutes); the task is retried rather than the run failing outright."""
+    _, jobs = _load()
+    for name in ("medgemma_reader", "encoder_gpu"):
+        for t in jobs[name][0]["tasks"]:
+            assert t["max_retries"] >= 1, name
+            assert t["min_retry_interval_millis"] >= 60_000 and t["retry_on_timeout"] is True, name
