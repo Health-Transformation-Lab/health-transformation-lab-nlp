@@ -141,8 +141,9 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
             for jargon in ("accuracy", "recall", "precision", "macro", "f1", "false alarm"):
                 assert jargon not in h.lower(), (jargon, h)
         ph, de = headers
-        for col in ("Correct", "Incorrect diagnosis", "Incorrect stage", "No answer"):
+        for col in ("Correct", rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED, "Incorrect stage", "No answer"):
             assert col in ph, col
+        assert "Incorrect diagnosis" not in ph
         for col in ("PHI incorrectly left in", "Valid text incorrectly scrubbed"):
             assert col in de, col
 
@@ -167,11 +168,17 @@ def test_readme_phenotype_rows_add_to_100_and_match_the_predictions(inp, summary
     preds, key = inp["preds"], inp["key"].reindex(inp["preds"].index)
     for r in rows:
         s = _cell(r, 2).strip("`")
-        nums = [int(_cell(r, i)) for i in (3, 4, 5, 6)]
+        nums = [int(_cell(r, i)) for i in (3, 4, 5, 6, 7)]
         assert sum(nums) == 100, r
         pred = preds[s] if s in preds else key[s]
         b = rr.breakdown(preds["truth"], pred.where(pred.isin(rr.LABELS)))
-        assert nums == rr.out_of_100([b["correct"], b["dx_said_no"] + b["dx_said_yes"], b["stage"], b["no_answer"]])
+        assert nums == rr.out_of_100([b["correct"], b["dx_said_yes"], b["dx_said_no"], b["stage"], b["no_answer"]])
+
+
+def test_full_table_uses_the_same_two_column_names(md):
+    header = next(line for line in _section(md, rr.PHENOTYPE_TITLE).splitlines() if line.startswith("| Rank"))
+    cols = [c.strip() for c in header.split("|")]
+    assert cols[6:8] == [rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED]
 
 
 def test_readme_deid_rows_are_out_of_100(inp, summary):

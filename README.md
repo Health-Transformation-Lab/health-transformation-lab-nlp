@@ -48,18 +48,18 @@ The 2012 CDC/AAP surveillance definitions, behind national prevalence, are compu
 
 ### Phenotyping: periodontal status per chart
 
-Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it plausibly ranks among all 38 systems. Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Incorrect diagnosis**: wrong about whether the patient has periodontitis. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the system gave no status.
+Best system in each group on the 240 review charts, groups ordered by their best. Rank: where it plausibly ranks among all 38 systems. Out of 100 charts. **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4). **Periodontitis incorrectly assigned**: said periodontitis, the patient doesn't have it. **Periodontitis incorrectly not assigned**: the patient has it, the system didn't say so. **Incorrect stage**: right that it is or isn't periodontitis, wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up. **No answer**: the system gave no status.
 
-| Group | Best system | Correct | Incorrect diagnosis | Incorrect stage | No answer | Rank | Systems |
-|---|---|---:|---:|---:|---:|---|---:|
-| Rule phenotype, whole record | `algorithm_v0` | 98 | 0 | 2 | 0 | 1 | 2 |
-| Fine-tuned note model + rules for stage IV | `modernbert-base+cw+s2+rules4` | 91 | 2 | 7 | 0 | 2–10 | 11 |
-| Note baselines (rules, TF-IDF) | `fusion_tfidf_rad+rules4` | 87 | 4 | 9 | 0 | 7–16 | 5 |
-| Fine-tuned note model | `modernbert-base+cw` | 84 | 2 | 14 | 0 | 12–18 | 11 |
-| One evidence type alone | `probing_chart` | 80 | 0 | 1 | 19 | 14–31 | 7 |
-| Zero-shot LLM on the note | `medgemma-1.5-4b-it+rules4` | 77 | 8 | 15 | 0 | 17–31 | 2 |
+| Group | Best system | Correct | Periodontitis incorrectly assigned (not present) | Periodontitis incorrectly not assigned (present) | Incorrect stage | No answer | Rank | Systems |
+|---|---|---:|---:|---:|---:|---:|---|---:|
+| Rule phenotype, whole record | `algorithm_v0` | 98 | 0 | 0 | 2 | 0 | 1 | 2 |
+| Fine-tuned note model + rules for stage IV | `modernbert-base+cw+s2+rules4` | 91 | 2 | 0 | 7 | 0 | 2–10 | 11 |
+| Note baselines (rules, TF-IDF) | `fusion_tfidf_rad+rules4` | 87 | 3 | 1 | 9 | 0 | 7–16 | 5 |
+| Fine-tuned note model | `modernbert-base+cw` | 84 | 1 | 1 | 14 | 0 | 12–18 | 11 |
+| One evidence type alone | `probing_chart` | 80 | 0 | 0 | 1 | 19 | 14–31 | 7 |
+| Zero-shot LLM on the note | `medgemma-1.5-4b-it+rules4` | 77 | 3 | 4 | 16 | 0 | 17–31 | 2 |
 
-All 38 systems, with the 95% CIs, which way each incorrect diagnosis went, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
+All 38 systems, with the 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
 ### De-identification
 

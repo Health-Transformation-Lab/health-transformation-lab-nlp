@@ -70,3 +70,8 @@ in one consistent pattern:
   MACCROBAT in the full table. Precision is no longer shown.
 
 Ranking is unchanged (FR-004).
+
+Second revision, same day: "incorrect diagnosis" was still vague, so the README and full table name
+both directions: **Periodontitis incorrectly assigned (not present)** and **Periodontitis
+incorrectly not assigned (present)**, next to Correct, Incorrect stage and No answer (five columns
+adding to 100).
