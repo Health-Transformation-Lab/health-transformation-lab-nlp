@@ -146,9 +146,23 @@ def test_plain_column_names_say_correct_or_incorrect(summary, md):
         for col in ("Correct", rr.COL_ASSIGNED, rr.COL_NOT_ASSIGNED, "Incorrect stage", "No answer"):
             assert col in ph, col
         assert "Incorrect diagnosis" not in ph
+        for h in headers:
+            assert not any(w in h for w in ("System", "Tool", "Engine")), h
         for col in (rr.COL_LEAKED, rr.COL_SCRUBBED):
             assert col in de, col
         assert "left in" not in de and "Valid text" not in de
+
+
+def test_readme_says_method_in_both_tables(summary):
+    for title in (rr.PHENOTYPE_TITLE, rr.DEID_TITLE):
+        header = next(x for x in _section(summary, title).splitlines() if x.startswith("| Group"))
+        assert "| Best method |" in header and "| Methods in group |" in header and "| Total " in header, title
+
+
+def test_dental_word_count_matches_the_scored_challenge_set(inp):
+    allt = inp["deid"].query("tier == 'all'")
+    damaged = allt["decoy_damage"] * inp["n_decoys"]
+    assert (damaged - damaged.round()).abs().max() < 1e-9     # the scored set: every rate is k / n_decoys
 
 
 def test_breakdown_buckets():
@@ -166,17 +180,18 @@ def test_out_of_100_adds_to_100():
     assert sum(rr.out_of_100([1 / 3, 1 / 3, 1 / 3])) == 100
 
 
-def test_readme_phenotype_rows_add_to_100_and_match_the_predictions(inp, summary, md):
+def test_readme_phenotype_rows_are_counts_that_add_to_the_total(inp, summary, md):
     rows = _rows(_section(summary, rr.PHENOTYPE_TITLE))
     best = _best_by_group(_rows(_section(md, rr.PHENOTYPE_TITLE)), rr.phenotype_group)
     preds, key = inp["preds"], inp["key"].reindex(inp["preds"].index)
     for r in rows:
         s = best[_cell(r, 1)]
         nums = [int(_cell(r, i)) for i in (3, 4, 5, 6, 7)]
-        assert sum(nums) == 100, r
+        total = int(_cell(r, 8))
+        assert total == len(preds) == 240 and sum(nums) == total, r
         pred = preds[s] if s in preds else key[s]
         b = rr.breakdown(preds["truth"], pred.where(pred.isin(rr.LABELS)))
-        assert nums == rr.out_of_100([b["correct"], b["dx_said_yes"], b["dx_said_no"], b["stage"], b["no_answer"]])
+        assert nums == [round(total * b[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage", "no_answer")]
 
 
 def test_plain_names():
@@ -213,13 +228,14 @@ def test_full_deid_table_names_every_pair_the_same_way(md):
         assert f"{prefix}{rr.COL_LEAKED}" in header and f"{prefix}{rr.COL_SCRUBBED}" in header, prefix
 
 
-def test_readme_deid_rows_are_out_of_100(inp, summary, md):
+def test_readme_deid_rows_are_counts_with_their_totals(inp, summary, md):
     allt = inp["deid"].query("tier == 'all'").set_index("method")
     best = _best_by_group(_rows(_section(md, rr.DEID_TITLE)), rr.deid_group)
     for r in _rows(_section(summary, rr.DEID_TITLE)):
         m = best[_cell(r, 1)]
-        assert int(_cell(r, 3)) == round(100 * (1 - allt.loc[m, "entity_recall"]))
-        assert int(_cell(r, 4)) == round(100 * allt.loc[m, "decoy_damage"])
+        n_phi, n_words = int(allt.loc[m, "n_phi"]), inp["n_decoys"]
+        assert int(_cell(r, 3)) == round(n_phi * (1 - allt.loc[m, "entity_recall"])) and _cell(r, 4) == f"{n_phi:,}"
+        assert int(_cell(r, 5)) == round(n_words * allt.loc[m, "decoy_damage"]) and _cell(r, 6) == f"{n_words:,}"
 
 
 def test_difficulty_levels_match_the_medgemma_comparison(inp, md):
