@@ -202,3 +202,24 @@ def test_judge_scorecard_job_and_dev_judge_endpoint():
     assert root["targets"]["dev"]["variables"]["judge_endpoint"] == "databricks-meta-llama-3-3-70b-instruct"
     deploy = (ROOT / ".github" / "workflows" / "deploy.yml").read_text()
     assert "JUDGE_ENDPOINT || 'none'" not in deploy     # CI must not mask the dev default
+
+
+def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
+    """Spec 012 US3: an AI/BI dashboard deployed with the bundle, same name in every target, reading
+    the gold tables the judge_scorecard job writes."""
+    import json
+    res = yaml.safe_load((ROOT / "databricks/resources/dashboards.yml").read_text())["resources"]["dashboards"]
+    d = res["scorecard"]
+    assert "${bundle.target}" not in d["display_name"] and d["warehouse_id"] == "${var.warehouse_id}"
+    dash = json.loads((ROOT / "databricks/resources" / d["file_path"]).resolve().read_text())
+    assert [p["displayName"] for p in dash["pages"]] == ["Phenotyping", "De-identification"]
+    names = {ds["name"] for ds in dash["datasets"]}
+    tables = {"chart_answers", "judgments", "judge_metrics", "judge_agreement", "deid_scores"}
+    for ds in dash["datasets"]:
+        sql = " ".join(ds["queryLines"])
+        used = set(re.findall(r"dental_omop\.gold_dental_omop_perio\.(\w+)", sql))
+        assert used and used <= tables, ds["name"]
+    for page in dash["pages"]:
+        for item in page["layout"]:
+            for q in item["widget"].get("queries", []):
+                assert q["query"]["datasetName"] in names, item["widget"]["name"]

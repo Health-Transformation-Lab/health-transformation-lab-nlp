@@ -41,8 +41,8 @@
 
 **Independent test**: bundle test parses the dashboard and finds pages Phenotyping and De-identification, each dataset reading a gold table.
 
-- [ ] T018 [US3] Failing test in `python/tests/test_bundle.py`: `resources.dashboards.scorecard` exists with the same name in every target, uses `${var.warehouse_id}`, its `.lvdash.json` has pages named Phenotyping and De-identification
-- [ ] T019 [US3] `databricks/dashboards/scorecard.lvdash.json` and `databricks/resources/dashboards.yml`: Phenotyping page (scorecard truth vs judge, judge agreement, per-chart table filterable by system with answer, truth, judge status, verdict, quote); De-identification page (`deid` scores table, loaded by the scorecard notebook from `data/deid/scores.csv`)
+- [x] T018 [US3] Failing test in `python/tests/test_bundle.py`: `resources.dashboards.scorecard` exists with the same name in every target, uses `${var.warehouse_id}`, its `.lvdash.json` has pages named Phenotyping and De-identification
+- [x] T019 [US3] `databricks/dashboards/scorecard.lvdash.json` and `databricks/resources/dashboards.yml`: Phenotyping page (scorecard truth vs judge, judge agreement, per-chart table filterable by system with answer, truth, judge status, verdict, quote); De-identification page (`deid` scores table, loaded by the scorecard notebook from `data/deid/scores.csv`)
 
 ## Phase 6: User Story 4 - README link (P3)
 

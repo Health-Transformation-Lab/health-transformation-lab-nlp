@@ -1,0 +1,8 @@
+# AI/BI dashboard (spec 012): Phenotyping and De-identification pages over the gold tables the
+# judge_scorecard job writes. Same name in every target (each target is its own workspace).
+resources:
+  dashboards:
+    scorecard:
+      display_name: dental-omop-nlp scorecard
+      file_path: ../dashboards/scorecard.lvdash.json
+      warehouse_id: ${var.warehouse_id}

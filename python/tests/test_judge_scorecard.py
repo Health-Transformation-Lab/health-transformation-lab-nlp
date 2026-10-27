@@ -279,3 +279,8 @@ def test_without_a_judge_the_truth_metrics_still_publish(inp, answers):
     assert m["vs_truth"].notna().any() and m["vs_judge"].isna().all() and (m["n_judged"] == 0).all()
     a = js.judge_agreement(inp, empty, n_boot=20)
     assert (a["coverage"] == 0).all() and a["agreement"].isna().all()
+
+
+def test_chart_answers_carry_the_truth_for_the_drill_down(inp, answers):
+    truth, _, _ = rr.phenotype_predictions(inp)
+    assert (answers["truth"].to_numpy() == truth.reindex(answers["visit_id"]).to_numpy()).all()

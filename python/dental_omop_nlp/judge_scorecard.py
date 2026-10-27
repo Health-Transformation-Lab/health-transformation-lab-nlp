@@ -34,11 +34,11 @@ CHARS_PER_TOKEN = 4
 
 
 def chart_answers(inp: dict) -> pd.DataFrame:
-    """One row per (visit_id, system): the system's status on that review chart (NaN = none) and
-    the note's difficulty (L1/L2/L3). Same systems and answers as the README leaderboard."""
-    _, pred, level = rr.phenotype_predictions(inp)
+    """One row per (visit_id, system): the system's status on that review chart (NaN = none), the
+    note's difficulty (L1/L2/L3) and the generator's truth (for the dashboard's drill-down). Same systems and answers as the README leaderboard."""
+    truth, pred, level = rr.phenotype_predictions(inp)
     parts = [pd.DataFrame({"visit_id": p.index, "system": s, "answer": p.to_numpy(),
-                           "difficulty": level.reindex(p.index).to_numpy()})
+                           "difficulty": level.reindex(p.index).to_numpy(), "truth": truth.reindex(p.index).to_numpy()})
              for s, p in pred.items()]
     return pd.concat(parts, ignore_index=True)
 
