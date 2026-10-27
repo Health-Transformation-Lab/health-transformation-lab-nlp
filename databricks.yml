@@ -94,6 +94,12 @@ targets:
       trigger_pause_status: PAUSED
     variables:
       judge_endpoint: databricks-meta-llama-3-3-70b-instruct   # pay-per-token; synthetic, de-identified notes only
+    resources:
+      catalogs:
+        dental_omop:
+          # dev has Default Storage: the catalog was made with SQL and adopted (docs/deployment.md), which
+          # gives it the workspace's default storage root. Stating it keeps the plan from recreating the catalog.
+          storage_root: s3://dbstorage-prod-ast0p/uc/556de223-f832-4c59-8269-f8bebde9a978/71a2bfe2-25ec-4dde-ad73-b6f34409fcef
 
   # Shared test environment. Deployed by CI from main, runs as the service principal.
   uat:

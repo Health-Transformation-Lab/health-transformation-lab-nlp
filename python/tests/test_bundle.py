@@ -223,3 +223,13 @@ def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
         for item in page["layout"]:
             for q in item["widget"].get("queries", []):
                 assert q["query"]["datasetName"] in names, item["widget"]["name"]
+
+
+def test_dev_catalog_states_its_default_storage_root():
+    """dev's dental_omop was made with SQL on Default Storage (docs/deployment.md), which sets a storage
+    root; without it in the config the deploy plans to recreate the catalog (prevent_destroy stops it)."""
+    root, _ = _load()
+    dev = root["targets"]["dev"]["resources"]["catalogs"]["dental_omop"]
+    assert dev["storage_root"].startswith("s3://") and "/uc/" in dev["storage_root"]
+    for env in ("uat", "prod"):
+        assert "catalogs" not in root["targets"][env].get("resources", {})
