@@ -18,6 +18,9 @@ Writes:
   data/deid/maccrobat_scores.csv    one row per engine
   data/deid/maccrobat_by_type.csv   per engine, role and entity type: share touched, share of characters removed
   data/deid/maccrobat_not_run.csv   engines that couldn't run here, and why
+
+routed+guard uses the routes chosen on the challenge set (data/deid/routes.csv, written by
+26_deid_benchmark.py), not routes chosen on MACCROBAT.
 """
 
 import argparse
@@ -33,7 +36,8 @@ from dental_omop_nlp.paths import DEID_DIR, EXTERNAL_DIR, RAW_DIR
 
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
            "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
-           "hf_obi", "hf_obi+regex_v2+guard", "hf_stanford+presidio+regex_v2+guard"]
+           "hf_obi", "hf_obi+regex_v2+guard", "hf_stanford+presidio+regex_v2+guard",
+           "hf_stanford+hf_obi+regex_v2+guard", "routed+guard"]   # every method scored by 26_deid_benchmark.py
 ap = argparse.ArgumentParser()
 ap.add_argument("--source", choices=["brat", "bio"], default="brat")
 ap.add_argument("--path", default=None, help="the zip or folder (brat), or the JSONL (bio)")
@@ -52,10 +56,22 @@ recs = (maccrobat.load_brat if a.source == "brat" else maccrobat.load_bio)(a.pat
 n_ent = pd.Series([e["role"] for r in recs for e in r["entities"]]).value_counts()
 print(f"{len(recs)} documents; entities by role: {n_ent.to_dict()}")
 
+# Each base engine runs once per document; the unions reuse its spans.
+for _name, _fn in dict(deid.ENGINES).items():
+    deid.ENGINES[_name] = functools.lru_cache(maxsize=None)(lambda t, _fn=_fn: tuple(_fn(t)))
+
+
+def _engine(spec: str):
+    if spec != "routed+guard":
+        return deid.get_engine(spec)
+    routes = deid_eval.routes_from_table(pd.read_csv(DEID_DIR / "routes.csv"))
+    return deid.routed_engine(routes, {n: lambda t, n=n: list(deid.ENGINES[n](t)) for n in routes})
+
+
 scores, by_type, not_run = [], [], []
 for spec in a.engines.split(","):
     try:
-        detect = deid.get_engine(spec)
+        detect = _engine(spec)
         detect(recs[0]["text"])
     except Exception as e:  # noqa: BLE001 - missing package or model: record and skip
         not_run.append({"method": spec, "reason": f"{type(e).__name__}: {str(e)[:160]}"})

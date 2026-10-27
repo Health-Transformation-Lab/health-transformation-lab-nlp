@@ -266,7 +266,7 @@ def test_tables_use_the_readme_names(inp, answers):
     from dental_omop_nlp.paths import REPO_ROOT
     m = js.judge_metrics(inp, answers, _perfect_judgments(inp, answers), n_boot=20)
     header = next(line for line in (REPO_ROOT / "docs" / "results.md").read_text().splitlines()
-                  if line.startswith("| Rank | System |"))
+                  if line.startswith("| Rank | Method |"))
     for label in m["metric_label"].unique():
         assert label.split(":")[0] in header, label          # the README's column names, verbatim
     assert set(m.loc[m.metric == "incorrectly_assigned", "metric_label"]) == {rr.COL_ASSIGNED}

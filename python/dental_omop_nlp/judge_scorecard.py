@@ -119,7 +119,7 @@ LEVEL_NAMES = {"L1": "easy", "L2": "medium", "L3": "hard"}   # the README's Easy
 # The README's own column names (readme_results), so tables and the dashboard read like the README.
 METRIC_LABELS = {"correct": "Correct", "incorrectly_assigned": rr.COL_ASSIGNED,
                  "incorrectly_ruled_out": rr.COL_NOT_ASSIGNED, "incorrect_stage": "Incorrect stage",
-                 "no_answer": "No answer", "unsafe_rate": "Unsafe errors", "sensitivity": "Sensitivity",
+                 "no_answer": rr.COL_NO_ANSWER, "unsafe_rate": "Unsafe errors", "sensitivity": "Sensitivity",
                  "specificity": "Specificity", "ppv": "PPV", "npv": "NPV", "stage4_correct": "Stage 4 correct",
                  **{f"correct_{lv}": f"Correct: {n} note" for lv, n in LEVEL_NAMES.items()}}
 STATUS_NAMES = {"healthy": "Healthy", "gingivitis": "Gingivitis", "periodontitis_stage_1": "Stage I",
