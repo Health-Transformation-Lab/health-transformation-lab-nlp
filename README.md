@@ -1,8 +1,8 @@
 # Health Transformation Lab
 
-> **Personal learning project.** Built on my own time. "Health Transformation Lab" is a working name for a
-> personal idea: not affiliated with or endorsed by any employer, institution or vendor, and nothing here is any
-> organization's plan, study or finding. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
+> **Personal learning project.** Built on my own time: not affiliated with or endorsed by any employer,
+> institution or vendor, and nothing here is any organization's plan, study or finding. Synthetic data only. See
+> [DISCLAIMER.md](DISCLAIMER.md).
 
 **The goal: better health answers from AI, and better care for the millions of people who ask.** More than 40
 million people a day ask OpenAI's assistant alone about their health (OpenAI, January 2026), and those answers shape

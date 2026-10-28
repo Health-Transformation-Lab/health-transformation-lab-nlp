@@ -98,6 +98,7 @@ erDiagram
         bigint visit_id PK, FK "review chart"
         string model_name "model id"
         string backend_code "hf (local weights) · openai (OpenAI-compatible endpoint)"
+        string model_revision_id "Kaggle Models handle or Hugging Face commit of the weights; empty before #214"
         string prompt_version_code "e.g. reader-v2"
         bigint shot_count "few-shot examples in the prompt"
         bigint input_token_count "prompt tokens"
@@ -412,6 +413,7 @@ One per LLM reader call on a chart. Written by: as fact_prediction.
 | PK,FK | `visit_id` | bigint | review chart |
 |  | `model_name` | string | model id |
 |  | `backend_code` | string | hf (local weights) · openai (OpenAI-compatible endpoint) |
+|  | `model_revision_id` | string | Kaggle Models handle or Hugging Face commit of the weights; empty before #214 |
 |  | `prompt_version_code` | string | e.g. reader-v2 |
 |  | `shot_count` | bigint | few-shot examples in the prompt |
 |  | `input_token_count` | bigint | prompt tokens |
