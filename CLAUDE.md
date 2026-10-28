@@ -15,23 +15,6 @@ This file is the only place the name may appear, to state this rule. An exceptio
 naming the file and why. `python/tests/test_no_org_references.py` fails CI if the name appears in any other tracked
 file.
 
-## Words: we find gum disease in records, we don't diagnose
-
-We aren't clinicians. "Diagnosis" is only ever something a dentist recorded (`diagnosis code`, "the recorded
-diagnosis"), never something our rules, models or agents do. What we do is phenotyping, but most readers don't know
-the word: say it plainly first and give the term once in brackets, e.g. "finding gum disease in dental records
-(phenotyping)", then "case finding".
-
-| Avoid | Write |
-|---|---|
-| diagnose, AI diagnoses, diagnostic tool | identify or find gum disease in the record; record-reading or case-finding tool |
-| accurate diagnosis, diagnosis accuracy | agreement with gum specialists reviewing the same record |
-| inaccurate or wrong diagnosis, misdiagnosis | record mismatch ("the recorded code doesn't fit the chart"); records to recheck |
-
-A mismatch is often a coding or charting gap, not a clinical error: never imply a dentist got it wrong. This covers
-docs, decks, dashboards, Genie instructions, table and column names, issues and PRs. Quoting a cited paper's own
-words is fine.
-
 ## Workflow: Spec Kit + Superpowers
 
 | Stage | Tool | Output |

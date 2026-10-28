@@ -4,14 +4,14 @@ A personal idea, not affiliated with or endorsed by any organization. Built from
 ## Slide 1 — cover
 
 PerioBench · executive pitch · the dental record (EDR) · October 2026
-The diagnosis is in the dental record.
+Gum disease is in the dental record.
 Nobody can count it.
-PerioBench: can more accurate diagnosis from the dental record improve care for gum disease, for millions of patients? Checked against gum specialists, built and tested end to end on synthetic records.
+PerioBench: can finding gum disease accurately in the dental record improve care for millions of patients? Checked against gum specialists, built and tested end to end on synthetic records.
 Health Transformation Lab
 Working name · synthetic data only
 John Bowyer · personal project, not affiliated with any organization
 
-**Speaker notes:** Gum disease is one of the most common chronic diseases in adults, and it is written down at almost every dental visit. But it is written down in pieces: a checkbox here, a billing code there, measurements, and a free-text note. Nobody can count it across clinics, so nobody can study it at scale, link it to diabetes, or see whether care is working. PerioBench asks one question: can a more accurate diagnosis from the dental record improve care for people with gum disease, so it is found earlier, treated, followed over time and managed alongside diabetes? Agreement with gum specialists is how we check the diagnosis is accurate; better patient care is the goal. Everything shown is on synthetic records, built so the right answer is known; it is a rehearsal of the real study, not a result on real patients. This is a personal project, not any organization's plan.
+**Speaker notes:** Gum disease is one of the most common chronic diseases in adults, and it is written down at almost every dental visit. But it is written down in pieces: a checkbox here, a billing code there, measurements, and a free-text note. Nobody can count it across clinics, so nobody can study it at scale, link it to diabetes, or see whether care is working. PerioBench asks one question: can finding gum disease accurately in the dental record improve care for people with it, so it is found earlier, treated, followed over time and managed alongside diabetes? Agreement with gum specialists reviewing the same records is how we check we found it accurately; better patient care is the goal. Everything shown is on synthetic records, built so the right answer is known; it is a rehearsal of the real study, not a result on real patients. This is a personal project, not any organization's plan.
 
 ## Slide 2 — problem
 

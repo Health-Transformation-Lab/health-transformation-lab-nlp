@@ -12,15 +12,15 @@ care. The lab builds those benchmarks in the open: [healthtransformationlab.org]
 
 Two benchmarks so far, each with a short pitch that drills down to the detail.
 
-## 1. PerioBench: better care for gum disease through more accurate diagnosis
+## 1. PerioBench: better care for gum disease by finding it accurately in dental records
 
-<a href="docs/edr/full_text_and_notes.md"><img src="docs/img/edr_deck_cover.png" alt="The diagnosis is in the dental record. Nobody can count it." width="480"></a>
+<a href="docs/edr/full_text_and_notes.md"><img src="docs/img/edr_deck_cover.png" alt="Gum disease is in the dental record. Nobody can count it." width="480"></a>
 
 The goal is better care for people with periodontitis. Gum disease is written down at almost every dental visit,
 but in pieces: notes, forms, codes and measurements that often disagree, so it is missed, can't be followed over
-time, and can't be linked to diabetes care. A diagnostic tool that reads the whole record accurately lets clinics
-find it earlier and treat it. PerioBench scores how accurately rules and AI diagnose it; agreement with gum
-specialists is how accuracy is checked, not the goal. It runs end to end on **synthetic** records:
+time, and can't be linked to diabetes care. A case-finding tool that reads the whole record accurately (what
+researchers call phenotyping) lets clinics find it earlier and treat it. PerioBench scores how well rules and AI find
+it in the record; agreement with gum specialists reviewing the same record is how that is checked, not the goal. It runs end to end on **synthetic** records:
 
 - the whole record, combined by rules that read the gum measurements first: **234 of 240** charts right;
 - the free-text note alone, read by a small trained model with a stage 4 rule: **219 of 240**;
