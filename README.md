@@ -1,210 +1,62 @@
-# health-transformation-lab-nlp
+# Health Transformation Lab
 
-> **Personal learning project.** Built on my own time while waiting for internal
-> approvals. Not affiliated with or endorsed by any employer, institution or
-> vendor, and nothing here reflects official business or research of any
-> organization. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
+> **Personal learning project.** Built on my own time. "Health Transformation Lab" is a working name for a
+> personal idea: not affiliated with or endorsed by any employer, institution or vendor, and nothing here is any
+> organization's plan, study or finding. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
 
-Can periodontal status be phenotyped from a dental EHR, and can AI reading the
-chart notes match clinicians? (**OMOP** = a common format for health records; **NLP** = software
-that reads free text: [what they are](docs/omop_and_nlp.md).) This repo runs that study end to end on **synthetic**
-data, to learn the pipeline, the reviewer workflow and the analysis.
+**Better oral health for millions of people, and better overall health where medicine meets dentistry, by
+testing in public the AI that reads our records and answers our questions.**
 
-<img src="docs/img/process.png" alt="Study process" width="420">
+There are two paths in, and each starts with a short pitch and drills down to the detail.
 
-**What a phenotype is:** a computable definition of a condition, meaning a rule or model that reads a
-patient's record and assigns a label the same way every time. Here the label is periodontal status:
-healthy; **gingivitis** (bleeding gums, no lasting damage); or **periodontitis** (lost gum attachment
-and bone), with a **stage** I–IV (how severe), **grade** A–C (how fast) and **extent** (how many teeth):
-[in plain words](docs/staging_grading.md#in-plain-words). Dental records rarely hold a
-reliable assigned diagnosis, so the phenotype has to be derived from the evidence below.
+## 1. The dental record (EDR): can software read the chart the way a specialist does?
 
-**Evidence types per visit:** seven parts of the dental record that each suggest a
-periodontal status. They often disagree:
+<a href="docs/edr/full_text_and_notes.md"><img src="docs/img/edr_deck_cover.png" alt="The diagnosis is in the dental record. Nobody can count it." width="480"></a>
 
-| # | Evidence type | How it's turned into a status | Phenotype order |
-|---|---|---|---|
-| 1 | Chart note: free text the clinician writes | A written diagnosis first (2017 stage as written; mild / moderate / severe → stage 1 / 2 / 3). If none, the bleeding, attachment loss and teeth lost written in the note go through the probing-chart rules. [Rules](docs/evidence_rules.md#chart-note-keyword-rules) | 3rd |
-| 2 | Exam form: PSR score and perio-status checkbox | The checkbox if ticked. Otherwise PSR: 0 healthy, 1–2 gingivitis, 3 stage 2, 4 stage 3 (never stage 1 or 4). [Rules](docs/evidence_rules.md#exam-form) | 1st |
-| 3–4 | Procedure codes, completed / planned: CDT codes, e.g. D4341 ([planned vs completed](docs/process.md#planned-vs-completed-procedures)) | A rough guess from the treatment: D4346 gingivitis, D4342 stage 1, D4341 stage 2, bone surgery stage 3, cleaning only healthy. [Rules](docs/evidence_rules.md#procedure-codes-planned--procedure-codes-done) | compared, not used |
-| 5–6 | Procedure diagnosis codes, completed / planned: ICD-10-CM on the procedure | Z01.20 healthy, K05.0x/K05.1x gingivitis, K05.3x slight / moderate / severe → stage 1 / 2 / 3 (no stage 4 code). [Rules](docs/evidence_rules.md#diagnosis-codes-planned-treatment--diagnosis-codes-done-treatment) | 2nd |
-| 7 | Probing chart: attachment loss, pockets, bleeding, teeth lost | The 2017 AAP worksheet: worst attachment loss 1–2 mm stage 1, 3–4 mm stage 2, 5 mm+ stage 3; teeth lost and complications raise it. [Rules](docs/evidence_rules.md#gum-measurements-probing-chart) | 4th |
+Gum disease is written down at almost every dental visit, but in pieces: notes, forms, codes and measurements
+that often disagree, so nobody can count it across clinics or link it to diabetes. This study reads the whole
+record, compares rules and AI with gum specialists, and runs end to end on **synthetic** records:
 
-When the evidence disagrees, the phenotype uses the first one in this order that gives a status.
-The four can be ranked 24 ways (4×3×2×1); each ranking is checked against the human reviewers, and a
-ranking that agrees better can replace this one. A radiograph AI reading can only raise the stage.
+- the whole record, combined by rules that read the gum measurements first: **234 of 240** charts right;
+- the free-text note alone, read by a small trained model with a stage 4 rule: **219 of 240**;
+- a bigger medical AI used as is, with the same rule: **185 of 240**.
 
-**Free text:** here the chart notes are the only free text and the only AI input; real records have
-more (form and chart comments, radiograph reports, referral letters): [action items](docs/action_items.md). Details: [process.md](docs/process.md).
+Scored against the generator's truth on synthetic charts, not clinical performance. Read in a different order,
+the same evidence gets 173: the order is one of the findings.
 
-**Classification: 2017 AAP/EFP by default**, the current clinical standard for diagnosis; truth,
-reviewers and AI all follow the AAP worksheet ([PDF](https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf), [staging_grading.md](docs/staging_grading.md)).
-The 2012 CDC/AAP surveillance definitions, behind national prevalence, are computed too ([site_level_omop.md](docs/site_level_omop.md)).
-
-## Results
-
-<!-- results:start (generated by python/scripts/35_readme_results.py; do not edit) -->
-> **Synthetic data, scored against the generator's truth: not clinical performance.** Real model runs (CPU, 2026-10-26), not simulated; agreement with *simulated* reviewers is a dry run and isn't shown here. One leaderboard per capability; methods aren't ranked across them.
-
-### Phenotyping: periodontal status per chart
-
-Counted on the 240 review charts, by what is available to read:
-
-1. **The whole dental record**
-2. **Only the chart note** (where structured data is missing): the best trained AI, simple keyword rules, and a medical AI used as is
-3. **One part of the record by itself**
-
-How each part of the record (gum measurements, chart note, exam form, codes, X-ray) is turned into a status: [rules for each evidence type](docs/evidence_rules.md).
-
-What the columns mean:
-
-- **Correct**: the right status (healthy, gingivitis, or periodontitis stage 1–4).
-- **Periodontitis incorrectly assigned**: said periodontitis, but the patient doesn't have it.
-- **Periodontitis correctly ruled out**: (in brackets) of the 84 charts without periodontitis, the share the method said don't have it. The standard name is specificity.
-- **Periodontitis incorrectly ruled out**: the patient has periodontitis, but the method said they don't.
-- **Periodontitis correctly assigned**: (in brackets) of the 156 charts with periodontitis, the share the method said have it. No answer counts against it. The standard name is sensitivity.
-- **Incorrect stage**: right that it is or isn't periodontitis, but the wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up.
-- **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken.
-- **Rank**: where it plausibly ranks among all 40 methods.
-- **Stage 4 rule**: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from).
-
-Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned (out of the 84 without it) + incorrectly ruled out (out of the 156 with it) + incorrect stage + no answer.
-
-| Question | Method | Correct | Periodontitis incorrectly assigned | Periodontitis incorrectly ruled out | Incorrect stage | No answer | Rank |
-|---|---|---:|---:|---:|---:|---:|---|
-| 1. Whole record available | Rules, gum measurements first | 234 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (100% correctly assigned) | 6 of 240 | 0 of 240 | 1 |
-| 2. Only the note available | Trained AI (ModernBERT) + stage 4 rule | 219 of 240 | 4 of 84 (95% correctly ruled out) | 1 of 156 (99% correctly assigned) | 16 of 240 | 0 of 240 | 2–10 |
-|  | Keyword rules (simple baseline) | 189 of 240 | 10 of 84 (88% correctly ruled out) | 8 of 156 (95% correctly assigned) | 33 of 240 | 0 of 240 | 17–32 |
-|  | Medical AI, untrained (MedGemma 1.5 4B) + stage 4 rule | 185 of 240 | 8 of 84 (90% correctly ruled out) | 10 of 156 (94% correctly assigned) | 37 of 240 | 0 of 240 | 19–33 |
-| 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (80% correctly assigned) | 2 of 240 | 45 of 240 | 14–33 |
-|  | Exam form | 149 of 240 | 10 of 84 (88% correctly ruled out) | 0 of 156 (87% correctly assigned) | 48 of 240 | 33 of 240 | 35 |
-
-All 40 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
-
-**Can an AI check the answers?** On real notes there is no answer key, so we tested whether a general-purpose AI (a large language model) could stand in for one. It read each note and gave its own status, which matched the answer key on 83% of charts but only 53% of hard notes (they leave out what the answer key is built from). Asked whether a method's answer was right, it caught most mistakes of weak methods but only 26% of the best note model's, which are near-misses such as one stage off. So it can't replace the answer key yet. (These are LLM judgments, checked against the answer key.) Details: [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading); in Databricks, the *Scorecard* dashboard.
-
-### De-identification
-
-Best method in each group, counted on the 400 synthetic notes; groups ordered by their best. What the columns mean:
-
-- **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). This risks patients.
-- **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. This damages the note the AI reads.
-- **Rank**: where it plausibly ranks among all 17 methods.
-
-| Group | Best method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Methods in group |
-|---|---|---:|---:|---|---:|
-| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 | 41 of 2,462 | 1–3 | 7 |
-| One AI tool | Databricks AI mask | 284 of 2,714 | 125 of 2,462 | 5–7 | 6 |
-| Pattern matching only | Patterns | 645 of 2,714 | 0 of 2,462 | 11–12 | 4 |
-
-All 17 methods, per 100 with a likely range for each number (95% confidence interval), on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
-
-#### The other note sets
-
-The best method on each of the other note sets; the link opens that set's full table.
-
-| Note set | Best method on it | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Details |
-|---|---|---:|---:|---|
-| John Snow Labs benchmark (48 clinical notes) | Routed by identifier type + dental-word guard | 44 of 1,479 | not labelled | [John Snow Labs benchmark](docs/results.md#john-snow-labs-benchmark) |
-| ASQ-PHI (1,051 synthetic clinical queries) | Routed by identifier type + dental-word guard | 48 of 2,975 | 201 of 219 | [ASQ-PHI](docs/results.md#asq-phi) |
-| MACCROBAT (200 real, published case reports) | Stanford AI + Presidio + patterns + dental-word guard | 0 of 105 | 820 of 22,272 | [MACCROBAT](docs/results.md#maccrobat) |
-| University of Michigan course files (40 MACCROBAT test reports) | A trained PHI tagger (exact matches only) | 33 of 195 missed or only partly found | 45 tagged wrongly | [Course tagger](docs/results.md#a-trained-phi-tagger-on-the-university-of-michigan-course-files) |
-<!-- results:end -->
-
-## What it does, step by step
-
-Summary here; **[code walkthrough](docs/code_walkthrough.md)** for how the code does each
-step, with links to the code; the Databricks notebook
-[`00_walkthrough.py`](databricks/notebooks/00_walkthrough.py) runs one section per step.
-
-| # | Step | Walkthrough |
-|---|---|---|
-| 1 | Generate synthetic patients over time (8 clinics): notes, exam forms, procedure codes and diagnoses, probing chart; fake PHI in notes | [1](docs/code_walkthrough.md#1-generate-the-synthetic-study) |
-| 2 | Remove names, dates and other identifiers; a final check holds back any note with one left | [2](docs/code_walkthrough.md#2-de-identify-and-gate) |
-| 3 | Read and compare the diagnostic evidence; build the rule-based phenotype | [3–5](docs/code_walkthrough.md#3-read-the-diagnostic-evidence) |
-| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma 1.5 4B | [6](docs/code_walkthrough.md#6-ai-models-read-the-notes) |
-| 5 | Periodontists label the same 240 charts, each on their own, in a labeling tool (Label Studio) | [7](docs/code_walkthrough.md#7-reviewers-stage-charts) |
-| 6 | Does the AI agree with the periodontists as often as they agree with each other? Also: which order of checking the evidence agrees best | [8–9](docs/code_walkthrough.md#8-reliability-and-the-acceptance-test) |
-| 7 | Over time: catch impossible changes and bad data; compare clinics; predict who gets worse | [10–12](docs/code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
-| 8 | Tooth-by-tooth measurements; both classifications; three ways to store them in OMOP | [13–15](docs/code_walkthrough.md#13-site-level-charts-both-classifications) |
-| 9 | Scale to 1M+ notes: an AI judge spot-checks answers; costs; deploy to dev, test, production | [16–18](docs/code_walkthrough.md#16-llm-judge-and-cost-at-1m-notes) |
-
-Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[dev]" && cd .. && python/scripts/make_parity_inputs.sh`; tests: `pytest -q python/tests`, `Rscript r/tests/test_parity.R`.
-
-## Ground rules
-
-- **Synthetic data only**, never PHI or employer data; no note reaches Label Studio or a model until
-  a final check finds no identifier left. **Python and R** give the same numbers (parity-tested).
-
-## How results are measured
-
-- **Acceptance test:** an AI passes if it agrees with the reviewers at least as much as
-  they agree with each other (OHDSI case validation: [video](https://www.youtube.com/watch?v=scUssf863TI)
-  from ~49 min, [paper](https://doi.org/10.1038/s41746-025-01433-4)).
-- **Kappa** is agreement beyond chance. **95% confidence intervals** (bootstrap over
-  charts) give the range the true value plausibly falls in; overlapping intervals mean two
-  methods can't be called different. [statistics](docs/statistics.md)
-- **Unsafe mistakes:** labels that could harm a patient if acted on, e.g. missed stage III–IV (tooth
-  loss). Results also split by how hard the chart is ([details](docs/dentbench_methods.md#in-plain-words)).
-- **De-identification** is scored on two numbers that pull against each other, like a spam filter.
-  **Recall:** share of identifiers removed; *higher is better* (0.96 = 4 in 100 slip through).
-  **Over-redaction:** share of identifier-free text changed anyway; *lower is better* (0.89 = 89 in 100
-  clean notes damaged, which is bad). Best so far: hf_stanford+regex_v2+guard, recall 0.96,
-  over-redaction 0.35 ([details](docs/deidentification.md#how-to-read-the-numbers)).
-
-## Models evaluated (the 12 from the evaluation sheet; `models.yaml`)
-
-All 12 are BERT-type models: AI that reads text and picks a label. [What is a BERT model?](docs/bert.md)
-
-| Model · paper · domain, role | Model · paper · domain, role |
+| For | Go to |
 |---|---|
-| [BERT base](https://huggingface.co/google-bert/bert-base-uncased) · [1810.04805](https://arxiv.org/abs/1810.04805) · general, classifier | [BiomedBERT](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) · [2007.15779](https://arxiv.org/abs/2007.15779) · biomedical, classifier |
-| [DistilBERT](https://huggingface.co/distilbert/distilbert-base-uncased) · [1910.01108](https://arxiv.org/abs/1910.01108) · general, classifier | [BioClinical ModernBERT base](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-base) · [2506.10896](https://arxiv.org/abs/2506.10896) · clinical, classifier, long context |
-| [ModernBERT base](https://huggingface.co/answerdotai/ModernBERT-base) · [2412.13663](https://arxiv.org/abs/2412.13663) · general, classifier, long context | [BioClinical ModernBERT large](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-large) · [2506.10896](https://arxiv.org/abs/2506.10896) · clinical, classifier, long context |
-| [ModernBERT large](https://huggingface.co/answerdotai/ModernBERT-large) · [2412.13663](https://arxiv.org/abs/2412.13663) · general, classifier, long context | [Clinical-Longformer](https://huggingface.co/yikuan8/Clinical-Longformer) · [2201.11838](https://arxiv.org/abs/2201.11838) · clinical, long context |
-| [Longformer](https://huggingface.co/allenai/longformer-base-4096) · [2004.05150](https://arxiv.org/abs/2004.05150) · general, long context | [SapBERT](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) · [2010.11784](https://arxiv.org/abs/2010.11784) · biomedical, concept mapping |
-| [SciBERT](https://huggingface.co/allenai/scibert_scivocab_uncased) · [1903.10676](https://arxiv.org/abs/1903.10676) · scientific, classifier | [GTE-ModernColBERT](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) · card · general, retrieval |
+| **Executives** (11 slides, 10 minutes) | [read the pitch with speaker notes](docs/edr/full_text_and_notes.md) · [slides](docs/edr/deck.html) (download and open in a browser) |
+| **Scientists** | [the study](docs/edr/README.md): the seven kinds of evidence, every method with 95% intervals, the acceptance test, models, de-identification |
+| **Engineers** | [code walkthrough](docs/code_walkthrough.md), [deployment](docs/deployment.md), [how we work](AGENTS.md) |
 
-Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it),
-[27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
-**Status:** six encoders have run on CPU (3 epochs, 2026-10-26). On the 240 synthetic review charts
-(against the generator's truth, with 95% bootstrap CIs; `28_ladder_vs_truth.py`):
-- alone they score 77-82% (ModernBERT base best), **not distinguishable** from the note rules (79%), and
-  miss nearly every stage IV chart (7 in 3,484 training notes);
-- letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
-  clearly better than the rules (difference CI excludes 0);
-- they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
-- class-weighted training (`--class-weight sqrt`) gives **no reliable gain**: over three seeds ModernBERT base
-  averages 82% (80-84%) with stage IV recall 21%, 0%, 0%; BERT base stays at 0%. The seed alone moves accuracy
-  ~4 points, as much as the spread between encoders. The `+rules4` hybrid holds at 90-91% on every seed;
-- Bio_ClinicalBERT (trained on hospital notes) scores 80%, like the others.
+## 2. The lab: is AI safe where medicine meets dentistry, and does it help people get care?
 
-The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
+<a href="docs/pitch/full_text_and_notes.md"><img src="docs/img/pitch_deck_cover.png" alt="AI passes the dental exam. It fails the real patient." width="480"></a>
 
-**MedGemma vs BERT:** `29_medgemma_vs_bert.py` scores each MedGemma run (zero-shot, few-shot, LoRA)
-against the best encoder on the same charts (paired CI, stage IV recall, by note difficulty, fallback
-rate, assumed cost). First real run, `medgemma-1.5-4b-it` zero-shot on CPU: **0.758** (0.700-0.808)
-vs 0.838 for `modernbert-base+cw`, difference -0.079 (-0.154 to -0.013); 100% / 97% / 16% on
-L1 / L2 / L3, so it reads a written diagnosis but doesn't yet stage from the chart
-([details](docs/medgemma.md)). Few-shot and LoRA not run yet (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; LoRA needs a GPU:
-[notebook 03](databricks/notebooks/03_medgemma_reader.py)); `--simulated` is a dry run, not a result.
+Twelve leading AI models average 81% on the dental licensing exam and 22% on real patient cases (GlobalDentBench, 2026), and no public
+test checks whether they connect the mouth to the rest of the body or helps people get care. The lab would write
+those missing test questions, each traced to published evidence, and measure the gain from an open agent in public.
 
-## Action items
-
-Differences from the study design and open decisions: **[docs/action_items.md](docs/action_items.md)**. Decisions made: [docs/adr/](docs/adr/README.md).
-Also: [how we work](AGENTS.md) · [references](docs/references.md) · [protocol](docs/labeling_protocol.md) · [plan](docs/plan.md) · owner John Bowyer · MIT.
-
-## Drill-downs
-
-| Topic | |
+| For | Go to |
 |---|---|
-| **Results: every method**, phenotyping and de-identification, with rank ranges | [results.md](docs/results.md) |
-| **What OMOP and NLP are**, in plain words | [omop_and_nlp.md](docs/omop_and_nlp.md) |
-| **Diagrams**: [medallion architecture](diagrams/d0_medallion_architecture.png), study process, platform, ERD, site storage, MLOps, flows | [diagrams/](diagrams/README.md) |
-| Tooth-by-tooth data in OMOP; 2017 AAP/EFP **and 2012 CDC/AAP**; storage designs on Postgres/Lakebase | [site_level_omop.md](docs/site_level_omop.md) |
-| Study design vs this repo; open decisions | [process.md](docs/process.md#integrated-phenotype-and-validation-spec-005), [action_items.md](docs/action_items.md) |
-| Dental vs medical data in OMOP; synthetic notes, review set, public datasets | [omop_dental_vs_medical.md](docs/omop_dental_vs_medical.md), [note_realism.md](docs/note_realism.md), [data_sources.md](docs/data_sources.md) |
-| MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
-| Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
-| De-identification methods and cost, human review in Label Studio; financial trade-offs; radiographs; MedGemma | [deidentification.md](docs/deidentification.md), [deid_review_protocol.md](docs/deid_review_protocol.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
-| The idea this repo tests: a personal Shark Tank pitch for an open lab that writes the missing AI test questions on medical-dental care and access to care | [pitch/](docs/pitch/README.md) |
+| **Executives** (6 slides, plus backup) | [read the pitch with speaker notes](docs/pitch/full_text_and_notes.md) · [slides](docs/pitch/deck.html) (download and open in a browser) |
+| **Detail** | [the pitch's sources and how this repo tests it](docs/pitch/README.md) |
+
+## How the two paths connect
+
+The dental record path builds synthetic patients whose right answers are known, in OMOP, the format medicine
+already uses. Those patients become test questions for the lab. One harness, with the same models, runners, harm grades
+and leaderboards, scores AI first on gum charts, then on case questions, then on broader medical-dental questions.
+
+## Run it
+
+```bash
+cd python && pip install -e ".[dev]"
+pytest -q tests                                    # Python tests
+cd .. && python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R   # Python and R give the same numbers
+python docs/build_decks.py                         # rebuild both decks from docs/<deck>/slides/
+```
+
+Ground rules: synthetic data only, never PHI; Python and R in parity; anything simulated is labelled simulated
+([AGENTS.md](AGENTS.md)). Open decisions: [action items](docs/action_items.md). Owner John Bowyer · MIT licence.

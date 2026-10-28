@@ -1,5 +1,5 @@
 """Regenerate the results leaderboards from committed results (no re-runs): the summary block in
-README.md and the full tables in docs/results.md.
+the EDR study page (docs/edr/README.md) and the full tables in docs/results.md.
 
     python scripts/35_readme_results.py           # rewrite both
     python scripts/35_readme_results.py --check   # exit 1 if either is stale
@@ -12,14 +12,13 @@ import argparse
 import sys
 
 from health_transformation_lab_nlp import readme_results as rr
-from health_transformation_lab_nlp.paths import REPO_ROOT
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--check", action="store_true")
 a = ap.parse_args()
 
 inp = rr.load_inputs()
-readme = REPO_ROOT / "README.md"
+readme = rr.SUMMARY_DOC
 text = readme.read_text()
 new = {readme: rr.update_readme(text, rr.results_markdown(inp)), rr.RESULTS_DOC: rr.details_markdown(inp)}
 stale = [p for p, t in new.items() if not p.exists() or p.read_text() != t]

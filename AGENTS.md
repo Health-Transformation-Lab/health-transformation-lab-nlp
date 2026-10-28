@@ -177,9 +177,10 @@ cd python && pip install -e ".[dev]"
 pytest -q tests                                   # Python tests
 cd .. && python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R   # R vs Python parity
 cd python && python scripts/10_build_study.py     # rebuild study datasets (seeded)
-cd python && python scripts/35_readme_results.py  # refresh the README results leaderboards after new results
+cd python && python scripts/35_readme_results.py  # refresh the results leaderboards (docs/edr/README.md, docs/results.md)
 cd python && python scripts/42_build_dashboards.py  # rebuild the grader dashboards and Genie spaces (spec 019)
 cd python && python scripts/43_simulated_grader.py  # the lab grader's SIMULATED sample (seeded), until real runs exist
+python docs/build_decks.py                        # rebuild the slide decks after editing docs/<deck>/slides/
 ```
 
 Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
