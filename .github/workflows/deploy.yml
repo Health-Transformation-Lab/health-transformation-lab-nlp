@@ -1,5 +1,6 @@
-# Deploy the bundle. dev and uat on every push to main and on demand;
-# prod on demand only, gated by the "prod" GitHub environment (required reviewers).
+# Deploy the bundle to Databricks dev on every merge to main, and on demand. Only dev exists today.
+# uat and prod are ready but optional: a merge also tries uat, which skips until its GitHub environment has
+# a secret; prod is on demand only, gated by the "prod" GitHub environment (required reviewers).
 #
 # Each GitHub environment (dev, uat, prod) holds the service principal's sign-in (OAuth M2M;
 # databricks/setup/create_service_principal.sh makes the principal):
@@ -7,7 +8,7 @@
 # (an older setup with HOST / CLIENT_ID as secrets still works), and variables passed to the
 # bundle as BUNDLE_VAR_<name>, e.g.
 #   SERVICE_PRINCIPAL, JUDGE_ENDPOINT, WAREHOUSE_NAME, USERS_GROUP
-name: Deploy to Databricks (dev and uat on merge, prod by hand)
+name: Deploy to Databricks dev (runs on every merge)
 on:
   push:
     branches: [main]
@@ -18,7 +19,7 @@ on:
         description: Bundle target
         type: choice
         options: [dev, uat, prod]
-        default: uat
+        default: dev
       run_benchmark:
         description: Run the study + benchmark job after deploying
         type: boolean

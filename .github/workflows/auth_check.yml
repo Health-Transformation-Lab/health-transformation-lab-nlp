@@ -9,7 +9,7 @@ on:
         description: GitHub environment
         type: choice
         options: [dev, uat, prod]
-        default: uat
+        default: dev
 
 permissions:
   contents: read

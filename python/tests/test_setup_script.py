@@ -160,3 +160,14 @@ def test_workflow_names_say_what_they_do():
     for f in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
         name = yaml.safe_load(f.read_text())["name"]
         assert len(name.split()) >= 4 and "_" not in name and name[0].isupper(), (f.name, name)
+
+
+def test_manual_runs_default_to_dev_the_only_environment_that_exists():
+    """Only dev exists; uat and prod stay possible (they skip until their secret is set) but a manual run
+    shouldn't default to one of them, and the deploy name shouldn't promise them."""
+    for f in ("deploy.yml", "auth_check.yml"):
+        doc = yaml.safe_load((ROOT / ".github" / "workflows" / f).read_text())
+        on = doc.get("on", doc.get(True))
+        assert on["workflow_dispatch"]["inputs"]["target"]["default"] == "dev", f
+    name = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())["name"]
+    assert "dev" in name and "uat" not in name and "prod" not in name, name

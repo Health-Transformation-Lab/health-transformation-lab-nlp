@@ -116,7 +116,7 @@ databricks bundle validate -t dev
 databricks bundle run      -t dev study_benchmark
 ```
 
-To deploy dev before a merge, run the deploy workflow by hand (Actions → *Deploy to Databricks* → Run workflow → dev).
+To deploy dev before a merge, run the deploy workflow by hand (Actions → *Deploy to Databricks dev* → Run workflow; the target is dev by default).
 
 ## Deploy with CI (dev, uat, prod)
 
