@@ -81,6 +81,7 @@ resources:
     # Run on demand: no schedule.
     medgemma_reader:
       name: MedGemma reader
+      max_concurrent_runs: 2   # a new run starts even while an old one waits hours to retry
       tags:
         project: dental-omop-nlp
         data: synthetic
@@ -112,6 +113,7 @@ resources:
 
     encoder_gpu:
       name: Encoders on GPU
+      max_concurrent_runs: 2   # a new run starts even while an old one waits hours to retry
       tags:
         project: dental-omop-nlp
         data: synthetic
