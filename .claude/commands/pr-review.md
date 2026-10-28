@@ -10,7 +10,7 @@ Review `$ARGUMENTS` (a PR number, a branch, or empty for the current branch) usi
    SHA, CI check runs). For a branch, use `git merge-base origin/main <branch>` as `BASE_SHA`.
 2. Run the three scans (secrets, PHI / real data, organization claims) on the full diff.
 3. Dispatch the Superpowers `requesting-code-review` reviewer over `BASE_SHA..HEAD_SHA` with the
-   rubric and `CLAUDE.md` as requirements; then verify each finding with `receiving-code-review`.
+   rubric, `AGENTS.md` and `CLAUDE.md` as requirements; then verify each finding with `receiving-code-review`.
    Keep only verified findings.
 4. Run `cd python && pytest -q tests` and `ruff check` on changed Python files if the diff touches
    Python; note R changes and whether CI `r-parity` passed.

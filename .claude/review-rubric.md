@@ -1,7 +1,7 @@
 # PR review rubric (shared by /create-pr and /pr-review)
 
 Adapted from the open-navigator `/create-pr` review flow (Superpowers code-review skills,
-verified findings only, mandatory secrets scan), with this repo's rules from `CLAUDE.md`,
+verified findings only, mandatory secrets scan), with this repo's rules from `AGENTS.md` (and `CLAUDE.md`),
 `DISCLAIMER.md` and `.specify/memory/constitution.md`.
 
 ## How the review runs
@@ -17,9 +17,9 @@ verified findings only, mandatory secrets scan), with this repo's rules from `CL
      `data/external/<name>/` with a source-and-licence README are allowed (constitution v1.2.0). Fake PHI from the generators is
      expected; anything that could be real is 🔴 Blocking.
    - **Organization claims:** text describing any organization's plan, study, finding or partnership;
-     company claims without a citation (`CLAUDE.md` ground rules). 🔴 Blocking.
+     company claims without a citation (`AGENTS.md` ground rules). 🔴 Blocking.
 3. **Reviewer.** Use Superpowers `requesting-code-review`: a read-only reviewer subagent over the
-   range, with this rubric and `CLAUDE.md` appended to the requirements.
+   range, with this rubric, `AGENTS.md` and `CLAUDE.md` appended to the requirements.
 4. **Verify.** Use Superpowers `receiving-code-review`: reproduce or trace each finding against the
    code before writing it down. Drop what doesn't survive. Severity: Critical → 🔴 Blocking,
    Important → 🟡 Should fix, Minor → 🔵 Nit.
