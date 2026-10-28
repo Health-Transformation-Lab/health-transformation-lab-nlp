@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Health Transformation Lab</title>
+<meta name="description" content="Open benchmarks for better AI health answers and better care, where medicine meets dentistry. A personal learning project; synthetic data only.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400..700&display=swap">
+<style>
+  :root {
+    --bg: #F7F5EF; --surface: #FFFFFF; --ink: #0F2A33; --ink-2: #3D5560; --ink-3: #6B7F86;
+    --rule: #D9D3C4; --accent: #B8541F; --accent-soft: #F2A070; --hero: #0F2A33; --hero-ink: #F7F5EF; --hero-2: #D5E3E1;
+    --display: "Libre Baskerville", Georgia, serif; --body: "Public Sans", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0B1E24; --surface: #12303A; --ink: #EEF2EF; --ink-2: #BFD0CC; --ink-3: #8EA5A3;
+      --rule: #23444E; --accent: #F2A070; --hero: #071519; --hero-2: #BFD0CC;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header.hero { background: var(--hero); color: var(--hero-ink); padding: 72px 0 64px; }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-soft); }
+  h1 { font: 700 clamp(32px, 5.5vw, 54px)/1.15 var(--display); margin: 16px 0 20px; max-width: 18ch; }
+  h1 em { font-style: normal; color: var(--accent-soft); }
+  .lede { font-size: 19px; color: var(--hero-2); max-width: 62ch; margin: 0; }
+  .tag { display: inline-block; margin-top: 24px; font-size: 12px; font-weight: 700; letter-spacing: .12em;
+         text-transform: uppercase; background: var(--accent-soft); color: #0F2A33; border-radius: 6px; padding: 6px 12px; }
+  main section { padding: 56px 0 8px; }
+  h2 { font: 700 26px/1.25 var(--display); margin: 0 0 8px; }
+  .sub { color: var(--ink-2); margin: 0 0 28px; max-width: 66ch; }
+  .benches { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+  .bench { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 24px;
+           display: flex; flex-direction: column; gap: 12px; }
+  .bench .status { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .bench h3 { font: 700 22px/1.25 var(--display); margin: 0; }
+  .bench p { margin: 0; color: var(--ink-2); }
+  .bench ul { margin: 0; padding-left: 1.1em; color: var(--ink-2); }
+  .bench .num { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+  .bench .links { margin-top: auto; padding-top: 8px; display: flex; flex-wrap: wrap; gap: 8px 16px; font-weight: 600; }
+  .note { font-size: 14px; color: var(--ink-3); }
+  .steps { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 0; padding: 0; list-style: none; }
+  .steps li { border-top: 3px solid var(--accent); padding-top: 12px; color: var(--ink-2); }
+  .steps b { display: block; color: var(--ink); }
+  footer { margin-top: 64px; border-top: 1px solid var(--rule); padding: 24px 0 48px; font-size: 14px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Health Transformation Lab</span>
+    <h1>Better health answers from AI, and <em>better care for the millions of people who ask</em>.</h1>
+    <p class="lede">More than 40 million people a day ask OpenAI's assistant alone about their health (OpenAI,
+      January 2026). Those answers shape whether people see a dentist or a doctor, what they ask for, and what care
+      they get. AI developers such as OpenAI, Anthropic and Google improve what public benchmarks measure, and no public
+      benchmark we found checks answers where medicine meets dentistry, or whether an answer helps someone get care.
+      The lab builds those benchmarks in the open, so the answers, and the care that follows, can get better.</p>
+    <span class="tag">Personal learning project · synthetic data only</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="benchmarks">
+    <h2>Three benchmarks</h2>
+    <p class="sub">Each one is open, checked against experts, and reports possible harm to patients alongside accuracy.</p>
+    <div class="benches">
+      <article class="bench" id="periobench">
+        <span class="status">Built, on synthetic records</span>
+        <h3>PerioBench: better care for gum disease through more accurate diagnosis</h3>
+        <p>Gum disease is written down at almost every dental visit, but in pieces that often disagree, so it is
+          missed, can't be followed over time, and can't be linked to diabetes care. PerioBench scores how accurately
+          rules and AI diagnose it from the whole dental record; agreement with gum specialists is how accuracy is
+          checked, not the goal.</p>
+        <ul>
+          <li>The whole record, combined by rules: <span class="num">234 of 240</span> charts right</li>
+          <li>The note alone, a small trained model: <span class="num">219 of 240</span></li>
+          <li>A bigger medical AI used as is: <span class="num">185 of 240</span></li>
+        </ul>
+        <p class="note">Scored against the generator's truth on synthetic charts: not clinical performance.</p>
+        <div class="links">
+          <a href="https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/docs/edr/full_text_and_notes.md">The pitch</a>
+          <a href="https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/docs/edr/README.md">The study</a>
+        </div>
+      </article>
+      <article class="bench" id="oralhealthbench">
+        <span class="status">Proposed</span>
+        <h3>OralHealthBench: where medicine meets dentistry</h3>
+        <p>Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases
+          (GlobalDentBench, 2026). OralHealthBench asks whether they connect the mouth to the rest of the body: a
+          medicine that makes a tooth extraction unsafe, or gum disease and diabetes. Each question is traced to
+          published evidence, with public results so improvements are visible to everyone.</p>
+        <div class="links">
+          <a href="https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/docs/pitch/full_text_and_notes.md">The pitch</a>
+          <a href="https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/docs/pitch/README.md">Sources</a>
+        </div>
+      </article>
+      <article class="bench" id="accessbench">
+        <span class="status">Proposed</span>
+        <h3>AccessBench: does the answer help someone get care?</h3>
+        <p>An answer can be correct and still not help someone with no coverage, no car or no dentist nearby.
+          AccessBench grades whether an answer works in the person's circumstances, with the same rubric
+          and harm grades as OralHealthBench; an answer that delays urgent care is unsafe.</p>
+        <div class="links">
+          <a href="https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/docs/pitch/full_text_and_notes.md">The pitch</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>How the benchmarks help</h2>
+    <p class="sub">A benchmark improves answers when AI developers can run it easily and trust what it measures.</p>
+    <ul class="steps">
+      <li><b>Realistic questions</b>Conversations graded by key-point rubrics, in the format health benchmarks already use.</li>
+      <li><b>Safety first</b>Answers that could harm a patient are counted and reported, not only the right ones.</li>
+      <li><b>Open and cheap to run</b>Open data and one harness, with the cost per answer printed.</li>
+      <li><b>Shared results</b>Results published and checked with clinical partners, so progress is easy to see.</li>
+    </ul>
+  </section>
+
+  <section id="code">
+    <h2>The code</h2>
+    <p class="sub">Everything is open: the synthetic data generator, every method, the graders and the dashboards.
+      <a href="https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp">Read it on GitHub</a>.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><b>Personal learning project</b>, built on my own time. "Health Transformation Lab" is a working name: not
+      affiliated with or endorsed by any employer, institution or vendor, and nothing here is any organization's plan,
+      study or finding. Synthetic data only; no real patient data.
+      <a href="https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/DISCLAIMER.md">Disclaimer</a>.</p>
+    <p>John Bowyer · MIT licence</p>
+  </div>
+</footer>
+
+</body>
+</html>
