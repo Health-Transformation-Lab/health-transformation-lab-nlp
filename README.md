@@ -4,12 +4,15 @@
 > personal idea: not affiliated with or endorsed by any employer, institution or vendor, and nothing here is any
 > organization's plan, study or finding. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
 
-**Better oral health for millions of people, and better overall health where medicine meets dentistry, by
-testing in public the AI that reads our records and answers our questions.**
+**The goal: hold the AI leaders accountable for correct health information, so they fix their scores and health
+outcomes improve for millions of people.** OpenAI, Anthropic, Google and others are graded on public benchmarks and
+compete to raise their scores; more than 40 million people a day ask OpenAI's assistant alone about health (OpenAI,
+January 2026). What a benchmark tests is what gets fixed, and no public benchmark we found tests where medicine meets dentistry, or
+whether an answer helps someone get care. The lab writes those benchmarks and publishes the scores.
 
-There are two paths in, and each starts with a short pitch and drills down to the detail.
+Two benchmarks so far, each with a short pitch that drills down to the detail.
 
-## 1. The dental record (EDR): can software read the chart the way a specialist does?
+## 1. PerioBench: can AI read the dental record the way a gum specialist does?
 
 <a href="docs/edr/full_text_and_notes.md"><img src="docs/img/edr_deck_cover.png" alt="The diagnosis is in the dental record. Nobody can count it." width="480"></a>
 
@@ -30,13 +33,16 @@ the same evidence gets 173: the order is one of the findings.
 | **Scientists** | [the study](docs/edr/README.md): the seven kinds of evidence, every method with 95% intervals, the acceptance test, models, de-identification |
 | **Engineers** | [code walkthrough](docs/code_walkthrough.md), [deployment](docs/deployment.md), [how we work](AGENTS.md) |
 
-## 2. The lab: is AI safe where medicine meets dentistry, and does it help people get care?
+## 2. OralHealthBench: hold the AI leaders accountable where medicine meets dentistry
 
 <a href="docs/pitch/full_text_and_notes.md"><img src="docs/img/pitch_deck_cover.png" alt="AI passes the dental exam. It fails the real patient." width="480"></a>
 
-Twelve leading AI models average 81% on the dental licensing exam and 22% on real patient cases (GlobalDentBench, 2026), and no public
-test checks whether they connect the mouth to the rest of the body or helps people get care. The lab would write
-those missing test questions, each traced to published evidence, and measure the gain from an open agent in public.
+Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench,
+2026). No public test we found checks whether they connect the mouth to the rest of the body: a medicine that makes a tooth
+extraction unsafe, or gum disease and diabetes. OralHealthBench puts those questions, each traced to published
+evidence, on a public scorecard the AI leaders answer to, and measures how much an open evidence agent improves
+their answers. Its companion, **AccessBench**, asks whether an answer works for someone with no coverage, no car or
+no dentist nearby.
 
 | For | Go to |
 |---|---|
