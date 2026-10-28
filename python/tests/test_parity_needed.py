@@ -1,0 +1,68 @@
+"""CI runs R parity on a pull request only when a change can reach it (issue #152): .github/scripts/parity_needed.py
+works out what make_parity_inputs.sh depends on and compares it with the changed files."""
+
+import importlib.util
+
+import pytest
+
+from dental_omop_nlp.paths import REPO_ROOT
+
+_spec = importlib.util.spec_from_file_location("parity_needed", REPO_ROOT / ".github" / "scripts" / "parity_needed.py")
+pn = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(pn)
+
+
+@pytest.fixture(scope="module")
+def deps():
+    return pn.dependencies(REPO_ROOT)
+
+
+def test_the_pipeline_scripts_and_the_modules_they_import_are_dependencies(deps):
+    assert "python/scripts/make_parity_inputs.sh" in deps
+    assert "python/scripts/13_reliability.py" in deps                 # run by make_parity_inputs.sh
+    assert "python/dental_omop_nlp/reliability.py" in deps            # imported by it
+    assert "python/dental_omop_nlp/labels.py" in deps                 # imported through other modules
+    assert "python/dental_omop_nlp/__init__.py" in deps
+    assert "python/dental_omop_nlp/readme_results.py" in deps        # 36_judge_scorecard.py imports it
+
+
+def test_modules_the_pipeline_never_imports_are_not_dependencies(deps):
+    for path in ("python/dental_omop_nlp/dashboards.py", "python/dental_omop_nlp/grader_tables.py",
+                 "python/scripts/35_readme_results.py"):
+        assert path not in deps, path
+
+
+@pytest.mark.parametrize("changed", [
+    ["r/R/04_reliability.R"],
+    ["python/dental_omop_nlp/reliability.py"],
+    ["data/datasets/ai_predictions_bert-base.csv"],
+    ["eval/score.py"],
+    ["python/pyproject.toml"],
+    [".github/workflows/ci.yml"],
+    [".github/scripts/parity_needed.py"],
+    ["docs/results.md", "python/dental_omop_nlp/labels.py"],      # one reaching file is enough
+])
+def test_a_change_parity_reads_runs_it(changed):
+    assert pn.needed(changed, REPO_ROOT)
+
+
+@pytest.mark.parametrize("changed", [
+    [],
+    ["README.md", "docs/edr/README.md"],
+    ["python/tests/test_decks.py"],
+    ["python/dental_omop_nlp/dashboards.py", "databricks/dashboards/dq_grader.lvdash.json"],
+    ["python/scripts/35_readme_results.py", "python/scripts/42_build_dashboards.py"],
+    ["databricks/notebooks/10_load_results.py", "infra/azure/main.tf"],
+])
+def test_a_change_parity_never_reads_skips_it(changed):
+    assert not pn.needed(changed, REPO_ROOT)
+
+
+def test_ci_skips_parity_only_on_pull_requests_and_runs_it_weekly():
+    import yaml
+    wf = yaml.safe_load((REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text())
+    job = wf["jobs"]["r-parity"]
+    assert job["needs"] == "changes" and job["if"] == "needs.changes.outputs.parity == 'true'"
+    step = wf["jobs"]["changes"]["steps"][-1]["run"]
+    assert 'github.event_name }}" = "pull_request"' in step and "needed=true" in step   # everything else: full run
+    assert wf[True]["schedule"]                                                            # the weekly full run

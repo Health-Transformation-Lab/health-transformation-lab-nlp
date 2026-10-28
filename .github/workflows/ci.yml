@@ -9,6 +9,8 @@ on:
   pull_request:
     paths-ignore: ["docs/**", "**/*.md", "diagrams/**"]
   workflow_dispatch:      # Actions -> ci -> Run workflow: rerun the checks on any branch by hand
+  schedule:
+    - cron: "17 6 * * 1"  # Mondays: R parity in full, whatever changed (issue #152)
 
 # A new push to the same PR cancels the run still going for the previous push.
 concurrency:
@@ -16,6 +18,27 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    # R parity reruns the whole Python pipeline (~5 min). On a pull request it runs only when a changed file can reach
+    # it (.github/scripts/parity_needed.py); pushes to main, manual runs and the Monday run always run it. A skipped
+    # job counts as passing for required checks.
+    runs-on: ubuntu-latest
+    outputs:
+      parity: ${{ steps.parity.outputs.needed }}
+    steps:
+      - uses: actions/checkout@v6
+        with: {fetch-depth: 0}
+      - id: parity
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python .github/scripts/parity_needed.py >> "$GITHUB_OUTPUT"
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
   python:
     runs-on: ubuntu-latest
     steps:
@@ -44,6 +67,8 @@ jobs:
       - run: cd python && python scripts/01_build_dataset.py && pytest -q tests/test_db_postgres.py tests/test_site_designs.py
 
   r-parity:
+    needs: changes
+    if: needs.changes.outputs.parity == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
