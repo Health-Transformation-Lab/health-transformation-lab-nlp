@@ -152,7 +152,7 @@ pill(d, sub("databricks.yml", "resources/*.yml", "dev · uat · prod"), 440, 110
 pill(d, "<b>deploy.yml</b> → bundle deploy → <b>Load results</b><font style='font-size:10px' color='#5B6B73'><br>"
         "jobs: load_results · medgemma_reader · judge_scorecard · llm_judge · encoder_gpu · study_benchmark</font>", 645, 110, 405, 52, "lakeflow-jobs")
 ing = pill(d, sub("Git folder", "data/datasets/", "(bundle sync)"), 228, 236, 144, 64, "notebooks")
-nb = pill(d, sub("10_load_results.py", "07_judge_scorecard.py", "02_llm_judge.sql"), 402, 214, 170, 62, "notebooks")
+nb = pill(d, sub("11 migrate → 10 load results", "07_judge_scorecard.py", "02_llm_judge.sql"), 402, 214, 170, 62, "notebooks")
 gpu = pill(d, sub("03 MedGemma reader", "serverless GPU", "6 retries, 30 min apart"), 402, 282, 170, 46, "databricks")
 py = pill(d, sub("python/dental_omop_nlp/", "results_store.py · delta.py", "judge_scorecard.py"), 584, 232, 166, 72)
 ms = pill(d, sub("serving endpoint", "var.judge_endpoint · max_usd 5"), 782, 216, 268, 44, "model-serving")
@@ -163,8 +163,9 @@ pill(d, sub("MLflow experiment + UC model", "perio_note_classifier"), 776, 374, 
 pill(d, sub("Delta tables", "UC managed"), 232, 482, 130, 52, "delta-lake")
 b = d.v("bronze_dental_omop_perio<br><font style='font-size:10px'>no tables yet</font>", 374, 478, 150, 60, CYL + BRONZE)
 s = d.v("silver_dental_omop_perio<br><font style='font-size:10px'>no tables yet</font>", 536, 478, 150, 60, CYL + SILVER)
-g = d.v("<b>gold_dental_omop_perio</b><font style='font-size:10px'><br>result_files · ai_predictions · llm_reader_runs<br>"
-        "chart_answers · judgments · judge_metrics<br>judge_agreement · judge_run · deid_scores</font>", 700, 466, 260, 84, CYL + GOLD)
+g = d.v("<b>gold_dental_omop_perio</b><font style='font-size:10px'><br>dim_result_file · fact_prediction · fact_llm_call<br>"
+        "fact_chart_answer · fact_judge_call · judge_metric<br>judge_agreement · judge_cost · deid_score<br>"
+        "judge_queue · fact_corpus_judge_call</font>", 700, 462, 260, 92, CYL + GOLD)
 d.e(b, s, ARROW); d.e(s, g, ARROW)
 d.v("Gold also gets, from jobs not run in this workspace yet: person · visit_occurrence · measurement · note · "
     "labeled_notes · benchmark_results (study_benchmark) · encoder_gpu_predictions (encoder_gpu)", 1100, 586, 200, 84, NOTE + "align=left;")
