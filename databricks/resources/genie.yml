@@ -4,7 +4,7 @@
 # (DATABRICKS_BUNDLE_ENGINE=direct, as CI deploys). Same names in every target.
 resources:
   genie_spaces:
-    dq_grader:
+    dq_grader_genie:
       title: EHR DQ grader
       description: Data quality of the synthetic dental record for periodontal phenotyping. Synthetic data only.
       warehouse_id: ${var.warehouse_id}

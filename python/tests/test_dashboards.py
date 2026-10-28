@@ -124,3 +124,14 @@ def test_genie_spaces_are_in_the_bundle_and_ci_has_a_cli_that_knows_them():
     for wf in ("ci.yml", "deploy.yml"):
         pins = re.findall(r"databricks/setup-cli@v(\d+)\.(\d+)", (REPO_ROOT / ".github" / "workflows" / wf).read_text())
         assert pins and all((int(a), int(b)) >= (1, 3) for a, b in pins), wf   # genie_spaces: CLI 1.3.0
+
+
+def test_bundle_resource_keys_are_unique_across_resource_types():
+    # bundle validate: "multiple resources ... have been defined with the same key" (a dashboard and a space)
+    import yaml
+    keys = []
+    for f in sorted((REPO_ROOT / "databricks" / "resources").glob("*.yml")):
+        for kind, items in (yaml.safe_load(f.read_text()).get("resources") or {}).items():
+            keys += [(k, f"{f.name}:{kind}") for k in items]
+    names = [k for k, _ in keys]
+    assert len(names) == len(set(names)), sorted(x for x in keys if names.count(x[0]) > 1)
