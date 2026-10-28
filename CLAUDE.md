@@ -15,6 +15,7 @@ The rules above (in `AGENTS.md`) apply to every agent. This file adds Claude Cod
 | Session plan | Superpowers `writing-plans`, then `executing-plans` or `subagent-driven-development` | `docs/superpowers/plans/YYYY-MM-DD-topic.md` |
 | Each task | Superpowers `test-driven-development` | failing test → code → passing test |
 | Before saying done | Superpowers `verification-before-completion` | commands run, output checked |
+| Settings, secrets, writes | AGENTS.md "Configuration and secrets", "Failures, retries and reruns"; background in `docs/operations.md` | register updated, settings checked at start, writes idempotent |
 | Open a PR | `/create-pr` (checks, opens the PR with `Closes #<issue>`, reviews it) | PR + `pull_requests/pr-<n>-review.md` |
 | Before merge | `/pr-review <n>` (Superpowers `requesting-code-review`, rubric in `.claude/review-rubric.md`) | `pull_requests/pr-<n>-review.md` |
 

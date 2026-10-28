@@ -39,6 +39,14 @@ it is scored on the same 240 review charts with the same code, and its results a
 - **Label the output.** Results are `agent:chart_review` (or `sim:chart_review` for a simulated dry run)
   and are LLM output, said so wherever they're shown.
 - **Names are identical in every target** (root `AGENTS.md`): no `dev_` prefixes, no `mode: development`.
+- **Configuration is checked first** (root `AGENTS.md`, "Configuration and secrets"): with the endpoint
+  variable `none` the job skips with a message; an endpoint that is set but doesn't answer one cheap call
+  fails before any visit is read, naming the variable.
+- **Writes are idempotent**: results for a run replace that run's rows (keyed by run id and `visit_id`),
+  so a repair re-run never doubles them.
+- **Severity of its failures**: a quote-gate failure rate above the threshold, or any note reaching the
+  model without passing the leak gate, is SEV1 (stop the run); an endpoint error that retries clear is SEV3;
+  cost above `max_usd` stops the run before it starts (SEV2 if it happens in a scheduled run).
 
 ## Tools
 
@@ -91,7 +99,7 @@ Planned; add each file with its tests, under the spec.
 | `databricks/agents/chart_review/CLAUDE.md` | Imports this file for Claude Code |
 | `databricks/agents/chart_review/agent.py` | The agent: prompt, tool calls, output validation (MLflow agent interface) |
 | `databricks/agents/chart_review/tools.sql` | `CREATE FUNCTION` statements for the Unity Catalog tools |
-| `databricks/notebooks/10_chart_review_agent.py` | Job notebook: cost check, run on the review charts, save, score |
+| `databricks/notebooks/11_chart_review_agent.py` | Job notebook: cost check, run on the review charts, save, score |
 | `python/dental_omop_nlp/chart_review.py` | Testable logic: evidence gathering, output schema, quote checks, scoring hookup |
 | `python/tests/test_chart_review.py` | Tests, with a simulated agent so no endpoint is needed |
 | `r/R/` | R twin of anything added to scoring |
