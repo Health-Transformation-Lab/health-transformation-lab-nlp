@@ -102,3 +102,10 @@ def test_medgemma_is_still_the_default_job(tmp_path):
     subprocess.run([sys.executable, str(REPO_ROOT / "kaggle" / "prepare_kernel.py"), "--out", str(out),
                     "--username", "someone"], check=True)
     assert (out / "medgemma_reader.ipynb").exists() and not (out / "encoder_gpu.ipynb").exists()
+
+
+def test_notebook_trains_with_gradient_checkpointing():
+    # #172: modernbert-large, bioclinical-modernbert-large and both Longformers ran out of memory on a T4
+    script = (REPO_ROOT / "python" / "scripts" / "11_ai_predict.py").read_text()
+    assert '"--grad-checkpoint"' in script
+    assert "--grad-checkpoint" in "".join(re.findall(r"cmd = \[[^\]]*\]", _code(), flags=re.DOTALL))

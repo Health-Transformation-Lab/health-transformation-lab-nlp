@@ -160,11 +160,15 @@ def class_weights(labels, classes, power: float = 0.5) -> list[float]:
 
 class HFEncoder:
     """Fine-tune a Hugging Face encoder. CPU works for the small models on a few
-    hundred notes; set epochs/max_len down on Databricks Free Edition."""
+    hundred notes; set epochs/max_len down on Databricks Free Edition. grad_checkpoint recomputes
+    activations in the backward pass instead of storing them: same training, less GPU memory, slower
+    (the large encoders on Kaggle's 15 GB T4, #172)."""
 
     def __init__(self, hf_id: str, max_len: int = 256, epochs: int = 3, batch_size: int = 16,
-                 lr: float = 5e-5, out_dir: str = "runs", class_weight: str | None = None, seed: int = 42):
+                 lr: float = 5e-5, out_dir: str = "runs", class_weight: str | None = None, seed: int = 42,
+                 grad_checkpoint: bool = False):
         self.hf_id, self.max_len, self.epochs = hf_id, max_len, epochs
+        self.grad_checkpoint = grad_checkpoint
         self.batch_size, self.lr, self.out_dir = batch_size, lr, out_dir
         self.class_weight, self.seed = class_weight, seed       # class_weight: None or "sqrt"
         tag = (f"__cw-{class_weight}" if class_weight else "") + (f"__seed{seed}" if seed != 42 else "")
@@ -178,6 +182,13 @@ class HFEncoder:
                                         padding="max_length"), batched=True)
 
     @traced
+    def training_kwargs(self) -> dict:
+        return {"output_dir": self.run_dir, "num_train_epochs": self.epochs,
+                "per_device_train_batch_size": self.batch_size, "learning_rate": self.lr, "logging_steps": 20,
+                "save_strategy": "steps", "save_steps": 50, "save_total_limit": 1, "report_to": [],
+                "seed": self.seed, "gradient_checkpointing": self.grad_checkpoint}
+
+    @traced
     def fit(self, train):
         from transformers import (
             AutoModelForSequenceClassification,
@@ -189,11 +200,7 @@ class HFEncoder:
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.hf_id, num_labels=len(LABELS), id2label=dict(enumerate(LABELS)),
             label2id={l: i for i, l in enumerate(LABELS)}, ignore_mismatched_sizes=True)
-        args = TrainingArguments(output_dir=self.run_dir,
-                                 num_train_epochs=self.epochs, per_device_train_batch_size=self.batch_size,
-                                 learning_rate=self.lr, logging_steps=20, save_strategy="steps",
-                                 save_steps=50, save_total_limit=1,
-                                 report_to=[], seed=self.seed)
+        args = TrainingArguments(**self.training_kwargs())
         trainer_cls = Trainer
         if self.class_weight == "sqrt":
             import torch

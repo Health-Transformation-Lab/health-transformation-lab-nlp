@@ -30,3 +30,30 @@ def test_a_finished_run_leaves_nothing_to_resume(tmp_path):
     assert _last_checkpoint(tmp_path) is None
     assert (tmp_path / "keep.txt").exists()
     _clear_checkpoints(tmp_path / "missing")                  # no folder: no error
+
+
+# ---- gradient checkpointing (#172): the large encoders ran out of memory on Kaggle's T4
+
+def test_gradient_checkpointing_is_off_unless_asked_and_changes_nothing_else():
+    from health_transformation_lab_nlp.rungs import HFEncoder
+    plain = HFEncoder("answerdotai/ModernBERT-large").training_kwargs()
+    ckpt = HFEncoder("answerdotai/ModernBERT-large", grad_checkpoint=True).training_kwargs()
+    assert plain["gradient_checkpointing"] is False and ckpt["gradient_checkpointing"] is True
+    # same batch, rate, epochs and seed: checkpointing recomputes activations, it doesn't change the training
+    assert {k: v for k, v in ckpt.items() if k != "gradient_checkpointing"} == \
+        {k: v for k, v in plain.items() if k != "gradient_checkpointing"}
+    assert plain["per_device_train_batch_size"] == 16
+
+
+def test_make_rung_passes_gradient_checkpointing_to_the_encoder():
+    from health_transformation_lab_nlp.registry import load_registry
+    from health_transformation_lab_nlp.rungs import make_rung
+    assert make_rung("modernbert-large", load_registry(), grad_checkpoint=True).grad_checkpoint is True
+
+
+def test_gradient_checkpointing_keeps_the_output_file_name():
+    # same results, so the same file: the Databricks job's runs and Kaggle's land in one place
+    import inspect
+
+    from health_transformation_lab_nlp.rungs import output_tag
+    assert "grad_checkpoint" not in inspect.signature(output_tag).parameters

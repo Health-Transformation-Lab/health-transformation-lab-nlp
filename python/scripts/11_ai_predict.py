@@ -45,6 +45,8 @@ ap.add_argument("--class-weight", choices=["sqrt"], default=None,
                 help="encoders: weight the loss by inverse class frequency (square root); output tagged +cw")
 ap.add_argument("--seed", type=int, default=42, help="encoders: training seed; a non-default seed tags the output +s<seed>")
 ap.add_argument("--lr", type=float, default=5e-5, help="encoders: learning rate; a non-default rate tags the output +lr<rate>")
+ap.add_argument("--grad-checkpoint", action="store_true",
+                help="encoders: gradient checkpointing, for a GPU too small for the model (same results, slower)")
 llm = ap.add_argument_group("LLM readers")
 llm.add_argument("--backend", choices=["hf", "openai", "simulated"], default="hf")
 llm.add_argument("--shots", type=int, default=0, help="few-shot examples per status from train.csv")
@@ -83,7 +85,8 @@ if is_llm:
 elif a.rung in ("rules_baseline", "note_rules", "tfidf_logreg", "fusion_tfidf_rad"):
     kw = {}
 else:
-    kw = {"epochs": a.epochs, "max_len": a.max_len, "class_weight": a.class_weight, "seed": a.seed, "lr": a.lr}
+    kw = {"epochs": a.epochs, "max_len": a.max_len, "class_weight": a.class_weight, "seed": a.seed, "lr": a.lr,
+          "grad_checkpoint": a.grad_checkpoint}
 
 model = make_rung(a.rung, reg, **kw).fit(train)
 pred, proba = model.predict(review)
