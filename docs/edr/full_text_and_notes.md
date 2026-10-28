@@ -84,22 +84,33 @@ Synthetic charts, scored against the generator's truth: not clinical performance
 
 ## Slide 5 — economics
 
-Why it pays
-Computers are cheap. Specialist hours are not.
+What it costs
+Software costs depend on the model; choose the least costly one that passes.
 By hand
 33,333 h
-to review a million visits, one person at 2 minutes a chart.
-By software
-Hundreds of $
-of computing for the same million notes, even for the largest models priced (simulated).
+a million visits, one specialist, 2 minutes a chart
 To prove it
 ~31 h
-of specialist time: 233 charts, 4 reviewers, to run the acceptance test.
-The case is not the computing price:
-it is replacing review hours, once the software passes the acceptance test with a margin people accept.
-Illustrative prices and assumed throughput (a dry run) · review pace from the labelling protocol, 1–3 minutes a chart · 5
+233 charts, 4 reviewers: the acceptance test
+By software, a million visits
+Model
+Reads
+Cost
+Small trained model, own hardware
+the note
+under $15*
+Open LLM, hosted (Llama 3.3 70B)
+the note
+~$260
+Frontier LLM (Claude Fable 5.1)
+the note
+~$5,500
+Frontier LLM, 3 calls a visit
+whole record, examples, reasoning†
+~$1.2M
+List prices: Databricks (2026-10-26), claude.com/pricing (2026-10-28) · *illustrative compute · †assumed 20k tokens in, 4k out a call · 5
 
-**Speaker notes:** The economics. Reading a million visits by hand, at the protocol's pace of about 2 minutes a chart, is 33,333 hours of a specialist's time. The software does the same million notes for tens to hundreds of dollars of computing, even for the largest models we priced; those are illustrative prices and assumed speeds, a dry run, not quotes. Proving the software is good enough is small: about 31 specialist hours, 233 charts each read by 4 reviewers. So the argument is not that computers are cheap. It is that specialist hours are the bottleneck, and the software can replace most of them, but only after it passes the acceptance test. If asked for a dollar figure: at an illustrative 100 dollars an hour, validation is about 3,100 dollars and reviewing everything by hand about 3.3 million. If asked about errors: the study also counts unsafe errors, such as missing severe disease, and reports them separately.
+**Speaker notes:** The economics, and it depends on the model. Reading a million visits by hand, at the protocol's pace of about 2 minutes a chart, is 33,333 hours of a specialist's time. Software for the same million visits ranges from under 15 dollars to about 1.2 million, depending on the model. A small model trained on dental notes, on our own hardware, costs under 15 dollars, at illustrative compute prices. An open model hosted per token, Llama 3.3 70B at Databricks list price, costs about 260 dollars for the note alone. A frontier commercial model, Claude Fable 5.1 at Anthropic's list price, costs about 5,500 dollars for the note alone. And if that frontier model reads the whole record, with worked examples and reasoning, three calls a visit, it is about 1.2 million dollars; batch pricing halves that. Those token counts are assumed, about 20 thousand in and 4 thousand out a call, not measured. The note-only token count is estimated from our synthetic notes, characters divided by four, and they are shorter than real ones; the prompt and answer lengths are assumed. The acceptance test is small: about 31 specialist hours, 233 charts each read by 4 reviewers. So the choice is the least costly model that passes the acceptance test. If asked for a dollar figure for people: at an illustrative 100 dollars an hour, validation is about 3,100 dollars and reviewing everything by hand about 3.3 million. If asked about errors: the study also counts unsafe errors, such as missing severe disease, and reports them separately.
 
 ## Slide 6 — ask
 
