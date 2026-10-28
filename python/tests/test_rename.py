@@ -37,14 +37,16 @@ def test_no_old_names_left():
 
 
 def test_repo_links_name_the_org():
-    """The repo moved to the Health-Transformation-Lab org (#166); GitHub's redirect from the old owner
-    lasts only until a repo with the old name is made there, and the Kaggle notebooks clone it."""
+    """The repo moved to the Health-Transformation-Lab org (#166). GitHub's redirect from the old
+    owner lasts only until a repo with the old name is made there; the Kaggle notebooks clone it."""
     files = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-files"], capture_output=True, text=True,
                            check=True).stdout.split()
     old = re.compile(r"jcbowyer/(?:health-transformation-lab-nlp|dental-omop-nlp)")
     hits = []
     for f in files:
-        if f.startswith(HISTORY) or f == "python/tests/test_rename.py" or f.endswith((".png", ".gz", ".parquet", ".zip", ".pptx", ".xlsx")):
+        if f.startswith(HISTORY) or f == "python/tests/test_rename.py":
+            continue
+        if f.endswith((".png", ".gz", ".parquet", ".zip", ".pptx", ".xlsx")):
             continue
         try:
             text = (REPO_ROOT / f).read_text()
