@@ -264,3 +264,14 @@ def test_load_results_job_migrates_the_old_gold_names_before_loading():
     nb = _text("databricks/notebooks/11_migrate_gold_names.py")
     assert "gold_names.RENAMED" in nb and "DROP TABLE" in nb
     assert "spark.sql(f\"DROP" not in nb                     # prints the drops, never runs them
+
+
+def test_deploy_breaks_the_genie_deadlock_by_loading_results_first():
+    # issue #154: a Genie space can't be created before its tables, which Load results writes after the deploy
+    text = _text(".github/workflows/deploy.yml")
+    deploy = text[text.index("- name: Deploy"):text.index("- name: Run benchmark job")]
+    assert "genie_spaces" in deploy and "does not exist" in deploy      # only that failure is retried
+    assert "bundle run -t \"$TARGET\" load_results" in deploy           # waits for the tables
+    assert deploy.count("bundle deploy -t \"$TARGET\"") >= 2           # then deploys again
+    assert "exit 1" in deploy                                           # any other failure still fails
+    assert "loaded=true" in deploy and "steps.deploy.outputs.loaded" in text   # no second, no-wait load
