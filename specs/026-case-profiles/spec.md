@@ -78,7 +78,7 @@ A set of named rules flags visits whose recorded code doesn't fit the rest of th
 | No periodontal care | a periodontitis code, and no periodontal procedure completed or planned |
 | Code against the chart reading | the code's status differs from the probing-chart reading by more than one step |
 | Code against the radiograph | the code says healthy or gingivitis and the radiograph AI reads stage II or worse, or the reverse |
-| Stage drops without treatment | the next visit's code is lower and no treatment came between |
+| Stage drops | a later visit's code is lower than a periodontitis stage recorded before, or no longer periodontitis (a stage never goes down under the 2017 classification, even after treatment) |
 
 A visit gets every rule it fails and a count of them, so the visits failing most rules sort to the top. Each
 rule is scored against the generator's truth:
@@ -135,7 +135,8 @@ read only the new gold tables.
 - **"Unknown" codes.** A visit with no recorded code fails no code-based rule; it shows as "no code recorded".
 - **Planned versus completed codes.** Completed codes are the recorded code; planned codes are shown in the
   profile but don't trigger rules (matching how the rule phenotypes treat them).
-- **First and last visits.** The temporal rule needs a later visit; a patient's last visit is not checkable.
+- **First visits.** The stage-drop rule flags the later visit and needs an earlier coded one; a patient's first coded
+  visit is not checkable for it.
 - **Thresholds.** The figures above are starting values, named so they can change, and cited to the 2017
   AAP/EFP classification where they come from it. A change is a new run, not an edit to past results.
 
