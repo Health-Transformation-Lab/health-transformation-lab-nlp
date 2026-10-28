@@ -1,0 +1,22 @@
+erDiagram
+    result_files |o--o{ ai_predictions : "sha256 (repo · kaggle rows)"
+    result_files |o--o{ llm_reader_runs : "sha256 (repo · kaggle rows)"
+    ai_predictions }o..o{ llm_reader_runs : "method, visit_id, source (per version or run)"
+    review_key ||--o{ ai_predictions : "visit_id"
+    review_key ||--o{ llm_reader_runs : "visit_id"
+    review_key ||--o{ chart_answers : "visit_id"
+    judgments |o--o{ chart_answers : "visit_id, answer"
+    judge_run ||..o{ judgments : "kind"
+    judgments }o..o{ judge_agreement : "status rows summarised"
+    chart_answers }o..o{ judge_metrics : "system"
+    ai_predictions }o..o{ chart_answers : "method = system"
+    review_key
+    result_files
+    ai_predictions
+    llm_reader_runs
+    chart_answers
+    judgments
+    judge_metrics
+    judge_agreement
+    judge_run
+    deid_scores

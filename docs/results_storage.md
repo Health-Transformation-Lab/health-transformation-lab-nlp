@@ -97,6 +97,8 @@ each file version (SHA-256) it hasn't loaded yet to `result_files`, `ai_predicti
 answer key). Loading again adds nothing; a changed file is a new version and the old rows stay. `simulated_*`
 files are never loaded.
 
+Every gold table, column by column, with ERDs: [gold_tables.md](gold_tables.md).
+
 ```sql
 select source, method, count(*) from dental_omop.gold_dental_omop_perio.ai_predictions group by all;
 ```
