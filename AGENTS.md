@@ -97,7 +97,8 @@ A SEV2 that fires every week for the same cause gets its cause fixed or its leve
 - **Every write is idempotent**: overwrite, `MERGE` on a key, or delete-then-append by batch key (as Load
   results does). Plain append only for event logs. Databricks repair re-runs a whole task from the start and
   does not make it idempotent for you.
-- **Every written row carries its batch key** (run id or file SHA, `git_commit`, load time).
+- **Every written row carries its batch key** (`run_id` and `run_ts`, or `file_sha256` and `loaded_ts`; and
+  `git_commit_sha`).
 - **Retries are set explicitly** per task (count and interval), only for failures that can pass on their own
   (no GPU free, a network blip); a timeout applies to each retry. A bad setting or bad data fails at once.
 - A failure says how it ended (exit code, signal, memory) and is logged where it survives the process
@@ -111,6 +112,49 @@ A SEV2 that fires every week for the same cause gets its cause fixed or its leve
 - Rows in the rescued-data column are counted per batch and reported (SEV3).
 - `cleanSource` only for single-reader directories, `DELETE` only with bucket versioning on, and keep our
   own file ledger when we must prove what was loaded.
+
+## SQL and data names
+
+New tables and views, in Unity Catalog or Postgres, follow these, and the gold tables do since spec 018
+(adapted from jcbowyer/DE_Assessment). OMOP CDM tables and columns keep their official names. Older objects that
+don't yet (the Postgres `perio_chart` view, `labeled_notes`, `benchmark_results`, `encoder_gpu_predictions`) change
+when they're next touched. `python/tests/test_sql_conventions.py` checks the gold tables declared in
+`diagrams/_build/gold_model.py`.
+
+- **Style:** lowercase snake_case names, no quoted or mixed-case identifiers. Keywords lowercase in new SQL; older
+  files and the dashboard queries are uppercase, so keep one case per file. Three-part names
+  (`dental_omop.gold_dental_omop_perio.fact_prediction`) outside a pipeline. CTEs, not nested subqueries;
+  explicit `inner join` / `left join`; no `select *` outside bronze. Each table's comment states its grain.
+- **Tables are singular**, one row per noun (`fact_prediction`, not `ai_predictions`).
+- **Gold prefixes:** `fact_<event>` one row per event or answer, with a key to each dimension it uses;
+  `dim_<noun>` one row per thing described; a summary table is named `<subject>_<noun>` (`judge_metric`,
+  `deid_score`); `kpi_<subject>` a metric view. Silver and bronze tables are named for what they hold.
+- **pandas frames and CSV files keep their analysis names.** `dental_omop_nlp.gold_names.to_gold` renames them
+  when a job writes gold, and fails on a column it doesn't know: declare a new column there, with its gold name.
+- **Columns:** `<what it describes>_<kind>`, never a bare generic name (`code`, `name`, `status`, `type`,
+  `value`): say whose (`predicted_status_code`, `engine_name`).
+
+| Suffix or prefix | Holds | Type | Example |
+|---|---|---|---|
+| `_id` | an identifier from a source, OMOP or Databricks | `bigint` or `string` | `visit_id`, `run_id` |
+| `_key` | a key built here (hash of a natural key) | `string` | |
+| `_code` | a coded value from a fixed set | `string` | `predicted_status_code`, `tier_code` |
+| `_name` | a short label | `string` | `method_name`, `engine_name` |
+| `_text` | free text: a note, a quote, an error | `string` | `quote_text`, `error_text` |
+| `_date` | a calendar date | `date` | `exam_date` |
+| `_ts` | a moment: from the source, or when a job acted | `timestamp` (UTC) | `run_ts`, `loaded_ts` |
+| `_count` | a count | `bigint` | `row_count`, `judged_count` |
+| `_ratio` | a proportion 0 to 1 (or a difference of two) | `double` | `agreement_ratio` |
+| `_pct` | a percent 0 to 100; never `percent` | `double` | `bop_pct` |
+| `_rate` | a count per unit, the unit named before it | `double` | `leaked_phi_per_1k_note_rate` |
+| `_coef` | a coefficient such as Cohen's kappa, −1 to 1 | `double` | `kappa_coef` |
+| `_seconds` | a duration | `double` | `latency_seconds` |
+| `_usd` | money, US dollars (`double`: per-call costs are fractions of a cent) | `double` | `cost_usd` |
+| `_num` | a number that isn't a count or a measure: a position, a year | `bigint` | |
+| `_url` | a link | `string` | `run_url` |
+| `_sha256`, `_sha` | a file's SHA-256, a git commit's SHA, hex | `string` | `file_sha256`, `git_commit_sha` |
+| `is_` prefix | a boolean: true or false, null when unknown; never Y/N or 0/1 | `boolean` | `is_gate_ok`, `is_simulated` |
+| `avg_`, `p50_`, `p95_` prefix | an average or percentile of what follows, which keeps its suffix | as that suffix, `double` | `avg_latency_seconds` |
 
 ## Commands
 

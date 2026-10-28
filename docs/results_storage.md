@@ -13,7 +13,7 @@
 | Model predictions, LLM reader details | `data/datasets/ai_predictions_<rung>.csv`, `llm_details_<rung>.csv` | CSV |
 | Judge verdicts, cost-effectiveness | `data/corpus/` | CSV / Parquet / PNG |
 | Model runs (optional) | MLflow (`pip install -e ".[track]"`; workspace MLflow on Databricks) | MLflow runs |
-| On Databricks | `dental_omop.gold_dental_omop_perio.*` Delta tables (notebook 01); `llm_reader_runs` (notebook 03) | Delta |
+| On Databricks | `dental_omop.gold_dental_omop_perio.*` Delta tables (notebook 01); `fact_llm_call` (notebook 03) | Delta |
 | Every committed result, wherever it ran (spec 016) | `result_files`, `ai_predictions`, `llm_reader_runs` in `gold_dental_omop_perio`, loaded by the **Load results** job after each deploy; source in `data/datasets/results_manifest.csv` | Delta |
 | OMOP target for model output | `NOTE_NLP` (a flag for review, never `CONDITION_OCCURRENCE`) | OMOP table |
 
@@ -87,20 +87,20 @@ All of them end in the same gold tables:
    start CI: push a commit to it to run the checks. The repo setting *Allow GitHub Actions to create and approve
    pull requests* must be on; if it's off, the branch is pushed and the log links to open the PR by hand.
 2. **Laptop**: commit the CSVs as before; they load with `source = repo`.
-3. **Databricks**: the MedGemma reader job writes `ai_predictions` and `llm_reader_runs` itself, with
-   `source = databricks`, its job `run_id` and `run_ts`; a retry of the run replaces its rows. Its CSVs in the
+3. **Databricks**: the MedGemma reader job writes `fact_prediction` and `fact_llm_call` itself, with
+   `source_code = databricks`, its job `run_id` and `run_ts`; a retry of the run replaces its rows. Its CSVs in the
    Git folder are scratch.
 
 After every deploy, `deploy.yml` starts **Load results** (`databricks/notebooks/10_load_results.py`). It appends
-each file version (SHA-256) it hasn't loaded yet to `result_files`, `ai_predictions` (method, visit_id, pred) and
-`llm_reader_runs`, and logs one MLflow run per new LLM file (gate-failure and fallback rates, agreement with the
+each file version (SHA-256) it hasn't loaded yet to `dim_result_file`, `fact_prediction` (method, visit, predicted status) and
+`fact_llm_call`, and logs one MLflow run per new LLM file (gate-failure and fallback rates, agreement with the
 answer key). Loading again adds nothing; a changed file is a new version and the old rows stay. `simulated_*`
 files are never loaded.
 
 Every gold table, column by column, with ERDs: [gold_tables.md](gold_tables.md).
 
 ```sql
-select source, method, count(*) from dental_omop.gold_dental_omop_perio.ai_predictions group by all;
+select source_code, method_name, count(*) from dental_omop.gold_dental_omop_perio.fact_prediction group by all;
 ```
 
 ## Cautions

@@ -1,22 +1,26 @@
 erDiagram
-    result_files |o--o{ ai_predictions : "sha256 (repo · kaggle rows)"
-    result_files |o--o{ llm_reader_runs : "sha256 (repo · kaggle rows)"
-    ai_predictions }o..o{ llm_reader_runs : "method, visit_id, source (per version or run)"
-    review_key ||--o{ ai_predictions : "visit_id"
-    review_key ||--o{ llm_reader_runs : "visit_id"
-    review_key ||--o{ chart_answers : "visit_id"
-    judgments |o--o{ chart_answers : "visit_id, answer"
-    judge_run ||..o{ judgments : "kind"
-    judgments }o..o{ judge_agreement : "status rows summarised"
-    chart_answers }o..o{ judge_metrics : "system"
-    ai_predictions }o..o{ chart_answers : "method = system"
+    dim_result_file |o--o{ fact_prediction : "file_sha256 (repo · kaggle rows)"
+    dim_result_file |o--o{ fact_llm_call : "file_sha256 (repo · kaggle rows)"
+    fact_prediction }o..o{ fact_llm_call : "method_name, visit_id, source_code (per version or run)"
+    review_key ||--o{ fact_prediction : "visit_id"
+    review_key ||--o{ fact_llm_call : "visit_id"
+    review_key ||--o{ fact_chart_answer : "visit_id"
+    fact_judge_call |o--o{ fact_chart_answer : "visit_id, answer_status_code"
+    judge_cost ||..o{ fact_judge_call : "call_kind_code"
+    fact_judge_call }o..o{ judge_agreement : "status calls summarised"
+    fact_chart_answer }o..o{ judge_metric : "system_name"
+    fact_prediction }o..o{ fact_chart_answer : "method_name = system_name"
+    fact_prediction ||..o| judge_queue : "sampled from"
+    judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
     review_key
-    result_files
-    ai_predictions
-    llm_reader_runs
-    chart_answers
-    judgments
-    judge_metrics
+    dim_result_file
+    fact_prediction
+    fact_llm_call
+    fact_chart_answer
+    fact_judge_call
+    judge_metric
     judge_agreement
-    judge_run
-    deid_scores
+    judge_cost
+    deid_score
+    judge_queue
+    fact_corpus_judge_call

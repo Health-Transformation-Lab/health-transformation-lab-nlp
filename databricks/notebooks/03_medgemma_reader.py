@@ -112,16 +112,18 @@ else:
 # COMMAND ----------
 
 # Keep the run in Unity Catalog, next to every other method's results (spec 016): predictions in
-# ai_predictions, per-note details in llm_reader_runs. Keyed by (source, run_id, method): a retry of this job
-# run replaces its rows instead of adding them again. The CSVs in the Git folder are scratch.
-from dental_omop_nlp.delta import replace_batch
-from dental_omop_nlp.results_store import run_rows
+# fact_prediction, per-note details in fact_llm_call, under the gold names (spec 018). Keyed by
+# (source_code, run_id, method_name): a retry of this job run replaces its rows instead of adding them again.
+# The CSVs in the Git folder are scratch.
+from dental_omop_nlp import gold_names  # noqa: E402
+from dental_omop_nlp.delta import replace_batch  # noqa: E402
+from dental_omop_nlp.results_store import run_rows  # noqa: E402
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")  # noqa: F821
 preds, details = run_rows("../../data/datasets", rung, source="databricks", run_id=run_id,
                           git_commit=dbutils.widgets.get("git_commit"), run_ts=pd.Timestamp.now(tz="UTC"))  # noqa: F821
 details = details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id", validate="one_to_one")
-key = {"source": "databricks", "run_id": run_id, "method": rung}
-for rows, name in ((preds, "ai_predictions"), (details, "llm_reader_runs")):
-    n = replace_batch(spark, rows, f"{catalog}.{schema}.{name}", key)  # noqa: F821
+key = {"source_code": "databricks", "run_id": run_id, "method_name": rung}
+for rows, name in ((preds, "fact_prediction"), (details, "fact_llm_call")):
+    n = replace_batch(spark, gold_names.to_gold(rows, name), f"{catalog}.{schema}.{name}", key)  # noqa: F821
     print(f"{catalog}.{schema}.{name}: {n} rows for run {run_id}, {rung}")
