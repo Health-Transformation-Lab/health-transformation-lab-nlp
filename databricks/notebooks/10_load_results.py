@@ -48,8 +48,9 @@ def table(name: str) -> str:
 
 # COMMAND ----------
 
-# The files deployed with the bundle, next to this notebook (as notebook 03 reads them). The installed
-# package's own path can point elsewhere on serverless, which found nothing (issue #71).
+# The files deployed with the bundle, next to this notebook (as notebook 03 reads them). If there are none,
+# say so and stop; a run with nothing new must not display an empty table, which crashed every run after the
+# first one (issue #71).
 data_dir = Path("../../data/datasets").resolve()
 if not data_dir.is_dir() or not (files := results_store.result_files(data_dir)).shape[0]:
     raise RuntimeError(f"No result files in {data_dir}: expected ai_predictions_*.csv / llm_details_*.csv "
