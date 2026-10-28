@@ -5,7 +5,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: in progress
+**Status**: implemented; the dashboards and Genie spaces are confirmed on the first dev deploy
 
 **Input**: "We should create Databricks Genie light versions of the React dashboards we designed yesterday;
 we should have different dashboards for the healthtransformationlab.org grader and the EHR DQ grader." The EHR

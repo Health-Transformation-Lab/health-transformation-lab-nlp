@@ -19,7 +19,7 @@ def con():
     c = duckdb.connect()
     c.execute("ATTACH ':memory:' AS dental_omop")
     c.execute("CREATE SCHEMA dental_omop.gold_dental_omop_perio")
-    for name, df in gt.dq_tables(DATASETS_DIR).items():
+    for name, df in {**gt.dq_tables(DATASETS_DIR), **gt.lab_tables(DATASETS_DIR)}.items():
         c.register(f"src_{name}", df)
         c.execute(f"CREATE TABLE dental_omop.gold_dental_omop_perio.{name} AS SELECT * FROM src_{name}")
     return c
@@ -59,8 +59,7 @@ def test_every_widget_query_names_a_dataset_and_its_fields(con):
         d = json.loads(dash.render(name))
         cols = {}
         for ds in d["datasets"]:
-            if name == "dq_grader":
-                cols[ds["name"]] = {c[0] for c in con.execute("".join(ds["queryLines"])).description}
+            cols[ds["name"]] = {c[0] for c in con.execute("".join(ds["queryLines"])).description}
         for page in d["pages"]:
             for item in page["layout"]:
                 for q in item["widget"].get("queries", []):
@@ -124,3 +123,52 @@ def test_genie_spaces_are_in_the_bundle_and_ci_has_a_cli_that_knows_them():
     for wf in ("ci.yml", "deploy.yml"):
         pins = re.findall(r"databricks/setup-cli@v(\d+)\.(\d+)", (REPO_ROOT / ".github" / "workflows" / wf).read_text())
         assert pins and all((int(a), int(b)) >= (1, 3) for a, b in pins), wf   # genie_spaces: CLI 1.3.0
+
+
+# ---------------------------------------------------------------- the lab grader (US4)
+
+def _run(con, name, ds):
+    sql = {d["name"]: "".join(d["queryLines"]) for d in _datasets(name)}[ds]
+    return con.execute(sql).df()
+
+
+def test_every_lab_dataset_runs_and_returns_rows(con):
+    for ds in _datasets("lab_grader"):
+        assert con.execute("".join(ds["queryLines"])).fetchall(), ds["name"]
+
+
+def test_uplift_is_the_with_agent_score_minus_the_own_score_access_to_care_first(con):
+    up = _run(con, "lab_grader", "uplift")
+    assert up.category.iloc[0] == "Access to care"
+    lab = gt.lab_tables(DATASETS_DIR)
+    m = lab["grader_answers"].merge(lab["grader_questions"][["question_id", "category"]], on="question_id")
+    mean = m.groupby(["category", "with_agent"]).score.mean().unstack()
+    for r in up.itertuples():
+        assert r.own_pct == pytest.approx(round(100 * mean.loc[r.category, False], 1))
+        assert r.agent_pct == pytest.approx(round(100 * mean.loc[r.category, True], 1))
+        assert r.uplift_lo <= r.uplift_pts <= r.uplift_hi
+
+
+def test_leaderboard_ranks_only_within_a_category(con):
+    lb = _run(con, "lab_grader", "leaderboard")
+    assert set(lb.category) == set(gt.CATEGORIES)
+    for (_, _), g in lb.groupby(["category", "answer_mode"]):
+        assert sorted(g["rank"]) == list(range(1, len(g) + 1))
+    assert "overall" not in dash.render("lab_grader").lower()
+
+
+def test_safety_and_levels_follow_globaldentbench(con):
+    s = _run(con, "lab_grader", "safety")
+    assert ((s.unsafe_pct >= s.s2_pct) & (s.s2_pct >= 0)).all()
+    lv = _run(con, "lab_grader", "by_level")
+    assert set(lv.level) == {"L1", "L2", "L3", "Macro average"}
+
+
+def test_lab_dashboard_and_space_say_simulated():
+    text = dash.render("lab_grader")
+    assert "SIMULATED" in text and "not a result" in text
+    space = json.loads(dash.render_genie("lab_grader"))
+    instructions = " ".join(" ".join(i["content"]) for i in space["instructions"]["text_instructions"])
+    assert "simulated" in instructions and "never rank" in instructions.lower()
+    tables = {t["identifier"] for t in space["data_sources"]["tables"]}
+    assert tables == {f"{dash.GOLD}.grader_questions", f"{dash.GOLD}.grader_answers"}

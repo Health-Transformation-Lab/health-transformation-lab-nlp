@@ -9,3 +9,8 @@ resources:
       description: Data quality of the synthetic dental record for periodontal phenotyping. Synthetic data only.
       warehouse_id: ${var.warehouse_id}
       file_path: ../genie/dq_grader.geniespace.json
+    lab_grader:
+      title: Lab grader
+      description: AI answers on medical-dental and access-to-care questions, with and without an open agent. A SIMULATED sample until real runs exist.
+      warehouse_id: ${var.warehouse_id}
+      file_path: ../genie/lab_grader.geniespace.json

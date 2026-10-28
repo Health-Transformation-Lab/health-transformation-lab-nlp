@@ -75,5 +75,53 @@ def test_load_results_overwrites_every_grader_table():
     # spec 018 US1: the job writes each table whole, so a rerun leaves the same rows
     from dental_omop_nlp.paths import REPO_ROOT
     nb = (REPO_ROOT / "databricks" / "notebooks" / "10_load_results.py").read_text()
-    assert "grader_tables.dq_tables(data_dir)" in nb
+    assert "grader_tables.dq_tables(data_dir)" in nb and "grader_tables.lab_tables(data_dir)" in nb
     assert '.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(table(name))' in nb
+
+
+# ---------------------------------------------------------------- the lab grader (US3)
+
+LAB = {
+    "grader_questions": {"question_id", "category", "category_order", "level", "n_key_points", "source", "simulated"},
+    "grader_answers": {"question_id", "model", "with_agent", "key_points_covered", "score", "harm", "cost_usd",
+                       "judge", "run_id", "simulated"},
+}
+
+
+@pytest.fixture(scope="module")
+def sim():
+    return gt.simulate_grader(seed=2026)
+
+
+def test_simulated_sample_is_seeded_and_reproducible(sim):
+    again = gt.simulate_grader(seed=2026)
+    for name in sim:
+        assert sim[name].equals(again[name]), name
+    assert not sim["grader_answers"].equals(gt.simulate_grader(seed=7)["grader_answers"])
+
+
+def test_simulated_sample_has_the_spec_shape(sim):
+    q, a = sim["grader_questions"], sim["grader_answers"]
+    assert set(sim) == set(LAB)
+    for name, cols in LAB.items():
+        assert cols <= set(sim[name].columns), (name, cols - set(sim[name].columns))
+    assert q.simulated.all() and a.simulated.all()                          # never a result
+    assert a.model.str.startswith("sim:").all() and a.judge.str.startswith("sim:").all()
+    assert q.groupby("category").size().eq(25).all()                         # the pitch's pilot size
+    assert q.sort_values("category_order").category.iloc[0] == "Access to care"   # the mission first
+    assert set(q.level) == {"L1", "L2", "L3"} and set(a.harm) <= {"S0", "S1", "S2"}
+    assert (a.score == a.key_points_covered / a.question_id.map(q.set_index("question_id").n_key_points)).all()
+    per_question = a.groupby(["question_id", "model"]).with_agent.nunique()
+    assert per_question.eq(2).all()                                          # each model with and without the agent
+    assert not set(a.judge.str.split(":").str[1]) & set(a.model.str.split(":").str[1])   # never self-judged
+
+
+def test_lab_tables_use_real_files_when_present_else_the_sample(tmp_path, sim):
+    out = gt.lab_tables(tmp_path)                                            # nothing there: the seeded sample
+    assert out["grader_answers"].simulated.all() and (out["grader_answers"].sha256.str.len() == 64).all()
+    (tmp_path / "grader").mkdir()
+    for name, df in sim.items():
+        df.assign(simulated=False).to_csv(tmp_path / "grader" / f"{name}.csv", index=False)
+    real = gt.lab_tables(tmp_path)
+    assert not real["grader_answers"].simulated.any()
+    assert real["grader_answers"].source_files.iloc[0] == "grader/grader_answers.csv"

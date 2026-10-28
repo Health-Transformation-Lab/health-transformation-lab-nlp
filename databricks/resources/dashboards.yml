@@ -11,3 +11,7 @@ resources:
       display_name: EHR DQ grader
       file_path: ../dashboards/dq_grader.lvdash.json
       warehouse_id: ${var.warehouse_id}
+    lab_grader:
+      display_name: Lab grader
+      file_path: ../dashboards/lab_grader.lvdash.json
+      warehouse_id: ${var.warehouse_id}

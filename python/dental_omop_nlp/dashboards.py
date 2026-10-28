@@ -89,6 +89,16 @@ def _heatmap(name, ds, x, y, value, title, description, pos, *, x_title="", y_ti
             "frame": _frame(title, description)}}, "position": _at(*pos)}
 
 
+def _scatter(name, ds, x, y, color, title, description, pos, *, x_title="", y_title="") -> dict:
+    return {"widget": {"name": name, "queries": [{"name": "main_query", "query": {
+        "datasetName": ds, "fields": _fields(x, y, color), "disaggregated": True}}],
+        "spec": {"version": 3, "widgetType": "scatter", "encodings": {
+            "x": {"fieldName": x, "scale": {"type": "quantitative"}, "displayName": x_title or x},
+            "y": {"fieldName": y, "scale": {"type": "quantitative"}, "displayName": y_title or y},
+            "color": {"fieldName": color, "scale": {"type": "categorical"}, "displayName": color}},
+            "frame": _frame(title, description)}}, "position": _at(*pos)}
+
+
 def _filter(name, field, datasets, title, pos) -> dict:
     queries = [{"name": f"f_{name}_{ds}", "query": {"datasetName": ds, "fields": _fields(field),
                                                     "disaggregated": False}} for ds in datasets]
@@ -246,7 +256,132 @@ def dq_grader() -> dict:
                        "layout": layout}]}
 
 
-DASHBOARDS = {"dq_grader": dq_grader}
+# ---------------------------------------------------------------- Lab grader (spec 018 US4)
+
+MODE = "CASE WHEN ans.with_agent THEN 'With the agent' ELSE 'On its own' END"
+ANSWERS = "{gold}.grader_answers ans JOIN {gold}.grader_questions q ON ans.question_id = q.question_id"
+
+LAB_SQL = {
+    "status": """
+SELECT ROUND(100 * AVG(CASE WHEN simulated THEN 1.0 ELSE 0.0 END), 1) AS simulated_pct,
+  COUNT(DISTINCT question_id) AS questions, COUNT(DISTINCT model) AS models, COUNT(*) AS answers
+FROM {gold}.grader_answers""",
+    "uplift": f"""
+WITH s AS (
+  SELECT q.category, q.category_order,
+    AVG(CASE WHEN NOT ans.with_agent THEN ans.score END) AS own,
+    AVG(CASE WHEN ans.with_agent THEN ans.score END) AS agent,
+    VAR_SAMP(CASE WHEN NOT ans.with_agent THEN ans.score END) AS v_own,
+    VAR_SAMP(CASE WHEN ans.with_agent THEN ans.score END) AS v_agent,
+    SUM(CASE WHEN NOT ans.with_agent THEN 1 ELSE 0 END) AS n_own,
+    SUM(CASE WHEN ans.with_agent THEN 1 ELSE 0 END) AS n_agent,
+    AVG(CASE WHEN NOT ans.with_agent THEN ans.cost_usd END) AS cost_own,
+    AVG(CASE WHEN ans.with_agent THEN ans.cost_usd END) AS cost_agent
+  FROM {ANSWERS}
+  GROUP BY q.category, q.category_order)
+SELECT category, category_order, ROUND(100 * own, 1) AS own_pct, ROUND(100 * agent, 1) AS agent_pct,
+  ROUND(100 * (agent - own), 1) AS uplift_pts,
+  ROUND(100 * (agent - own - 1.96 * SQRT(v_own / n_own + v_agent / n_agent)), 1) AS uplift_lo,
+  ROUND(100 * (agent - own + 1.96 * SQRT(v_own / n_own + v_agent / n_agent)), 1) AS uplift_hi,
+  ROUND(cost_own, 4) AS cost_own_usd, ROUND(cost_agent, 4) AS cost_agent_usd, n_own AS answers_each
+FROM s
+ORDER BY category_order""",
+    "leaderboard": f"""
+WITH s AS (
+  SELECT q.category, q.category_order, ans.model, {MODE} AS answer_mode, AVG(ans.score) AS score, COUNT(*) AS n
+  FROM {ANSWERS}
+  GROUP BY q.category, q.category_order, ans.model, ans.with_agent)
+SELECT category, category_order, answer_mode,
+  RANK() OVER (PARTITION BY category, answer_mode ORDER BY score DESC) AS rank,
+  model, ROUND(100 * score, 1) AS score_pct, n
+FROM s
+ORDER BY category_order, answer_mode, rank""",
+    "safety": f"""
+SELECT ans.model, {MODE} AS answer_mode,
+  ROUND(100 * AVG(CASE WHEN ans.harm IN ('S1', 'S2') THEN 1.0 ELSE 0.0 END), 1) AS unsafe_pct,
+  ROUND(100 * AVG(CASE WHEN ans.harm = 'S2' THEN 1.0 ELSE 0.0 END), 1) AS s2_pct, COUNT(*) AS n
+FROM {{gold}}.grader_answers ans
+GROUP BY ans.model, ans.with_agent
+ORDER BY ans.model, answer_mode""",
+    "by_level": f"""
+WITH l AS (
+  SELECT ans.model, ans.with_agent, q.level, AVG(ans.score) AS score
+  FROM {ANSWERS}
+  GROUP BY ans.model, ans.with_agent, q.level)
+SELECT ans.model, {MODE} AS answer_mode, ans.level, ROUND(100 * ans.score, 1) AS score_pct FROM l ans
+UNION ALL
+SELECT ans.model, {MODE} AS answer_mode, 'Macro average' AS level, ROUND(100 * AVG(ans.score), 1) AS score_pct
+FROM l ans
+GROUP BY ans.model, ans.with_agent""",
+    "cost_vs_score": f"""
+SELECT ans.model || CASE WHEN ans.with_agent THEN ' + agent' ELSE '' END AS entry, {MODE} AS answer_mode,
+  ROUND(AVG(ans.cost_usd), 4) AS cost_usd, ROUND(100 * AVG(ans.score), 1) AS score_pct
+FROM {{gold}}.grader_answers ans
+GROUP BY ans.model, ans.with_agent""",
+}
+
+LAB_BANNER = """## Lab grader: do AI answers improve with an open agent built on public evidence?
+**SIMULATED sample: every number on this page is made up, not a result.** It shows the shape of what a real run
+brings back (the pitch's uplift and leaderboard slides) until one exists; the *Simulated rows* tile then reads 0.
+Practices from GlobalDentBench: five key points per answer, harm graded S0 safe, S1 reversible, S2 irreversible,
+reasoning levels L1–L3 macro-averaged, cost per answer, and a judge from a family no model shares."""
+
+
+@traced
+def lab_grader() -> dict:
+    by_category = ["uplift", "leaderboard"]
+    by_model = ["leaderboard", "safety", "by_level"]
+    layout = [_text("banner", LAB_BANNER, (0, 0, 6, 3))]
+    layout += [_counter(n, "status", f, t, d, (i, 3, 1, 3)) for i, (n, f, t, d) in enumerate([
+        ("c_sim", "simulated_pct", "Simulated rows (%)", "100 until a real run is committed."),
+        ("c_q", "questions", "Questions", "About 25 per category: a pilot that shows direction only."),
+        ("c_m", "models", "Models", "Each answers every question on its own and with the agent."),
+        ("c_a", "answers", "Answers", "Every answer judged on its key points and graded for harm.")])]
+    layout += [_filter("f_category", "category", by_category, "Category", (4, 3, 2, 3)),
+               _filter("f_model", "model", by_model, "Model", (4, 6, 2, 2)),
+               _text("s_uplift", "### Uplift by category, access to care first", (0, 6, 4, 2)),
+               _table("tb_uplift", "uplift", [("category", "Category"), ("own_pct", "On its own (%)"),
+                                              ("agent_pct", "With the agent (%)"), ("uplift_pts", "Uplift (points)"),
+                                              ("uplift_lo", "95% CI low"), ("uplift_hi", "95% CI high"),
+                                              ("cost_own_usd", "Cost per answer, own (US$)"),
+                                              ("cost_agent_usd", "Cost per answer, agent (US$)"),
+                                              ("answers_each", "Answers each")],
+                      "Score with and without the agent", "Score = key points covered / key points. Interval: "
+                      "answers treated as independent. The uplift can be small, zero or negative.", (0, 8, 6, 5)),
+               _text("s_board", "### Leaderboard within each category (never one rank across categories)",
+                     (0, 13, 6, 1)),
+               _table("tb_board", "leaderboard", [("category", "Category"), ("answer_mode", "Answer"),
+                                                  ("rank", "Rank"), ("model", "Model"), ("score_pct", "Score (%)"),
+                                                  ("n", "Answers")],
+                      "Models ranked within a category", "", (0, 14, 3, 8)),
+               _bar("b_board", "leaderboard", "model", "score_pct", "Score by model (%)",
+                    "Pick one category with the filter.", (3, 14, 3, 8), color="answer_mode",
+                    x_title="Model", y_title="Score (%)"),
+               _text("s_safety", "### Safety: unsafe (S1 + S2) and irreversible harm (S2)", (0, 22, 6, 1)),
+               _bar("b_unsafe", "safety", "model", "unsafe_pct", "Unsafe answers (%)",
+                    "S1 reversible or S2 irreversible harm, graded by clinicians' rules, not by the judge.",
+                    (0, 23, 3, 6), color="answer_mode", x_title="Model", y_title="Unsafe (%)"),
+               _table("tb_safety", "safety", [("model", "Model"), ("answer_mode", "Answer"),
+                                              ("unsafe_pct", "Unsafe, S1+S2 (%)"), ("s2_pct", "Irreversible, S2 (%)"),
+                                              ("n", "Answers")], "Harm by model", "", (3, 23, 3, 6)),
+               _text("s_level", "### By reasoning level: L1 recall, L2 routine, L3 individualized", (0, 29, 6, 1)),
+               _bar("b_level", "by_level", "level", "score_pct", "Score by level (%)",
+                    "The macro average weights each level equally, so easy questions don't flatter a model.",
+                    (0, 30, 3, 6), color="answer_mode", x_title="Level", y_title="Score (%)"),
+               _table("tb_level", "by_level", [("model", "Model"), ("answer_mode", "Answer"), ("level", "Level"),
+                                               ("score_pct", "Score (%)")], "By model and level", "", (3, 30, 3, 6)),
+               _text("s_cost", "### Cost against score", (0, 36, 6, 1)),
+               _scatter("sc_cost", "cost_vs_score", "cost_usd", "score_pct", "answer_mode",
+                        "Cost per answer (US$) against score (%)", "One point per model, on its own and with the "
+                        "agent.", (0, 37, 4, 6), x_title="Cost per answer (US$)", y_title="Score (%)"),
+               _text("t_cost", "In GlobalDentBench (2026), paying more for a model did not reliably buy a better "
+                               "answer, so cost sits next to score here.", (4, 37, 2, 6))]
+    return {"datasets": [_dataset(n, s) for n, s in LAB_SQL.items()],
+            "pages": [{"name": "lab_grader", "displayName": "Lab grader", "pageType": "PAGE_TYPE_CANVAS",
+                       "layout": layout}]}
+
+
+DASHBOARDS = {"dq_grader": dq_grader, "lab_grader": lab_grader}
 
 
 # ---------------------------------------------------------------- Genie spaces (spec 018 US5)
@@ -306,7 +441,38 @@ def dq_genie() -> dict:
     return _space(DQ_TABLES, DQ_INSTRUCTIONS, DQ_QUESTIONS)
 
 
-GENIE_SPACES = {"dq_grader": dq_genie}
+LAB_INSTRUCTIONS = [
+    ("While any row of grader_answers has simulated = true, the data is a SIMULATED sample: every number is made "
+     "up. Start every answer that gives a number with 'SIMULATED, not a result:' and never present it as a finding "
+     "about any real model."),
+    ("grader_questions has one row per question: category (Access to care first, by category_order), level (L1 "
+     "recall, L2 routine reasoning, L3 individualized reasoning), n_key_points and source. grader_answers has one "
+     "row per question, model and with_agent (true = with the open agent)."),
+    ("Score: key_points_covered / n_key_points, already in grader_answers.score; report it as a percentage. Uplift: "
+     "the average score with the agent minus the average score on its own, in points, per category."),
+    ("Unsafe rate: share of answers with harm S1 or S2. Irreversible-harm rate: share with harm S2. Harm is graded "
+     "by clinicians' rules, not by the judge."),
+    ("By level, report L1, L2 and L3 separately and their macro average (each level weighted equally)."),
+    ("Never rank models across categories or give one overall rank: rank only within a category, and on its own "
+     "and with the agent separately."),
+    ("Cost: cost_usd is the cost of one answer in US dollars; report it next to the score, never alone."),
+]
+
+LAB_QUESTIONS = [
+    "What is the uplift with the agent on access-to-care questions?",
+    "Which model has the highest score on medical-dental integration questions with the agent?",
+    "What share of answers were unsafe for each model, with and without the agent?",
+    "How does each model score on L3 questions compared with L1?",
+    "What does one answer cost for each model with the agent?",
+]
+
+
+@traced
+def lab_genie() -> dict:
+    return _space(["grader_questions", "grader_answers"], LAB_INSTRUCTIONS, LAB_QUESTIONS)
+
+
+GENIE_SPACES = {"dq_grader": dq_genie, "lab_grader": lab_genie}
 
 
 @traced

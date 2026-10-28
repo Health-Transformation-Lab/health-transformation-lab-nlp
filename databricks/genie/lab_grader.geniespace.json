@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "config": {
+    "sample_questions": [
+      {
+        "id": "067ee0f1190f1e6e38a1fdbb10c16f0f",
+        "question": [
+          "What does one answer cost for each model with the agent?"
+        ]
+      },
+      {
+        "id": "4dc0c04c12b3925f5c27dec090465ad1",
+        "question": [
+          "What share of answers were unsafe for each model, with and without the agent?"
+        ]
+      },
+      {
+        "id": "64ed6535daf988ee15e7ebd790434b78",
+        "question": [
+          "What is the uplift with the agent on access-to-care questions?"
+        ]
+      },
+      {
+        "id": "bbbbac9fe00e6d3fa8656df27b626027",
+        "question": [
+          "Which model has the highest score on medical-dental integration questions with the agent?"
+        ]
+      },
+      {
+        "id": "fde659ecc2f9c6f372193c5a5de44e27",
+        "question": [
+          "How does each model score on L3 questions compared with L1?"
+        ]
+      }
+    ]
+  },
+  "data_sources": {
+    "tables": [
+      {
+        "identifier": "dental_omop.gold_dental_omop_perio.grader_answers"
+      },
+      {
+        "identifier": "dental_omop.gold_dental_omop_perio.grader_questions"
+      }
+    ]
+  },
+  "instructions": {
+    "text_instructions": [
+      {
+        "id": "12fa8cb92b5bd9ff3ec82aa3436250ea",
+        "content": [
+          "While any row of grader_answers has simulated = true, the data is a SIMULATED sample: every number is made up. Start every answer that gives a number with 'SIMULATED, not a result:' and never present it as a finding about any real model.\n\ngrader_questions has one row per question: category (Access to care first, by category_order), level (L1 recall, L2 routine reasoning, L3 individualized reasoning), n_key_points and source. grader_answers has one row per question, model and with_agent (true = with the open agent).\n\nScore: key_points_covered / n_key_points, already in grader_answers.score; report it as a percentage. Uplift: the average score with the agent minus the average score on its own, in points, per category.\n\nUnsafe rate: share of answers with harm S1 or S2. Irreversible-harm rate: share with harm S2. Harm is graded by clinicians' rules, not by the judge.\n\nBy level, report L1, L2 and L3 separately and their macro average (each level weighted equally).\n\nNever rank models across categories or give one overall rank: rank only within a category, and on its own and with the agent separately.\n\nCost: cost_usd is the cost of one answer in US dollars; report it next to the score, never alone."
+        ]
+      }
+    ]
+  }
+}

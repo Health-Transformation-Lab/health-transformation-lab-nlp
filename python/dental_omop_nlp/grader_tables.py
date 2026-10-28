@@ -1,5 +1,6 @@
 """The tables the two graders read (spec 018), one DataFrame per gold table, built from committed CSVs.
 
+    lab_tables  the lab grader: questions and answers, real when committed, else a seeded SIMULATED sample
     dq_tables   the EHR DQ grader: data-quality checks, completeness, prevalence, temporal plausibility,
                 transitions, concordance, per-visit evidence with its truth (statuses only, never note text)
 
@@ -83,3 +84,62 @@ def dq_tables(datasets_dir: Path) -> dict[str, pd.DataFrame]:
     f = ["data_quality/injected_error_recall.csv"]
     out["dq_injected_errors"] = _with_provenance(_read(d, f[0]), d, f)
     return out
+
+
+# ---------------------------------------------------------------- the lab grader (spec 018 US3)
+
+# Access to care first: the mission (docs/pitch/, slide 11). Five key points per question, as GlobalDentBench
+# decomposes a case answer (docs/dentbench_methods.md).
+CATEGORIES = ["Access to care", "Clinical cases", "Medical-dental integration", "Barriers to care",
+              "Cost and coverage"]
+KEY_POINTS = 5
+SIM_MODELS = {"sim:model-a": 0.62, "sim:model-b": 0.55, "sim:model-c": 0.48}   # made-up base skill
+SIM_JUDGE = "sim:judge-x"                                                      # a family no model shares
+# made-up agent effect per category: the pitch expects little on clinical cases, more on access and the seam
+SIM_AGENT_EFFECT = dict(zip(CATEGORIES, [0.12, 0.01, 0.08, 0.06, 0.05]))
+SIM_LEVEL_EFFECT = {"L1": 0.10, "L2": 0.0, "L3": -0.15}
+SIM_COST = {"sim:model-a": 0.020, "sim:model-b": 0.006, "sim:model-c": 0.002}   # US$ per answer, made up
+
+
+@traced
+def simulate_grader(seed: int = 2026, per_category: int = 25) -> dict[str, pd.DataFrame]:
+    """A SIMULATED lab grader run: every number is made up, so the dashboard and Genie can be built and checked
+    before any real run. Every row says simulated = true and every model is a sim: name."""
+    import numpy as np
+    rng = np.random.default_rng(seed)
+    q = pd.DataFrame([{"question_id": f"q{i * per_category + j + 1:03d}", "category": c, "category_order": i + 1,
+                       "level": rng.choice(["L1", "L2", "L3"], p=[0.3, 0.4, 0.3]), "n_key_points": KEY_POINTS,
+                       "source": "simulated: no evidence attached"}
+                      for i, c in enumerate(CATEGORIES) for j in range(per_category)]).assign(simulated=True)
+    rows = []
+    for r in q.itertuples():
+        for model, skill in SIM_MODELS.items():
+            for agent in (False, True):
+                p = skill + SIM_LEVEL_EFFECT[r.level] + (SIM_AGENT_EFFECT[r.category] if agent else 0.0)
+                covered = int(rng.binomial(KEY_POINTS, min(max(p, 0.02), 0.98)))
+                # harm follows what was left out (most harmful errors are omissions); medicines raise S2
+                missed = KEY_POINTS - covered
+                s2 = 0.04 * missed * (2.0 if r.category == "Medical-dental integration" else 1.0)
+                s1 = 0.08 * missed
+                u = rng.random()
+                harm = "S2" if u < s2 else "S1" if u < s2 + s1 else "S0"
+                cost = SIM_COST[model] * (1.6 if agent else 1.0) * float(rng.uniform(0.8, 1.2))
+                rows.append({"question_id": r.question_id, "model": model, "with_agent": agent,
+                             "key_points_covered": covered, "score": covered / KEY_POINTS, "harm": harm,
+                             "cost_usd": round(cost, 5), "judge": SIM_JUDGE, "run_id": f"sim-{seed}"})
+    return {"grader_questions": q, "grader_answers": pd.DataFrame(rows).assign(simulated=True)}
+
+
+@traced
+def lab_tables(datasets_dir: Path) -> dict[str, pd.DataFrame]:
+    """grader_questions and grader_answers: real files in data/datasets/grader/ when they exist, else the committed
+    simulated sample there, else the seeded sample itself."""
+    d = Path(datasets_dir)
+    for prefix in ("", "simulated_"):
+        files = {n: f"grader/{prefix}{n}.csv" for n in ("grader_questions", "grader_answers")}
+        if all((d / f).exists() for f in files.values()):
+            return {n: _with_provenance(_read(d, f), d, [f]) for n, f in files.items()}
+    sim = simulate_grader()
+    return {n: df.assign(source_files="simulate_grader(seed=2026)",
+                         sha256=hashlib.sha256(df.to_csv(index=False).encode()).hexdigest())
+            for n, df in sim.items()}
