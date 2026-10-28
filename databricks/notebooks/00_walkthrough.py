@@ -4,7 +4,7 @@
 # MAGIC
 # MAGIC Personal learning project; synthetic data and simulated reviewers only.
 # MAGIC
-# MAGIC One section per step of [`docs/code_walkthrough.md`](https://github.com/jcbowyer/health-transformation-lab-nlp/blob/main/docs/code_walkthrough.md),
+# MAGIC One section per step of [`docs/code_walkthrough.md`](https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/docs/code_walkthrough.md),
 # MAGIC in run order. Each section links three levels: the **README** section (what the study does),
 # MAGIC the **walkthrough** step (how the code does it), and the **code**, then shows the step's output
 # MAGIC from the files in this Git folder. Rebuild the outputs with `python/scripts/make_parity_inputs.sh`.
@@ -39,7 +39,7 @@ import os
 import pandas as pd
 
 REPO = os.path.abspath("../..")                      # this Git folder
-GITHUB = "https://github.com/jcbowyer/health-transformation-lab-nlp/blob/main/"
+GITHUB = "https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp/blob/main/"
 WALK = GITHUB + "docs/code_walkthrough.md"
 try:
     host = "https://" + spark.conf.get("spark.databricks.workspaceUrl")  # noqa: F821

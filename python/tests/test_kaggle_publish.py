@@ -48,7 +48,7 @@ def test_metadata_is_cc_by_with_a_card_and_kaggle_length_limits(tmp_path, name):
     assert owner == "someone" and 6 <= len(slug) <= 50 and slug == slug.lower()
     assert 6 <= len(meta["title"]) <= 50 and 20 <= len(meta["subtitle"]) <= 80
     card = meta["description"].lower()
-    for words in ("synthetic", "not affiliated", "not for clinical", "cc by 4.0", "github.com/jcbowyer/health-transformation-lab-nlp",
+    for words in ("synthetic", "not affiliated", "not for clinical", "cc by 4.0", "github.com/health-transformation-lab/health-transformation-lab-nlp",
                   "abc1234"):
         assert words in card, words
     for f in pub.files_of(name):              # the card lists every file
