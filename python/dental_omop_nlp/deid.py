@@ -409,22 +409,15 @@ _MASK = "[MASKED]"
 
 
 def _ai_mask_sql(text: str, labels: list[str]) -> str:  # pragma: no cover - needs a Databricks SQL warehouse
-    """ai_mask through the SQL Statement Execution API (works from a laptop or a notebook)."""
-    import json
-    import urllib.request
-    host, token, wh = (_need("DATABRICKS_HOST").rstrip("/"), _need("DATABRICKS_TOKEN"),
-                       _need("DATABRICKS_WAREHOUSE_ID"))
+    """ai_mask through the SQL Statement Execution API (works from a laptop or a notebook). Waits for a
+    statement that is still running after the first 50 s instead of failing (databricks_ai.sql_execute)."""
+    from .databricks_ai import sql_execute
     arr = ", ".join("'" + lab.replace("'", "") + "'" for lab in labels)
-    body = json.dumps({"warehouse_id": wh, "wait_timeout": "50s", "statement": f"SELECT ai_mask(:t, array({arr}))",
-                       "parameters": [{"name": "t", "value": text, "type": "STRING"}]}).encode()
-    host = host if host.startswith("http") else f"https://{host}"
-    req = urllib.request.Request(f"{host}/api/2.0/sql/statements", data=body, method="POST",
-                                 headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=90) as r:
-        out = json.loads(r.read())
-    if out.get("status", {}).get("state") != "SUCCEEDED":
-        raise RuntimeError(f"ai_mask statement {out.get('status')}")
-    return out["result"]["data_array"][0][0]
+    stmt, params = f"SELECT ai_mask(:t, array({arr}))", [{"name": "t", "value": text, "type": "STRING"}]
+    try:
+        return sql_execute(stmt, params)[0][0]
+    except RuntimeError:                                  # one retry: a 400-note run shouldn't stop on one blip
+        return sql_execute(stmt, params)[0][0]
 
 
 @traced

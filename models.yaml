@@ -182,6 +182,7 @@ models:
   # by the judge bake-off: a judge of the same family is not selected.
   - id: medgemma-1.5-4b-it
     hf: google/medgemma-1.5-4b-it
+    revision: 91850547d9f0b2fdd21aa7c5f4f3d1a8a52c243b   # Hugging Face commit, pinned 2026-10-28: a rerun uses the same weights
     kaggle: keras/medgemma/keras/medgemma_1.5_instruct_4b/1   # Kaggle Models (Keras preset; kaggle/keras_to_hf.py), no token
     license: Health AI Developer Foundations (HAI-DEF) terms of use, https://developers.google.com/health-ai-developer-foundations/terms
     gated: true   # requires: accept the HAI-DEF terms on the model's Hugging Face page, then a read token in HF_TOKEN
@@ -196,8 +197,27 @@ models:
     paper_url: https://arxiv.org/abs/2507.05201
     note: Newer 4B; better document/EHR extraction reported. Default reader to try first.
 
+  # General-purpose LLM on a Databricks pay-per-token Foundation Model endpoint (spec 017 US3): the same
+  # reader prompt and quote gate as MedGemma, so a hosted general model sits next to it. Same family as
+  # the LLM judge's default endpoint, so its judge scores carry self-preference risk.
+  #   python scripts/11_ai_predict.py --rung llama-3.3-70b-instruct --backend openai
+  - id: llama-3.3-70b-instruct
+    hf: meta-llama/Llama-3.3-70B-Instruct
+    endpoint: databricks-meta-llama-3-3-70b-instruct
+    served_by: Databricks Foundation Model API (pay-per-token)
+    license: Llama 3.3 Community License, https://www.llama.com/llama3_3/license/; Databricks terms for the endpoint
+    org: Meta
+    year: 2024
+    domain: general
+    role: llm
+    family: llama
+    max_len: 128000
+    paper: "The Llama 3 Herd of Models (arXiv 2407.21783)"
+    paper_url: https://arxiv.org/abs/2407.21783
+
   - id: medgemma-4b-it
     hf: google/medgemma-4b-it
+    revision: 290cda5eeccbee130f987c4ad74a59ae6f196408   # Hugging Face commit, pinned 2026-10-28: a rerun uses the same weights
     license: Health AI Developer Foundations (HAI-DEF) terms of use, https://developers.google.com/health-ai-developer-foundations/terms
     gated: true   # requires: accept the HAI-DEF terms on the model's Hugging Face page, then a read token in HF_TOKEN
     org: Google (Health AI Developer Foundations)
@@ -213,6 +233,7 @@ models:
 
   - id: medgemma-27b-text-it
     hf: google/medgemma-27b-text-it
+    revision: 5b667cf2ddcf064085bc90952edb35a0edbfb79c   # Hugging Face commit, pinned 2026-10-28: a rerun uses the same weights
     license: Health AI Developer Foundations (HAI-DEF) terms of use, https://developers.google.com/health-ai-developer-foundations/terms
     gated: true   # requires: accept the HAI-DEF terms on the model's Hugging Face page, then a read token in HF_TOKEN
     org: Google (Health AI Developer Foundations)
@@ -224,7 +245,10 @@ models:
     max_len: 128000
     paper: "MedGemma Technical Report (arXiv 2507.05201)"
     paper_url: https://arxiv.org/abs/2507.05201
-    note: Text only. Candidate zero-shot reader and judge.
+    note: >
+      Text only. Candidate zero-shot reader and judge. The 27B is expected to read notes better than the
+      4B (Google reports 87.7% vs 64.4% on MedQA), but it needs about 54 GB of GPU memory in bfloat16: more
+      than Kaggle's T4 x2 or Databricks Free Edition's A10. Not run yet; see docs/medgemma.md, "Next: MedGemma 27B".
 
 # ---- benchmark groupings ---------------------------------------------------
 ladders:
