@@ -28,16 +28,19 @@ The **Load results** job also writes the data-quality outputs to `dental_omop.go
 table is overwritten from its deployed CSV on every run (idempotent), and every row carries the file's `sha256`,
 `git_commit` and `loaded_at`.
 
+Gold names follow AGENTS.md "SQL and data names" (spec 018): the frames keep analysis names and Load results
+renames them with `gold_names.to_gold`; each table is declared in `diagrams/_build/gold_model.py`.
+
 | Table | From | One row per |
 |---|---|---|
-| `dq_checks` | `data_quality/dq_overall.csv`, `dq_by_clinic.csv` | (check, clinic); `clinic` = `All` for the overall rows |
-| `dq_completeness` | `data_quality/completeness_columns.csv` | evidence column: rows, missing, % missing |
+| `dq_check` | `data_quality/dq_overall.csv`, `dq_by_clinic.csv` | (check, clinic); `clinic` = `All` for the overall rows |
+| `dq_column_missing` | `data_quality/completeness_columns.csv` | evidence column: rows, missing, % missing |
 | `dq_prevalence` | `prevalence/prevalence_by_clinic.csv`, `data_quality/prevalence_by_scale.csv` | (method, clinic or scale) |
-| `dq_temporal` | `data_quality/temporal_by_method.csv` joined with `transitions_by_method.csv` | method |
-| `dq_transitions` | `data_quality/transitions_algorithm_design.csv`, long form | (from stage, to stage), with count, row % and better / same / worse |
-| `dq_concordance` | `method_agreement.csv` | pair of evidence sources |
-| `dq_visits` | `visits_structured.csv` joined with `answer_key/visits_truth.csv` | visit: clinic, visit date, each evidence source's status, the truth status (no note text) |
-| `dq_injected_errors` | `data_quality/injected_error_recall.csv` | one row |
+| `dq_temporal_change` | `data_quality/temporal_by_method.csv` joined with `transitions_by_method.csv` | method |
+| `dq_stage_transition` | `data_quality/transitions_algorithm_design.csv`, long form | (from stage, to stage), with count, row % and better / same / worse |
+| `dq_source_concordance` | `method_agreement.csv` | pair of evidence sources |
+| `fact_visit_evidence` | `visits_structured.csv` joined with `answer_key/visits_truth.csv` | visit: clinic, visit date, each evidence source's status, the truth status (no note text) |
+| `dq_injected_error` | `data_quality/injected_error_recall.csv` | one row |
 
 ### US2 - An EHR DQ grader dashboard (P1) #103
 An AI/BI dashboard, **EHR DQ grader**, the light version of the DQ Monitor. A banner says synthetic data, scored

@@ -230,7 +230,7 @@ def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
     dash = json.loads((ROOT / "databricks/resources" / d["file_path"]).resolve().read_text())
     assert [p["displayName"] for p in dash["pages"]] == ["Phenotyping", "De-identification"]
     names = {ds["name"] for ds in dash["datasets"]}
-    tables = {"chart_answers", "judgments", "judge_metrics", "judge_agreement", "judge_run", "deid_scores"}
+    tables = {"fact_chart_answer", "fact_judge_call", "judge_metric", "judge_agreement", "judge_cost", "deid_score"}
     for ds in dash["datasets"]:
         sql = " ".join(ds["queryLines"])
         used = set(re.findall(r"dental_omop\.gold_dental_omop_perio\.(\w+)", sql))

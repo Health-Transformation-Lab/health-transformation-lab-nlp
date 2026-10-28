@@ -4,12 +4,14 @@
 -- MAGIC
 -- MAGIC Same prompt as `python/dental_omop_nlp/judge.py` (prompt version `judge-v2`, AAP worksheet rules), run as batch SQL.
 -- MAGIC
--- MAGIC * Input: `${catalog}.${schema}.judge_queue` with columns `method, visit_id, note_text, pred`.
+-- MAGIC * Input: `${catalog}.${schema}.judge_queue` with columns `method_name, visit_id, note_text, predicted_status_code`.
 -- MAGIC   Build it from a **stratified sample** of each method's predictions (not all million notes:
 -- MAGIC   judging every note costs as much as using the LLM as the classifier).
 -- MAGIC * Notes must come from the de-identified zone. Confirm the endpoint is approved for this data first.
--- MAGIC * Output: `${catalog}.${schema}.judgments` with the quote gate applied in SQL.
--- MAGIC   Export it to `data/corpus/judgments_corpus.csv` and run `scripts/16_cost_effectiveness.py`.
+-- MAGIC * Output: `${catalog}.${schema}.fact_corpus_judge_call` with the quote gate applied in SQL (its own table:
+-- MAGIC   the judge scorecard's calls are `fact_judge_call`; names: AGENTS.md, SQL and data names).
+-- MAGIC   Export it to `data/corpus/judgments_corpus.csv` with the analysis names (`gold_names.from_gold`, table
+-- MAGIC   `fact_corpus_judge_call`) and run `scripts/16_cost_effectiveness.py`.
 
 -- COMMAND ----------
 
@@ -19,10 +21,10 @@ CREATE WIDGET TEXT judge_endpoint DEFAULT '<your-judge-endpoint>';  -- a Model S
 
 -- COMMAND ----------
 
-CREATE OR REPLACE TABLE IDENTIFIER(:catalog || '.' || :schema || '.judgments') AS
+CREATE OR REPLACE TABLE IDENTIFIER(:catalog || '.' || :schema || '.fact_corpus_judge_call') AS
 WITH raw AS (
   SELECT
-    method, visit_id, pred, note_text,
+    method_name, visit_id, predicted_status_code, note_text,
     ai_query(
       :judge_endpoint,
       CONCAT(
@@ -38,7 +40,7 @@ WITH raw AS (
         '< 20 remaining teeth, masticatory dysfunction, bite collapse, drifting/flaring or severe ridge defect -> stage 4. ',
         'Measured findings outrank a written diagnosis; ignore copied-forward text; ',
         'slight=stage 1, moderate=stage 2, severe=stage 3 (4 if >= 5 teeth lost to perio).\n\n',
-        'Note:\n<<<\n', note_text, '\n>>>\n\nPredicted status: ', pred,
+        'Note:\n<<<\n', note_text, '\n>>>\n\nPredicted status: ', predicted_status_code,
         '\n\nIs the predicted status supported by the note?'
       ),
       responseFormat => 'STRUCT<verdict: STRING, supported_status: STRING, quote: STRING, rationale: STRING>',
@@ -48,23 +50,23 @@ WITH raw AS (
   FROM IDENTIFIER(:catalog || '.' || :schema || '.judge_queue')
 )
 SELECT
-  method, visit_id, pred,
-  r.result.verdict           AS verdict,
-  r.result.supported_status  AS supported_status,
-  r.result.quote             AS quote,
-  r.result.rationale         AS rationale,
+  method_name, visit_id, predicted_status_code,
+  r.result.verdict           AS verdict_code,
+  r.result.supported_status  AS supported_status_code,
+  r.result.quote             AS quote_text,
+  r.result.rationale         AS rationale_text,
   -- quote gate: a verdict other than not_determinable must quote the note verbatim
   (r.errorMessage IS NULL
    AND r.result.verdict IN ('correct', 'incorrect', 'not_determinable')
    AND (r.result.verdict = 'not_determinable' OR (length(r.result.quote) > 0 AND instr(note_text, r.result.quote) > 0)))
-                             AS gate_ok,
-  coalesce(r.errorMessage, '') AS error,
-  'judge-v2'                 AS prompt_version,
-  :judge_endpoint            AS judge_model
+                             AS is_gate_ok,
+  coalesce(r.errorMessage, '') AS error_text,
+  'judge-v2'                 AS prompt_version_code,
+  :judge_endpoint            AS judge_model_name
 FROM raw;
 
 -- COMMAND ----------
 
-SELECT method, verdict, gate_ok, count(*) AS n
-FROM IDENTIFIER(:catalog || '.' || :schema || '.judgments')
-GROUP BY ALL ORDER BY method, verdict;
+SELECT method_name, verdict_code, is_gate_ok, count(*) AS call_count
+FROM IDENTIFIER(:catalog || '.' || :schema || '.fact_corpus_judge_call')
+GROUP BY ALL ORDER BY method_name, verdict_code;

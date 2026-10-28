@@ -9,9 +9,10 @@
 # MAGIC * Notes: `data/datasets/answer_key/review_key.csv`: synthetic, de-identified, through the leak gate.
 # MAGIC * Judge: `judge_endpoint` (a pay-per-token serving endpoint; `none` skips the judge and publishes
 # MAGIC   the truth-based metrics only). The job prints the token cost first and stops above `max_usd`.
-# MAGIC * Resumes: rows already in the `judgments` table aren't asked again (endpoint errors are).
-# MAGIC * Writes to the gold schema: `chart_answers`, `judgments`, `judge_metrics`, `judge_agreement`, `judge_run`,
-# MAGIC   `deid_scores` (for the dashboard's de-identification page). One MLflow trace per judge call.
+# MAGIC * Resumes: calls already in the `fact_judge_call` table aren't asked again (endpoint errors are).
+# MAGIC * Writes to the gold schema, under the gold names (spec 018, `dental_omop_nlp.gold_names`): `fact_chart_answer`,
+# MAGIC   `fact_judge_call`, `judge_metric`, `judge_agreement`, `judge_cost`, `deid_score` (for the dashboard's
+# MAGIC   de-identification page). One MLflow trace per judge call.
 
 # COMMAND ----------
 
@@ -44,6 +45,7 @@ experiment_id = dbutils.widgets.get("experiment_id")
 import mlflow
 import pandas as pd
 
+from dental_omop_nlp import gold_names
 from dental_omop_nlp import judge as jg
 from dental_omop_nlp import judge_scorecard as js
 from dental_omop_nlp import readme_results as rr
@@ -54,9 +56,15 @@ answers = js.chart_answers(inp)
 queue = js.judge_queue(answers, inp["key"])
 table = lambda name: f"{catalog}.{schema}.{name}"  # noqa: E731
 
+# Spec 018: earlier calls still under the old name would be missed and paid for again: migrate them first.
+old = {n: spark.table(table(n)).columns for n in ("judgments", "fact_judge_call") if spark.catalog.tableExists(table(n))}
+if ("copy", "judgments", "fact_judge_call") in gold_names.migration_plan(old):    # once merged, both exist: carry on
+    raise RuntimeError(f"{table('judgments')} holds judge calls not yet in fact_judge_call: run Load results first "
+                       "(its migrate_gold_names task moves them), then this job")
+
 done = None
-if spark.catalog.tableExists(table("judgments")):
-    done = js.reusable(spark.table(table("judgments")).toPandas(), endpoint) if endpoint != "none" else None
+if spark.catalog.tableExists(table("fact_judge_call")) and endpoint != "none":
+    done = js.reusable(gold_names.from_gold(spark.table(table("fact_judge_call")).toPandas(), "fact_judge_call"), endpoint)
 
 if endpoint in ("", "none"):
     print("judge_endpoint is none: publishing truth-based metrics only")
@@ -108,16 +116,17 @@ if len(judgments) and experiment_id:      # cost and speed next to the traces, a
 
 def save(pdf: pd.DataFrame, name: str):
     # typed schema from pandas: with no judge run the judge columns are all empty and Spark can't infer them
+    pdf = gold_names.to_gold(pdf, name)
     spark.createDataFrame(js.spark_rows(pdf), schema=js.spark_ddl(pdf)).write.mode("overwrite") \
          .option("overwriteSchema", "true").saveAsTable(table(name))
 
-save(answers, "chart_answers")
-if len(judgments) or not spark.catalog.tableExists(table("judgments")):   # keep an earlier run's judgments
-    save(judgments, "judgments")
-save(metrics, "judge_metrics")
+save(answers, "fact_chart_answer")
+if len(judgments) or not spark.catalog.tableExists(table("fact_judge_call")):   # keep an earlier run's calls
+    save(judgments, "fact_judge_call")
+save(metrics, "judge_metric")
 save(agreement, "judge_agreement")
-save(run, "judge_run")
-save(pd.read_csv(DEID_DIR / "scores.csv").assign(group=lambda d: d["method"].map(rr.deid_group)), "deid_scores")
+save(run, "judge_cost")
+save(pd.read_csv(DEID_DIR / "scores.csv").assign(group=lambda d: d["method"].map(rr.deid_group)), "deid_score")
 
 label = "LLM judgment" if len(judgments) else "no judge run"
 print(f"{label}: {len(judgments)} calls; tables written to {catalog}.{schema}")

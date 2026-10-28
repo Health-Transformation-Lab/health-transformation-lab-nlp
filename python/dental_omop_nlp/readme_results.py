@@ -79,9 +79,10 @@ _PLAIN = {"algorithm_v0": "Gum measurements first", "algorithm_design": "Exam fo
           "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT",
           "modernbert-large": "ModernBERT large", "bioclinical-modernbert-large": "BioClinical ModernBERT large",
           "longformer-base": "Longformer", "clinical-longformer": "Clinical-Longformer", "gatortron-base": "GatorTron",
-          "dbai-classify": "Databricks ai_classify", "llama-3.3-70b-instruct": "Llama 3.3 70B"}
+          "dbai-classify": "Databricks AI classify", "llama-3.3-70b-instruct": "Llama 3.3 70B"}
 _GENERAL_LLMS = ("dbai-classify", "llama-3.3-70b-instruct")   # spec 017: Databricks-hosted, untrained on our notes
-_PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Presidio", "regex_v2": "patterns",
+_PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Presidio", "ai_mask": "Databricks AI mask",
+               "regex_v2": "patterns",
                "regex": "patterns (first version)", "guard": "dental-word guard", "routed": "routed by identifier type"}
 
 
@@ -171,7 +172,7 @@ def phenotype_group(system: str) -> str:
 
 @traced
 def deid_group(engine: str) -> str:
-    ml = "hf_" in engine or "presidio" in engine
+    ml = "hf_" in engine or "presidio" in engine or "ai_mask" in engine
     if engine.startswith("routed") or (ml and "regex" in engine):
         return DEID_GROUPS[0]
     return DEID_GROUPS[1] if ml else DEID_GROUPS[2]

@@ -56,7 +56,7 @@ Bio_ClinicalBERT and Clinical-Longformer); only their published weights are used
 | Service · role | Where | Licence / terms | Status |
 |---|---|---|---|
 | Meta Llama 3.3 70B Instruct · LLM judge (spec 012), LLM de-identification, and a zero-shot note reader (spec 017, `llama-3.3-70b-instruct`; Hugging Face reference `meta-llama/Llama-3.3-70B-Instruct`) | Databricks Foundation Model API, pay-per-token endpoint `databricks-meta-llama-3-3-70b-instruct` | Llama 3.3 Community License; Databricks terms | judge: run in dev (2 runs, 2026-10-27); reader: results (240 notes, 2026-10-28); de-id: not run |
-| `ai_mask` · de-identification | Databricks SQL AI Function (Public Preview), Databricks-hosted model | Databricks terms | not run |
+| `ai_mask` · de-identification | Databricks SQL AI Function (Public Preview), Databricks-hosted model | Databricks terms | results (400 synthetic challenge notes, 2026-10-28) |
 | Azure Health Data Services de-identification · de-identification | Azure (needs `AZURE_DEID_ENDPOINT`) | Microsoft terms | not run |
 | Azure AI Language PII detection · de-identification | Azure (needs `AZURE_LANGUAGE_ENDPOINT`) | Microsoft terms | not run |
 | Amazon Comprehend Medical · de-identification | AWS (needs `AWS_REGION`) | AWS terms | not run |
@@ -82,7 +82,7 @@ workspace settings change where the text can go:
 | `ai_query` (SQL AI Function, [docs](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_query)) | Sends a prompt to a serving endpoint from SQL. Used for the LLM judge at corpus scale (`02_llm_judge.sql`), the benchmark's optional LLM challenger (`01_run_benchmark.py`) and, as an option, MedGemma served on Model Serving | whatever endpoint is named; here the Llama 3.3 70B endpoint | judge: run in dev; challenger: off by default |
 | `ai_classify` (SQL AI Function, GA June 2026, [docs](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_classify)) | Gives each review note one of the six statuses, each with a one-line description (spec 017: `dbai-classify`, `scripts/41_databricks_ai_methods.py`) | Databricks-managed; the docs don't name it | not run |
 | `ai_extract` (SQL AI Function, GA June 2026) | Could pull measurements (CAL, probing depth, teeth lost) out of a note, for the rules to stage | Databricks-managed; not named | not used (listed for review) |
-| `ai_mask` (SQL AI Function, Public Preview) | De-identification: replaces identifiers with `[MASKED]` (spec 007; the *De-id AI methods* job) | Databricks-hosted LLM; not named | not run |
+| `ai_mask` (SQL AI Function, Public Preview) | De-identification: replaces identifiers with `[MASKED]` (spec 007; the *De-id AI methods* job) | Databricks-hosted LLM; not named | results (400 challenge notes, 2026-10-28) |
 | Foundation Model API pay-per-token endpoints | The hosted LLMs behind `ai_query`, the judge and the Llama reader (section 4) | Meta Llama 3.3 70B Instruct | see section 4 |
 | MLflow `make_judge` (custom judge, `mlflow_judge.py`) | The AAP/EFP judge, written as an MLflow GenAI judge | the model passed in: here the judge endpoint | run in dev with the judge |
 | MLflow built-in Guidelines judge (`aap_guidelines`) | Checks answers against five plain-language AAP rules | **a Databricks-hosted judge model by default**, unless a model is passed; this repo passes the judge endpoint ([built-in judges](https://docs.databricks.com/aws/en/mlflow3/genai/eval-monitor/predefined-judge-scorers)) | defined; runs only in monitoring |
@@ -105,4 +105,4 @@ workspace settings change where the text can go:
   partner-powered AI settings with the approval.
 - **Not run yet** (no real results): ModernBERT large, BioClinical ModernBERT large, GatorTron, Clinical-
   Longformer, Longformer as a classifier, SapBERT, GTE-ModernColBERT, MedGemma 4B and 27B,
-  `ai_classify`, `ai_mask`, and every service in section 4 except the judge.
+  `ai_classify`, and every service in section 4 except the judge.

@@ -1,0 +1,34 @@
+erDiagram
+    dim_result_file |o--o{ fact_prediction : "file_sha256 (repo · kaggle rows)"
+    dim_result_file |o--o{ fact_llm_call : "file_sha256 (repo · kaggle rows)"
+    fact_prediction }o..o{ fact_llm_call : "method_name, visit_id, source_code (per version or run)"
+    review_key ||--o{ fact_prediction : "visit_id"
+    review_key ||--o{ fact_llm_call : "visit_id"
+    review_key ||--o{ fact_chart_answer : "visit_id"
+    fact_judge_call |o--o{ fact_chart_answer : "visit_id, answer_status_code"
+    judge_cost ||..o{ fact_judge_call : "call_kind_code"
+    fact_judge_call }o..o{ judge_agreement : "status calls summarised"
+    fact_chart_answer }o..o{ judge_metric : "system_name"
+    fact_prediction }o..o{ fact_chart_answer : "method_name = system_name"
+    fact_prediction ||..o| judge_queue : "sampled from"
+    judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
+    review_key
+    dim_result_file
+    fact_prediction
+    fact_llm_call
+    fact_chart_answer
+    fact_judge_call
+    judge_metric
+    judge_agreement
+    judge_cost
+    deid_score
+    judge_queue
+    fact_corpus_judge_call
+    dq_check
+    dq_column_missing
+    dq_prevalence
+    dq_temporal_change
+    dq_stage_transition
+    dq_source_concordance
+    fact_visit_evidence
+    dq_injected_error

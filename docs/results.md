@@ -140,23 +140,25 @@ Counts on each note set. What the columns mean (read them together):
 
 | Rank | Code name | Method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed |
 |---|---|---|---|---:|
-| 1–2 | `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 (95% range 3.5–5.1%) | 41 of 2,462 |
-| 1–3 | `routed+guard` | Routed by identifier type + dental-word guard | 129 of 2,714 (95% range 4.0–5.6%) | 154 of 2,462 |
-| 2–4 | `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 2,714 (95% range 5.5–7.4%) | 154 of 2,462 |
-| 3–4 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 2,714 (95% range 7.3–9.4%) | 41 of 2,462 |
-| 5–6 | `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 332 of 2,714 (95% range 11.1–13.5%) | 34 of 2,462 |
-| 5–6 | `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 376 of 2,714 (95% range 12.6–15.2%) | 122 of 2,462 |
-| 7–8 | `hf_stanford+guard` | Stanford AI + dental-word guard | 560 of 2,714 (95% range 19.2–22.2%) | 41 of 2,462 |
-| 7–8 | `hf_stanford` | Stanford AI | 560 of 2,714 (95% range 19.2–22.2%) | 415 of 2,462 |
-| 9–10 | `regex_v2` | Patterns | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
-| 9–10 | `regex_v2+guard` | Patterns + dental-word guard | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
-| 11–13 | `presidio+guard` | Presidio + dental-word guard | 849 of 2,714 (95% range 29.6–33.1%) | 122 of 2,462 |
-| 11–13 | `presidio` | Presidio | 849 of 2,714 (95% range 29.6–33.1%) | 921 of 2,462 |
-| 11–13 | `hf_obi` | OBI AI | 860 of 2,714 (95% range 30.0–33.5%) | 414 of 2,462 |
-| 14–15 | `regex` | Patterns (first version) | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
-| 14–15 | `regex+guard` | Patterns (first version) + dental-word guard | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
+| 1–3 | `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 (95% range 3.5–5.1%) | 41 of 2,462 |
+| 1–4 | `routed+guard` | Routed by identifier type + dental-word guard | 129 of 2,714 (95% range 4.0–5.6%) | 154 of 2,462 |
+| 1–4 | `ai_mask+regex_v2+guard` | Databricks AI mask + patterns + dental-word guard | 155 of 2,714 (95% range 4.9–6.6%) | 2 of 2,462 |
+| 2–5 | `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 2,714 (95% range 5.5–7.4%) | 154 of 2,462 |
+| 4–6 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 2,714 (95% range 7.3–9.4%) | 41 of 2,462 |
+| 5–7 | `ai_mask` | Databricks AI mask | 284 of 2,714 (95% range 9.4–11.7%) | 125 of 2,462 |
+| 6–8 | `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 332 of 2,714 (95% range 11.1–13.5%) | 34 of 2,462 |
+| 7–8 | `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 376 of 2,714 (95% range 12.6–15.2%) | 122 of 2,462 |
+| 9–10 | `hf_stanford+guard` | Stanford AI + dental-word guard | 560 of 2,714 (95% range 19.2–22.2%) | 41 of 2,462 |
+| 9–10 | `hf_stanford` | Stanford AI | 560 of 2,714 (95% range 19.2–22.2%) | 415 of 2,462 |
+| 11–12 | `regex_v2` | Patterns | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
+| 11–12 | `regex_v2+guard` | Patterns + dental-word guard | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
+| 13–15 | `presidio+guard` | Presidio + dental-word guard | 849 of 2,714 (95% range 29.6–33.1%) | 122 of 2,462 |
+| 13–15 | `presidio` | Presidio | 849 of 2,714 (95% range 29.6–33.1%) | 921 of 2,462 |
+| 13–15 | `hf_obi` | OBI AI | 860 of 2,714 (95% range 30.0–33.5%) | 414 of 2,462 |
+| 16–17 | `regex` | Patterns (first version) | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
+| 16–17 | `regex+guard` | Patterns (first version) + dental-word guard | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
 
-**Not run yet:** `llm`, `llm+regex_v2+guard`, `ai_mask`, `ai_mask+regex_v2+guard`, `azure_deid`, `azure_deid+regex_v2+guard`, `azure_language`, `azure_language+regex_v2+guard`, `aws_comprehend`, `aws_comprehend+regex_v2+guard` (cloud and LLM methods; each needs its service's credentials).
+**Not run yet:** `llm`, `llm+regex_v2+guard`, `azure_deid`, `azure_deid+regex_v2+guard`, `azure_language`, `azure_language+regex_v2+guard`, `aws_comprehend`, `aws_comprehend+regex_v2+guard` (cloud and LLM methods; each needs its service's credentials).
 
 #### Synthetic dental notes, hardest tier only
 
@@ -166,6 +168,8 @@ The 120 synthetic notes whose identifier shapes no method was written for: 879 i
 |---|---|---|---:|
 | `routed+guard` | Routed by identifier type + dental-word guard | 109 of 879 | 34 of 739 |
 | `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 879 | 4 of 739 |
+| `ai_mask+regex_v2+guard` | Databricks AI mask + patterns + dental-word guard | 153 of 879 | 2 of 739 |
+| `ai_mask` | Databricks AI mask | 157 of 879 | 63 of 739 |
 | `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 879 | 34 of 739 |
 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 879 | 4 of 739 |
 | `hf_stanford` | Stanford AI | 251 of 879 | 126 of 739 |

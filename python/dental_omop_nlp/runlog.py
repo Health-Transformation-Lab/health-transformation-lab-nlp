@@ -9,17 +9,24 @@ how the script ended: an exit code, or the signal that killed it, with the machi
 A log file is written once and never appended to: Unity Catalog volumes can't append to an existing file
 ("OSError: [Errno 29] Illegal seek"). When `log_path` already exists, the run writes `<name>_<UTC time>.log`
 next to it and prints which file it used.
+
+A script never sees the notebook's Py4J gateway (PYSPARK_GATEWAY_PORT, PYSPARK_GATEWAY_SECRET): MLflow in the
+script attached to it ("Connection to spark using Py4J from PID ..."), and once the script exited the
+notebook's next cell failed with that Py4JException. The scripts don't use Spark; MLflow reaches Databricks
+with the login `tracking.pass_databricks_login` puts in the environment.
 """
 
 from __future__ import annotations
 
 import datetime as dt
+import os
 import signal
 import subprocess
 from pathlib import Path
 
 from .telemetry import traced
 
+_NOTEBOOK_ONLY = ("PYSPARK_GATEWAY_PORT", "PYSPARK_GATEWAY_SECRET")
 _SIGNAL_HINT = {signal.SIGKILL: "usually out of memory", signal.SIGTERM: "stopped from outside"}
 
 
@@ -66,7 +73,8 @@ def run(cmd: list[str], log_path: str | Path | None = None, cwd: str | Path | No
         log = open(path, "w", buffering=1)  # noqa: SIM115 - line-buffered, closed below; never "a" (see above)
         log.write(f"--- {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M:%S} UTC: {' '.join(map(str, cmd))}\n")
     try:
-        with subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+        env = {k: v for k, v in os.environ.items() if k not in _NOTEBOOK_ONLY}
+        with subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                               bufsize=1) as p:
             for line in p.stdout:
                 print(line, end="", flush=True)

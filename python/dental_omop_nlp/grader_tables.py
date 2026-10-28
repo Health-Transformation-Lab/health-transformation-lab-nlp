@@ -3,6 +3,9 @@
     dq_tables   the EHR DQ grader: data-quality checks, completeness, prevalence, temporal plausibility,
                 transitions, concordance, per-visit evidence with its truth (statuses only, never note text)
 
+Each dict is keyed by the gold table name; the frames keep their analysis column names, and the Load results job
+renames them with gold_names.to_gold before writing (AGENTS.md "SQL and data names").
+
 Every row carries `source_files` and `sha256` (of those files, together), so a table says which version of the
 results it holds. The Load results job overwrites each table from these on every run.
 """
@@ -44,10 +47,10 @@ def dq_tables(datasets_dir: Path) -> dict[str, pd.DataFrame]:
     overall = _read(d, f[0]).assign(clinic="All")
     by_clinic = _read(d, f[1]).assign(clinic=lambda x: x.clinic_id.astype(int).astype(str)).drop(columns="clinic_id")
     checks = pd.concat([overall, by_clinic], ignore_index=True).rename(columns={"check": "check_name"})
-    out["dq_checks"] = _with_provenance(checks, d, f)   # `check` and `column` are reserved words in SQL
+    out["dq_check"] = _with_provenance(checks, d, f)   # `check` and `column` are reserved words in SQL
 
     f = ["data_quality/completeness_columns.csv"]
-    out["dq_completeness"] = _with_provenance(_read(d, f[0]).rename(columns={"column": "evidence_column"}), d, f)
+    out["dq_column_missing"] = _with_provenance(_read(d, f[0]).rename(columns={"column": "evidence_column"}), d, f)
 
     f = ["prevalence/prevalence_by_clinic.csv", "data_quality/prevalence_by_scale.csv"]
     clinic = _read(d, f[0]).rename(columns={"n_people": "n"}).assign(
@@ -59,7 +62,7 @@ def dq_tables(datasets_dir: Path) -> dict[str, pd.DataFrame]:
     out["dq_prevalence"] = _with_provenance(pd.concat([clinic, scale], ignore_index=True).reindex(columns=cols), d, f)
 
     f = ["data_quality/temporal_by_method.csv", "data_quality/transitions_by_method.csv"]
-    out["dq_temporal"] = _with_provenance(_read(d, f[0]).merge(_read(d, f[1]), on="method", how="outer"), d, f)
+    out["dq_temporal_change"] = _with_provenance(_read(d, f[0]).merge(_read(d, f[1]), on="method", how="outer"), d, f)
 
     f = ["data_quality/transitions_algorithm_design.csv"]
     m = _read(d, f[0]).set_index("from_status")
@@ -69,17 +72,18 @@ def dq_tables(datasets_dir: Path) -> dict[str, pd.DataFrame]:
     step = long.to_status.map(rank) - long.from_status.map(rank)
     long["direction"] = step.map(lambda s: "worse" if s > 0 else "better" if s < 0 else "same")
     long.insert(0, "method", "algorithm_design")
-    out["dq_transitions"] = _with_provenance(long, d, f)
+    out["dq_stage_transition"] = _with_provenance(long, d, f)
 
     f = ["method_agreement.csv"]
-    out["dq_concordance"] = _with_provenance(_read(d, f[0]), d, f)
+    out["dq_source_concordance"] = _with_provenance(_read(d, f[0]), d, f)
 
     f = ["visits_structured.csv", "answer_key/visits_truth.csv"]
     v = _read(d, f[0])[["visit_id", "person_id", "clinic_id", "visit_date", "visit_seq", "in_review", *EVIDENCE]]
     truth = _read(d, f[1])[["visit_id", "truth_status"]]
-    v = v.merge(truth, on="visit_id", validate="one_to_one").assign(clinic=lambda x: x.clinic_id.astype(str))
-    out["dq_visits"] = _with_provenance(v.drop(columns="clinic_id"), d, f)
+    v = v.merge(truth, on="visit_id", validate="one_to_one").assign(
+        clinic=lambda x: x.clinic_id.astype(str), visit_date=lambda x: pd.to_datetime(x.visit_date).dt.date)
+    out["fact_visit_evidence"] = _with_provenance(v.drop(columns="clinic_id"), d, f)
 
     f = ["data_quality/injected_error_recall.csv"]
-    out["dq_injected_errors"] = _with_provenance(_read(d, f[0]), d, f)
+    out["dq_injected_error"] = _with_provenance(_read(d, f[0]), d, f)
     return out

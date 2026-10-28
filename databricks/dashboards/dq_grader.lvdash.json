@@ -5,128 +5,135 @@
       "displayName": "tiles",
       "queryLines": [
         "SELECT\n",
-        "  ROUND(100 * AVG(CASE WHEN exam_form <> 'unknown' AND proc_dx_completed <> 'unknown' AND probing_chart <> 'unknown'\n",
-        "                       THEN 1.0 ELSE 0.0 END), 1) AS completeness_pct,\n",
-        "  ROUND(100 * AVG(CASE WHEN algorithm_v0 = truth_status THEN 1.0 ELSE 0.0 END), 1) AS accuracy_pct,\n",
-        "  ROUND(100 * AVG(CASE WHEN algorithm_design = truth_status THEN 1.0 ELSE 0.0 END), 1) AS accuracy_design_pct,\n",
-        "  (SELECT ROUND(100 * (MAX(periodontitis) - MIN(periodontitis)), 1) FROM dental_omop.gold_dental_omop_perio.dq_prevalence\n",
-        "    WHERE level = 'clinic' AND method = 'algorithm_design') AS consistency_pts,\n",
-        "  (SELECT ROUND(100 * better, 1) FROM dental_omop.gold_dental_omop_perio.dq_temporal WHERE method = 'algorithm_design') AS implausible_pct,\n",
+        "  ROUND(100 * AVG(CASE WHEN exam_form_status_code <> 'unknown' AND dx_completed_status_code <> 'unknown'\n",
+        "                        AND probing_chart_status_code <> 'unknown' THEN 1.0 ELSE 0.0 END), 1) AS completeness_pct,\n",
+        "  ROUND(100 * AVG(CASE WHEN rules_v0_status_code = truth_status_code THEN 1.0 ELSE 0.0 END), 1) AS accuracy_pct,\n",
+        "  ROUND(100 * AVG(CASE WHEN rules_design_status_code = truth_status_code THEN 1.0 ELSE 0.0 END), 1)\n",
+        "    AS accuracy_design_pct,\n",
+        "  (SELECT ROUND(100 * (MAX(periodontitis_ratio) - MIN(periodontitis_ratio)), 1) FROM dental_omop.gold_dental_omop_perio.dq_prevalence\n",
+        "    WHERE level_code = 'clinic' AND method_name = 'algorithm_design') AS consistency_pts,\n",
+        "  (SELECT ROUND(100 * better_ratio, 1) FROM dental_omop.gold_dental_omop_perio.dq_temporal_change WHERE method_name = 'algorithm_design')\n",
+        "    AS implausible_pct,\n",
         "  COUNT(*) AS n_visits\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n"
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n"
       ]
     },
     {
       "name": "missingness",
       "displayName": "missingness",
       "queryLines": [
-        "SELECT evidence_column, ROUND(pct_missing, 1) AS pct_missing, n_missing, n_rows\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_completeness\n",
-        "ORDER BY pct_missing DESC\n"
+        "SELECT evidence_column_name AS evidence_column, ROUND(missing_pct, 1) AS pct_missing, missing_count AS n_missing,\n",
+        "  row_count AS n_rows\n",
+        "FROM dental_omop.gold_dental_omop_perio.dq_column_missing\n",
+        "ORDER BY missing_pct DESC\n"
       ]
     },
     {
       "name": "checks",
       "displayName": "checks",
       "queryLines": [
-        "SELECT clinic, category, check_name, n_checked, n_fail, ROUND(100 * pass_rate, 2) AS pass_pct, status\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_checks\n",
-        "ORDER BY CASE WHEN clinic = 'All' THEN 0 ELSE 1 END, clinic, category, check_name\n"
+        "SELECT clinic_code AS clinic, check_category_code AS category, check_name, checked_count AS n_checked,\n",
+        "  failed_count AS n_fail, ROUND(100 * pass_ratio, 2) AS pass_pct, check_status_code AS status\n",
+        "FROM dental_omop.gold_dental_omop_perio.dq_check\n",
+        "ORDER BY CASE WHEN clinic_code = 'All' THEN 0 ELSE 1 END, clinic_code, check_category_code, check_name\n"
       ]
     },
     {
       "name": "accuracy",
       "displayName": "accuracy",
       "queryLines": [
-        "SELECT clinic, 'Exam form' AS evidence_source,\n",
-        "  CASE WHEN exam_form <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
-        "  CASE WHEN exam_form = 'unknown' THEN NULL WHEN exam_form = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n",
+        "SELECT clinic_code AS clinic, 'Exam form' AS evidence_source,\n",
+        "  CASE WHEN exam_form_status_code <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN exam_form_status_code = 'unknown' THEN NULL WHEN exam_form_status_code = truth_status_code THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n",
         "UNION ALL\n",
         "\n",
-        "SELECT clinic, 'Diagnosis codes, done' AS evidence_source,\n",
-        "  CASE WHEN proc_dx_completed <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
-        "  CASE WHEN proc_dx_completed = 'unknown' THEN NULL WHEN proc_dx_completed = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n",
+        "SELECT clinic_code AS clinic, 'Diagnosis codes, done' AS evidence_source,\n",
+        "  CASE WHEN dx_completed_status_code <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN dx_completed_status_code = 'unknown' THEN NULL WHEN dx_completed_status_code = truth_status_code THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n",
         "UNION ALL\n",
         "\n",
-        "SELECT clinic, 'Diagnosis codes, planned' AS evidence_source,\n",
-        "  CASE WHEN proc_dx_planned <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
-        "  CASE WHEN proc_dx_planned = 'unknown' THEN NULL WHEN proc_dx_planned = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n",
+        "SELECT clinic_code AS clinic, 'Diagnosis codes, planned' AS evidence_source,\n",
+        "  CASE WHEN dx_planned_status_code <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN dx_planned_status_code = 'unknown' THEN NULL WHEN dx_planned_status_code = truth_status_code THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n",
         "UNION ALL\n",
         "\n",
-        "SELECT clinic, 'Chart note' AS evidence_source,\n",
-        "  CASE WHEN notes <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
-        "  CASE WHEN notes = 'unknown' THEN NULL WHEN notes = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n",
+        "SELECT clinic_code AS clinic, 'Chart note' AS evidence_source,\n",
+        "  CASE WHEN note_status_code <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN note_status_code = 'unknown' THEN NULL WHEN note_status_code = truth_status_code THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n",
         "UNION ALL\n",
         "\n",
-        "SELECT clinic, 'Gum measurements' AS evidence_source,\n",
-        "  CASE WHEN probing_chart <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
-        "  CASE WHEN probing_chart = 'unknown' THEN NULL WHEN probing_chart = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n",
+        "SELECT clinic_code AS clinic, 'Gum measurements' AS evidence_source,\n",
+        "  CASE WHEN probing_chart_status_code <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN probing_chart_status_code = 'unknown' THEN NULL WHEN probing_chart_status_code = truth_status_code THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n",
         "UNION ALL\n",
         "\n",
-        "SELECT clinic, 'Rules, measurements first (v0)' AS evidence_source,\n",
-        "  CASE WHEN algorithm_v0 <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
-        "  CASE WHEN algorithm_v0 = 'unknown' THEN NULL WHEN algorithm_v0 = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n",
+        "SELECT clinic_code AS clinic, 'Rules, measurements first (v0)' AS evidence_source,\n",
+        "  CASE WHEN rules_v0_status_code <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN rules_v0_status_code = 'unknown' THEN NULL WHEN rules_v0_status_code = truth_status_code THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n",
         "UNION ALL\n",
         "\n",
-        "SELECT clinic, 'Rules, exam form first (design)' AS evidence_source,\n",
-        "  CASE WHEN algorithm_design <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
-        "  CASE WHEN algorithm_design = 'unknown' THEN NULL WHEN algorithm_design = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_visits\n"
+        "SELECT clinic_code AS clinic, 'Rules, exam form first (design)' AS evidence_source,\n",
+        "  CASE WHEN rules_design_status_code <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN rules_design_status_code = 'unknown' THEN NULL WHEN rules_design_status_code = truth_status_code THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.fact_visit_evidence\n"
       ]
     },
     {
       "name": "concordance",
       "displayName": "concordance",
       "queryLines": [
-        "SELECT method_a, method_b, ROUND(100 * pct_agree, 1) AS pct_agree, ROUND(kappa, 2) AS kappa, n\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_concordance\n",
-        "WHERE level = 'status'\n"
+        "SELECT method_a_name AS method_a, method_b_name AS method_b, ROUND(100 * agreement_ratio, 1) AS pct_agree,\n",
+        "  ROUND(kappa_coef, 2) AS kappa, visit_count AS n\n",
+        "FROM dental_omop.gold_dental_omop_perio.dq_source_concordance\n",
+        "WHERE level_code = 'status'\n"
       ]
     },
     {
       "name": "prevalence_clinic",
       "displayName": "prevalence_clinic",
       "queryLines": [
-        "SELECT group_name AS clinic, ROUND(100 * periodontitis, 1) AS periodontitis_pct,\n",
-        "  ROUND(100 * periodontitis_ci_low, 1) AS ci_low, ROUND(100 * periodontitis_ci_high, 1) AS ci_high, n\n",
+        "SELECT group_name AS clinic, ROUND(100 * periodontitis_ratio, 1) AS periodontitis_pct,\n",
+        "  ROUND(100 * periodontitis_ci_low_ratio, 1) AS ci_low, ROUND(100 * periodontitis_ci_high_ratio, 1) AS ci_high,\n",
+        "  subject_count AS n\n",
         "FROM dental_omop.gold_dental_omop_perio.dq_prevalence\n",
-        "WHERE level = 'clinic' AND method = 'algorithm_design'\n",
-        "ORDER BY clinic\n"
+        "WHERE level_code = 'clinic' AND method_name = 'algorithm_design'\n",
+        "ORDER BY group_name\n"
       ]
     },
     {
       "name": "prevalence_scale",
       "displayName": "prevalence_scale",
       "queryLines": [
-        "SELECT method, group_name AS scale, n, ROUND(100 * periodontitis, 1) AS periodontitis_pct,\n",
-        "  ROUND(100 * stage3_4, 1) AS stage3_4_pct\n",
+        "SELECT method_name AS method, group_name AS scale, subject_count AS n,\n",
+        "  ROUND(100 * periodontitis_ratio, 1) AS periodontitis_pct, ROUND(100 * stage3_4_ratio, 1) AS stage3_4_pct\n",
         "FROM dental_omop.gold_dental_omop_perio.dq_prevalence\n",
-        "WHERE level = 'scale'\n",
-        "ORDER BY method, scale\n"
+        "WHERE level_code = 'scale'\n",
+        "ORDER BY method_name, group_name\n"
       ]
     },
     {
       "name": "transitions",
       "displayName": "transitions",
       "queryLines": [
-        "SELECT from_status, to_status, n, ROUND(row_pct, 1) AS row_pct, direction\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_transitions\n"
+        "SELECT from_status_code AS from_status, to_status_code AS to_status, visit_pair_count AS n,\n",
+        "  ROUND(row_pct, 1) AS row_pct, direction_code AS direction\n",
+        "FROM dental_omop.gold_dental_omop_perio.dq_stage_transition\n"
       ]
     },
     {
       "name": "temporal",
       "displayName": "temporal",
       "queryLines": [
-        "SELECT method, pairs, ROUND(100 * better, 1) AS improved_pct, ROUND(100 * same, 1) AS same_pct,\n",
-        "  ROUND(100 * worse, 1) AS worse_pct, ROUND(100 * perio_resolved, 1) AS resolved_pct,\n",
-        "  ROUND(100 * stage_drop, 1) AS stage_drop_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_temporal\n",
+        "SELECT method_name AS method, visit_pair_count AS pairs, ROUND(100 * better_ratio, 1) AS improved_pct,\n",
+        "  ROUND(100 * same_ratio, 1) AS same_pct, ROUND(100 * worse_ratio, 1) AS worse_pct,\n",
+        "  ROUND(100 * perio_resolved_ratio, 1) AS resolved_pct, ROUND(100 * stage_drop_ratio, 1) AS stage_drop_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.dq_temporal_change\n",
         "ORDER BY improved_pct\n"
       ]
     },
@@ -134,9 +141,9 @@
       "name": "injected",
       "displayName": "injected",
       "queryLines": [
-        "SELECT injected_errors, ROUND(100 * caught_share, 1) AS caught_pct,\n",
-        "  ROUND(100 * flag_rate_without_error, 2) AS false_flag_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.dq_injected_errors\n"
+        "SELECT injected_error_count AS injected_errors, ROUND(100 * caught_ratio, 1) AS caught_pct,\n",
+        "  ROUND(100 * false_flag_ratio, 2) AS false_flag_pct\n",
+        "FROM dental_omop.gold_dental_omop_perio.dq_injected_error\n"
       ]
     }
   ],
@@ -232,7 +239,7 @@
             "name": "how",
             "multilineTextboxSpec": {
               "lines": [
-                "Tiles are for all clinics; the clinic filter applies to accuracy by source and prevalence. The checks table lists every clinic and All. Per-visit evidence is in `dq_visits` (statuses only, never note text).\n"
+                "Tiles are for all clinics; the clinic filter applies to accuracy by source and prevalence. The checks table lists every clinic and All. Per-visit evidence is in `fact_visit_evidence` (statuses only, never note text).\n"
               ]
             }
           },

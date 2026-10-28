@@ -4,9 +4,11 @@ DuckDB, on the tables grader_tables builds from the committed CSVs, under the sa
 import json
 import re
 
+import pandas as pd
 import pytest
 
 from dental_omop_nlp import dashboards as dash
+from dental_omop_nlp import gold_names
 from dental_omop_nlp import grader_tables as gt
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
 
@@ -19,7 +21,9 @@ def con():
     c = duckdb.connect()
     c.execute("ATTACH ':memory:' AS dental_omop")
     c.execute("CREATE SCHEMA dental_omop.gold_dental_omop_perio")
-    for name, df in gt.dq_tables(DATASETS_DIR).items():
+    now = pd.Timestamp("2026-10-28", tz="UTC")
+    for name, df in gt.dq_tables(DATASETS_DIR).items():      # under their gold names, as Load results writes them
+        df = gold_names.to_gold(df.assign(git_commit="abc1234", loaded_at=now), name)
         c.register(f"src_{name}", df)
         c.execute(f"CREATE TABLE dental_omop.gold_dental_omop_perio.{name} AS SELECT * FROM src_{name}")
     return c
@@ -46,7 +50,7 @@ def test_every_dq_dataset_runs_and_returns_rows(con):
 def test_dq_tiles_give_the_values_the_tables_hold(con):
     sql = {d["name"]: "".join(d["queryLines"]) for d in _datasets("dq_grader")}
     tiles = dict(zip([c[0] for c in con.execute(sql["tiles"]).description], con.execute(sql["tiles"]).fetchone()))
-    visits = gt.dq_tables(DATASETS_DIR)["dq_visits"]
+    visits = gt.dq_tables(DATASETS_DIR)["fact_visit_evidence"]
     known = (visits[["exam_form", "proc_dx_completed", "probing_chart"]] != "unknown").all(axis=1)
     assert tiles["completeness_pct"] == pytest.approx(round(100 * known.mean(), 1))
     acc = (visits.algorithm_v0 == visits.truth_status).mean()

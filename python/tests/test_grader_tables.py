@@ -6,19 +6,19 @@ from dental_omop_nlp import grader_tables as gt
 from dental_omop_nlp.paths import DATASETS_DIR
 
 DQ = {
-    "dq_checks": {"check_name", "category", "clinic", "n_checked", "n_fail", "pass_rate", "status"},
-    "dq_completeness": {"evidence_column", "n_rows", "n_missing", "pct_missing"},
+    "dq_check": {"check_name", "category", "clinic", "n_checked", "n_fail", "pass_rate", "status"},
+    "dq_column_missing": {"evidence_column", "n_rows", "n_missing", "pct_missing"},
     "dq_prevalence": {"method", "level", "group_name", "n", "periodontitis", "periodontitis_ci_low",
                       "periodontitis_ci_high", "stage3_4"},
-    "dq_temporal": {"method", "n_later_visits", "perio_resolved", "stage_drop", "pairs", "better", "same", "worse"},
-    "dq_transitions": {"method", "from_status", "to_status", "n", "row_pct", "direction"},
-    "dq_concordance": {"method_a", "method_b", "n", "pct_agree", "kappa"},
-    "dq_visits": {"visit_id", "person_id", "clinic", "visit_date", "visit_seq", "truth_status", "notes",
+    "dq_temporal_change": {"method", "n_later_visits", "perio_resolved", "stage_drop", "pairs", "better", "same", "worse"},
+    "dq_stage_transition": {"method", "from_status", "to_status", "n", "row_pct", "direction"},
+    "dq_source_concordance": {"method_a", "method_b", "n", "pct_agree", "kappa"},
+    "fact_visit_evidence": {"visit_id", "person_id", "clinic", "visit_date", "visit_seq", "truth_status", "notes",
                   "exam_form", "proc_dx_completed", "proc_dx_planned", "probing_chart", "algorithm_v0",
                   "algorithm_design"},
-    "dq_injected_errors": {"injected_errors", "caught_share", "flag_rate_without_error"},
+    "dq_injected_error": {"injected_errors", "caught_share", "flag_rate_without_error"},
 }
-PROVENANCE = {"sha256", "source_files"}
+PROVENANCE = {"sha256", "source_files"}   # analysis names; gold_names.to_gold renames them for gold
 
 
 @pytest.fixture(scope="module")
@@ -39,18 +39,18 @@ def test_no_note_text_reaches_a_dq_table(dq):
     # the evidence columns are statuses, never the note itself
     statuses = {"unknown", "healthy_gingivitis", "healthy", "gingivitis"} | {f"periodontitis_stage_{i}" for i in range(1, 5)}
     for col in ("notes", "exam_form", "probing_chart", "algorithm_design", "truth_status"):
-        assert set(dq["dq_visits"][col].dropna()) <= statuses, col
+        assert set(dq["fact_visit_evidence"][col].dropna()) <= statuses, col
     assert "text" not in " ".join(c for df in dq.values() for c in df.columns)
 
 
 def test_checks_hold_the_overall_rows_and_every_clinic(dq):
-    c = dq["dq_checks"]
+    c = dq["dq_check"]
     overall = c[c.clinic == "All"]
     assert len(overall) == 16 and c.clinic.nunique() == 1 + 8
 
 
 def test_transitions_are_long_form_with_row_shares_and_direction(dq):
-    t = dq["dq_transitions"]
+    t = dq["dq_stage_transition"]
     assert len(t) == 25
     sums = t.groupby("from_status").row_pct.sum()
     assert ((sums - 100).abs() < 1e-6).all()
@@ -77,3 +77,20 @@ def test_load_results_overwrites_every_grader_table():
     nb = (REPO_ROOT / "databricks" / "notebooks" / "10_load_results.py").read_text()
     assert "grader_tables.dq_tables(data_dir)" in nb
     assert '.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(table(name))' in nb
+    assert "gold_names.to_gold(df.assign(git_commit=commit, loaded_at=now), name)" in nb   # gold names
+
+
+def test_every_dq_table_becomes_its_declared_gold_table(dq):
+    # AGENTS.md "SQL and data names": the frames keep analysis names; to_gold gives the declared gold columns
+    import importlib.util
+
+    import pandas as pd
+
+    from dental_omop_nlp import gold_names
+    from dental_omop_nlp.paths import REPO_ROOT
+    spec = importlib.util.spec_from_file_location("gold_model", REPO_ROOT / "diagrams" / "_build" / "gold_model.py")
+    gm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gm)
+    for name, df in dq.items():
+        gold = gold_names.to_gold(df.assign(git_commit="abc", loaded_at=pd.Timestamp("2026-10-28", tz="UTC")), name)
+        assert list(gold.columns) == [c.name for c in gm.TABLES[name].columns], name

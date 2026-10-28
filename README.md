@@ -3,7 +3,7 @@
 > **Personal learning project.** Built on my own time while waiting for internal
 > approvals. Not affiliated with or endorsed by any employer, institution or
 > vendor, and nothing here reflects official business or research of any
-> organization, including CareQuest. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
+> organization. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
 
 Can periodontal status be phenotyped from a dental EHR, and can AI reading the
 chart notes match clinicians? (**OMOP** = a common format for health records; **NLP** = software
@@ -89,15 +89,15 @@ Best method in each group, counted on the 400 synthetic notes; groups ordered by
 
 - **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). This risks patients.
 - **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. This damages the note the AI reads.
-- **Rank**: where it plausibly ranks among all 15 methods.
+- **Rank**: where it plausibly ranks among all 17 methods.
 
 | Group | Best method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Methods in group |
 |---|---|---:|---:|---|---:|
-| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 | 41 of 2,462 | 1–2 | 6 |
-| One AI tool | Stanford AI + dental-word guard | 560 of 2,714 | 41 of 2,462 | 7–8 | 5 |
-| Pattern matching only | Patterns | 645 of 2,714 | 0 of 2,462 | 9–10 | 4 |
+| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 | 41 of 2,462 | 1–3 | 7 |
+| One AI tool | Databricks AI mask | 284 of 2,714 | 125 of 2,462 | 5–7 | 6 |
+| Pattern matching only | Patterns | 645 of 2,714 | 0 of 2,462 | 11–12 | 4 |
 
-All 15 methods, per 100 with a likely range for each number (95% confidence interval), on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
+All 17 methods, per 100 with a likely range for each number (95% confidence interval), on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
 
 #### The other note sets
 
