@@ -192,7 +192,7 @@ L1 / L2 / L3, so it reads a written diagnosis but doesn't yet stage from the cha
 
 ## Action items
 
-Differences from the study design and open decisions: **[docs/action_items.md](../action_items.md)**.
+Differences from the study design and open decisions: **[docs/action_items.md](../action_items.md)**. Decisions made: [docs/adr/](../adr/README.md).
 Also: [how we work](../../AGENTS.md) · [references](../references.md) · [protocol](../labeling_protocol.md) · [plan](../plan.md) · owner John Bowyer · MIT.
 
 ## Drill-downs

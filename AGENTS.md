@@ -33,6 +33,14 @@ Small fixes (a typo, a one-line bug with a regression test) don't need one.
 Every pull request gets a review written to `pull_requests/pr-<n>-review.md`, against
 `.claude/review-rubric.md` and these rules.
 
+## Decisions and action items
+
+Keep decisions apart from to-dos. A decision (what we chose, why, when to revisit) is a decision record
+in `docs/adr/NNNN-slug.md` ([`docs/adr/README.md`](docs/adr/README.md)). An action item (work still to
+do) is a GitHub issue labelled `action-item`. Don't file a decision as an `action-item` issue, and don't
+leave one only in an issue or PR thread. An issue asking for a decision to be written down is closed by
+the PR that adds the ADR. Work the decision leads to gets its own issue.
+
 ## Branches and issues
 
 Every user story is a GitHub issue, and every branch and pull request belongs to one.
