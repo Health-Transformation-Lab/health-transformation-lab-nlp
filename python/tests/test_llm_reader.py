@@ -201,3 +201,20 @@ def test_sft_records_use_reader_format():
     assert [m["role"] for m in rec["messages"]] == ["system", "user", "assistant"]
     target = parse_answer(rec["messages"][-1]["content"], NOTE)
     assert target["gate_ok"] and target["status"] == "periodontitis_stage_2"
+
+
+# ---- dtype for the GPU the reader lands on (Kaggle T4 / P100 have no native bfloat16) -------------
+
+def test_pick_dtype_matches_the_hardware(monkeypatch):
+    from dental_omop_nlp.llm_reader import pick_dtype
+    monkeypatch.delenv("DENTAL_LLM_DTYPE", raising=False)
+    assert pick_dtype(cuda=True, capability=(8, 6), total_gb=24) == "bfloat16"     # A10 (Databricks)
+    assert pick_dtype(cuda=True, capability=(7, 5), total_gb=30) == "float32"      # Kaggle T4 x2
+    assert pick_dtype(cuda=True, capability=(6, 0), total_gb=16) == "float16"      # P100: last resort
+    assert pick_dtype(cuda=False, capability=None, total_gb=0) == "float32"        # CPU
+
+
+def test_pick_dtype_can_be_overridden(monkeypatch):
+    from dental_omop_nlp.llm_reader import pick_dtype
+    monkeypatch.setenv("DENTAL_LLM_DTYPE", "float16")
+    assert pick_dtype(cuda=True, capability=(8, 0), total_gb=80) == "float16"

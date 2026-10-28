@@ -105,6 +105,14 @@ placeholder error rates and say nothing about MedGemma.
   ([limitations](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations),
   [announcement](https://www.databricks.com/blog/whats-coming-next-free-edition)).
   The 27B model is unlikely to fit.
+- **Kaggle (free GPU), when Databricks has none:** GPU access on Free Edition needs LinkedIn
+  verification and free capacity, and some accounts get none, so the `medgemma_reader` job can wait and
+  retry for hours without starting. [`kaggle/medgemma_reader.ipynb`](../kaggle/medgemma_reader.ipynb) runs
+  the same `11_ai_predict.py` on Kaggle's free "GPU T4 x2" (about 30 GPU-hours a week): clone, install,
+  token from Kaggle Secrets, a 10-note test, then all 240 notes with *Save & Run All*. The reader picks
+  the weights dtype for the GPU (`llm_reader.pick_dtype`: bfloat16 on A10/A100/H100, float32 on T4 x2,
+  `DENTAL_LLM_DTYPE` to force one). Download the prediction CSVs from the Output tab into
+  `data/datasets/`, then run `28_ladder_vs_truth.py` and `35_readme_results.py`.
 - **Paid Databricks:** register through MLflow, serve on GPU Model Serving, and
   batch-score with `ai_query`. Costs go in `costs.yaml` as a self-hosted GPU method.
 - **Evaluation:** the same split, scorer, harm grading, difficulty levels and
