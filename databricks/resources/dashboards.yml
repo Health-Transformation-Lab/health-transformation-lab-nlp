@@ -6,3 +6,8 @@ resources:
       display_name: Scorecard
       file_path: ../dashboards/scorecard.lvdash.json
       warehouse_id: ${var.warehouse_id}
+    # The two graders (spec 018), built by python/scripts/42_build_dashboards.py; never edit the JSON by hand.
+    dq_grader:
+      display_name: EHR DQ grader
+      file_path: ../dashboards/dq_grader.lvdash.json
+      warehouse_id: ${var.warehouse_id}
