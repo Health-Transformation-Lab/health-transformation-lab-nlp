@@ -40,6 +40,9 @@ PRESENT_CODES = {2, 5}
 SITE_WORDS = [("distofacial", "DB"), ("distobuccal", "DB"), ("mesiofacial", "MB"), ("mesiobuccal", "MB"),
               ("midfacial", "B"), ("midbuccal", "B"), ("distolingual", "DL"), ("mesiolingual", "ML"),
               ("midlingual", "L")]
+# the abbreviation tokens the OHXPER files of 2009-2014 use ('LOA: Max R(2M) DF FGM-sulcus(mm)'), matched as
+# whole words because DF is inside MdF
+SITE_TOKENS = {"DF": "DB", "MdF": "B", "MF": "MB", "DL": "DL", "MdL": "L", "ML": "ML"}
 
 
 @traced
@@ -79,14 +82,17 @@ def read_xpt(path: Path) -> tuple[pd.DataFrame, dict[str, str]]:
 
 @traced
 def sites_from_labels(labels: dict[str, str]) -> dict[tuple[str, str, str], str]:
-    """(tooth, measure, letter) -> site, from labels such as 'Pocket depth: ..., distofacial'."""
+    """(tooth, measure, letter) -> site, from labels such as 'LOA: Max R(2M) DF FGM-sulcus(mm)' (the real files)
+    or 'Pocket depth: ..., distofacial'."""
     out = {}
     for var, label in labels.items():
         m = VAR.match(var)
         if not m:
             continue
-        text = re.sub(r"[\s\-]", "", label.lower())
-        site = next((s for w, s in SITE_WORDS if w in text), None)
+        site = next((SITE_TOKENS[t] for t in label.split() if t in SITE_TOKENS), None)
+        if site is None:
+            text = re.sub(r"[\s\-]", "", label.lower())
+            site = next((s for w, s in SITE_WORDS if w in text), None)
         if site is None:
             raise ValueError(f"{var}: no site in label {label!r}")
         out[m.groups()] = site

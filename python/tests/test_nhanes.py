@@ -106,3 +106,16 @@ def test_xpt_names_and_labels_are_text_even_when_pandas_gives_bytes(monkeypatch,
     assert labels == {"OHX02PCD": "Pocket depth: upper right 2nd molar, distofacial",
                       "SEQN": "Respondent sequence number"}
     assert nhanes.sites_from_labels(labels) == {("02", "PC", "D"): "DB"}
+
+
+def test_sites_are_read_from_the_abbreviations_in_the_real_nhanes_labels():
+    # #174: the OHXPER files of 2009-10, 2011-12 and 2013-14 name the site by an abbreviation token, not a word.
+    # These are the real labels of tooth 2's six pocket-depth sites (OHXPER_H.xpt, CDC public data).
+    labels = {"OHX02PCD": "LOA: Max R(2M) DF FGM-sulcus(mm)", "OHX02PCM": "LOA: Max R(2M) MdF FGM-sulcus(mm)",
+              "OHX02PCS": "LOA: Max R(2M) MF FGM-sulcus(mm)", "OHX02PCP": "LOA: Max R(2M) DL FGM-sulcus(mm)",
+              "OHX02PCL": "LOA: Max R(2M) MdL FGM-sulcus(mm)", "OHX02PCA": "LOA: Max R(2M) ML FGM-sulcus(mm)",
+              "OHX02LAD": "LOA: Max R(2M) DF calculated AL(mm)"}
+    assert sites_from_labels(labels) == {
+        ("02", "PC", "D"): "DB", ("02", "PC", "M"): "B", ("02", "PC", "S"): "MB",     # DF is inside MdF: whole tokens
+        ("02", "PC", "P"): "DL", ("02", "PC", "L"): "L", ("02", "PC", "A"): "ML",
+        ("02", "LA", "D"): "DB"}
