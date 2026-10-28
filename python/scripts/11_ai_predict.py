@@ -7,6 +7,7 @@ The AI model reads ONLY the de-identified note. Reviewers see every evidence typ
     python scripts/11_ai_predict.py --rung bioclinical-modernbert-base --label stated_status
     python scripts/11_ai_predict.py --rung modernbert-base --class-weight sqrt --seed 1   # -> ..._modernbert-base+cw+s1.csv
     python scripts/11_ai_predict.py --rung gatortron-base --lr 2e-5                        # -> ..._gatortron-base+lr2e-05.csv
+    python scripts/11_ai_predict.py --rung modernbert-base --class-weight sqrt --save-model runs/model   # + the weights
 
 LLM note readers (MedGemma, spec 004):
 
@@ -26,6 +27,7 @@ which the reliability and judge scripts do not pick up.
 """
 
 import argparse
+import sys
 
 import pandas as pd
 
@@ -56,6 +58,8 @@ llm.add_argument("--endpoint", default=None, help="openai backend: model / servi
 llm.add_argument("--weights", default=None,
                  help="hf backend: local transformers folder to load instead of Hugging Face (kaggle/keras_to_hf.py)")
 llm.add_argument("--limit", type=int, default=None, help="only the first N review notes (smoke test)")
+ap.add_argument("--save-model", default=None, metavar="DIR",
+                help="encoders: keep the fine-tuned model and tokenizer here, in transformers format (spec 020 US3)")
 ap.add_argument("--register", default=None, metavar="CATALOG.SCHEMA.MODEL",
                 help="log the fitted rung as an MLflow pyfunc and register a version (alias: challenger)")
 a = ap.parse_args()
@@ -89,6 +93,11 @@ else:
           "grad_checkpoint": a.grad_checkpoint}
 
 model = make_rung(a.rung, reg, **kw).fit(train)
+if a.save_model:
+    if not hasattr(model, "save"):
+        sys.exit(f"--save-model: {a.rung} is not a fine-tuned encoder; only encoders are saved")
+    model.save(a.save_model)
+    print(f"saved the fine-tuned model to {a.save_model}")
 pred, proba = model.predict(review)
 out = review[["visit_id"]].assign(pred=pred)
 if proba is not None:
