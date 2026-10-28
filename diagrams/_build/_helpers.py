@@ -126,13 +126,12 @@ def entity(cid, name, fields, x, y, w=230, color="#147EBA", fill="#E6F2F8"):
     return h
 
 
-def rel(src, dst, label="", dashed=False, exit=None, entry=None, via=(), start="ERmany", end="ERmandOne"):
-    """ERD relationship, many-to-one by default (crow's foot at the many end, src), routed orthogonally.
-    start/end take draw.io's ER arrows (ERmandOne for one-to-one)."""
+def rel(src, dst, label="", dashed=False, exit=None, entry=None, via=()):
+    """ERD relationship, many-to-one (crow's foot at the many end), routed orthogonally."""
     pts = ""
     if exit: pts += f"exitX={exit[0]};exitY={exit[1]};exitDx=0;exitDy=0;"
     if entry: pts += f"entryX={entry[0]};entryY={entry[1]};entryDx=0;entryDy=0;"
-    style = (f"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;fontSize=10;html=1;endArrow={end};startArrow={start};"
+    style = ("edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;fontSize=10;html=1;endArrow=ERmandOne;startArrow=ERmany;"
              f"endFill=0;startFill=0;strokeColor=#545B64;strokeWidth=1.2;labelBackgroundColor=#ffffff;{'dashed=1;' if dashed else ''}{pts}")
     geo = '<mxGeometry relative="1" as="geometry">' + ('<Array as="points">' + "".join(f'<mxPoint x="{x}" y="{y}"/>' for x, y in via) + '</Array>' if via else '') + '</mxGeometry>'
     cells.append(f'<mxCell id="{nid()}" value="{escape(label)}" style="{style}" edge="1" parent="1" source="{src}" target="{dst}">{geo}</mxCell>')
