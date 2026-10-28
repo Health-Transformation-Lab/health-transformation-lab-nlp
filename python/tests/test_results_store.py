@@ -197,3 +197,11 @@ def test_load_notebook_appends_new_versions_to_the_three_tables():
 
 def test_reader_job_tags_its_rows_as_databricks():
     assert 'source="databricks"' in _text("databricks/notebooks/03_medgemma_reader.py")
+
+
+def test_load_notebook_finds_the_deployed_files_and_says_when_there_are_none():
+    # issue #71: the package path pointed away from the deployed files; it found none and crashed in display()
+    nb = _text("databricks/notebooks/10_load_results.py")
+    assert 'Path("../../data/datasets")' in nb          # next to the notebook, as notebook 03 finds them
+    assert "No result files in" in nb                   # a clear stop, naming the folder
+    assert "if len(new):" in nb                         # never display an empty table
