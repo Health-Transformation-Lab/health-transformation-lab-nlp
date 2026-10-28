@@ -285,7 +285,7 @@ def test_every_model_that_can_be_scored_has_a_plain_name():
 
 
 def test_job_and_dashboard_names_are_short_and_the_same_in_every_target():
-    """Readable on a phone; no per-target suffix (CLAUDE.md: names identical in every target)."""
+    """Readable on a phone; no per-target suffix (AGENTS.md: names identical in every target)."""
     root, jobs = _load()
     names = [j["name"] for j, _ in jobs.values()]
     names += [j["name"] for t in root["targets"].values() for j in t.get("resources", {}).get("jobs", {}).values()]
