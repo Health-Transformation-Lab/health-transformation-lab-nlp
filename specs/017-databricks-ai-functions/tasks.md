@@ -8,4 +8,5 @@
 - [x] T006 [US3] `databricks_ai.py` query path
 - [x] T007 Failing tests: the script checks settings, prints the estimate, writes `simulated_*` on `--simulate`, and its names are `dbai-classify` / `dbai-query-<endpoint>`
 - [x] T008 `scripts/41_databricks_ai_methods.py`; plain names and group in `readme_results.py`
-- [ ] T009 After approval: run both on the 240 review notes; commit the results; refresh the README results
+- [x] T009a Llama 3.3 70B reader on the 240 review notes (approved 2026-10-28): 83.8% correct (95% CI 78.8–88.3), gate pass 94.6%
+- [ ] T009b `ai_classify` on the 240 review notes: waiting for approval

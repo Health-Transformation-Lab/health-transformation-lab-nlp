@@ -55,7 +55,7 @@ Bio_ClinicalBERT and Clinical-Longformer); only their published weights are used
 
 | Service · role | Where | Licence / terms | Status |
 |---|---|---|---|
-| Meta Llama 3.3 70B Instruct · LLM judge (spec 012), LLM de-identification, and a zero-shot note reader (spec 017, `llama-3.3-70b-instruct`; Hugging Face reference `meta-llama/Llama-3.3-70B-Instruct`) | Databricks Foundation Model API, pay-per-token endpoint `databricks-meta-llama-3-3-70b-instruct` | Llama 3.3 Community License; Databricks terms | judge: run in dev (2 runs, 2026-10-27); de-id and reader: not run |
+| Meta Llama 3.3 70B Instruct · LLM judge (spec 012), LLM de-identification, and a zero-shot note reader (spec 017, `llama-3.3-70b-instruct`; Hugging Face reference `meta-llama/Llama-3.3-70B-Instruct`) | Databricks Foundation Model API, pay-per-token endpoint `databricks-meta-llama-3-3-70b-instruct` | Llama 3.3 Community License; Databricks terms | judge: run in dev (2 runs, 2026-10-27); reader: results (240 notes, 2026-10-28); de-id: not run |
 | `ai_mask` · de-identification | Databricks SQL AI Function (Public Preview), Databricks-hosted model | Databricks terms | not run |
 | Azure Health Data Services de-identification · de-identification | Azure (needs `AZURE_DEID_ENDPOINT`) | Microsoft terms | not run |
 | Azure AI Language PII detection · de-identification | Azure (needs `AZURE_LANGUAGE_ENDPOINT`) | Microsoft terms | not run |
@@ -104,5 +104,5 @@ workspace settings change where the text can go:
   models Databricks doesn't name in their documentation, and can change. Record the workspace's cross-Geo and
   partner-powered AI settings with the approval.
 - **Not run yet** (no real results): ModernBERT large, BioClinical ModernBERT large, GatorTron, Clinical-
-  Longformer, Longformer as a classifier, SapBERT, GTE-ModernColBERT, MedGemma 4B and 27B, the Llama 3.3 70B
-  reader, `ai_classify`, `ai_mask`, and every service in section 4 except the judge.
+  Longformer, Longformer as a classifier, SapBERT, GTE-ModernColBERT, MedGemma 4B and 27B,
+  `ai_classify`, `ai_mask`, and every service in section 4 except the judge.
