@@ -64,11 +64,16 @@ def download(dest: Path) -> list[Path]:
     return got
 
 
+def _text(v) -> str:
+    """Some pandas versions give XPORT field names and labels as bytes (padded with spaces)."""
+    return (v.decode("latin-1") if isinstance(v, bytes) else str(v or "")).strip()
+
+
 @traced
 def read_xpt(path: Path) -> tuple[pd.DataFrame, dict[str, str]]:
-    """Data and {variable: SAS label}."""
+    """Data and {variable: SAS label}, as text whatever pandas version reads them."""
     with pd.read_sas(path, format="xport", iterator=True) as r:
-        labels = {f["name"]: f.get("label", "") for f in r.fields}
+        labels = {_text(f["name"]): _text(f.get("label")) for f in r.fields}
         return r.read(), labels
 
 

@@ -81,3 +81,28 @@ def test_classify_people_end_to_end_on_nhanes_shaped_tables():
     assert p.loc[2, "cdc_aap"] == "severe"
     assert p.loc[2, "aces"] == "periodontitis_stage_3" and p.loc[2, "aces_no_complexity"] == "periodontitis_stage_3_4"
     assert p.loc[3, "edentulous"] and p.loc[3, "aces"] == "edentulous"
+
+
+def test_xpt_names_and_labels_are_text_even_when_pandas_gives_bytes(monkeypatch, tmp_path):
+    # NHANES perio job on Databricks, 2026-10-28: its pandas returned the XPORT field names and labels as bytes,
+    # and sites_from_labels failed with "cannot use a string pattern on a bytes-like object"
+    from health_transformation_lab_nlp import nhanes
+
+    class Reader:
+        fields = ({"name": b"OHX02PCD", "label": b"Pocket depth: upper right 2nd molar, distofacial  "},
+                  {"name": "SEQN", "label": "Respondent sequence number"})
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return pd.DataFrame({"SEQN": [1.0], "OHX02PCD": [3.0]})
+
+    monkeypatch.setattr(nhanes.pd, "read_sas", lambda *a, **kw: Reader())
+    _, labels = nhanes.read_xpt(tmp_path / "OHXPER_J.xpt")
+    assert labels == {"OHX02PCD": "Pocket depth: upper right 2nd molar, distofacial",
+                      "SEQN": "Respondent sequence number"}
+    assert nhanes.sites_from_labels(labels) == {("02", "PC", "D"): "DB"}
