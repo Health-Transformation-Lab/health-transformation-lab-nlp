@@ -24,8 +24,6 @@ models = [
 ]
 # LLM note readers (MedGemma, spec 004). Gemma 3 support needs transformers >= 4.50.
 llm = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30"]
-# LLM readers through KerasHub on PyTorch (llm_reader.KerasChat, --backend keras): MedGemma from Kaggle Models.
-keras = ["keras-hub>=0.32", "kagglehub", "torch>=2.2"]
 # LoRA fine-tuning of an LLM reader (scripts/17_medgemma_lora.py). GPU strongly advised.
 lora = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30", "peft>=0.11", "trl>=0.12", "datasets>=2.19"]
 # Load OMOP into Postgres / Lakebase (dental_omop_nlp/db.py, scripts/05_load_omop_db.py)

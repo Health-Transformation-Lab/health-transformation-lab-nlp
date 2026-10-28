@@ -12,13 +12,12 @@ LLM note readers (MedGemma, spec 004):
 
     python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf          # local GPU/CPU
     python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf --adapter runs/medgemma-lora
-    python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend keras       # Kaggle Models, no HF token
+    python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf --weights /kaggle/temp/medgemma-hf   # Kaggle
     READER_BASE_URL=... READER_API_KEY=... python scripts/11_ai_predict.py \
         --rung medgemma-27b-text-it --backend openai --endpoint <serving endpoint name>
     python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend simulated   # dry run, no model
 
-LLM variants get their own files: +lora (adapter), +k<shots> (few-shot), +terse (prompt variant),
-+keras (KerasHub backend; compare with the hf run: scripts/40_compare_backends.py).
+LLM variants get their own files: +lora (adapter), +k<shots> (few-shot), +terse (prompt variant).
 Compare with the BERT encoders: scripts/29_medgemma_vs_bert.py.
 
 Writes data/datasets/ai_predictions_<rung>.csv (visit_id, pred, p_<status>...), plus
@@ -47,11 +46,13 @@ ap.add_argument("--class-weight", choices=["sqrt"], default=None,
 ap.add_argument("--seed", type=int, default=42, help="encoders: training seed; a non-default seed tags the output +s<seed>")
 ap.add_argument("--lr", type=float, default=5e-5, help="encoders: learning rate; a non-default rate tags the output +lr<rate>")
 llm = ap.add_argument_group("LLM readers")
-llm.add_argument("--backend", choices=["hf", "keras", "openai", "simulated"], default="hf")
+llm.add_argument("--backend", choices=["hf", "openai", "simulated"], default="hf")
 llm.add_argument("--shots", type=int, default=0, help="few-shot examples per status from train.csv")
 llm.add_argument("--variant", default="reader-v2", help="prompt variant (reader-v2, reader-v2-terse)")
 llm.add_argument("--adapter", default=None, help="LoRA adapter dir from scripts/17_medgemma_lora.py")
 llm.add_argument("--endpoint", default=None, help="openai backend: model / serving endpoint name")
+llm.add_argument("--weights", default=None,
+                 help="hf backend: local transformers folder to load instead of Hugging Face (kaggle/keras_to_hf.py)")
 llm.add_argument("--limit", type=int, default=None, help="only the first N review notes (smoke test)")
 ap.add_argument("--register", default=None, metavar="CATALOG.SCHEMA.MODEL",
                 help="log the fitted rung as an MLflow pyfunc and register a version (alias: challenger)")
@@ -78,7 +79,7 @@ if is_llm:
                                         dict(zip(key.visit_id, key.difficulty)), seed=4)
         prefix = "simulated_"
     else:
-        kw.update(backend_kind=a.backend, adapter=a.adapter, endpoint=a.endpoint)
+        kw.update(backend_kind=a.backend, adapter=a.adapter, endpoint=a.endpoint, weights=a.weights)
 elif a.rung in ("rules_baseline", "note_rules", "tfidf_logreg", "fusion_tfidf_rad"):
     kw = {}
 else:
@@ -90,7 +91,7 @@ out = review[["visit_id"]].assign(pred=pred)
 if proba is not None:
     for i, lab in enumerate(LABELS):
         out[f"p_{lab}"] = proba[:, i]
-tag = (output_tag(adapter=a.adapter, shots=a.shots, variant=a.variant, backend=a.backend) if is_llm
+tag = (output_tag(adapter=a.adapter, shots=a.shots, variant=a.variant) if is_llm
        else output_tag(class_weight=a.class_weight, seed=a.seed, lr=a.lr))
 path = DATASETS_DIR / f"{prefix}ai_predictions_{a.rung}{tag}.csv"
 out.to_csv(path, index=False)
@@ -106,7 +107,7 @@ if is_llm:
         print(f"*** SIMULATED READER: dry run, not a MedGemma result (agreement with truth {acc:.1%}) ***")
 
 # ---- MLflow (docs/mlops.md): params, prediction file, optional Unity Catalog registration
-from dental_omop_nlp.tracking import track
+from dental_omop_nlp.tracking import track  # noqa: E402
 
 with track("11_ai_predict", a.rung, simulated=bool(prefix),
            params={"rung": a.rung, "label": a.label, "n_train": len(train), "n_review": len(review), **{

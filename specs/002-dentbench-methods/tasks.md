@@ -31,7 +31,7 @@
 - [x] T015 Model ladder vs the synthetic truth (`ladder_eval.py`, `28_ladder_vs_truth.py`, R `10_ladder.R`): accuracy with paired bootstrap CIs vs note_rules, stage IV recall, unsafe/S2 rates, calibration error, and the rules-decide-stage-IV hybrid (`+rules4`)
 - [x] T016 Class-weighted fine-tuning for stage IV (`--class-weight sqrt`), 3 seeds of ModernBERT base: no reliable gain (stage IV recall 21/0/0%); seed spread ~4 points; `+rules4` stable at 90-91%. Bio_ClinicalBERT added (80%); GatorTron-base diverged on CPU at lr 5e-5 (loss to 0, every chart 'healthy'; not committed)
 
-- [ ] T017 Rerun GatorTron-base at lr 1-2e-5 on a Databricks GPU; the Longformers and large ModernBERTs there too. Job `encoder_gpu` (every target incl. dev, serverless GPU; notebook 08; `11_ai_predict.py --lr`) added; not run yet
+- [ ] T017 Rerun GatorTron-base at lr 1-2e-5 on a Databricks GPU; the Longformers and large ModernBERTs there too. Job `encoder_gpu` (every target incl. dev, serverless GPU; notebook 08; `11_ai_predict.py --lr`) added; not run yet. Kaggle alternative (issue #84): workflow `kaggle-encoders.yml`, notebook `kaggle/encoder_gpu.ipynb`, same rungs and rates (databricks.yml defaults), results PR per spec 016
 
 ## Phase 6: Polish
 

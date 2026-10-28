@@ -16,13 +16,6 @@ def test_output_tag_keeps_each_variant_in_its_own_file():
     assert output_tag(adapter="runs/x", shots=1, variant="reader-v2-terse") == "+lora+k1+terse"
 
 
-def test_output_tag_names_the_backend_unless_it_is_hf():
-    # hf files keep their names (the committed results); a KerasHub run of the same rung gets its own file
-    assert output_tag(backend="hf") == "" and output_tag(backend="openai") == ""
-    assert output_tag(backend="keras") == "+keras"
-    assert output_tag(shots=2, backend="keras") == "+k2+keras"
-
-
 def test_llm_summary_reports_fallback_and_gate_per_rung():
     d = pd.DataFrame({"gate_ok": [True, True, False, True], "fallback": [False, False, True, False],
                       "input_tokens": [400, 420, 410, 430], "output_tokens": [60, 50, 70, 60],

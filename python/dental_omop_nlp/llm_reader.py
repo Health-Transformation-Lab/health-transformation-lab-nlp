@@ -17,12 +17,6 @@ Backends
              text-only 27B via AutoModelForCausalLM; optional LoRA adapter. Needs
              `pip install -e ".[llm]"`, a Hugging Face login that has accepted the
              HAI-DEF terms, and ideally a GPU.
-  keras      KerasHub Gemma3CausalLM from Kaggle Models (`kaggle_model` in models.yaml), on PyTorch.
-             No Hugging Face token: attached to a Kaggle notebook via model_sources, or downloaded
-             by kagglehub with Kaggle credentials (the account must have accepted the licence on
-             the model's Kaggle page). Needs `pip install -e ".[keras]"`. Output files are
-             tagged +keras; compare them with the hf run (scripts/40_compare_backends.py)
-             before trusting a full run.
   openai     any OpenAI-compatible chat endpoint: Databricks Model Serving, vLLM,
              Ollama (http://localhost:11434/v1). READER_BASE_URL, READER_API_KEY,
              READER_MODEL.
@@ -40,7 +34,6 @@ import time
 import urllib.request
 from typing import ClassVar
 
-import numpy as np
 import pandas as pd
 
 from .deid import residual_scan
@@ -280,71 +273,6 @@ class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
                 "output_tokens": len(gen), "latency_s": time.time() - t0}
 
 
-@traced
-def gemma_prompt(messages: list[dict]) -> str:
-    """The chat messages as Gemma 3 / MedGemma's chat template writes them (chat_template.jinja): the system
-    text opens the first user turn, contents are trimmed, assistant turns are 'model', and the prompt ends
-    on an open model turn. <bos> is left to the tokenizer."""
-    prefix = ""
-    if messages and messages[0]["role"] == "system":
-        prefix, messages = messages[0]["content"] + "\n\n", messages[1:]
-    out = ""
-    for i, m in enumerate(messages):
-        role = "model" if m["role"] == "assistant" else m["role"]
-        out += f"<start_of_turn>{role}\n" + (prefix if i == 0 else "") + m["content"].strip() + "<end_of_turn>\n"
-    return out + "<start_of_turn>model\n"
-
-
-@traced
-def keras_dtype() -> str:
-    """bfloat16 unless DENTAL_LLM_DTYPE says otherwise: float32 4B doesn't fit one 15 GB T4, and KerasHub
-    has no Gemma 3 layout map to split it over two (the hf backend runs float32 on T4 x2)."""
-    return os.environ.get("DENTAL_LLM_DTYPE", "").strip() or "bfloat16"
-
-
-class KerasChat:  # pragma: no cover - needs keras-hub, torch and the model weights
-    """KerasHub generation, greedy, with MedGemma's thought token suppressed as in HFChat. Loads lazily."""
-
-    name, simulated = "keras", False
-
-    def __init__(self, handle: str, max_new_tokens: int = 300, dtype: str | None = None):
-        self.handle, self.max_new_tokens, self.dtype = handle, max_new_tokens, dtype
-        self.model = None
-
-    def _load(self):
-        # before keras is first imported: on JAX the MedGemma preset's token embedding didn't load (keras-hub 0.32)
-        os.environ.setdefault("KERAS_BACKEND", "torch")
-        os.environ.setdefault("TF_FORCE_GPU_ALLOW_GROWTH", "true")   # keras-hub imports TensorFlow
-        import kagglehub
-        import keras_hub
-        from keras import ops
-        dtype = self.dtype or keras_dtype()
-        preset = kagglehub.model_download(self.handle)   # on Kaggle: the copy model_sources attached
-        print(f"loading {preset} as {dtype} (Keras backend {os.environ['KERAS_BACKEND']})", flush=True)
-        self.model = keras_hub.models.Gemma3CausalLM.from_preset(preset, dtype=dtype)
-        self.tokenizer = self.model.preprocessor.tokenizer
-        think = self.tokenizer.token_to_id(THOUGHT_START)
-
-        class NoThought(keras_hub.samplers.GreedySampler):
-            # answer directly: a thought block would use up the new tokens before the JSON
-            def get_next_token(self, probabilities):
-                vocab = ops.arange(ops.shape(probabilities)[-1])
-                return ops.argmax(ops.where(vocab == think, 0.0, probabilities), axis=-1)
-
-        self.model.compile(sampler=NoThought())
-
-    def __call__(self, messages: list[dict], visit_id=None) -> dict:
-        if self.model is None:
-            self._load()
-        prompt = gemma_prompt(messages)
-        n = np.asarray(self.tokenizer.tokenize(prompt)).size + 1        # + <bos>
-        t0 = time.time()
-        # max_length counts prompt and answer (hf's max_new_tokens counts the answer only)
-        raw = self.model.generate(prompt, max_length=n + self.max_new_tokens, strip_prompt=True)
-        out_tokens = np.asarray(self.tokenizer.tokenize(raw)).size if raw else 0
-        return {"raw": raw, "input_tokens": n, "output_tokens": out_tokens, "latency_s": time.time() - t0}
-
-
 class SimulatedReader:
     """Dry-run reader. Knows the generator truth; errs more on harder notes.
     Error rates are placeholders, not estimates of MedGemma."""
@@ -382,15 +310,11 @@ def _hf_token() -> str | None:
 @traced
 def make_backend(entry: dict, kind: str, **kw):
     if kind == "hf":
-        if entry.get("gated") and not _hf_token():
+        weights = kw.get("weights")   # a local transformers folder (Kaggle: kaggle/keras_to_hf.py); no token needed
+        if entry.get("gated") and not weights and not _hf_token():
             raise RuntimeError(f"{entry['hf']} is gated ({entry.get('license', 'see its model card')}): accept "
                                "the terms on its Hugging Face page, then set HF_TOKEN to a read token from that account")
-        return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"))
-    if kind == "keras":
-        if not entry.get("kaggle_model"):
-            raise RuntimeError(f"{entry.get('id', entry.get('hf'))} has no kaggle_model in models.yaml: "
-                               "the keras backend loads it from Kaggle Models")
-        return KerasChat(entry["kaggle_model"])
+        return HFChat(weights or entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"))
     if kind == "openai":
         return OpenAIChat(model=kw.get("endpoint"))
     raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
@@ -402,26 +326,6 @@ def summarize_details(d: pd.DataFrame) -> dict:
     return {"gate_pass": d["gate_ok"].mean(), "fallback": d["fallback"].mean(),
             "input_tokens_mean": d["input_tokens"].mean(), "output_tokens_mean": d["output_tokens"].mean(),
             "latency_s_mean": d["latency_s"].mean()}
-
-
-@traced
-def compare_backends(new: pd.DataFrame, base: pd.DataFrame, truth: dict) -> tuple[pd.DataFrame, dict]:
-    """Two llm_details runs of one rung (say keras against the committed hf run) on the notes both read:
-    per-note predictions, and how often they agree, pass the gate and match the truth."""
-    keep = ["visit_id", "status", "pred", "gate_ok", "latency_s"]
-    m = new[keep].merge(base[keep], on="visit_id", suffixes=("_new", "_base"))
-    if m.empty:
-        raise ValueError("no notes in common: compare runs of the same review notes")
-    m["truth"] = m["visit_id"].map(truth)
-    m["same_pred"] = m["pred_new"] == m["pred_base"]
-    both = m["gate_ok_new"].astype(bool) & m["gate_ok_base"].astype(bool)
-    s = {"notes": len(m), "new_backend": str(new["backend"].iloc[0]), "base_backend": str(base["backend"].iloc[0]),
-         "pred_agreement": m["same_pred"].mean(),
-         "status_agreement": (m.loc[both, "status_new"] == m.loc[both, "status_base"]).mean() if both.any() else float("nan"),
-         "new_gate_pass": m["gate_ok_new"].astype(bool).mean(), "base_gate_pass": m["gate_ok_base"].astype(bool).mean(),
-         "new_accuracy": (m["pred_new"] == m["truth"]).mean(), "base_accuracy": (m["pred_base"] == m["truth"]).mean(),
-         "new_latency_s": m["latency_s_new"].mean(), "base_latency_s": m["latency_s_base"].mean()}
-    return m, s
 
 
 # ---------------------------------------------------------------- rung

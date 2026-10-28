@@ -76,10 +76,12 @@ in between.
 ## Results from anywhere, in one place (spec 016)
 
 MedGemma runs where a GPU is free: a Databricks job, Kaggle (the *Run MedGemma on a free Kaggle GPU* workflow) or a laptop.
-All three end in the same gold tables:
+The GPU encoders of spec 002 T017 do too: the Databricks `encoder_gpu` job, or Kaggle (the *Fine-tune the GPU
+encoders on a free Kaggle GPU* workflow, `kaggle/encoder_gpu.ipynb`, with that job's rungs and learning rates).
+All of them end in the same gold tables:
 
 1. **Kaggle**: when the workflow collects a run (`wait` or `collect_only`, with `open_pr` on), it opens a pull
-   request that adds `ai_predictions_<rung>.csv` and `llm_details_<rung>.csv` to `data/datasets/` and a row per
+   request that adds `ai_predictions_<rung>.csv` (and, for MedGemma, `llm_details_<rung>.csv`) to `data/datasets/` and a row per
    file in `results_manifest.csv` (`source = kaggle`, the workflow run URL). A run with fewer rows than the
    committed file (a 10-note test) is never committed. The PR is opened with the workflow's token, which doesn't
    start CI: push a commit to it to run the checks. The repo setting *Allow GitHub Actions to create and approve

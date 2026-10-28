@@ -223,16 +223,15 @@ class HFEncoder:
 
 @traced
 def output_tag(class_weight: str | None = None, seed: int = 42, adapter: str | None = None,
-               shots: int = 0, variant: str = "reader-v2", lr: float = 5e-5, backend: str = "hf") -> str:
+               shots: int = 0, variant: str = "reader-v2", lr: float = 5e-5) -> str:
     """Suffix for a run's prediction file, so variants of one rung don't overwrite each other:
     +cw (class-weighted), +s<seed> (non-default seed), +lr<rate> (non-default learning rate),
-    +lora (LoRA adapter), +k<shots> (few-shot), +<variant> (non-default prompt, minus 'reader-v2-'),
-    +keras (the KerasHub backend: same model, other weights format and dtype, so its own results)."""
+    +lora (LoRA adapter), +k<shots> (few-shot), +<variant> (non-default prompt, minus 'reader-v2-')."""
     tag = ("+cw" if class_weight else "") + (f"+s{seed}" if seed != 42 else "") + (f"+lr{lr:g}" if lr != 5e-5 else "")
     tag += ("+lora" if adapter else "") + (f"+k{shots}" if shots else "")
     if variant != "reader-v2":
         tag += "+" + variant.removeprefix("reader-v2-")
-    return tag + ("+keras" if backend == "keras" else "")
+    return tag
 
 
 @traced
@@ -254,7 +253,7 @@ def make_rung(rung_id: str, registry: dict, **hf_kwargs):
         raise KeyError(f"unknown rung {rung_id!r}")
     if m["role"] == "llm":
         from .llm_reader import LLMReader
-        allowed = {"backend", "backend_kind", "shots", "variant", "seed", "adapter", "endpoint"}
+        allowed = {"backend", "backend_kind", "shots", "variant", "seed", "adapter", "endpoint", "weights"}
         return LLMReader(rung_id, entry=m, **{k: v for k, v in hf_kwargs.items() if k in allowed})
     if m["role"] not in ("classifier", "long_context"):
         raise ValueError(f"{rung_id} has role {m['role']!r}; it is not a classifier rung")

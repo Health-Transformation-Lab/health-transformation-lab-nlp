@@ -220,91 +220,23 @@ def test_pick_dtype_can_be_overridden(monkeypatch):
     assert pick_dtype(cuda=True, capability=(8, 0), total_gb=80) == "float16"
 
 
-# ---- KerasHub backend: MedGemma from Kaggle Models, no Hugging Face token ----------------------------
-
-def test_gemma_prompt_matches_the_hf_chat_template():
-    # MedGemma 1.5's chat_template.jinja: the system text opens the first user turn, contents trimmed,
-    # assistant turns are 'model'. <bos> is left to the KerasHub preprocessor (add_start_token).
-    from dental_omop_nlp.llm_reader import gemma_prompt
-    msgs = [{"role": "system", "content": "SYS"}, {"role": "user", "content": " note one \n"},
-            {"role": "assistant", "content": "{}"}, {"role": "user", "content": "note two"}]
-    assert gemma_prompt(msgs) == ("<start_of_turn>user\nSYS\n\nnote one<end_of_turn>\n"
-                                  "<start_of_turn>model\n{}<end_of_turn>\n"
-                                  "<start_of_turn>user\nnote two<end_of_turn>\n<start_of_turn>model\n")
-    assert gemma_prompt([{"role": "user", "content": "x"}]) == "<start_of_turn>user\nx<end_of_turn>\n<start_of_turn>model\n"
-
-
-def test_keras_backend_needs_no_hf_token(monkeypatch):
-    from dental_omop_nlp.llm_reader import KerasChat, make_backend
-    from dental_omop_nlp.registry import load_registry
+def test_local_weights_need_no_hugging_face_token(monkeypatch, tmp_path):
+    # Kaggle: MedGemma comes from Kaggle Models and is converted to a local transformers folder (no HF_TOKEN)
+    from dental_omop_nlp.llm_reader import HFChat, make_backend
     for v in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"):
         monkeypatch.delenv(v, raising=False)
-    monkeypatch.setenv("HF_HOME", "/nonexistent")
-    entry = next(m for m in load_registry()["models"] if m["id"] == "medgemma-1.5-4b-it")
-    assert entry["gated"] and entry["kaggle_model"] == "keras/medgemma/keras/medgemma_1.5_instruct_4b/1"
-    be = make_backend(entry, "keras")
-    assert isinstance(be, KerasChat) and be.name == "keras" and not be.simulated
-    assert be.handle == entry["kaggle_model"] and be.model is None        # loads lazily, on the first note
+    monkeypatch.setenv("HF_HOME", str(tmp_path))
+    entry = {"hf": "google/medgemma-1.5-4b-it", "gated": True, "modality": "multimodal"}
+    with pytest.raises(RuntimeError, match="gated"):
+        make_backend(entry, "hf")
+    b = make_backend(entry, "hf", weights=str(tmp_path / "medgemma-hf"))
+    assert isinstance(b, HFChat) and b.hf_id == str(tmp_path / "medgemma-hf") and b.modality == "multimodal"
 
 
-def test_keras_backend_refuses_a_model_without_a_kaggle_handle():
-    from dental_omop_nlp.llm_reader import make_backend
-    with pytest.raises(RuntimeError, match="kaggle_model"):
-        make_backend({"id": "x", "hf": "google/x"}, "keras")
-
-
-def test_keras_dtype_defaults_to_bfloat16_and_can_be_overridden(monkeypatch):
-    # float32 4B doesn't fit one 15 GB T4, and KerasHub has no Gemma 3 layout map to split it over two
-    from dental_omop_nlp.llm_reader import keras_dtype
-    monkeypatch.delenv("DENTAL_LLM_DTYPE", raising=False)
-    assert keras_dtype() == "bfloat16"
-    monkeypatch.setenv("DENTAL_LLM_DTYPE", "float32")
-    assert keras_dtype() == "float32"
-
-
-def test_compare_backends_on_the_same_notes():
-    from dental_omop_nlp.llm_reader import compare_backends
-    new = pd.DataFrame({"visit_id": [1, 2, 3], "backend": "keras", "status": ["healthy", "gingivitis", None],
-                        "pred": ["healthy", "gingivitis", "healthy"], "gate_ok": [True, True, False],
-                        "fallback": [False, False, True], "latency_s": [2.0, 4.0, 3.0]})
-    base = pd.DataFrame({"visit_id": [3, 2, 1, 9], "backend": "hf",
-                         "status": ["healthy", "healthy", "healthy", "gingivitis"],
-                         "pred": ["healthy", "healthy", "healthy", "gingivitis"], "gate_ok": True,
-                         "fallback": False, "latency_s": 30.0})
-    truth = {1: "healthy", 2: "gingivitis", 3: "healthy", 9: "gingivitis"}
-    per_note, s = compare_backends(new, base, truth)
-    assert list(per_note.visit_id) == [1, 2, 3]                 # only the notes both runs read
-    assert list(per_note.same_pred) == [True, False, True]
-    assert s["notes"] == 3 and s["new_backend"] == "keras" and s["base_backend"] == "hf"
-    assert s["pred_agreement"] == pytest.approx(2 / 3)
-    assert s["status_agreement"] == pytest.approx(1 / 2)        # both answered (gate passed): notes 1 and 2
-    assert s["new_gate_pass"] == pytest.approx(2 / 3) and s["base_gate_pass"] == 1.0
-    assert s["new_accuracy"] == 1.0 and s["base_accuracy"] == pytest.approx(2 / 3)
-    assert s["new_latency_s"] == 3.0 and s["base_latency_s"] == 30.0
-
-
-def test_compare_backends_refuses_runs_with_no_notes_in_common():
-    from dental_omop_nlp.llm_reader import compare_backends
-    a = pd.DataFrame({"visit_id": [1], "backend": "keras", "status": ["healthy"], "pred": ["healthy"],
-                      "gate_ok": [True], "fallback": [False], "latency_s": [1.0]})
-    with pytest.raises(ValueError, match="no notes in common"):
-        compare_backends(a, a.assign(visit_id=[2], backend="hf"), {1: "healthy", 2: "healthy"})
-
-
-def test_compare_script_prints_the_backends_side_by_side(tmp_path):
-    import subprocess
-    import sys
-
-    from dental_omop_nlp.paths import REPO_ROOT
-    cols = {"status": ["healthy", "gingivitis"], "pred": ["healthy", "gingivitis"], "gate_ok": True,
-            "fallback": False}
-    pd.DataFrame({"visit_id": [1, 2], "backend": "keras", "latency_s": 2.0, **cols}).to_csv(tmp_path / "new.csv")
-    pd.DataFrame({"visit_id": [1, 2, 3], "backend": "hf", "latency_s": 30.0, "status": ["healthy", "healthy", "x"],
-                  "pred": ["healthy", "healthy", "x"], "gate_ok": True, "fallback": False}).to_csv(tmp_path / "base.csv")
-    pd.DataFrame({"visit_id": [1, 2, 3], "truth_status": ["healthy", "gingivitis", "x"]}).to_csv(tmp_path / "key.csv")
-    out = subprocess.run([sys.executable, str(REPO_ROOT / "python" / "scripts" / "40_compare_backends.py"),
-                          "--new", str(tmp_path / "new.csv"), "--base", str(tmp_path / "base.csv"),
-                          "--key", str(tmp_path / "key.csv")], check=True, capture_output=True, text=True,
-                         env={**__import__("os").environ, "DENTAL_TELEMETRY": "off"}).stdout
-    assert "keras vs hf on 2 notes" in out and "same prediction 50%" in out
-    assert "accuracy keras 100% / hf 50%" in out
+def test_weights_reach_the_reader_from_make_rung(monkeypatch, tmp_path):
+    from dental_omop_nlp.registry import load_registry
+    from dental_omop_nlp.rungs import make_rung
+    monkeypatch.delenv("HF_TOKEN", raising=False)
+    monkeypatch.setenv("HF_HOME", str(tmp_path))
+    r = make_rung("medgemma-1.5-4b-it", load_registry(), backend_kind="hf", weights="/kaggle/temp/x")
+    assert r.backend.hf_id == "/kaggle/temp/x"
