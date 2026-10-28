@@ -8,9 +8,9 @@ Generated from [`_build/gold_model.py`](../_build/gold_model.py) by `_build/gold
 
 ```mermaid
 erDiagram
-    result_files ||--o{ ai_predictions : "sha256"
-    result_files ||--o{ llm_reader_runs : "sha256"
-    ai_predictions ||..o| llm_reader_runs : "method, visit_id, source"
+    result_files |o--o{ ai_predictions : "sha256 (repo · kaggle rows)"
+    result_files |o--o{ llm_reader_runs : "sha256 (repo · kaggle rows)"
+    ai_predictions }o..o{ llm_reader_runs : "method, visit_id, source (per version or run)"
     review_key ||--o{ ai_predictions : "visit_id"
     review_key ||--o{ llm_reader_runs : "visit_id"
     review_key ||--o{ chart_answers : "visit_id"
@@ -37,9 +37,9 @@ erDiagram
 
 ```mermaid
 erDiagram
-    result_files ||--o{ ai_predictions : "sha256"
-    result_files ||--o{ llm_reader_runs : "sha256"
-    ai_predictions ||..o| llm_reader_runs : "method, visit_id, source"
+    result_files |o--o{ ai_predictions : "sha256 (repo · kaggle rows)"
+    result_files |o--o{ llm_reader_runs : "sha256 (repo · kaggle rows)"
+    ai_predictions }o..o{ llm_reader_runs : "method, visit_id, source (per version or run)"
     review_key ||--o{ ai_predictions : "visit_id"
     review_key ||--o{ llm_reader_runs : "visit_id"
     review_key ||--o{ chart_answers : "visit_id"
@@ -69,10 +69,10 @@ erDiagram
         string method "method (rung), e.g. modernbert-base+cw"
         bigint visit_id PK, FK "review chart"
         string pred "predicted status, one of six"
-        string sha256 PK, FK "SHA-256 of the source file: its version"
+        string sha256 PK, FK "SHA-256 of the source file: its version (in result_files for repo · kaggle rows only)"
         string source "repo · kaggle · databricks"
         string run_id "Databricks job run id (databricks rows)"
-        timestamp run_ts "when the reader job ran (databricks rows)"
+        timestamp run_ts "when the reader job ran (databricks rows); llm_reader_runs: also the load time of Load results rows"
         string git_commit "commit the job was deployed from"
         timestamp loaded_at "when Load results wrote it (Load results rows)"
     }
@@ -95,10 +95,10 @@ erDiagram
         boolean fallback "gate failed, so the rules answered"
         string pred "final status (= ai_predictions.pred)"
         string method "method (rung), with shot and adapter tags"
-        string sha256 PK, FK "SHA-256 of the source file: its version"
+        string sha256 PK, FK "SHA-256 of the source file: its version (in result_files for repo · kaggle rows only)"
         string source "repo · kaggle · databricks"
         string run_id "Databricks job run id (databricks rows)"
-        timestamp run_ts "when the reader job ran (databricks rows)"
+        timestamp run_ts "when the reader job ran (databricks rows); llm_reader_runs: also the load time of Load results rows"
         string git_commit "commit the job was deployed from"
         timestamp loaded_at "when Load results wrote it (Load results rows)"
         string truth "answer key truth (databricks rows)"
@@ -203,7 +203,7 @@ One per synthetic review chart (answer_key/review_key.csv, not a table). Written
 
 ### `result_files`
 
-One per committed result file version. Written by: Load results: append new versions, last.
+One per committed result file version. Written by: Load results: delete-then-append by sha256, written last.
 
 | Key | Column | Type | Description |
 |---|---|---|---|
@@ -219,17 +219,17 @@ One per committed result file version. Written by: Load results: append new vers
 
 ### `ai_predictions`
 
-One per method and chart, per file version or reader run. Written by: Load results: delete-then-append by sha256 · MedGemma reader: replace (source, run_id, method).
+One per method and chart, per file version (key sha256 + visit_id) or reader run (key source + run_id + method + visit_id). Written by: Load results: delete-then-append by sha256 · MedGemma reader: replace (source, run_id, method).
 
 | Key | Column | Type | Description |
 |---|---|---|---|
 |  | `method` | string | method (rung), e.g. modernbert-base+cw |
 | PK,FK | `visit_id` | bigint | review chart |
 |  | `pred` | string | predicted status, one of six |
-| PK,FK | `sha256` | string | SHA-256 of the source file: its version |
+| PK,FK | `sha256` | string | SHA-256 of the source file: its version (in result_files for repo · kaggle rows only) |
 |  | `source` | string | repo · kaggle · databricks |
 |  | `run_id` | string | Databricks job run id (databricks rows) |
-|  | `run_ts` | timestamp | when the reader job ran (databricks rows) |
+|  | `run_ts` | timestamp | when the reader job ran (databricks rows); llm_reader_runs: also the load time of Load results rows |
 |  | `git_commit` | string | commit the job was deployed from |
 |  | `loaded_at` | timestamp | when Load results wrote it (Load results rows) |
 
@@ -257,10 +257,10 @@ One per LLM reader call on a chart. Written by: as ai_predictions.
 |  | `fallback` | boolean | gate failed, so the rules answered |
 |  | `pred` | string | final status (= ai_predictions.pred) |
 |  | `method` | string | method (rung), with shot and adapter tags |
-| PK,FK | `sha256` | string | SHA-256 of the source file: its version |
+| PK,FK | `sha256` | string | SHA-256 of the source file: its version (in result_files for repo · kaggle rows only) |
 |  | `source` | string | repo · kaggle · databricks |
 |  | `run_id` | string | Databricks job run id (databricks rows) |
-|  | `run_ts` | timestamp | when the reader job ran (databricks rows) |
+|  | `run_ts` | timestamp | when the reader job ran (databricks rows); llm_reader_runs: also the load time of Load results rows |
 |  | `git_commit` | string | commit the job was deployed from |
 |  | `loaded_at` | timestamp | when Load results wrote it (Load results rows) |
 |  | `truth` | string | answer key truth (databricks rows) |

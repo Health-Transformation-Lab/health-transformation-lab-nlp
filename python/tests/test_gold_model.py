@@ -48,8 +48,9 @@ def test_ai_predictions_holds_the_reader_jobs_columns_and_load_results_load_time
 
 
 def test_llm_reader_runs_holds_every_llm_details_column_and_the_provenance():
-    details = header("data/datasets/llm_details_medgemma-1.5-4b-it.csv")
-    assert cols("llm_reader_runs")[:len(details)] == details
+    for path in sorted((ROOT / "data" / "datasets").glob("*llm_details_*.csv")):
+        details = header(path)
+        assert cols("llm_reader_runs")[:len(details)] == details, path.name
     assert set(cols("llm_reader_runs")[len(details):]) == {"method", "sha256", "source", "run_id", "run_ts",
                                                           "git_commit", "loaded_at", "truth", "difficulty"}
 

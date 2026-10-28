@@ -103,7 +103,7 @@ def sources(d, physical):
 
 
 def analyse(d, physical):
-    lead = d.v(sub("Study lead, data science", "Scorecard dashboard" if not physical else "dashboards/scorecard.lvdash.json",
+    lead = d.v(sub("Study lead, data science", "Scorecard dashboard" if not physical else "databricks/dashboards/scorecard.lvdash.json",
                    "phenotyping · de-identification"), 1100, 184, 200, 76, EXT)
     sql = d.v(sub("Ad hoc SQL, R, notebooks", "select … from gold_dental_omop_perio.*" if physical else "any gold table"), 1100, 280, 200, 60, EXT)
     rd = d.v(sub("README leaderboard", "35_readme_results.py" if physical else "", "reads the committed files, not gold"), 1100, 360, 200, 60, EXT)

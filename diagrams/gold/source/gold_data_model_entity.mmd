@@ -1,7 +1,7 @@
 erDiagram
-    result_files ||--o{ ai_predictions : "sha256"
-    result_files ||--o{ llm_reader_runs : "sha256"
-    ai_predictions ||..o| llm_reader_runs : "method, visit_id, source"
+    result_files |o--o{ ai_predictions : "sha256 (repo · kaggle rows)"
+    result_files |o--o{ llm_reader_runs : "sha256 (repo · kaggle rows)"
+    ai_predictions }o..o{ llm_reader_runs : "method, visit_id, source (per version or run)"
     review_key ||--o{ ai_predictions : "visit_id"
     review_key ||--o{ llm_reader_runs : "visit_id"
     review_key ||--o{ chart_answers : "visit_id"

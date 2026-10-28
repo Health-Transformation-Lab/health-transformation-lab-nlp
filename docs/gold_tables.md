@@ -23,7 +23,7 @@ the declaration and the tables' columns drift apart. This page covers who writes
 
 | Table | Grain (one row per) | Logical key | Written by | Write mode |
 |---|---|---|---|---|
-| `result_files` | committed result file version | `sha256` | Load results (`10_load_results.py`) | append new versions, written last |
+| `result_files` | committed result file version | `sha256` | Load results (`10_load_results.py`) | delete-then-append by `sha256`, written last |
 | `ai_predictions` | method × chart × file version (or reader run) | `sha256, visit_id`; reader rows: `source, run_id, method, visit_id` | Load results; MedGemma reader (`03`) | delete-then-append by `sha256`; reader: `replace_batch` on `(source, run_id, method)` |
 | `llm_reader_runs` | LLM reader call on one chart | as `ai_predictions` | Load results; MedGemma reader | as `ai_predictions` |
 | `chart_answers` | system × review chart | `visit_id, system` | Judge scorecard (`07`) | overwrite |
@@ -62,7 +62,9 @@ partway is redone on the next run.
 The status each method gave each review chart. Class probabilities (`p_*`) stay in the committed CSV.
 
 A changed file is a new version, and the old version's rows stay. For one answer per method, take the
-latest `sha256` per `(source, method)`, or one `run_id`:
+latest `sha256` per `(source, method)`, or one `run_id`. The reader job's own rows (`source = databricks`)
+carry the `sha256` of their scratch CSV but have no `result_files` row, so pick those by `run_id`; two runs
+with the same answers even share a `sha256`. This query covers the `repo` and `kaggle` rows:
 
 ```sql
 select p.method, p.visit_id, p.pred
@@ -75,7 +77,9 @@ join (select sha256, row_number() over (partition by source, method order by loa
 ### `llm_reader_runs`
 
 One row per LLM reader call: the columns of `llm_details_<method>.csv` plus provenance. It matches
-`ai_predictions` one to one on `method, visit_id, source` (and `run_id` for `databricks` rows).
+`ai_predictions` one to one on `method, visit_id, source` within one file version or one `run_id`. Across
+versions there are several rows per key on both sides, and the two files have different `sha256` values, so
+pair the latest version of each (by `loaded_at`) or one run.
 
 New columns in a file are added to the table (`mergeSchema`). A column that is empty in a whole file
 takes the type the table already has.
@@ -124,6 +128,12 @@ doesn't join to the other tables.
   `02_llm_judge.sql` (the `llm_judge` job, corpus scale with `ai_query`) runs `CREATE OR REPLACE` with
   `method, visit_id, pred, verdict, supported_status, quote, rationale, gate_ok, error, prompt_version,
   judge_model`. Whichever ran last owns the table, and the dashboard and the scorecard's resume step expect
-  `07`'s. Run the corpus judge into another table name until that's settled.
+  `07`'s: if `02` ran last, the scorecard's resume step fails (`judge_scorecard.reusable` reads `endpoint`,
+  which `02`'s table doesn't have). Run the corpus judge into another table name until that's settled.
+- The scorecard keeps an earlier judge call only for the same endpoint and the current prompt version
+  (`judge_scorecard.reusable`); a new endpoint asks, and pays for, every call again.
+- `encoder_gpu_predictions` (the `encoder_gpu` job) is written by plain append with no batch key
+  (`08_encoder_gpu.py`), so a rerun adds the same predictions again: against AGENTS.md, "Failures, retries
+  and reruns". It isn't in the data model yet.
 - `simulated_*` files are never loaded. `judgments.simulated = true` marks a simulated judge's rows: label
   anything built from them as simulated wherever it's shown.
