@@ -39,15 +39,15 @@ td,th{{padding:12px 16px;border-bottom:1px solid #D9D3C4}}ul{{padding-left:1.2em
 .home{{display:flex;align-items:center;gap:10px;font-family:'Libre Baskerville',Georgia,serif;font-weight:700;font-size:15px;color:#F7F5EF;text-decoration:none;white-space:nowrap}}
 .home .mark{{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#F2A070;color:#0F2A33;font-size:15px}}
 .home:hover .name{{text-decoration:underline}}
-.topnav .links{{display:flex;align-items:center;gap:4px;min-width:0}}
+.topnav .links{{display:flex;flex:1 1 auto;justify-content:flex-end;align-items:center;gap:4px;min-width:0}}
 .topnav .links a,.topnav button{{color:#D5E3E1;text-decoration:none;font:600 14px 'Public Sans',Arial,sans-serif;padding:7px 11px;border-radius:8px;background:none;border:0;cursor:pointer;white-space:nowrap}}
 .topnav .links a:hover,.topnav button:hover{{color:#F7F5EF;background:rgba(255,255,255,.07)}}.topnav .links a.active,.topnav button[aria-pressed=true]{{color:#F2A070}}
 .topnav .links a.cta{{background:#F2A070;color:#0F2A33;margin-left:6px}}.topnav .links a.cta:hover{{background:#F7F5EF}}
-.topnav select{{max-width:280px;min-width:0;font:600 14px 'Public Sans',Arial,sans-serif;color:#F7F5EF;background:#15303A;border:1px solid rgba(213,227,225,.3);border-radius:8px;padding:6px 8px}}
+.topnav select{{flex:1 1 auto;width:280px;max-width:280px;min-width:72px;font:600 14px 'Public Sans',Arial,sans-serif;color:#F7F5EF;background:#15303A;border:1px solid rgba(213,227,225,.3);border-radius:8px;padding:6px 8px}}
 .disclaimer{{position:fixed;top:56px;left:0;right:0;z-index:40;padding:6px 16px;background:#15303A;color:#D5E3E1;font:13px/1.45 'Public Sans',Arial,sans-serif}}
 .reveal-viewport,.reveal{{background:#2b2b2b}}.reveal{{position:fixed;top:84px;left:0;right:0;bottom:0;width:auto;height:auto}}
 .reveal .slides{{text-align:left}}.reveal .slides>section{{height:1080px}}.reveal .progress{{color:#F2A070}}
-.topnav .pager{{display:flex;align-items:center;gap:4px}}
+.topnav .pager{{display:flex;flex:0 1 auto;align-items:center;gap:4px;min-width:0}}
 .topnav .pager button{{color:#0F2A33;background:#F2A070;padding:7px 12px}}.topnav .pager button:hover{{color:#0F2A33;background:#F7F5EF}}
 .topnav .pager button:disabled{{opacity:.35;cursor:default;background:#F2A070}}
 .topnav button:focus-visible,.topnav select:focus-visible{{outline:2px solid #F7F5EF;outline-offset:2px}}
@@ -57,12 +57,16 @@ td,th{{padding:12px 16px;border-bottom:1px solid #D9D3C4}}ul{{padding-left:1.2em
 .reveal .slide-number{{font:600 14px 'Public Sans',Arial,sans-serif;background:rgba(15,42,51,.8);color:#F7F5EF}}
 .notes-panel{{position:fixed;left:0;right:0;bottom:0;z-index:45;max-height:35vh;overflow:auto;background:#f4f1ea;color:#222;padding:16px 20px 28px;font-size:15px;line-height:1.5;box-shadow:0 -8px 24px rgba(0,0,0,.3)}}
 .notes-panel[hidden]{{display:none}}
-@media (max-width:820px){{.home .name,.topnav .links a.deck{{display:none}}.topnav select{{max-width:40vw}}}}</style></head><body>
+/* the slide picker shrinks first; then the site name goes, then the deck links; on phones the pager's labels and
+   the GitHub link (also on the home page) go, so Previous, the picker, Next and Notes always fit */
+@media (max-width:1180px){{.home .name{{display:none}}}}
+@media (max-width:820px){{.topnav .links a.deck{{display:none}}}}
+@media (max-width:560px){{.topnav .pager .lbl,.topnav .links a.cta{{display:none}}.topnav .pager button{{padding:7px 13px;font-size:16px}}}}</style></head><body>
 <nav class="topnav" aria-label="Main"><div class="bar">
 <a class="home" href="{site}/" title="Back to the Health Transformation Lab home page"><span class="mark" aria-hidden="true">←</span><span class="name">Health Transformation Lab</span></a>
-<div class="links">{decks}<span class="pager"><button id="deck-prev" aria-label="Previous slide" title="Previous slide (←)">‹ Previous</button>
+<div class="links">{decks}<span class="pager"><button id="deck-prev" aria-label="Previous slide" title="Previous slide (←)">‹<span class="lbl"> Previous</span></button>
 <select id="deck-jump" aria-label="Go to slide">{options}</select>
-<button id="deck-next" aria-label="Next slide" title="Next slide (→)">Next ›</button></span>
+<button id="deck-next" aria-label="Next slide" title="Next slide (→)"><span class="lbl">Next </span>›</button></span>
 <button id="deck-notes-btn" aria-pressed="false" title="Speaker notes (N)">Notes</button>
 <a class="cta" href="{repo}" target="_blank" rel="noopener">GitHub ↗</a></div></div></nav>
 <p class="disclaimer" id="deck-disclaimer">{note}</p>
@@ -81,9 +85,10 @@ function fit(){{deck.style.top=(56+bar.offsetHeight)+'px';deck.style.bottom=(pan
 function toggleNotes(){{var on=panel.hidden;panel.hidden=!on;btn.setAttribute('aria-pressed',on);fit()}}
 jump.addEventListener('change',()=>{{Reveal.slide(jump.selectedIndex);jump.blur()}})
 btn.addEventListener('click',toggleNotes)
-// blur after a click so the arrow keys page again (the keyboard is off while focus is in the nav)
-prev.addEventListener('click',()=>{{Reveal.prev();prev.blur()}})
-next.addEventListener('click',()=>{{Reveal.next();next.blur()}})
+// after a mouse click, blur so the arrow keys page again (the keyboard is off while focus is in the nav);
+// a keyboard press (detail 0) keeps focus on the button, so Enter pages again
+prev.addEventListener('click',e=>{{Reveal.prev();if(e.detail)prev.blur()}})
+next.addEventListener('click',e=>{{Reveal.next();if(e.detail)next.blur()}})
 fit()
 Reveal.initialize({{width:1920,height:1080,margin:0.03,center:false,display:'flex',hash:true,history:false,
   // scrollActivationWidth:null: phones page by swipe too, not reveal's scroll view below 435 px
