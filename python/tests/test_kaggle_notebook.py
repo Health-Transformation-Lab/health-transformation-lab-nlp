@@ -72,11 +72,20 @@ def test_default_rung_attaches_medgemma_1_5_from_kaggle_models(tmp_path):
     assert meta["model_sources"] == ["keras/medgemma/keras/medgemma_1.5_instruct_4b/1"]
 
 
+def test_medgemma_v1_attaches_its_own_kaggle_model(tmp_path):
+    # #185: MedGemma 4B v1 next to 1.5, from Kaggle Models, with Google's own config for it
+    _, meta, nb = _prepare(tmp_path, "--rung", "medgemma-4b-it")
+    assert meta["model_sources"] == ["keras/medgemma/keras/medgemma_instruct_4b/1"]
+    assert 'RUNG = "medgemma-4b-it"' in _settings(nb)
+    for name in ("config.json", "generation_config.json"):
+        assert (REPO_ROOT / "kaggle" / "hf_config" / f"medgemma-4b-it.{name}").exists(), name
+
+
 def test_rung_without_a_kaggle_model_is_refused(tmp_path):
     import subprocess
     import sys
     r = subprocess.run([sys.executable, str(REPO_ROOT / "kaggle" / "prepare_kernel.py"), "--out", str(tmp_path / "k"),
-                        "--username", "someone", "--rung", "medgemma-4b-it"], capture_output=True, text=True, check=False)
+                        "--username", "someone", "--rung", "medgemma-27b-text-it"], capture_output=True, text=True, check=False)
     assert r.returncode != 0 and "kaggle" in r.stderr
 
 
@@ -146,7 +155,7 @@ def test_every_kaggle_rung_ships_googles_config():
     import yaml
     reg = yaml.safe_load((REPO_ROOT / "models.yaml").read_text())
     on_kaggle = [m for m in reg["models"] if m.get("kaggle")]
-    assert [m["id"] for m in on_kaggle] == ["medgemma-1.5-4b-it"]
+    assert [m["id"] for m in on_kaggle] == ["medgemma-1.5-4b-it", "medgemma-4b-it"]   # 4B v1: #185
     for m in on_kaggle:
         assert re.fullmatch(r"keras/medgemma/keras/[a-z0-9_.]+/\d+", m["kaggle"]), m["id"]
         cfg = json.loads((REPO_ROOT / "kaggle" / "hf_config" / f"{m['id']}.config.json").read_text())
