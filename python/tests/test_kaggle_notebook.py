@@ -48,7 +48,8 @@ def _settings(nb):
 def test_prepared_kernel_runs_on_a_gpu_with_internet_and_the_chosen_settings(tmp_path):
     _, meta, nb = _prepare(tmp_path, "--rung", "medgemma-4b-it", "--limit", "5", "--shots", "2", "--branch", "dev-x")
     assert meta["id"] == "someone/dental-omop-medgemma-reader" and meta["code_file"] == "medgemma_reader.ipynb"
-    assert meta["enable_gpu"] is True and meta["enable_internet"] is True and meta["is_private"] is True
+    assert meta["enable_gpu"] is True and meta["enable_internet"] is True
+    assert meta["is_private"] is False          # public: synthetic notes only; HF_TOKEN stays a private Kaggle secret
     assert meta["kernel_type"] == "notebook" and meta["language"] == "python"
     s = _settings(nb)
     assert 'RUNG = "medgemma-4b-it"' in s and "TEST_NOTES = 5" in s and "SHOTS = 2" in s

@@ -114,7 +114,7 @@ placeholder error rates and say nothing about MedGemma.
   `DENTAL_LLM_DTYPE` to force one). Download the prediction CSVs from the Output tab into
   `data/datasets/`, then run `28_ladder_vs_truth.py` and `35_readme_results.py`.
   **From GitHub:** Actions → *kaggle-medgemma* → Run workflow pushes the notebook to Kaggle
-  (`kaggle kernels push --accelerator NvidiaTeslaT4`, private), waits, and keeps the predictions and
+  (`kaggle kernels push --accelerator NvidiaTeslaT4`, public: synthetic notes only, and the Hugging Face token stays a private Kaggle secret), waits, and keeps the predictions and
   the Kaggle log as a workflow artifact. Needs `KAGGLE_USERNAME` and `KAGGLE_API_TOKEN` (or
   `KAGGLE_KEY`) in the GitHub environment `dev` (Kaggle → Settings → API → Generate New Token; delete it
   there when done). The Hugging Face token stays a Kaggle secret: after the first push, open the
