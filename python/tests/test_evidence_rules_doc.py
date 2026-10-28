@@ -61,7 +61,7 @@ def test_each_worked_example_gives_the_status_the_code_gives(kind, inp, status):
 
 
 def test_readme_and_results_link_the_rules():
-    for f in ("README.md", "docs/results.md"):
+    for f in ("docs/edr/README.md", "docs/results.md"):
         assert "evidence_rules.md" in (REPO_ROOT / f).read_text(), f
 
 
@@ -71,11 +71,11 @@ def _anchor(heading: str) -> str:
 
 
 def test_readme_evidence_table_says_how_each_type_is_read_and_links_its_rules():
-    readme = (REPO_ROOT / "README.md").read_text()
+    readme = (REPO_ROOT / "docs" / "edr" / "README.md").read_text()
     start = readme.index("**Evidence types per visit:**")
     rows = [x for x in readme[start:].split("\n\n")[1].splitlines() if x.startswith("| ") and "---" not in x][1:]
     assert len(rows) == 5
     anchors = {_anchor(h) for h in re.findall(r"^##+ (.+)$", DOC.read_text(), re.MULTILINE)}
     for r in rows:
-        links = re.findall(r"\(docs/evidence_rules\.md#([\w\-]+)\)", r)
+        links = re.findall(r"\(\.\./evidence_rules\.md#([\w\-]+)\)", r)
         assert len(links) == 1 and links[0] in anchors, r

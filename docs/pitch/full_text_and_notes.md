@@ -1,5 +1,5 @@
 # Health Transformation Lab: Shark Tank pitch: full text and notes
-A personal idea, not affiliated with or endorsed by any organization. Built from `slides/` by `build.py`; edit the slides, then rebuild.
+A personal idea, not affiliated with or endorsed by any organization. Built from `slides/` by `docs/build_decks.py`; edit the slides, then rebuild.
 
 ## Slide 1 — cover
 

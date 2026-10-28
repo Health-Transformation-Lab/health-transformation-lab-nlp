@@ -15,7 +15,7 @@ health for millions of Americans and better overall health through medical-denta
 | [deck.html](deck.html) | The 24 slides with speaker notes (open in a browser) |
 | [full_text_and_notes.md](full_text_and_notes.md) | Every slide's text and notes, for reading or search |
 | [slides/](slides/) | The source: one `<section>` per slide, notes in its `<aside>` |
-| [build.py](build.py) | Rebuilds the two files above from `slides/`: `python docs/pitch/build.py` |
+| [../build_decks.py](../build_decks.py) | Rebuilds the two files above from `slides/`: `python docs/build_decks.py pitch` |
 
 Slides 1–6 are the pitch; 7–24 are backup for questions.
 
@@ -23,7 +23,7 @@ Slides 1–6 are the pitch; 7–24 are backup for questions.
 
 The pitch asks for a fair test, and this repo is where one gets built on synthetic data:
 
-- **The medical-dental seam, from the record:** the periodontal phenotyping study (README) reads a dental chart the
+- **The medical-dental seam, from the record:** the periodontal phenotyping study ([the dental record path](../edr/README.md)) reads a dental chart the
   way a doctor or an AI would have to, with harm grades borrowed from GlobalDentBench
   ([dentbench_methods.md](../dentbench_methods.md)) and the record in OMOP, the format medicine already uses.
 - **Large LLMs, from narrow to broad:** the same models, runners, harm grades and leaderboards score LLMs first on
