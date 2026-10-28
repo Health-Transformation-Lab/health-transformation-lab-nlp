@@ -10,13 +10,21 @@
      status, and source (citation plus table or page).
    - `draw_medical_record(person, status, risk, rng)` draws one record. It reuses the generator's
      `RiskFactors.hba1c`: diabetes = HbA1c ≥ 6.5, as `study.py` already decides.
-   - Blood pressure is drawn from a hypertension flag (normal or raised ranges). ASA class follows from the
-     number and kind of conditions (ASA Physical Status definitions: I healthy, II mild systemic disease, III
-     severe systemic disease, IV a constant threat to life).
-2. **Own random stream.** `study.generate_visits` keeps its current draws in the same order. The medical record
-   uses `random.Random(f"{seed}:medical")` after them, so existing outputs are byte-identical (FR-001).
+   - Each condition is drawn given periodontal status and age band only, so the age-adjusted odds ratio is
+     the declared one.
+   - Blood pressure is drawn from a hypertension flag (normal or raised ranges).
+   - ASA class follows from the number and kind of conditions (ASA Physical Status definitions: I healthy, II
+     mild systemic disease, III severe systemic disease, IV a constant threat to life). It therefore carries
+     medical signal into the dental set, which is the point of the `dental_no_asa` run.
+   - The record is written to `data/datasets/medical_record.csv`, one row per person. Its columns are
+     `person_id`, `is_<condition>`, `systolic_bp_mmhg`, `diastolic_bp_mmhg` and `asa_class_code`. HbA1c stays
+     in the visits.
+2. **Own random stream, own file.** `study.generate_visits` keeps its current draws in the same order. The
+   medical record uses `random.Random(f"{seed}:medical")` after them and goes to its own file, so existing
+   outputs are byte-identical (FR-001).
 3. **Feature sets and scheme.** `classify_status.py` gets:
-   - `FEATURE_SETS = {"dental": [...], "dental_medical": [...], "medical": [...]}`;
+   - `FEATURE_SETS = {"dental": [...], "dental_no_asa": [...], "dental_medical": [...], "medical": [...]}`. Medical
+     is the record's features plus age; there is no sex column;
    - a `four` scheme (healthy+gingivitis, I, II, III+IV);
    - `split_stratified(f, seed, test_share=0.3)`, grouped by person and stratified by class;
    - `compare_feature_sets(visits, seed)`, which returns one row per feature set and class.
@@ -55,7 +63,7 @@ memory.
   - existing columns byte-identical;
   - every `CONDITIONS` row has a source;
   - diabetes agrees with HbA1c;
-  - odds ratios recovered within tolerance on 10,000 people;
+  - age-adjusted (Mantel–Haenszel) odds ratios recovered within tolerance on 10,000 people;
   - ranges and AGENTS.md column names.
 - `test_classify_status.py`:
   - the `four` scheme;

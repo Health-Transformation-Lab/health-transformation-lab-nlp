@@ -9,11 +9,11 @@ Implementation starts after this spec, plan and tasks are reviewed.
 - [ ] T002 [US1] Failing tests: `test_medical_record.py` (seed, byte-identical rebuild, sources, diabetes =
   HbA1c, odds ratios within tolerance, ranges, column names)
 - [ ] T003 [US1] `medical_record.py`: `CONDITIONS`, `draw_medical_record`, own random stream; `@traced`
-- [ ] T004 [US1] `study.py` writes the medical record next to the visits; the data card says synthetic
+- [ ] T004 [US1] `study.py` writes `medical_record.csv` (a new file; existing files unchanged); the data card says synthetic
 
 ## US2 #199: dental-only, dental+medical and medical-only
 
-- [ ] T005 [US2] Failing tests: `four` scheme, feature sets, stratified split grouped by person
+- [ ] T005 [US2] Failing tests: `four` scheme, the four feature sets (incl. `dental_no_asa`), stratified split grouped by person
 - [ ] T006 [US2] `classify_status.py`: `FEATURE_SETS`, `four`, `split_stratified`, `compare_feature_sets`
 - [ ] T007 [US2] `scripts/44_medical_features.py`, writes `synthetic_medical_feature_sets.csv`
 - [ ] T008 [US2] Docs: results labelled synthetic, the paper's Table 2 averages cited beside them; PROBAST /

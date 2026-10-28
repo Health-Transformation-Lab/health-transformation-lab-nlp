@@ -59,12 +59,16 @@ published, cited source, so a model can find a signal, but a weak one.
 
 **Acceptance Scenarios**:
 
-1. **Given** the default seed, **When** the study datasets are rebuilt, **Then** every file and column that
-   existed before is byte-identical, and the medical-record columns are added.
+1. **Given** the default seed, **When** the study datasets are rebuilt, **Then** every file that existed
+   before is byte-identical, and the medical record is a new file (`medical_record.csv`, one row per person,
+   joined on `person_id`).
 2. **Given** a person with diabetes in the existing generator (HbA1c ≥ 6.5), **When** the medical record is
    drawn, **Then** diabetes is recorded with that same HbA1c: the two never disagree.
-3. **Given** 10,000 generated people, **When** each condition's rate is compared by periodontal status,
-   **Then** the odds ratio is within the declared tolerance of the cited value.
+3. **Given** 10,000 generated people, **When** each condition's rate is compared by periodontal status
+   within age bands, **Then** the age-adjusted (Mantel–Haenszel) odds ratio is within the declared tolerance
+   of the value the generator was given. The generator conditions each condition only on periodontal status
+   and age band, so the adjusted odds ratio is the cited one by construction. Diabetes is the exception: it
+   comes from the existing generator and is reported, not tested against a source.
 4. **Given** any generated file, **When** a reader opens it or its data card, **Then** it says the medical
    records are synthetic.
 
@@ -125,7 +129,9 @@ metrics. Hand-worked cases include a perfect model, a constant model and a class
 - **HbA1c not measured** (most people without diabetes): it stays missing, not imputed to a normal value. The
   medical-only set must handle a missing value, as the current classifier already does.
 - **ASA class:** the paper counts it among the dental-record factors (its abstract lists it with oral hygiene,
-  periodontal treatment and smoking). It goes in the dental set, and the spec says so.
+  periodontal treatment and smoking). It goes in the dental set. ASA class reflects systemic disease, so it
+  carries medical signal into the dental-only run, as it does in the paper. A fourth run, dental without ASA,
+  shows how much.
 - **Medical-only runs that do worse than chance in a class:** reported as they are.
 - **Smaller runs (`limit`):** they keep the stratification or fail clearly, never silently unstratified.
 
@@ -133,8 +139,9 @@ metrics. Hand-worked cases include a perfect model, a constant model and a class
 
 ### Functional Requirements
 
-- **FR-001** The medical record is drawn from its own seeded random stream, after the existing draws, so the
-  existing datasets and every committed result built from them stay byte-identical. A test compares a rebuild
+- **FR-001** The medical record is drawn from its own seeded random stream, after the existing draws, and is
+  written to its own file (`medical_record.csv`), so the existing datasets and every committed result built
+  from them stay byte-identical. A test compares a rebuild
   against the committed files.
 - **FR-002** Conditions, HbA1c, blood pressure and ASA class are declared in one table. For each one it gives:
   - the column name, following AGENTS.md naming: `is_` prefix for booleans, `_pct`, `_code` and so on;
@@ -145,7 +152,8 @@ metrics. Hand-worked cases include a perfect model, a constant model and a class
 - **FR-003** Links run from periodontal status (and age, smoking, diabetes) to the condition. The generator
   never changes the chart or the label to fit a condition. The data card says the links are associations
   built in, not causes.
-- **FR-004** `classify_status.py` takes a named feature set (`dental`, `dental_medical`, `medical`) and the
+- **FR-004** `classify_status.py` takes a named feature set (`dental`, `dental_no_asa`, `dental_medical`,
+  `medical`) and the
   4-class scheme (`healthy`, `I`, `II`, `III_IV`) alongside its existing 5- and 3-level ones. Gingivitis
   counts as healthy (not periodontitis), as in the existing 3-level scheme.
 - **FR-005** The split is 70/30, stratified by class and grouped by person, with a fixed default seed. The
@@ -163,9 +171,12 @@ metrics. Hand-worked cases include a perfect model, a constant model and a class
 
 ### Key Entities
 
-- **Medical record** (one per synthetic person, or per visit for measures that change): conditions as booleans;
-  HbA1c (`hba1c_pct`); systolic and diastolic blood pressure (`systolic_bp_mmhg`, `diastolic_bp_mmhg`, names
-  to be settled in the plan against the suffix table); ASA class (`asa_class_code`).
+- **Medical record** (one row per synthetic person, in `medical_record.csv`): conditions as `is_` booleans
+  (`is_hypertension`, `is_ckd`, ...); systolic and diastolic blood pressure (`systolic_bp_mmhg`,
+  `diastolic_bp_mmhg`); ASA class (`asa_class_code`, I–IV). HbA1c is not repeated: the existing visit column
+  `hba1c` is reused. CSV columns keep these analysis names. If the comparison goes to gold, the
+  implementation PR declares their gold names in `gold_names.py` and adds a `_mmhg` row to AGENTS.md's
+  suffix table, since no suffix there holds a pressure.
 - **Feature set**: a named list of features: dental, dental+medical, medical.
 - **Comparison row**: feature set × class → sensitivity, specificity, AUC, Brier score, test count, seed,
   synthetic flag.
@@ -185,7 +196,8 @@ metrics. Hand-worked cases include a perfect model, a constant model and a class
 
 - The paper's 4-class target has no gingivitis class; gingivitis is grouped with healthy here (FR-004). This is
   a choice, not the paper's.
-- Medical-only means the medical-record features plus age and sex. Smoking and ASA class are dental-record
+- Medical-only means the medical-record features plus age. The generator has no sex column (spec 013 G11
+  lists it as missing), so sex is left out rather than added here. Smoking and ASA class are dental-record
   factors, as in the paper's abstract.
 - Condition rates and links will come from published population sources (for example NHANES-based
   prevalence) and published periodontitis–systemic association studies. Each is to be checked against its
