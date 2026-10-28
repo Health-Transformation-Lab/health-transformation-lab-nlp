@@ -200,6 +200,7 @@ Also: [how we work](../../AGENTS.md) · [references](../references.md) · [proto
 | Topic | |
 |---|---|
 | **Results: every method**, phenotyping and de-identification, with rank ranges | [results.md](../results.md) |
+| **Where each diagnosis algorithm comes from**: published or designed here, with citations, and how each scores | [algorithms.md](../algorithms.md) |
 | **What OMOP and NLP are**, in plain words | [omop_and_nlp.md](../omop_and_nlp.md) |
 | **Diagrams**: [medallion architecture](../../diagrams/d0_medallion_architecture.png), study process, platform, ERD, site storage, MLOps, flows | [diagrams/](../../diagrams/README.md) |
 | Tooth-by-tooth data in OMOP; 2017 AAP/EFP **and 2012 CDC/AAP**; storage designs on Postgres/Lakebase | [site_level_omop.md](../site_level_omop.md) |
