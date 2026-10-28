@@ -33,6 +33,27 @@ Small fixes (a typo, a one-line bug with a regression test) don't need one.
 Every pull request gets a review written to `pull_requests/pr-<n>-review.md`, against
 `.claude/review-rubric.md` and these rules.
 
+## Branches and issues
+
+Every user story is a GitHub issue, and every branch and pull request belongs to one.
+
+1. **One issue per user story.** When a spec is written, open one issue per user story, titled
+   `<spec number> US<n>: <story>` (e.g. `016 US2: every committed result is in the gold tables`), and write
+   the issue number next to the story in `spec.md` (`### US2 - ... (P1) #71`). A fix or chore without a spec
+   gets its own issue too, describing the problem.
+2. **Branch: `<type>/<issue>-<slug>`**, e.g. `feat/71-016-results-loader` or `fix/72-volume-log-append`.
+   - type: `feat`, `fix`, `docs`, `data`, `ci`, `chore`, `spec`
+   - issue: the GitHub issue number (a Jira key like `DENT-123` also passes, if a Jira project is ever used)
+   - slug: lowercase words joined by `-`, at most 40 characters; for spec work, start with the spec number
+   - `/speckit-specify` creates `NNN-name`: rename it (`git branch -m spec/<issue>-NNN-name`)
+3. **Pull request: one issue's work, and `Closes #<issue>` in the description**, so the merge closes it
+   (use `Refs #<issue>` for one part of a larger story).
+4. **Branches a tool names are kept as they are:** `claude/*` (an agent session's assigned branch: the PR
+   still needs its `Closes #<issue>` line), `dependabot/*`, and `kaggle-results/*` (results PRs the Kaggle
+   workflow opens; no issue needed).
+
+CI checks 2–4 on every PR (`.github/workflows/pr-conventions.yml`, `.github/scripts/pr_conventions.py`).
+
 ## Commands
 
 ```bash

@@ -8,6 +8,8 @@ Open a pull request for the current branch, then review it. Follow `.claude/revi
 ## 1. Pre-flight (stop and report if any fails)
 
 - Not on `main`; working tree clean; branch pushed (`git push -u origin <branch>`).
+- The branch belongs to an issue (AGENTS.md, "Branches and issues"): named `<type>/<issue>-<slug>`, or an
+  agent session's `claude/*` branch. Know the issue number; if there is none, open one first.
 - `git fetch origin main` and merge it in if the branch is behind (merge, don't rebase a shared branch).
 - Run the rubric's three scans (secrets, PHI / real data, organization claims) on
   `origin/main..HEAD`. Any hit stops here: fix it first.
@@ -22,6 +24,8 @@ Open a pull request for the current branch, then review it. Follow `.claude/revi
 Title: `$ARGUMENTS`, or a short imperative summary of the commits. Body:
 
 ```markdown
+Closes #<issue>
+
 ## What changed
 <bullets by area: what and why>
 
