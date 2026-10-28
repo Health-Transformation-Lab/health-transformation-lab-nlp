@@ -264,3 +264,60 @@ def test_load_results_job_migrates_the_old_gold_names_before_loading():
     nb = _text("databricks/notebooks/11_migrate_gold_names.py")
     assert "gold_names.RENAMED" in nb and "DROP TABLE" in nb
     assert "spark.sql(f\"DROP" not in nb                     # prints the drops, never runs them
+
+
+# Issue #154: a Genie space can't be created before its tables exist, and Load results (which writes them) runs
+# after the deploy. The deploy script breaks that loop; these run it against a fake `databricks` CLI.
+FAKE_CLI = """#!/usr/bin/env bash
+echo "$*" >> "$CALLS"
+if [ "$1 $2" = "bundle deploy" ]; then
+  n=$(grep -c '^bundle deploy' "$CALLS")
+  if [ "$n" -le "${FAIL_DEPLOYS:-0}" ]; then echo "$DEPLOY_ERROR" >&2; exit 1; fi
+fi
+exit 0
+"""
+GENIE_ERROR = ("Error: cannot create resources.genie_spaces.dq_grader_genie: An error occurred accessing the schema. "
+               "Table 'health_transformation_lab.gold_dental_omop_perio.dq_check' does not exist. (403 PERMISSION_DENIED)")
+
+
+def _deploy(tmp_path, fail_deploys, error=GENIE_ERROR):
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    cli = bin_dir / "databricks"
+    cli.write_text(FAKE_CLI)
+    cli.chmod(0o755)
+    calls, out = tmp_path / "calls.txt", tmp_path / "github_output.txt"
+    env = {"PATH": f"{bin_dir}:/usr/bin:/bin", "CALLS": str(calls), "FAIL_DEPLOYS": str(fail_deploys),
+           "DEPLOY_ERROR": error, "GITHUB_OUTPUT": str(out)}
+    proc = subprocess.run(["bash", str(REPO_ROOT / ".github/scripts/deploy_bundle.sh"), "dev"],
+                          env=env, capture_output=True, text=True, check=False)
+    lines = calls.read_text().splitlines() if calls.exists() else []
+    return proc.returncode, lines, out.read_text() if out.exists() else ""
+
+
+def test_deploy_that_succeeds_deploys_once(tmp_path):
+    code, calls, out = _deploy(tmp_path, fail_deploys=0)
+    assert code == 0 and calls == ["bundle deploy -t dev"] and "loaded=false" in out
+
+
+def test_deploy_missing_genie_tables_loads_results_then_deploys_again(tmp_path):
+    code, calls, out = _deploy(tmp_path, fail_deploys=1)
+    assert code == 0
+    assert calls == ["bundle deploy -t dev", "bundle run -t dev load_results", "bundle deploy -t dev"]
+    assert "loaded=true" in out          # the workflow then skips its own --no-wait Load results
+
+
+def test_deploy_fails_on_any_other_error(tmp_path):
+    code, calls, _ = _deploy(tmp_path, fail_deploys=1, error="Error: cannot create resources.jobs.x: bad config")
+    assert code != 0 and calls == ["bundle deploy -t dev"]
+
+
+def test_deploy_fails_if_the_second_deploy_fails(tmp_path):
+    code, calls, _ = _deploy(tmp_path, fail_deploys=2)
+    assert code != 0 and calls[-1] == "bundle deploy -t dev" and len(calls) == 3
+
+
+def test_workflow_deploys_through_the_script_and_skips_a_second_load():
+    text = _text(".github/workflows/deploy.yml")
+    assert '.github/scripts/deploy_bundle.sh "$TARGET"' in text
+    assert "steps.deploy.outputs.loaded != 'true'" in text

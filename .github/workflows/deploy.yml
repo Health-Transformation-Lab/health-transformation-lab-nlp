@@ -75,17 +75,18 @@ jobs:
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle deployment bind health_transformation_lab health_transformation_lab -t "$TARGET" --auto-approve || echo "bind did not run (see above); the deploy below decides"
-      - name: Deploy
+      - name: Deploy   # runs Load results first if a Genie space's tables don't exist yet (issue #154)
+        id: deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
-        run: databricks bundle deploy -t "$TARGET"
+        run: .github/scripts/deploy_bundle.sh "$TARGET"
       - name: Run benchmark job
         if: env.DATABRICKS_CLIENT_SECRET != '' && github.event.inputs.run_benchmark == 'true'
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Returns once Databricks has started the run; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait study_benchmark
       - name: Load committed results into the gold tables (spec 016)
-        if: env.DATABRICKS_CLIENT_SECRET != ''
+        if: env.DATABRICKS_CLIENT_SECRET != '' && steps.deploy.outputs.loaded != 'true'
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Only file versions it hasn't loaded yet; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait load_results
