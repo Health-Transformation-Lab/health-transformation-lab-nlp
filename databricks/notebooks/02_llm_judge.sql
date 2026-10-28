@@ -16,7 +16,7 @@
 -- COMMAND ----------
 
 CREATE WIDGET TEXT catalog DEFAULT 'health_transformation_lab';
-CREATE WIDGET TEXT schema DEFAULT 'gold_health_transformation_lab';
+CREATE WIDGET TEXT schema DEFAULT 'gold_dental_omop_perio';
 CREATE WIDGET TEXT judge_endpoint DEFAULT '<your-judge-endpoint>';  -- a Model Serving endpoint approved for this data
 
 -- COMMAND ----------

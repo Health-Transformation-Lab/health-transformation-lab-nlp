@@ -27,10 +27,10 @@ schema names are the same everywhere. One catalog, one schema per layer:
 
 | Schema in `health_transformation_lab` | Holds |
 |---|---|
-| `landing_health_transformation_lab` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
-| `bronze_health_transformation_lab` | raw tables (empty for now) |
-| `silver_health_transformation_lab` | cleaned tables (empty for now) |
-| `gold_health_transformation_lab` | OMOP and study tables, `benchmark_results`; results `dim_result_file`, `fact_prediction`, `fact_llm_call` (spec 016); judge scorecard `fact_chart_answer`, `fact_judge_call`, `judge_metric`, `judge_agreement`, `judge_cost`, `deid_score` (spec 012); names: spec 018, [gold_tables.md](gold_tables.md), `perio_note_classifier` |
+| `landing_dental_omop_perio` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
+| `bronze_dental_omop_perio` | raw tables (empty for now) |
+| `silver_dental_omop_perio` | cleaned tables (empty for now) |
+| `gold_dental_omop_perio` | OMOP and study tables, `benchmark_results`; results `dim_result_file`, `fact_prediction`, `fact_llm_call` (spec 016); judge scorecard `fact_chart_answer`, `fact_judge_call`, `judge_metric`, `judge_agreement`, `judge_cost`, `deid_score` (spec 012); names: spec 018, [gold_tables.md](gold_tables.md), `perio_note_classifier` |
 
 The bundle creates the catalog, all four schemas and the volume on deploy
 (`databricks/resources/unity_catalog.yml`), each with `prevent_destroy` so

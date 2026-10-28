@@ -43,28 +43,28 @@
   "data_sources": {
     "tables": [
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_checks"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_checks"
       },
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_completeness"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_completeness"
       },
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_concordance"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_concordance"
       },
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_injected_errors"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_injected_errors"
       },
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_prevalence"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_prevalence"
       },
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_temporal"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_temporal"
       },
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_transitions"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_transitions"
       },
       {
-        "identifier": "health_transformation_lab.gold_health_transformation_lab.dq_visits"
+        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_visits"
       }
     ]
   },

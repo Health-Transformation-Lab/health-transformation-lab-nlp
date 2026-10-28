@@ -1,5 +1,5 @@
 """../gold/source/gold_logical_architecture.drawio and gold_physical_architecture.drawio: how results reach
-health_transformation_lab.gold_health_transformation_lab and who reads them. The frame (lanes, Data Intelligence Platform, groups, key,
+health_transformation_lab.gold_dental_omop_perio and who reads them. The frame (lanes, Data Intelligence Platform, groups, key,
 storage) follows jcbowyer/DE_Assessment scripts/shared/diagrams/drawio_architecture.py, which copies the Databricks
 reference architecture; each pill carries its Databricks product icon (dbx_icons/, see render.md).
 Run: python3 gold_architecture.py   (then node drawio_render.js)   Synthetic data only.
@@ -105,7 +105,7 @@ def sources(d, physical):
 def analyse(d, physical):
     lead = d.v(sub("Study lead, data science", "Scorecard dashboard" if not physical else "databricks/dashboards/scorecard.lvdash.json",
                    "phenotyping · de-identification"), 1100, 184, 200, 76, EXT)
-    sql = d.v(sub("Ad hoc SQL, R, notebooks", "select … from gold_health_transformation_lab.*" if physical else "any gold table"), 1100, 280, 200, 60, EXT)
+    sql = d.v(sub("Ad hoc SQL, R, notebooks", "select … from gold_dental_omop_perio.*" if physical else "any gold table"), 1100, 280, 200, 60, EXT)
     rd = d.v(sub("README leaderboard", "35_readme_results.py" if physical else "", "reads the committed files, not gold"), 1100, 360, 200, 60, EXT)
     return lead, sql, rd
 
@@ -142,7 +142,7 @@ lead, sql, rd = analyse(d, False)
 d.e(wh, lead, ARROW + ORTHO + "exitX=1;exitY=0.3;entryX=0;entryY=0.5;")
 d.e(wh, sql, ARROW + ORTHO + "exitX=1;exitY=0.7;entryX=0;entryY=0.5;")
 key(d)
-storage(d, "Unity Catalog managed storage · landing volume landing_health_transformation_lab.data (logs, scratch files)")
+storage(d, "Unity Catalog managed storage · landing volume landing_dental_omop_perio.data (logs, scratch files)")
 d.write("gold_logical_architecture")
 
 # ---------- physical ----------
@@ -158,12 +158,12 @@ py = pill(d, sub("python/health_transformation_lab_nlp/", "results_store.py · d
 ms = pill(d, sub("serving endpoint", "var.judge_endpoint · max_usd 5"), 782, 216, 268, 44, "model-serving")
 wh = pill(d, sub("SQL warehouse var.warehouse_id", "dashboard Scorecard · ai_query"), 782, 274, 268, 44, "sql-warehouse")
 pill(d, sub("catalog health_transformation_lab", "group health_transformation_lab_nlp_&lt;target&gt;_admin"), 232, 374, 250, 52, "unity-catalog")
-pill(d, sub("schemas", "landing_ · bronze_ · silver_ · gold_health_transformation_lab"), 494, 374, 270, 52, "unity-catalog")
+pill(d, sub("schemas", "landing_ · bronze_ · silver_ · gold_dental_omop_perio"), 494, 374, 270, 52, "unity-catalog")
 pill(d, sub("MLflow experiment + UC model", "perio_note_classifier"), 776, 374, 274, 52, "notebooks")
 pill(d, sub("Delta tables", "UC managed"), 232, 482, 130, 52, "delta-lake")
-b = d.v("bronze_health_transformation_lab<br><font style='font-size:10px'>no tables yet</font>", 374, 478, 150, 60, CYL + BRONZE)
-s = d.v("silver_health_transformation_lab<br><font style='font-size:10px'>no tables yet</font>", 536, 478, 150, 60, CYL + SILVER)
-g = d.v("<b>gold_health_transformation_lab</b><font style='font-size:10px'><br>dim_result_file · fact_prediction · fact_llm_call<br>"
+b = d.v("bronze_dental_omop_perio<br><font style='font-size:10px'>no tables yet</font>", 374, 478, 150, 60, CYL + BRONZE)
+s = d.v("silver_dental_omop_perio<br><font style='font-size:10px'>no tables yet</font>", 536, 478, 150, 60, CYL + SILVER)
+g = d.v("<b>gold_dental_omop_perio</b><font style='font-size:10px'><br>dim_result_file · fact_prediction · fact_llm_call<br>"
         "fact_chart_answer · fact_judge_call · judge_metric<br>judge_agreement · judge_cost · deid_score<br>"
         "judge_queue · fact_corpus_judge_call</font>", 700, 462, 260, 92, CYL + GOLD)
 d.e(b, s, ARROW); d.e(s, g, ARROW)
@@ -181,5 +181,5 @@ lead, sql, rd = analyse(d, True)
 d.e(wh, lead, ARROW + ORTHO + "exitX=1;exitY=0.3;entryX=0;entryY=0.5;")
 d.e(wh, sql, ARROW + ORTHO + "exitX=1;exitY=0.7;entryX=0;entryY=0.5;")
 key(d)
-storage(d, "volume health_transformation_lab.landing_health_transformation_lab.data · runlog logs · encoder_gpu/ CSVs")
+storage(d, "volume health_transformation_lab.landing_dental_omop_perio.data · runlog logs · encoder_gpu/ CSVs")
 d.write("gold_physical_architecture")

@@ -96,4 +96,4 @@ def run(cmd: list[str], log_path: str | Path | None = None, cwd: str | Path | No
 @traced
 def log_dir(catalog: str) -> str:
     """Where notebooks keep script logs on Databricks: the landing volume (same name in every target)."""
-    return f"/Volumes/{catalog}/landing_health_transformation_lab/data/logs"
+    return f"/Volumes/{catalog}/landing_dental_omop_perio/data/logs"

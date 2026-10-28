@@ -6,7 +6,7 @@
    "queryLines": [
     "SELECT group_name, system_name AS system, ROUND(100 * vs_truth_ratio, 1) AS `exact_truth`, ROUND(100 * vs_judge_ratio, 1) AS `exact_judge`,\n",
     "  ROUND(100 * difference_ratio, 1) AS `difference`, ROUND(100 * judged_correct_ratio, 1) AS `judged_correct`, ROUND(100 * verdict_sensitivity_ratio, 1) AS `caught_right`,\n",
-    "  ROUND(100 * verdict_specificity_ratio, 1) AS `caught_wrong`, judged_count AS n_judged FROM health_transformation_lab.gold_health_transformation_lab.judge_metric WHERE metric_code = 'correct'\n"
+    "  ROUND(100 * verdict_specificity_ratio, 1) AS `caught_wrong`, judged_count AS n_judged FROM health_transformation_lab.gold_dental_omop_perio.judge_metric WHERE metric_code = 'correct'\n"
    ]
   },
   {
@@ -14,7 +14,7 @@
    "displayName": "ph_metrics",
    "queryLines": [
     "SELECT group_name, system_name AS system, metric_name AS metric_label, ROUND(100 * vs_truth_ratio, 1) AS `vs_truth`, ROUND(100 * vs_judge_ratio, 1) AS `vs_judge`,\n",
-    "  ROUND(100 * difference_ratio, 1) AS `difference` FROM health_transformation_lab.gold_health_transformation_lab.judge_metric\n"
+    "  ROUND(100 * difference_ratio, 1) AS `difference` FROM health_transformation_lab.gold_dental_omop_perio.judge_metric\n"
    ]
   },
   {
@@ -22,7 +22,7 @@
    "displayName": "ph_agree",
    "queryLines": [
     "SELECT slice_name AS label, chart_count AS n, ROUND(100 * coverage_ratio, 1) AS `coverage`, ROUND(100 * agreement_ratio, 1) AS `agreement`, ROUND(100 * ci_low_ratio, 1) AS `agreement_low`,\n",
-    "  ROUND(100 * ci_high_ratio, 1) AS `agreement_high`, ROUND(kappa_coef, 3) AS kappa FROM health_transformation_lab.gold_health_transformation_lab.judge_agreement\n"
+    "  ROUND(100 * ci_high_ratio, 1) AS `agreement_high`, ROUND(kappa_coef, 3) AS kappa FROM health_transformation_lab.gold_dental_omop_perio.judge_agreement\n"
    ]
   },
   {
@@ -32,9 +32,9 @@
     "SELECT a.system_name AS system, a.visit_id, a.difficulty_code AS difficulty, a.truth_status_code AS truth, a.answer_status_code AS answer,\n",
     "  s.judge_status_code AS judge_status, v.verdict_code AS verdict, COALESCE(v.quote_text, s.quote_text) AS quote,\n",
     "  (a.answer_status_code = a.truth_status_code) AS answer_right\n",
-    "  FROM health_transformation_lab.gold_health_transformation_lab.fact_chart_answer a\n",
-    "  LEFT JOIN health_transformation_lab.gold_health_transformation_lab.fact_judge_call s ON s.visit_id = a.visit_id AND s.call_kind_code = 'status'\n",
-    "  LEFT JOIN health_transformation_lab.gold_health_transformation_lab.fact_judge_call v ON v.visit_id = a.visit_id AND v.call_kind_code = 'verdict' AND v.answer_status_code = a.answer_status_code\n"
+    "  FROM health_transformation_lab.gold_dental_omop_perio.fact_chart_answer a\n",
+    "  LEFT JOIN health_transformation_lab.gold_dental_omop_perio.fact_judge_call s ON s.visit_id = a.visit_id AND s.call_kind_code = 'status'\n",
+    "  LEFT JOIN health_transformation_lab.gold_dental_omop_perio.fact_judge_call v ON v.visit_id = a.visit_id AND v.call_kind_code = 'verdict' AND v.answer_status_code = a.answer_status_code\n"
    ]
   },
   {
@@ -43,7 +43,7 @@
    "queryLines": [
     "SELECT call_kind_code AS kind, call_count AS calls, chart_count AS charts, endpoint_error_count AS endpoint_errors, gate_failure_count AS gate_failures,\n",
     "  ROUND(cost_usd, 4) AS usd, ROUND(cost_per_chart_usd, 5) AS usd_per_chart, ROUND(p50_latency_seconds, 2) AS latency_p50_s,\n",
-    "  ROUND(p95_latency_seconds, 2) AS latency_p95_s, prompt_token_count AS prompt_tokens, completion_token_count AS completion_tokens FROM health_transformation_lab.gold_health_transformation_lab.judge_cost\n"
+    "  ROUND(p95_latency_seconds, 2) AS latency_p95_s, prompt_token_count AS prompt_tokens, completion_token_count AS completion_tokens FROM health_transformation_lab.gold_dental_omop_perio.judge_cost\n"
    ]
   },
   {
@@ -52,14 +52,14 @@
    "queryLines": [
     "SELECT group_name, engine_name AS engine, ROUND(100 * entity_recall_ratio, 1) AS `caught`, ROUND(100 * char_precision_ratio, 1) AS `precision`,\n",
     "  ROUND(100 * decoy_damage_ratio, 1) AS `dental_damage`, ROUND(100 * hard_negative_damage_ratio, 1) AS `clean_changed`\n",
-    "  FROM health_transformation_lab.gold_health_transformation_lab.deid_score WHERE tier_code = 'all'\n"
+    "  FROM health_transformation_lab.gold_dental_omop_perio.deid_score WHERE tier_code = 'all'\n"
    ]
   },
   {
    "name": "deid_tiers",
    "displayName": "deid_tiers",
    "queryLines": [
-    "SELECT engine_name AS engine, tier_code AS tier, ROUND(100 * entity_recall_ratio, 1) AS `caught` FROM health_transformation_lab.gold_health_transformation_lab.deid_score WHERE tier_code <> 'all'\n"
+    "SELECT engine_name AS engine, tier_code AS tier, ROUND(100 * entity_recall_ratio, 1) AS `caught` FROM health_transformation_lab.gold_dental_omop_perio.deid_score WHERE tier_code <> 'all'\n"
    ]
   }
  ],

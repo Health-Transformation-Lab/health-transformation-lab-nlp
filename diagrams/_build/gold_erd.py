@@ -19,7 +19,7 @@ CARD = {"||": "ERmandOne", "|o": "ERzeroToOne", "o|": "ERzeroToOne", "o{": "ERze
         "|{": "ERoneToMany", "}|": "ERoneToMany"}
 HEAD, RH = 46, 22
 WIDTHS = (56, 190, 80, 380)        # keys, column, type, description
-SCHEMA = "health_transformation_lab.gold_health_transformation_lab"
+SCHEMA = "health_transformation_lab.gold_dental_omop_perio"
 
 
 # ---------- Mermaid ----------

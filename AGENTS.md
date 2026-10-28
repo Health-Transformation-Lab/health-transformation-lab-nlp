@@ -131,7 +131,7 @@ when they're next touched. `python/tests/test_sql_conventions.py` checks the gol
 
 - **Style:** lowercase snake_case names, no quoted or mixed-case identifiers. Keywords lowercase in new SQL; older
   files and the dashboard queries are uppercase, so keep one case per file. Three-part names
-  (`health_transformation_lab.gold_health_transformation_lab.fact_prediction`) outside a pipeline. CTEs, not nested subqueries;
+  (`health_transformation_lab.gold_dental_omop_perio.fact_prediction`) outside a pipeline. CTEs, not nested subqueries;
   explicit `inner join` / `left join`; no `select *` outside bronze. Each table's comment states its grain.
 - **Tables are singular**, one row per noun (`fact_prediction`, not `ai_predictions`).
 - **Gold prefixes:** `fact_<event>` one row per event or answer, with a key to each dimension it uses;
@@ -187,7 +187,7 @@ Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
 - Names: simulated files `simulated_*`, simulated methods `sim:<name>`, calibration-only methods `calib:<name>`.
 - R: base R only, matching Python to 1e-9 (`r/tests/test_parity.R`).
 - Databricks names: identical in every target (catalog `health_transformation_lab`, schemas
-  `landing_`/`bronze_`/`silver_`/`gold_health_transformation_lab`). Never add `dev_`,
+  `landing_`/`bronze_`/`silver_`/`gold_dental_omop_perio`). Never add `dev_`,
   `[dev <user>]` or per-environment prefixes or suffixes, and never use
   `mode: development` (it adds them): each environment is its own workspace.
   dev is deployed by CI on every merge to `main`; don't `bundle deploy` it from a laptop.

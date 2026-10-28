@@ -26,7 +26,7 @@ variables:
     default: health_transformation_lab
   domain:
     description: Suffix of the layer schemas (landing_, bronze_, silver_, gold_)
-    default: health_transformation_lab
+    default: dental_omop_perio
   n_people:
     description: Synthetic people to generate in the benchmark job
     default: "300"

@@ -18,10 +18,10 @@ DASH_DIR = REPO_ROOT / "databricks" / "dashboards"
 def con():
     c = duckdb.connect()
     c.execute("ATTACH ':memory:' AS health_transformation_lab")
-    c.execute("CREATE SCHEMA health_transformation_lab.gold_health_transformation_lab")
+    c.execute("CREATE SCHEMA health_transformation_lab.gold_dental_omop_perio")
     for name, df in gt.dq_tables(DATASETS_DIR).items():
         c.register(f"src_{name}", df)
-        c.execute(f"CREATE TABLE health_transformation_lab.gold_health_transformation_lab.{name} AS SELECT * FROM src_{name}")
+        c.execute(f"CREATE TABLE health_transformation_lab.gold_dental_omop_perio.{name} AS SELECT * FROM src_{name}")
     return c
 
 

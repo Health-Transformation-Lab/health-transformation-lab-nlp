@@ -55,7 +55,7 @@ def test_every_target_uses_the_same_catalog_and_domain():
     d = {k: v["default"] for k, v in root["variables"].items() if "default" in v}
     places = {env: (t.get("variables", {}).get("catalog", d["catalog"]),
                     t.get("variables", {}).get("domain", d["domain"])) for env, t in root["targets"].items()}
-    assert set(places.values()) == {("health_transformation_lab", "health_transformation_lab")}, places
+    assert set(places.values()) == {("health_transformation_lab", "dental_omop_perio")}, places
 
 
 def test_every_variable_used_is_defined():
@@ -233,7 +233,7 @@ def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
     tables = {"fact_chart_answer", "fact_judge_call", "judge_metric", "judge_agreement", "judge_cost", "deid_score"}
     for ds in dash["datasets"]:
         sql = " ".join(ds["queryLines"])
-        used = set(re.findall(r"health_transformation_lab\.gold_health_transformation_lab\.(\w+)", sql))
+        used = set(re.findall(r"health_transformation_lab\.gold_dental_omop_perio\.(\w+)", sql))
         assert used and used <= tables, ds["name"]
     for page in dash["pages"]:
         for item in page["layout"]:

@@ -9,11 +9,11 @@
         "                       THEN 1.0 ELSE 0.0 END), 1) AS completeness_pct,\n",
         "  ROUND(100 * AVG(CASE WHEN algorithm_v0 = truth_status THEN 1.0 ELSE 0.0 END), 1) AS accuracy_pct,\n",
         "  ROUND(100 * AVG(CASE WHEN algorithm_design = truth_status THEN 1.0 ELSE 0.0 END), 1) AS accuracy_design_pct,\n",
-        "  (SELECT ROUND(100 * (MAX(periodontitis) - MIN(periodontitis)), 1) FROM health_transformation_lab.gold_health_transformation_lab.dq_prevalence\n",
+        "  (SELECT ROUND(100 * (MAX(periodontitis) - MIN(periodontitis)), 1) FROM health_transformation_lab.gold_dental_omop_perio.dq_prevalence\n",
         "    WHERE level = 'clinic' AND method = 'algorithm_design') AS consistency_pts,\n",
-        "  (SELECT ROUND(100 * better, 1) FROM health_transformation_lab.gold_health_transformation_lab.dq_temporal WHERE method = 'algorithm_design') AS implausible_pct,\n",
+        "  (SELECT ROUND(100 * better, 1) FROM health_transformation_lab.gold_dental_omop_perio.dq_temporal WHERE method = 'algorithm_design') AS implausible_pct,\n",
         "  COUNT(*) AS n_visits\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n"
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n"
       ]
     },
     {
@@ -21,7 +21,7 @@
       "displayName": "missingness",
       "queryLines": [
         "SELECT evidence_column, ROUND(pct_missing, 1) AS pct_missing, n_missing, n_rows\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_completeness\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_completeness\n",
         "ORDER BY pct_missing DESC\n"
       ]
     },
@@ -30,7 +30,7 @@
       "displayName": "checks",
       "queryLines": [
         "SELECT clinic, category, check_name, n_checked, n_fail, ROUND(100 * pass_rate, 2) AS pass_pct, status\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_checks\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_checks\n",
         "ORDER BY CASE WHEN clinic = 'All' THEN 0 ELSE 1 END, clinic, category, check_name\n"
       ]
     },
@@ -41,43 +41,43 @@
         "SELECT clinic, 'Exam form' AS evidence_source,\n",
         "  CASE WHEN exam_form <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
         "  CASE WHEN exam_form = 'unknown' THEN NULL WHEN exam_form = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n",
         "UNION ALL\n",
         "\n",
         "SELECT clinic, 'Diagnosis codes, done' AS evidence_source,\n",
         "  CASE WHEN proc_dx_completed <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
         "  CASE WHEN proc_dx_completed = 'unknown' THEN NULL WHEN proc_dx_completed = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n",
         "UNION ALL\n",
         "\n",
         "SELECT clinic, 'Diagnosis codes, planned' AS evidence_source,\n",
         "  CASE WHEN proc_dx_planned <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
         "  CASE WHEN proc_dx_planned = 'unknown' THEN NULL WHEN proc_dx_planned = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n",
         "UNION ALL\n",
         "\n",
         "SELECT clinic, 'Chart note' AS evidence_source,\n",
         "  CASE WHEN notes <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
         "  CASE WHEN notes = 'unknown' THEN NULL WHEN notes = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n",
         "UNION ALL\n",
         "\n",
         "SELECT clinic, 'Gum measurements' AS evidence_source,\n",
         "  CASE WHEN probing_chart <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
         "  CASE WHEN probing_chart = 'unknown' THEN NULL WHEN probing_chart = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n",
         "UNION ALL\n",
         "\n",
         "SELECT clinic, 'Rules, measurements first (v0)' AS evidence_source,\n",
         "  CASE WHEN algorithm_v0 <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
         "  CASE WHEN algorithm_v0 = 'unknown' THEN NULL WHEN algorithm_v0 = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n",
         "UNION ALL\n",
         "\n",
         "SELECT clinic, 'Rules, exam form first (design)' AS evidence_source,\n",
         "  CASE WHEN algorithm_design <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
         "  CASE WHEN algorithm_design = 'unknown' THEN NULL WHEN algorithm_design = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n"
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_visits\n"
       ]
     },
     {
@@ -85,7 +85,7 @@
       "displayName": "concordance",
       "queryLines": [
         "SELECT method_a, method_b, ROUND(100 * pct_agree, 1) AS pct_agree, ROUND(kappa, 2) AS kappa, n\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_concordance\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_concordance\n",
         "WHERE level = 'status'\n"
       ]
     },
@@ -95,7 +95,7 @@
       "queryLines": [
         "SELECT group_name AS clinic, ROUND(100 * periodontitis, 1) AS periodontitis_pct,\n",
         "  ROUND(100 * periodontitis_ci_low, 1) AS ci_low, ROUND(100 * periodontitis_ci_high, 1) AS ci_high, n\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_prevalence\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_prevalence\n",
         "WHERE level = 'clinic' AND method = 'algorithm_design'\n",
         "ORDER BY clinic\n"
       ]
@@ -106,7 +106,7 @@
       "queryLines": [
         "SELECT method, group_name AS scale, n, ROUND(100 * periodontitis, 1) AS periodontitis_pct,\n",
         "  ROUND(100 * stage3_4, 1) AS stage3_4_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_prevalence\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_prevalence\n",
         "WHERE level = 'scale'\n",
         "ORDER BY method, scale\n"
       ]
@@ -116,7 +116,7 @@
       "displayName": "transitions",
       "queryLines": [
         "SELECT from_status, to_status, n, ROUND(row_pct, 1) AS row_pct, direction\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_transitions\n"
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_transitions\n"
       ]
     },
     {
@@ -126,7 +126,7 @@
         "SELECT method, pairs, ROUND(100 * better, 1) AS improved_pct, ROUND(100 * same, 1) AS same_pct,\n",
         "  ROUND(100 * worse, 1) AS worse_pct, ROUND(100 * perio_resolved, 1) AS resolved_pct,\n",
         "  ROUND(100 * stage_drop, 1) AS stage_drop_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_temporal\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_temporal\n",
         "ORDER BY improved_pct\n"
       ]
     },
@@ -136,7 +136,7 @@
       "queryLines": [
         "SELECT injected_errors, ROUND(100 * caught_share, 1) AS caught_pct,\n",
         "  ROUND(100 * flag_rate_without_error, 2) AS false_flag_pct\n",
-        "FROM health_transformation_lab.gold_health_transformation_lab.dq_injected_errors\n"
+        "FROM health_transformation_lab.gold_dental_omop_perio.dq_injected_errors\n"
       ]
     }
   ],
