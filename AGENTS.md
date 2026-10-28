@@ -3,6 +3,10 @@
 Rules for every coding agent working in this repo (Claude Code, Codex, Cursor, Copilot and others).
 Claude Code reads them through `CLAUDE.md`, which imports this file and adds its own workflow.
 
+Folders with their own rules have their own `AGENTS.md` (read it before working there):
+
+- `databricks/agents/chart_review/AGENTS.md`: the planned Databricks chart review agent.
+
 ## Ground rules
 
 Read `DISCLAIMER.md` and `.specify/memory/constitution.md` first. The short version:

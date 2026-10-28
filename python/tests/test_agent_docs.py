@@ -28,3 +28,17 @@ def test_claude_md_imports_agents_md_and_does_not_repeat_it():
 def test_reviews_check_against_both_files():
     for f in (".claude/review-rubric.md", ".claude/commands/pr-review.md"):
         assert "AGENTS.md" in (REPO_ROOT / f).read_text(), f
+
+
+AGENT_DIR = REPO_ROOT / "databricks" / "agents" / "chart_review"
+
+
+def test_chart_review_agent_folder_has_its_own_agent_rules():
+    """The Databricks chart review agent gets its own AGENTS.md (what it is, its tools, rules, evaluation),
+    and a CLAUDE.md that imports it, because Claude Code reads nested CLAUDE.md files, not AGENTS.md."""
+    text = (AGENT_DIR / "AGENTS.md").read_text()
+    for heading in ("## What it is", "## Rules", "## Tools", "## Output", "## Evaluation", "## Deployment", "## Layout"):
+        assert heading in text, heading
+    assert "spec" in text.lower() and "agent:chart_review" in text          # needs a spec; how its results are named
+    assert (AGENT_DIR / "CLAUDE.md").read_text().strip().splitlines()[-1] == "@AGENTS.md"
+    assert "databricks/agents/chart_review/AGENTS.md" in AGENTS.read_text()  # the root file points to it
