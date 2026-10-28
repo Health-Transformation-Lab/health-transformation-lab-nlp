@@ -13,6 +13,7 @@ erDiagram
     fact_prediction ||..o| judge_queue : "sampled from"
     judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
     dim_grader_question ||--o{ fact_grader_answer : "question_id"
+    dim_study_note }o..o{ benchmark_metric : "run_id (its test split)"
     review_key
     dim_result_file
     fact_prediction
@@ -35,3 +36,5 @@ erDiagram
     dq_injected_error
     dim_grader_question
     fact_grader_answer
+    dim_study_note
+    benchmark_metric

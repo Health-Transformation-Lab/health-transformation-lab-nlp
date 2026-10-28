@@ -55,10 +55,13 @@ while old judge calls are unmigrated, so it never pays for them twice. The decis
 `gold_names.migration_plan` (tested). Old tables aren't dropped: the task prints the `DROP TABLE` statements to run
 after checking.
 
-Jobs that haven't run in the workspace yet write more tables to gold: `study_benchmark`
-(`01_run_benchmark.py`) writes `person`, `visit_occurrence`, `measurement`, `note` (OMOP, official names),
-`labeled_notes` and `benchmark_results`, and `encoder_gpu` writes `encoder_gpu_predictions`. Those three get
-convention names when they're next changed; they aren't in the data model yet.
+The Benchmark job (`study_benchmark`, `01_run_benchmark.py`) writes `person`, `visit_occurrence`, `measurement`,
+`note` (OMOP, official names) and, since spec 026, `dim_study_note` (the labelled study notes, overwritten each run)
+and `benchmark_metric` (the scores, replaced per job run, so a retry adds nothing). They were `labeled_notes` and
+`benchmark_results`; the migration carries those over, keeping every earlier benchmark run. The GPU encoder job
+(`encoder_gpu`) writes its predictions to `fact_prediction` with `source_code` databricks, replaced per job run
+and method, as the MedGemma reader does; the old `encoder_gpu_predictions` table was never written in a
+workspace.
 
 Also in the schema, though not tables: the Unity Catalog model `perio_note_classifier`
 (`databricks/resources/mlops.yml`). The one function the Catalog Explorer lists isn't created by this
@@ -158,8 +161,5 @@ two jobs replaced each other's table; each now has its own.
 
 - The scorecard keeps an earlier judge call only for the same endpoint and the current prompt version
   (`judge_scorecard.reusable`); a new endpoint asks, and pays for, every call again.
-- `encoder_gpu_predictions` (the `encoder_gpu` job) is written by plain append with no batch key
-  (`08_encoder_gpu.py`), so a rerun adds the same predictions again: against AGENTS.md, "Failures, retries
-  and reruns". It isn't in the data model yet.
 - `simulated_*` files are never loaded. `fact_judge_call.is_simulated = true` marks a simulated judge's rows:
   label anything built from them as simulated wherever it's shown.

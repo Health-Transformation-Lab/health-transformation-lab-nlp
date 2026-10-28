@@ -21,7 +21,9 @@ def test_the_model_declares_the_gold_tables_the_jobs_write():
                     # spec 019: the EHR DQ grader
                     "dq_check", "dq_column_missing", "dq_prevalence", "dq_temporal_change", "dq_stage_transition",
                     "dq_source_concordance", "fact_visit_evidence", "dq_injected_error",
-                    "dim_grader_question", "fact_grader_answer"}
+                    "dim_grader_question", "fact_grader_answer",
+                    # spec 026: the Benchmark job's tables
+                    "dim_study_note", "benchmark_metric"}
 
 
 def test_every_relationship_joins_declared_columns():
