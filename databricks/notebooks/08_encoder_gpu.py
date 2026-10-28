@@ -11,6 +11,9 @@
 # MAGIC Predictions are copied to the landing volume (`encoder_gpu/`) and appended to the table
 # MAGIC `encoder_gpu_predictions` in the gold schema. To score them with the other models, copy the CSVs into
 # MAGIC `data/datasets/`, then run `python/scripts/28_ladder_vs_truth.py` and `35_readme_results.py`.
+# MAGIC
+# MAGIC No GPU free? The *Fine-tune the GPU encoders on a free Kaggle GPU* workflow does the same work on Kaggle
+# MAGIC (`kaggle/encoder_gpu.ipynb`, with this job's `encoder_gpu_rungs` and `encoder_gpu_lr`) and commits the results.
 
 # COMMAND ----------
 

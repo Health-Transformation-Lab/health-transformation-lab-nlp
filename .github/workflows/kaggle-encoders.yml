@@ -1,0 +1,151 @@
+# Fine-tune the GPU encoders of spec 002 T017 on a free Kaggle GPU (kaggle/encoder_gpu.ipynb): the Databricks
+# encoder_gpu job's work, for when Databricks Free Edition has no GPU. Start it from the Actions tab:
+# "Fine-tune the GPU encoders on a free Kaggle GPU" -> Run workflow.
+#
+# Needs, in the GitHub environment `dev`: KAGGLE_USERNAME (variable or secret) and either KAGGLE_API_TOKEN
+# or KAGGLE_KEY (secret), the same as kaggle-medgemma.yml. No Hugging Face token: every encoder is public.
+# The rungs and learning rates default to the Databricks job's (databricks.yml encoder_gpu_rungs, encoder_gpu_lr;
+# a test keeps them in step).
+name: Fine-tune the GPU encoders on a free Kaggle GPU
+run-name: "GPU encoders on Kaggle: ${{ inputs.limit == '0' && 'full run' || format('{0}-note test', inputs.limit) }}${{ inputs.collect_only && ' (collect results only)' || '' }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Review notes to predict: 10 for a test (1 epoch), 0 for the full run (all 240, a few hours: set wait off)"
+        default: "10"
+      rungs:
+        description: "Encoders to fine-tune, comma-separated (models.yaml)"
+        default: modernbert-large,bioclinical-modernbert-large,longformer-base,clinical-longformer,gatortron-base
+      lr_overrides:
+        description: "Learning-rate overrides, rung=rate, comma-separated (the others train at 5e-5)"
+        default: gatortron-base=2e-5
+      epochs:
+        description: "Training epochs (full run)"
+        default: "3"
+      branch:
+        description: "Branch the notebook clones (empty: the one picked in \"Use workflow from\", at this run's commit)"
+        default: ""
+      wait:
+        description: "Wait for Kaggle to finish and keep the outputs as an artifact"
+        type: boolean
+        default: true
+      collect_only:
+        description: "Don't run: only download the outputs of the last Kaggle run"
+        type: boolean
+        default: false
+      open_pr:
+        description: "Open a pull request that commits the results (a full run; a smaller test run is never committed)"
+        type: boolean
+        default: true
+
+concurrency: kaggle-encoders
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment: dev
+    timeout-minutes: 350
+    permissions:
+      contents: write          # push the results branch
+      pull-requests: write     # open the PR (spec 016)
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - run: pip install --quiet "kaggle==2.2.5" pyyaml   # pyyaml: prepare_kernel.py reads databricks.yml
+
+      - name: Kaggle credentials (values stay masked)
+        env:
+          U: ${{ vars.KAGGLE_USERNAME || secrets.KAGGLE_USERNAME }}
+          T: ${{ secrets.KAGGLE_API_TOKEN }}
+          K: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          [ -n "$U" ] || { echo "::error::KAGGLE_USERNAME is not set in the GitHub environment 'dev' (variable or secret)"; exit 1; }
+          echo "KAGGLE_USERNAME=$U" >> "$GITHUB_ENV"
+          # As in kaggle-medgemma.yml: a new-style API token, or a legacy key; a token saved as KAGGLE_KEY works too.
+          tok="${T:-$K}"
+          [ -n "$tok" ] || { echo "::error::Set KAGGLE_API_TOKEN (or KAGGLE_KEY) in the GitHub environment 'dev'"; exit 1; }
+          echo "KAGGLE_API_TOKEN=$tok" >> "$GITHUB_ENV"
+          [ -n "$K" ] && echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"
+          echo "KERNEL=$U/dental-omop-encoder-gpu" >> "$GITHUB_ENV"
+
+      - name: Check Kaggle accepts the credentials
+        run: |
+          kaggle kernels list --mine --page-size 1 >/dev/null 2>err.txt || {
+            cat err.txt | head -5
+            echo "::error::Kaggle rejected the credentials. Kaggle -> Settings -> API -> Generate New Token, save it as the secret KAGGLE_API_TOKEN in the GitHub environment 'dev', and check KAGGLE_USERNAME is your Kaggle username (the name in kaggle.com/<username>), not your email."
+            exit 1; }
+          echo "Kaggle accepted the credentials"
+
+      - name: Prepare the notebook
+        if: ${{ !inputs.collect_only }}
+        run: >
+          python kaggle/prepare_kernel.py --job encoders --out build/kernel --username "$KAGGLE_USERNAME"
+          --rungs "${{ inputs.rungs }}" --lr-overrides "${{ inputs.lr_overrides }}" --epochs "${{ inputs.epochs }}"
+          --limit "${{ inputs.limit }}"
+          --branch "${{ inputs.branch || github.ref_name }}"
+          --commit "${{ (inputs.branch == '' || inputs.branch == github.ref_name) && github.sha || '' }}"
+
+      - name: Push and run it on Kaggle (GPU T4 x2)
+        if: ${{ !inputs.collect_only }}
+        run: kaggle kernels push -p build/kernel --accelerator NvidiaTeslaT4
+
+      - name: Wait for Kaggle to finish
+        if: ${{ inputs.wait || inputs.collect_only }}
+        run: |
+          for i in $(seq 1 330); do
+            s=$(kaggle kernels status "$KERNEL" 2>&1); echo "$(date -u +%H:%M) $s"
+            case "${s,,}" in
+              *complete*) exit 0 ;;
+              *error*|*cancel*) echo "::error::Kaggle run did not finish: $s (rungs that finished are still collected)"; exit 1 ;;
+            esac
+            sleep 60
+          done
+          echo "::error::still running after 330 minutes; run again later with collect_only"; exit 1
+
+      - name: Download the outputs and the log
+        if: ${{ always() && (inputs.wait || inputs.collect_only) }}
+        run: |
+          mkdir -p build/output
+          kaggle kernels output "$KERNEL" -p build/output || true
+          ls -la build/output
+          log=$(ls build/output/*.log 2>/dev/null | head -1)
+          if [ -n "$log" ]; then echo "---- end of the Kaggle log (warnings left out) ----"; python kaggle/show_log.py "$log"; fi
+
+      # Spec 016: commit the results so they're versioned and the Load results job puts them in Delta. Runs after
+      # a failed rung too: the rungs that finished are full runs and are kept. The branch starts from main.
+      - name: Open a pull request with the results
+        if: ${{ !cancelled() && inputs.open_pr && (inputs.wait || inputs.collect_only) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BRANCH: kaggle-results/encoders-${{ github.run_id }}
+        run: |
+          pip install --quiet -e ./python   # record_results.py uses the package (pandas, the manifest code)
+          git fetch --quiet --depth 1 origin main
+          git worktree add --quiet -b "$BRANCH" ../results origin/main
+          set +e; python kaggle/record_results.py --from build/output --to ../results/data/datasets --run-url "$RUN_URL"; rc=$?; set -e
+          if [ "$rc" = 3 ]; then echo "Nothing to commit (see above)"; exit 0; fi
+          [ "$rc" = 0 ] || exit "$rc"
+          cd ../results
+          if [ -z "$(git status --porcelain data/datasets)" ]; then echo "Results are the same as on main"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/datasets
+          git commit --quiet -m "Add GPU encoder results from Kaggle" \
+            -m "Collected by the kaggle-encoders workflow, $RUN_URL (rungs ${{ inputs.rungs }}). Synthetic review notes only. Recorded in data/datasets/results_manifest.csv; the Load results job puts them in Delta after the merge deploys."
+          git push --quiet -u origin "$BRANCH"
+          body="GPU encoder predictions (spec 002 T017: \`${{ inputs.rungs }}\`, lr overrides \`${{ inputs.lr_overrides }}\`, ${{ inputs.epochs }} epochs) on the synthetic review notes, collected from Kaggle by $RUN_URL (spec 016).
+
+          A pull request opened by the workflow token doesn't start CI: push a commit to this branch to run the checks before merging. After the merge, the dev deploy runs **Load results**, which appends these files to \`gold_dental_omop_perio.ai_predictions\` with \`source = kaggle\`. Then \`python scripts/28_ladder_vs_truth.py && python scripts/35_readme_results.py\` refreshes the README scores."
+          gh pr create --base main --head "$BRANCH" --title "Add GPU encoder results from Kaggle" --body "$body" \
+            || echo "::warning::Pushed $BRANCH but couldn't open the PR (Settings -> Actions -> General -> Allow GitHub Actions to create and approve pull requests). Open it here: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$BRANCH"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && (inputs.wait || inputs.collect_only) }}
+        with:
+          name: encoders-kaggle
+          path: build/output
+          if-no-files-found: warn
