@@ -3,9 +3,9 @@
 Rules for any coding agent working in `databricks/agents/chart_review/`. The repo-wide rules in the root
 [`AGENTS.md`](../../../AGENTS.md) apply first; this file adds what is specific to this agent.
 
-> **Status: planned, not built.** Nothing here runs yet. Building it changes the results and the review
-> workflow, so it needs a spec first (`specs/NNN-chart-review-agent/`, via `/speckit-specify`). Write the
-> spec, then the failing tests, then the code. Check Databricks APIs against the current Databricks
+> **Status: specified, not built.** Nothing here runs yet. The spec is
+> [`specs/015-chart-review-agent/spec.md`](../../../specs/015-chart-review-agent/spec.md); next come
+> `plan.md` and `tasks.md` (`/speckit-plan`, `/speckit-tasks`), then the failing tests, then the code. Check Databricks APIs against the current Databricks
 > documentation when building; the names below describe intent.
 
 ## What it is
