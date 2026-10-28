@@ -5,7 +5,7 @@ model's licence.
 
     python kaggle/publish_model.py --model-dir build/output/model \
         --predictions build/output/ai_predictions_modernbert-base+cw.csv --out build/kaggle-model \
-        --username <kaggle user> --commit <sha> [--upload --message "Trained on Kaggle"]
+        --username <kaggle user> --commit <sha the notebook trained> [--upload --message "Trained on Kaggle"]
 
 The card's scores come from --predictions, the review-set predictions of the same run that saved the weights.
 build() refuses a partial or simulated prediction file and a folder that isn't this six-label classifier.
@@ -21,7 +21,6 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "python"))
 
 import pandas as pd
-
 from health_transformation_lab_nlp.labels import LABELS
 from health_transformation_lab_nlp.ladder_eval import by_difficulty, ladder_table
 from health_transformation_lab_nlp.paths import DATASETS_DIR
@@ -75,13 +74,14 @@ def load_predictions(path: Path) -> pd.Series:
 def scores(pred: pd.Series, name: str) -> str:
     """The card's results section, from the same scoring as the repo's leaderboard (ladder_eval)."""
     key = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id")
+    n = len(key)
     row = ladder_table(key["truth_status"], {name: pred}, reference=name).iloc[0]
     diff = by_difficulty(key["truth_status"], {name: pred}, key["difficulty"]).set_index("difficulty")
     plain = {"L1": "states the 2017 diagnosis", "L2": "states it in older terms", "L3": "leaves it to the findings"}
     lines = [f"| {lev}: the note {plain.get(lev, lev)} | {int(r.n)} | {100 * r.accuracy:.1f} |"
              for lev, r in diff.iterrows()]
     return (f"## Results on the review set (synthetic, not clinical performance)\n\n"
-            f"240 synthetic review notes, scored against the generator's truth, from `{name}` of the same run.\n\n"
+            f"{n} synthetic review notes, scored against the generator's truth, from `{name}` of the same run.\n\n"
             f"- **Correct:** {100 * row.accuracy:.1f} per 100 (95% bootstrap CI {100 * row.acc_lo:.1f}-"
             f"{100 * row.acc_hi:.1f})\n"
             f"- **Unsafe errors** (could harm a patient if acted on, e.g. a missed stage 3-4): "
@@ -102,7 +102,7 @@ def build(model_dir: Path, predictions: Path, out: Path, username: str, commit: 
         if f.is_file():
             shutil.copyfile(f, out / f.name)
     card = (HERE / "cards" / "model.md").read_text().rstrip() + "\n\n" + scores(pred, predictions.name)
-    card += f"\nTrained and published from commit `{commit}` of [the repository]({REPO_URL}).\n"
+    card += f"\nTrained from commit `{commit}` of [the repository]({REPO_URL}).\n"
     meta = {"ownerSlug": username, "title": MODEL["title"], "slug": MODEL["slug"], "subtitle": MODEL["subtitle"],
             "isPrivate": False, "description": card, "publishTime": "", "provenanceSources": ""}
     inst = {"ownerSlug": username, "modelSlug": MODEL["slug"], "instanceSlug": INSTANCE["slug"],
@@ -126,7 +126,12 @@ def upload(folder: Path, model_ref: str, instance_slug: str, notes: str, api) ->
     """Create the model (public) and its transformers instance, or add an instance version. Returns the URL."""
     try:
         api.model_get(model_ref)
+        model_exists = True
     except Exception:  # noqa: BLE001 - a missing model is an HTTP error here; another failure resurfaces below
+        model_exists = False
+    if model_exists:            # a version sends files only: the card (scores, commit) is updated separately
+        _ok(api.model_update(str(folder)), model_ref)
+    else:
         _ok(api.model_create_new(str(folder)), model_ref)
         print(f"created {model_ref}")
     ref = f"{model_ref}/transformers/{instance_slug}"
@@ -136,6 +141,7 @@ def upload(folder: Path, model_ref: str, instance_slug: str, notes: str, api) ->
     except Exception:  # noqa: BLE001
         exists = False
     if exists:
+        _ok(api.model_instance_update(str(folder)), ref)
         resp = _ok(api.model_instance_version_create(ref, str(folder), notes, dir_mode="zip"), ref)
     else:
         resp = _ok(api.model_instance_create(str(folder), dir_mode="zip"), ref)

@@ -3,7 +3,7 @@
 ModernBERT-base fine-tuned to read a dental chart note and give the patient's periodontal status at that visit,
 under the 2017 AAP/EFP classification: one of six labels, `healthy`, `gingivitis`, or `periodontitis_stage_1`
 to `periodontitis_stage_4`. The loss is weighted by the square root of inverse class frequency, so the rare
-stages count for more. It is the top fine-tuned encoder on the repo's leaderboard before the stage IV keyword rule is added.
+stages count for more.
 
 **Trained and scored on synthetic notes only**, by a personal learning project that is **not affiliated** with
 any employer, institution or company. The scores below are against the generator's own truth: **not clinical

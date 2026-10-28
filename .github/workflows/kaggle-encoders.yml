@@ -50,7 +50,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     environment: dev
-    timeout-minutes: 350
+    timeout-minutes: 360
     permissions:
       contents: write          # push the results branch
       pull-requests: write     # open the PR (spec 016)
@@ -99,7 +99,7 @@ jobs:
       - name: Wait for Kaggle to finish
         if: ${{ inputs.wait || inputs.collect_only }}
         run: |
-          for i in $(seq 1 330); do
+          for i in $(seq 1 315); do   # leaves time to collect, record and publish
             s=$(kaggle kernels status "$KERNEL" 2>&1); echo "$(date -u +%H:%M) $s"
             case "${s,,}" in
               *complete*) exit 0 ;;
@@ -107,7 +107,7 @@ jobs:
             esac
             sleep 60
           done
-          echo "::error::still running after 330 minutes; run again later with collect_only"; exit 1
+          echo "::error::still running after 315 minutes; run again later with collect_only"; exit 1
 
       - name: Download the outputs and the log
         if: ${{ always() && (inputs.wait || inputs.collect_only) }}
@@ -155,9 +155,12 @@ jobs:
           set -o pipefail                      # a refused upload must fail the step, not tee
           [ -f build/output/saved_model.json ] || { echo "::error::No saved_model.json in the Kaggle output: did ${{ inputs.save_model }} fail?"; exit 1; }
           pip install --quiet -e ./python
-          pred=$(python -c 'import json; print(json.load(open("build/output/saved_model.json"))["predictions"])')
+          # the notebook's own record: which predictions the weights made, and the commit it trained (not this
+          # run's: a collect_only run, or another branch, would name the wrong one)
+          read -r full pred commit < <(python -c 'import json; s = json.load(open("build/output/saved_model.json")); print(s["full_run"], s["predictions"], s["commit"])')
+          [ "$full" = True ] || { echo "::error::The Kaggle run that saved the model was a test run; publish only a full run"; exit 1; }
           python kaggle/publish_model.py --model-dir build/output/model --predictions "build/output/$pred" \
-            --out build/kaggle-model --username "$KAGGLE_USERNAME" --commit "${{ github.sha }}" --upload \
+            --out build/kaggle-model --username "$KAGGLE_USERNAME" --commit "$commit" --upload \
             --message "Trained on Kaggle by ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             | tee -a "$GITHUB_STEP_SUMMARY"
 

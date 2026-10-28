@@ -153,6 +153,14 @@ class _Api:
         self.calls.append("model")
         return self.resp
 
+    def model_update(self, folder):
+        self.calls.append("model card")
+        return self.resp
+
+    def model_instance_update(self, folder):
+        self.calls.append("instance card")
+        return self.resp
+
     def model_instance_create(self, folder, **kw):
         self.calls.append(("instance", kw.get("dir_mode")))
         return self.resp
@@ -168,9 +176,10 @@ def test_upload_creates_the_model_and_instance_then_versions(tmp_path):
     api = _Api()
     pm.upload(tmp_path, "o/perio-bench-note-classifier", "modernbert-base-cw", "n (abc)", api)
     assert api.calls == ["model", ("instance", "zip")]
-    api = _Api(model=True, instance=True)
+    api = _Api(model=True, instance=True)       # a new version also refreshes both cards: scores of this run
     pm.upload(tmp_path, "o/perio-bench-note-classifier", "modernbert-base-cw", "n (abc)", api)
-    assert api.calls == [("version", "o/perio-bench-note-classifier/transformers/modernbert-base-cw", "n (abc)")]
+    assert api.calls == ["model card", "instance card",
+                         ("version", "o/perio-bench-note-classifier/transformers/modernbert-base-cw", "n (abc)")]
 
 
 def test_upload_fails_when_kaggle_says_no(tmp_path):
@@ -189,5 +198,8 @@ def test_workflow_publishes_the_model_only_after_a_full_run():
     step = next(s for s in wf["jobs"]["run"]["steps"] if s.get("name", "").startswith("Publish the model"))
     assert "inputs.save_model != ''" in step["if"] and "inputs.limit == '0'" in step["if"]
     assert "kaggle/publish_model.py" in step["run"] and "--upload" in step["run"]
+    # the card names the commit the notebook trained (saved_model.json), not this workflow run's
+    assert '--commit "$commit"' in step["run"] and "github.sha" not in step["run"]
+    assert 'rev-parse", "HEAD"' in _code() and '"commit": commit.strip()' in _code()
     artifact = next(s for s in wf["jobs"]["run"]["steps"] if "upload-artifact" in s.get("uses", ""))
     assert "!build/output/model" in artifact["with"]["path"]     # the weights go to Kaggle, not the artifact

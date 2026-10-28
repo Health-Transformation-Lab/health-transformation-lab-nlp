@@ -62,7 +62,8 @@ fine-tuned weights (`/kaggle/working/model`), and after the full run the workflo
 `publish_model.py`: the model `perio-bench-note-classifier` public the first time, its transformers instance
 `modernbert-base-cw`, then a new version per run. The card is `cards/model.md` plus the scores of that same run's
 review-set predictions (the leaderboard's scoring); a test run (`limit` 10) is never published. The weights go to
-Kaggle, not the workflow artifact.
+Kaggle, not the workflow artifact. A full run takes hours: to collect it later, run the workflow again with
+**`collect_only`** on and the same `save_model` and `limit` 0. The card names the commit the notebook trained.
 
 ## The collection
 
