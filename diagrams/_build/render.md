@@ -19,3 +19,14 @@ python3 build_drawio.py && python3 render_drawio.py ../*.drawio
 `mmdc -i 01_run_order.mmd -o 01_run_order.png -s 2 -b white`.
 
 PNGs next to each source were rendered this way at 2×.
+
+**Gold diagrams** (`../gold/`), built the way jcbowyer/DE_Assessment builds its data model and architecture diagrams:
+`gold_model.py` declares the gold tables (`python/tests/test_gold_model.py` checks it against the CSV twins and
+`results_store`), `gold_erd.py` writes the entity and full ERDs (`.drawio` and `.mmd`, laid out for the fewest
+crossing lines) and `gold/data_model.md`, and `gold_architecture.py` writes the logical and physical architecture.
+`drawio_render.js` renders `../gold/source/*.drawio` to `../gold/*.png`, with the diagram embedded so draw.io can open the PNG:
+
+```bash
+python3 gold_erd.py && python3 gold_architecture.py
+npm install playwright && node drawio_render.js        # VIEWER=http://localhost:8765/js/viewer-static.min.js with the local webapp above
+```

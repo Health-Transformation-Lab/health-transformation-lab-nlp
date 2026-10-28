@@ -54,8 +54,6 @@ Everything this repo relies on, and what it's used for.
 
 19. **Overjet.** *How to detect periodontal disease with AI* (bone level measurement, FDA 510(k) K210187).
     [overjet.com](https://www.overjet.com/blog/how-to-detect-periodontal-disease-with-ai)
-20. **MATTER / CareQuest Innovation Partners.** *2026 SMILE Health cohort and newest ACCELERATE pilots*, June 2026.
-    [matter.health](https://matter.health/posts/carequest-innovation-partners-2026-smile-health-cohort-accelerate-pilots/)
 21. **Yavuz MB, et al.** AI detection of periodontal status in bitewing radiographs. EuroPerio10, 2022.
     [Dental Tribune summary](https://www.dental-tribune.com/news/artificial-intelligence-shows-promise-for-detecting-periodontal-status-in-bitewing-radiographs/)
 
@@ -128,6 +126,14 @@ Everything this repo relies on, and what it's used for.
 14. **Fleiss JL.** *Measuring nominal scale agreement among many raters.*
     Psychol Bull 1971;76(5):378–382. → Reviewer reliability.
 15. **Cohen J.** *Weighted kappa.* Psychol Bull 1968;70(4):213–220. → Ordinal agreement.
+51. **Patel JS, et al.** *Developing and testing a prediction model for periodontal disease using machine
+    learning and big electronic dental record data.* Frontiers in Artificial Intelligence 2022.
+    doi:10.3389/frai.2022.979525. → Design of the status classifier (`classify_status.py`, spec 013 G10):
+    XGBoost, 80/20 split, 5-fold cross-validated hyperparameters, one-vs-all metrics. Whether it used SHAP
+    was not checked against the full text; SHAP here is this repo's choice.
+52. **Lundberg SM, Erion G, Chen H, et al.** *From local explanations to global understanding with
+    explainable AI for trees.* Nature Machine Intelligence 2020;2:56–67. → TreeSHAP, the exact SHAP values
+    XGBoost computes (`pred_contribs`) for the status classifier.
 
 ## De-identification
 
