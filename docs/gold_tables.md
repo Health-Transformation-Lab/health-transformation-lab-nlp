@@ -58,7 +58,9 @@ after checking.
 The Benchmark job (`study_benchmark`, `01_run_benchmark.py`) writes `person`, `visit_occurrence`, `measurement`,
 `note` (OMOP, official names) and, since spec 026, `dim_study_note` (the labelled study notes, overwritten each run)
 and `benchmark_metric` (the scores, replaced per job run, so a retry adds nothing). They were `labeled_notes` and
-`benchmark_results`; the migration carries those over, keeping every earlier benchmark run. The GPU encoder job
+`benchmark_results`; the migration carries those over, keeping every earlier benchmark run. Rows carried from
+`benchmark_results` have no job run, so their `run_id`, `run_ts` and `git_commit_sha` are null; `model_run_id` keys them,
+and no job's delete by `run_id` touches them. The GPU encoder job
 (`encoder_gpu`) writes its predictions to `fact_prediction` with `source_code` databricks, replaced per job run
 and method, as the MedGemma reader does; the old `encoder_gpu_predictions` table was never written in a
 workspace.
