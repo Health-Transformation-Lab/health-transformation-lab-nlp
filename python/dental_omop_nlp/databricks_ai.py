@@ -94,6 +94,19 @@ def check_settings() -> dict:
 
 
 @traced
+def wait_for(out: dict, get, timeout_s: int = 600, sleep=time.sleep) -> list[list]:
+    """Rows of a statement, checking again every 5 s while it's PENDING or RUNNING (a statement can outlast
+    the 50 s the first call waits). Raises with Databricks' message if it fails or times out."""
+    t0 = time.time()
+    while out["status"]["state"] in ("PENDING", "RUNNING") and time.time() - t0 < timeout_s:
+        sleep(5)
+        out = get(out["statement_id"])
+    if out["status"]["state"] != "SUCCEEDED":
+        raise RuntimeError(f"statement {out['status']['state']}: {out['status'].get('error', {}).get('message', '')[:300]}")
+    return out.get("result", {}).get("data_array") or []
+
+
+@traced
 def sql_execute(sql: str, params: list[dict], timeout_s: int = 600) -> list[list]:  # pragma: no cover - network
     """Run one statement on the warehouse and return its rows."""
     s = check_settings()
@@ -107,13 +120,7 @@ def sql_execute(sql: str, params: list[dict], timeout_s: int = 600) -> list[list
 
     out = call("POST", "/api/2.0/sql/statements", {"warehouse_id": s["warehouse"], "statement": sql,
                                                    "parameters": params, "wait_timeout": "50s"})
-    t0 = time.time()
-    while out["status"]["state"] in ("PENDING", "RUNNING") and time.time() - t0 < timeout_s:
-        time.sleep(5)
-        out = call("GET", f"/api/2.0/sql/statements/{out['statement_id']}")
-    if out["status"]["state"] != "SUCCEEDED":
-        raise RuntimeError(f"statement {out['status']['state']}: {out['status'].get('error', {}).get('message', '')[:300]}")
-    return out.get("result", {}).get("data_array") or []
+    return wait_for(out, lambda sid: call("GET", f"/api/2.0/sql/statements/{sid}"), timeout_s)
 
 
 @traced

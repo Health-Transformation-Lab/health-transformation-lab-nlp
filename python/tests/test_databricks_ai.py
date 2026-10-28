@@ -134,3 +134,24 @@ def test_script_simulate_writes_only_simulated_files(tmp_path):
 def test_script_without_settings_stops_and_names_them(tmp_path):
     r = _script("--out", str(tmp_path), "--limit", "2")
     assert r.returncode != 0 and "DATABRICKS_WAREHOUSE_ID" in (r.stdout + r.stderr)
+
+
+# ---- waiting for a statement (ai_mask failed when one was still PENDING after 50 s)
+
+def test_wait_polls_until_the_statement_finishes():
+    states = iter([{"status": {"state": "RUNNING"}, "statement_id": "s"},
+                   {"status": {"state": "SUCCEEDED"}, "result": {"data_array": [["x"]]}}])
+    first = {"status": {"state": "PENDING"}, "statement_id": "s"}
+    assert dbai.wait_for(first, get=lambda sid: next(states), sleep=lambda s: None) == [["x"]]
+
+
+def test_wait_raises_on_failure_with_the_message():
+    failed = {"status": {"state": "FAILED", "error": {"message": "quota exceeded"}}}
+    with pytest.raises(RuntimeError, match="quota exceeded"):
+        dbai.wait_for(failed, get=lambda sid: failed, sleep=lambda s: None)
+
+
+def test_ai_mask_uses_the_waiting_executor():
+    src = (REPO_ROOT / "python" / "dental_omop_nlp" / "deid.py").read_text()
+    body = src[src.index("def _ai_mask_sql"):src.index("def detect_ai_mask")]
+    assert "sql_execute(" in body and "urlopen" not in body
