@@ -34,32 +34,34 @@ Numbers are per 100 charts. What the columns mean:
 | 3–13 | [`scibert+rules4`](https://huggingface.co/allenai/scibert_scivocab_uncased) | chart note | fine-tuned encoder, + rules for stage IV | **88.8** (84.6–92.9) | 1.2 | 3.3 | 6.7 | 0.0 | 7.9 | 95% | 96% | 98% | 91% | 97% | 96 / 97 / 71 |
 | 4–13 | [`distilbert-base+rules4`](https://huggingface.co/distilbert/distilbert-base-uncased) | chart note | fine-tuned encoder, + rules for stage IV | **88.8** (84.6–92.5) | 1.7 | 2.5 | 7.1 | 0.0 | 7.5 | 96% | 95% | 97% | 93% | 97% | 95 / 97 / 72 |
 | 7–16 | `fusion_tfidf_rad+rules4` | chart note + radiograph | TF-IDF + radiograph features, + rules for stage IV | **87.1** (82.9–90.8) | 2.5 | 1.2 | 9.2 | 0.0 | 6.2 | 98% | 93% | 96% | 96% | 97% | 96 / 94 / 66 |
-| 11–17 | [`biomedbert+rules4`](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) | chart note | fine-tuned encoder, + rules for stage IV | **86.7** (82.5–90.8) | 2.1 | 2.9 | 8.3 | 0.0 | 9.2 | 96% | 94% | 97% | 92% | 97% | 94 / 94 / 68 |
+| 11–18 | [`biomedbert+rules4`](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) | chart note | fine-tuned encoder, + rules for stage IV | **86.7** (82.5–90.8) | 2.1 | 2.9 | 8.3 | 0.0 | 9.2 | 96% | 94% | 97% | 92% | 97% | 94 / 94 / 68 |
 | 8–17 | `tfidf_logreg+rules4` | chart note | TF-IDF + logistic regression, + rules for stage IV | **86.7** (82.5–90.8) | 2.9 | 1.7 | 8.8 | 0.0 | 7.1 | 97% | 92% | 96% | 95% | 97% | 96 / 97 / 63 |
-| 12–18 | [`modernbert-base+cw`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder, class-weighted | **83.8** (79.6–88.3) | 1.7 | 0.8 | 13.8 | 0.0 | 14.6 | 99% | 95% | 97% | 98% | 21% | 89 / 68 / 81 |
-| 13–22 | [`modernbert-base`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder | **82.1** (77.5–87.1) | 2.1 | 0.8 | 15.0 | 0.0 | 17.1 | 99% | 94% | 97% | 98% | 7% | 87 / 65 / 79 |
-| 14–24 | [`modernbert-base+cw+s2`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder, class-weighted, seed 2 | **81.7** (76.7–86.7) | 1.7 | 0.4 | 16.2 | 0.0 | 15.4 | 99% | 95% | 97% | 99% | 0% | 88 / 65 / 76 |
-| 15–28 | `fusion_tfidf_rad` | chart note + radiograph | TF-IDF + radiograph features | **80.8** (75.8–85.4) | 2.5 | 1.2 | 15.4 | 0.0 | 15.0 | 98% | 93% | 96% | 96% | 28% | 88 / 71 / 71 |
-| 16–24 | [`bert-base`](https://huggingface.co/google-bert/bert-base-uncased) | chart note | fine-tuned encoder | **80.8** (75.8–85.8) | 1.7 | 0.4 | 17.1 | 0.0 | 17.1 | 99% | 95% | 97% | 99% | 0% | 85 / 61 / 81 |
-| 17–27 | [`bio-clinicalbert`](https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT) | chart note | fine-tuned encoder | **80.4** (75.4–85.4) | 1.7 | 1.2 | 16.7 | 0.0 | 17.9 | 98% | 95% | 97% | 96% | 0% | 86 / 61 / 78 |
-| 15–27 | [`bert-base+cw`](https://huggingface.co/google-bert/bert-base-uncased) | chart note | fine-tuned encoder, class-weighted | **80.4** (75.4–85.8) | 2.1 | 2.1 | 15.4 | 0.0 | 19.2 | 97% | 94% | 97% | 94% | 0% | 86 / 65 / 76 |
-| 14–31 | `probing_chart` | probing chart | staged from the measurements | **80.4** (75.0–85.4) | 0.0 | 0.0 | 0.8 | 18.8 | 0.0 | 80% | 100% | 100% | 73% | 72% | 77 / 81 / 87 |
-| 17–29 | [`modernbert-base+cw+s1`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder, class-weighted, seed 1 | **80.0** (75.0–85.4) | 1.7 | 0.4 | 17.9 | 0.0 | 16.7 | 99% | 95% | 97% | 99% | 0% | 86 / 61 / 76 |
-| 19–29 | [`bioclinical-modernbert-base`](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-base) | chart note | fine-tuned encoder | **79.6** (74.6–85.0) | 2.1 | 0.8 | 17.5 | 0.0 | 17.9 | 99% | 94% | 97% | 98% | 0% | 84 / 61 / 78 |
-| 17–29 | [`scibert`](https://huggingface.co/allenai/scibert_scivocab_uncased) | chart note | fine-tuned encoder | **79.2** (74.2–84.6) | 1.2 | 3.3 | 16.2 | 0.0 | 20.0 | 95% | 96% | 98% | 91% | 0% | 87 / 65 / 71 |
-| 18–29 | [`distilbert-base`](https://huggingface.co/distilbert/distilbert-base-uncased) | chart note | fine-tuned encoder | **79.2** (74.2–84.6) | 1.7 | 2.5 | 16.7 | 0.0 | 19.6 | 96% | 95% | 97% | 93% | 0% | 86 / 65 / 72 |
-| 15–30 | `note_rules` | chart note | rules (regex) | **78.8** (73.3–83.8) | 4.2 | 3.3 | 13.8 | 0.0 | 10.0 | 95% | 88% | 94% | 90% | 97% | 100 / 100 / 25 |
-| 23–32 | `tfidf_logreg` | chart note | TF-IDF + logistic regression | **77.1** (71.7–82.5) | 2.9 | 1.7 | 18.3 | 0.0 | 19.2 | 97% | 92% | 96% | 95% | 0% | 87 / 65 / 63 |
-| 25–32 | [`biomedbert`](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) | chart note | fine-tuned encoder | **77.1** (71.7–82.9) | 2.1 | 2.9 | 17.9 | 0.0 | 21.2 | 96% | 94% | 97% | 92% | 0% | 85 / 61 / 68 |
-| 17–31 | [`medgemma-1.5-4b-it+rules4`](https://huggingface.co/google/medgemma-1.5-4b-it) | chart note | zero-shot LLM, + rules for stage IV | **77.1** (71.2–82.5) | 3.3 | 4.2 | 15.4 | 0.0 | 9.6 | 94% | 90% | 95% | 88% | 97% | 100 / 100 / 19 |
-| 19–32 | [`medgemma-1.5-4b-it`](https://huggingface.co/google/medgemma-1.5-4b-it) | chart note | zero-shot LLM | **75.8** (70.0–80.8) | 3.3 | 4.2 | 16.7 | 0.0 | 10.8 | 94% | 90% | 95% | 88% | 86% | 100 / 97 / 16 |
-| 26–32 | `algorithm_design` | whole record | rules, study-design order: exam form, diagnosis codes, note, chart | **72.1** (66.2–77.5) | 5.0 | 0.8 | 22.1 | 0.0 | 15.0 | 99% | 86% | 93% | 97% | 66% | 70 / 81 / 74 |
-| 33 | `exam_form` | exam form | status field as entered | **62.1** (56.7–68.3) | 4.2 | 0.0 | 20.0 | 13.8 | 15.0 | 87% | 88% | 93% | 79% | 62% | 62 / 71 / 57 |
-| 34–36 | `proc_codes_planned` | procedure codes, planned | CDT code mapped to status | **50.8** (44.6–57.5) | 0.0 | 0.0 | 42.9 | 6.2 | 27.6 | 90% | 100% | 100% | 85% | 0% | 54 / 39 / 50 |
-| 34–37 | `proc_dx_planned` | diagnosis codes, planned procedures | ICD-10 code mapped to status | **50.0** (43.3–56.7) | 3.8 | 0.0 | 15.8 | 30.4 | 18.6 | 67% | 89% | 92% | 60% | 0% | 48 / 48 / 56 |
-| 35–37 | `proc_codes_completed` | procedure codes, completed | CDT code mapped to status | **47.1** (40.8–53.3) | 0.0 | 0.0 | 37.5 | 15.4 | 25.6 | 76% | 100% | 100% | 69% | 0% | 50 / 35 / 47 |
-| 35–37 | `proc_dx_completed` | diagnosis codes, completed procedures | ICD-10 code mapped to status | **45.0** (39.2–50.8) | 2.9 | 6.7 | 15.0 | 30.4 | 26.9 | 57% | 92% | 93% | 53% | 0% | 44 / 29 / 54 |
-| 38 | `radiograph_ai` | radiograph AI | bone-loss reading mapped to stage | **17.5** (12.9–22.5) | 0.0 | 0.0 | 14.2 | 68.3 | 31.6 | 49% | 100% | 100% | 51% | 0% | 15 / 23 / 21 |
+| 12–20 | [`modernbert-base+cw`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder, class-weighted | **83.8** (79.6–88.3) | 1.7 | 0.8 | 13.8 | 0.0 | 14.6 | 99% | 95% | 97% | 98% | 21% | 89 / 68 / 81 |
+| 11–27 | [`llama-3.3-70b-instruct`](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) | chart note | zero-shot LLM | **83.8** (78.8–88.3) | 4.2 | 2.1 | 10.0 | 0.0 | 7.1 | 97% | 88% | 94% | 94% | 97% | 96 / 94 / 54 |
+| 11–27 | [`llama-3.3-70b-instruct+rules4`](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) | chart note | zero-shot LLM, + rules for stage IV | **83.8** (78.8–88.3) | 4.2 | 2.1 | 10.0 | 0.0 | 7.1 | 97% | 88% | 94% | 94% | 97% | 96 / 94 / 54 |
+| 13–24 | [`modernbert-base`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder | **82.1** (77.5–87.1) | 2.1 | 0.8 | 15.0 | 0.0 | 17.1 | 99% | 94% | 97% | 98% | 7% | 87 / 65 / 79 |
+| 14–26 | [`modernbert-base+cw+s2`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder, class-weighted, seed 2 | **81.7** (76.7–86.7) | 1.7 | 0.4 | 16.2 | 0.0 | 15.4 | 99% | 95% | 97% | 99% | 0% | 88 / 65 / 76 |
+| 16–26 | [`bert-base`](https://huggingface.co/google-bert/bert-base-uncased) | chart note | fine-tuned encoder | **80.8** (75.8–85.8) | 1.7 | 0.4 | 17.1 | 0.0 | 17.1 | 99% | 95% | 97% | 99% | 0% | 85 / 61 / 81 |
+| 16–30 | `fusion_tfidf_rad` | chart note + radiograph | TF-IDF + radiograph features | **80.8** (75.8–85.4) | 2.5 | 1.2 | 15.4 | 0.0 | 15.0 | 98% | 93% | 96% | 96% | 28% | 88 / 71 / 71 |
+| 15–29 | [`bert-base+cw`](https://huggingface.co/google-bert/bert-base-uncased) | chart note | fine-tuned encoder, class-weighted | **80.4** (75.4–85.8) | 2.1 | 2.1 | 15.4 | 0.0 | 19.2 | 97% | 94% | 97% | 94% | 0% | 86 / 65 / 76 |
+| 17–29 | [`bio-clinicalbert`](https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT) | chart note | fine-tuned encoder | **80.4** (75.4–85.4) | 1.7 | 1.2 | 16.7 | 0.0 | 17.9 | 98% | 95% | 97% | 96% | 0% | 86 / 61 / 78 |
+| 14–33 | `probing_chart` | probing chart | staged from the measurements | **80.4** (75.0–85.4) | 0.0 | 0.0 | 0.8 | 18.8 | 0.0 | 80% | 100% | 100% | 73% | 72% | 77 / 81 / 87 |
+| 18–31 | [`modernbert-base+cw+s1`](https://huggingface.co/answerdotai/ModernBERT-base) | chart note | fine-tuned encoder, class-weighted, seed 1 | **80.0** (75.0–85.4) | 1.7 | 0.4 | 17.9 | 0.0 | 16.7 | 99% | 95% | 97% | 99% | 0% | 86 / 61 / 76 |
+| 19–31 | [`bioclinical-modernbert-base`](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-base) | chart note | fine-tuned encoder | **79.6** (74.6–85.0) | 2.1 | 0.8 | 17.5 | 0.0 | 17.9 | 99% | 94% | 97% | 98% | 0% | 84 / 61 / 78 |
+| 19–31 | [`distilbert-base`](https://huggingface.co/distilbert/distilbert-base-uncased) | chart note | fine-tuned encoder | **79.2** (74.2–84.6) | 1.7 | 2.5 | 16.7 | 0.0 | 19.6 | 96% | 95% | 97% | 93% | 0% | 86 / 65 / 72 |
+| 19–31 | [`scibert`](https://huggingface.co/allenai/scibert_scivocab_uncased) | chart note | fine-tuned encoder | **79.2** (74.2–84.6) | 1.2 | 3.3 | 16.2 | 0.0 | 20.0 | 95% | 96% | 98% | 91% | 0% | 87 / 65 / 71 |
+| 17–32 | `note_rules` | chart note | rules (regex) | **78.8** (73.3–83.8) | 4.2 | 3.3 | 13.8 | 0.0 | 10.0 | 95% | 88% | 94% | 90% | 97% | 100 / 100 / 25 |
+| 25–34 | `tfidf_logreg` | chart note | TF-IDF + logistic regression | **77.1** (71.7–82.5) | 2.9 | 1.7 | 18.3 | 0.0 | 19.2 | 97% | 92% | 96% | 95% | 0% | 87 / 65 / 63 |
+| 26–34 | [`biomedbert`](https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext) | chart note | fine-tuned encoder | **77.1** (71.7–82.9) | 2.1 | 2.9 | 17.9 | 0.0 | 21.2 | 96% | 94% | 97% | 92% | 0% | 85 / 61 / 68 |
+| 19–33 | [`medgemma-1.5-4b-it+rules4`](https://huggingface.co/google/medgemma-1.5-4b-it) | chart note | zero-shot LLM, + rules for stage IV | **77.1** (71.2–82.5) | 3.3 | 4.2 | 15.4 | 0.0 | 9.6 | 94% | 90% | 95% | 88% | 97% | 100 / 100 / 19 |
+| 21–34 | [`medgemma-1.5-4b-it`](https://huggingface.co/google/medgemma-1.5-4b-it) | chart note | zero-shot LLM | **75.8** (70.0–80.8) | 3.3 | 4.2 | 16.7 | 0.0 | 10.8 | 94% | 90% | 95% | 88% | 86% | 100 / 97 / 16 |
+| 28–34 | `algorithm_design` | whole record | rules, study-design order: exam form, diagnosis codes, note, chart | **72.1** (66.2–77.5) | 5.0 | 0.8 | 22.1 | 0.0 | 15.0 | 99% | 86% | 93% | 97% | 66% | 70 / 81 / 74 |
+| 35 | `exam_form` | exam form | status field as entered | **62.1** (56.7–68.3) | 4.2 | 0.0 | 20.0 | 13.8 | 15.0 | 87% | 88% | 93% | 79% | 62% | 62 / 71 / 57 |
+| 36–38 | `proc_codes_planned` | procedure codes, planned | CDT code mapped to status | **50.8** (44.6–57.5) | 0.0 | 0.0 | 42.9 | 6.2 | 27.6 | 90% | 100% | 100% | 85% | 0% | 54 / 39 / 50 |
+| 36–39 | `proc_dx_planned` | diagnosis codes, planned procedures | ICD-10 code mapped to status | **50.0** (43.3–56.7) | 3.8 | 0.0 | 15.8 | 30.4 | 18.6 | 67% | 89% | 92% | 60% | 0% | 48 / 48 / 56 |
+| 37–39 | `proc_codes_completed` | procedure codes, completed | CDT code mapped to status | **47.1** (40.8–53.3) | 0.0 | 0.0 | 37.5 | 15.4 | 25.6 | 76% | 100% | 100% | 69% | 0% | 50 / 35 / 47 |
+| 37–39 | `proc_dx_completed` | diagnosis codes, completed procedures | ICD-10 code mapped to status | **45.0** (39.2–50.8) | 2.9 | 6.7 | 15.0 | 30.4 | 26.9 | 57% | 92% | 93% | 53% | 0% | 44 / 29 / 54 |
+| 40 | `radiograph_ai` | radiograph AI | bone-loss reading mapped to stage | **17.5** (12.9–22.5) | 0.0 | 0.0 | 14.2 | 68.3 | 31.6 | 49% | 100% | 100% | 51% | 0% | 15 / 23 / 21 |
 
 **Not run yet:** [`modernbert-large`](https://huggingface.co/answerdotai/ModernBERT-large) (needs a GPU); [`longformer-base`](https://huggingface.co/allenai/longformer-base-4096) (needs a GPU); [`gatortron-base`](https://huggingface.co/UFNLP/gatortron-base) (ran on CPU but diverged and called every chart healthy, so it wasn't kept, to rerun on a GPU at a lower learning rate, spec 002 task T017); [`sapbert`](https://huggingface.co/cambridgeltl/SapBERT-from-PubMedBERT-fulltext) (not a periodontal status classifier, and no scorer for its own task yet); [`bioclinical-modernbert-large`](https://huggingface.co/thomas-sounack/BioClinical-ModernBERT-large) (needs a GPU); [`clinical-longformer`](https://huggingface.co/yikuan8/Clinical-Longformer) (needs a GPU); [`gte-moderncolbert`](https://huggingface.co/lightonai/GTE-ModernColBERT-v1) (not a periodontal status classifier, and no scorer for its own task yet); [`medgemma-4b-it`](https://huggingface.co/google/medgemma-4b-it) (not scheduled yet); [`medgemma-27b-text-it`](https://huggingface.co/google/medgemma-27b-text-it) (needs a GPU). MedGemma few-shot and LoRA runs are not done yet (LoRA needs a GPU).
 
@@ -138,23 +140,25 @@ Counts on each note set. What the columns mean (read them together):
 
 | Rank | Code name | Method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed |
 |---|---|---|---|---:|
-| 1–2 | `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 (95% range 3.5–5.1%) | 41 of 2,462 |
-| 1–3 | `routed+guard` | Routed by identifier type + dental-word guard | 129 of 2,714 (95% range 4.0–5.6%) | 154 of 2,462 |
-| 2–4 | `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 2,714 (95% range 5.5–7.4%) | 154 of 2,462 |
-| 3–4 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 2,714 (95% range 7.3–9.4%) | 41 of 2,462 |
-| 5–6 | `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 332 of 2,714 (95% range 11.1–13.5%) | 34 of 2,462 |
-| 5–6 | `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 376 of 2,714 (95% range 12.6–15.2%) | 122 of 2,462 |
-| 7–8 | `hf_stanford+guard` | Stanford AI + dental-word guard | 560 of 2,714 (95% range 19.2–22.2%) | 41 of 2,462 |
-| 7–8 | `hf_stanford` | Stanford AI | 560 of 2,714 (95% range 19.2–22.2%) | 415 of 2,462 |
-| 9–10 | `regex_v2` | Patterns | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
-| 9–10 | `regex_v2+guard` | Patterns + dental-word guard | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
-| 11–13 | `presidio+guard` | Presidio + dental-word guard | 849 of 2,714 (95% range 29.6–33.1%) | 122 of 2,462 |
-| 11–13 | `presidio` | Presidio | 849 of 2,714 (95% range 29.6–33.1%) | 921 of 2,462 |
-| 11–13 | `hf_obi` | OBI AI | 860 of 2,714 (95% range 30.0–33.5%) | 414 of 2,462 |
-| 14–15 | `regex` | Patterns (first version) | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
-| 14–15 | `regex+guard` | Patterns (first version) + dental-word guard | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
+| 1–3 | `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 (95% range 3.5–5.1%) | 41 of 2,462 |
+| 1–4 | `routed+guard` | Routed by identifier type + dental-word guard | 129 of 2,714 (95% range 4.0–5.6%) | 154 of 2,462 |
+| 1–4 | `ai_mask+regex_v2+guard` | Databricks AI mask + patterns + dental-word guard | 155 of 2,714 (95% range 4.9–6.6%) | 2 of 2,462 |
+| 2–5 | `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 2,714 (95% range 5.5–7.4%) | 154 of 2,462 |
+| 4–6 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 2,714 (95% range 7.3–9.4%) | 41 of 2,462 |
+| 5–7 | `ai_mask` | Databricks AI mask | 284 of 2,714 (95% range 9.4–11.7%) | 125 of 2,462 |
+| 6–8 | `hf_obi+regex_v2+guard` | OBI AI + patterns + dental-word guard | 332 of 2,714 (95% range 11.1–13.5%) | 34 of 2,462 |
+| 7–8 | `presidio+regex_v2+guard` | Presidio + patterns + dental-word guard | 376 of 2,714 (95% range 12.6–15.2%) | 122 of 2,462 |
+| 9–10 | `hf_stanford+guard` | Stanford AI + dental-word guard | 560 of 2,714 (95% range 19.2–22.2%) | 41 of 2,462 |
+| 9–10 | `hf_stanford` | Stanford AI | 560 of 2,714 (95% range 19.2–22.2%) | 415 of 2,462 |
+| 11–12 | `regex_v2` | Patterns | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
+| 11–12 | `regex_v2+guard` | Patterns + dental-word guard | 645 of 2,714 (95% range 22.2–25.4%) | 0 of 2,462 |
+| 13–15 | `presidio+guard` | Presidio + dental-word guard | 849 of 2,714 (95% range 29.6–33.1%) | 122 of 2,462 |
+| 13–15 | `presidio` | Presidio | 849 of 2,714 (95% range 29.6–33.1%) | 921 of 2,462 |
+| 13–15 | `hf_obi` | OBI AI | 860 of 2,714 (95% range 30.0–33.5%) | 414 of 2,462 |
+| 16–17 | `regex` | Patterns (first version) | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
+| 16–17 | `regex+guard` | Patterns (first version) + dental-word guard | 1,434 of 2,714 (95% range 51.0–54.7%) | 0 of 2,462 |
 
-**Not run yet:** `llm`, `llm+regex_v2+guard`, `ai_mask`, `ai_mask+regex_v2+guard`, `azure_deid`, `azure_deid+regex_v2+guard`, `azure_language`, `azure_language+regex_v2+guard`, `aws_comprehend`, `aws_comprehend+regex_v2+guard` (cloud and LLM methods; each needs its service's credentials).
+**Not run yet:** `llm`, `llm+regex_v2+guard`, `azure_deid`, `azure_deid+regex_v2+guard`, `azure_language`, `azure_language+regex_v2+guard`, `aws_comprehend`, `aws_comprehend+regex_v2+guard` (cloud and LLM methods; each needs its service's credentials).
 
 #### Synthetic dental notes, hardest tier only
 
@@ -164,6 +168,8 @@ The 120 synthetic notes whose identifier shapes no method was written for: 879 i
 |---|---|---|---:|
 | `routed+guard` | Routed by identifier type + dental-word guard | 109 of 879 | 34 of 739 |
 | `hf_stanford+hf_obi+regex_v2+guard` | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 879 | 4 of 739 |
+| `ai_mask+regex_v2+guard` | Databricks AI mask + patterns + dental-word guard | 153 of 879 | 2 of 739 |
+| `ai_mask` | Databricks AI mask | 157 of 879 | 63 of 739 |
 | `hf_stanford+presidio+regex_v2+guard` | Stanford AI + Presidio + patterns + dental-word guard | 174 of 879 | 34 of 739 |
 | `hf_stanford+regex_v2+guard` | Stanford AI + patterns + dental-word guard | 226 of 879 | 4 of 739 |
 | `hf_stanford` | Stanford AI | 251 of 879 | 126 of 739 |

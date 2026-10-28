@@ -65,7 +65,7 @@ What the columns mean:
 - **Periodontitis correctly assigned**: (in brackets) of the 156 charts with periodontitis, the share the method said have it. No answer counts against it. The standard name is sensitivity.
 - **Incorrect stage**: right that it is or isn't periodontitis, but the wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up.
 - **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken.
-- **Rank**: where it plausibly ranks among all 38 methods.
+- **Rank**: where it plausibly ranks among all 40 methods.
 - **Stage 4 rule**: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from).
 
 Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned (out of the 84 without it) + incorrectly ruled out (out of the 156 with it) + incorrect stage + no answer.
@@ -74,12 +74,12 @@ Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned
 |---|---|---:|---:|---:|---:|---:|---|
 | 1. Whole record available | Rules, gum measurements first | 234 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (100% correctly assigned) | 6 of 240 | 0 of 240 | 1 |
 | 2. Only the note available | Trained AI (ModernBERT) + stage 4 rule | 219 of 240 | 4 of 84 (95% correctly ruled out) | 1 of 156 (99% correctly assigned) | 16 of 240 | 0 of 240 | 2–10 |
-|  | Keyword rules (simple baseline) | 189 of 240 | 10 of 84 (88% correctly ruled out) | 8 of 156 (95% correctly assigned) | 33 of 240 | 0 of 240 | 15–30 |
-|  | Medical AI, untrained (MedGemma 1.5 4B) + stage 4 rule | 185 of 240 | 8 of 84 (90% correctly ruled out) | 10 of 156 (94% correctly assigned) | 37 of 240 | 0 of 240 | 17–31 |
-| 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (80% correctly assigned) | 2 of 240 | 45 of 240 | 14–31 |
-|  | Exam form | 149 of 240 | 10 of 84 (88% correctly ruled out) | 0 of 156 (87% correctly assigned) | 48 of 240 | 33 of 240 | 33 |
+|  | Keyword rules (simple baseline) | 189 of 240 | 10 of 84 (88% correctly ruled out) | 8 of 156 (95% correctly assigned) | 33 of 240 | 0 of 240 | 17–32 |
+|  | Medical AI, untrained (MedGemma 1.5 4B) + stage 4 rule | 185 of 240 | 8 of 84 (90% correctly ruled out) | 10 of 156 (94% correctly assigned) | 37 of 240 | 0 of 240 | 19–33 |
+| 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (80% correctly assigned) | 2 of 240 | 45 of 240 | 14–33 |
+|  | Exam form | 149 of 240 | 10 of 84 (88% correctly ruled out) | 0 of 156 (87% correctly assigned) | 48 of 240 | 33 of 240 | 35 |
 
-All 38 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
+All 40 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
 **Can an AI check the answers?** On real notes there is no answer key, so we tested whether a general-purpose AI (a large language model) could stand in for one. It read each note and gave its own status, which matched the answer key on 83% of charts but only 53% of hard notes (they leave out what the answer key is built from). Asked whether a method's answer was right, it caught most mistakes of weak methods but only 26% of the best note model's, which are near-misses such as one stage off. So it can't replace the answer key yet. (These are LLM judgments, checked against the answer key.) Details: [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading); in Databricks, the *Scorecard* dashboard.
 
@@ -89,15 +89,15 @@ Best method in each group, counted on the 400 synthetic notes; groups ordered by
 
 - **Text that is sensitive (PHI) incorrectly leaked**: patient names, dates and IDs the method should have removed but left in (one character left counts). This risks patients.
 - **Text that is not sensitive incorrectly scrubbed**: dental words that look like a name or code (Glickman, Gracey 11/12, 6-5-6) that the method removed. This damages the note the AI reads.
-- **Rank**: where it plausibly ranks among all 15 methods.
+- **Rank**: where it plausibly ranks among all 17 methods.
 
 | Group | Best method | Text that is sensitive (PHI) incorrectly leaked | Text that is not sensitive incorrectly scrubbed | Rank | Methods in group |
 |---|---|---:|---:|---|---:|
-| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 | 41 of 2,462 | 1–2 | 6 |
-| One AI tool | Stanford AI + dental-word guard | 560 of 2,714 | 41 of 2,462 | 7–8 | 5 |
-| Pattern matching only | Patterns | 645 of 2,714 | 0 of 2,462 | 9–10 | 4 |
+| Several tools combined | Stanford AI + OBI AI + patterns + dental-word guard | 115 of 2,714 | 41 of 2,462 | 1–3 | 7 |
+| One AI tool | Databricks AI mask | 284 of 2,714 | 125 of 2,462 | 5–7 | 6 |
+| Pattern matching only | Patterns | 645 of 2,714 | 0 of 2,462 | 11–12 | 4 |
 
-All 15 methods, per 100 with a likely range for each number (95% confidence interval), on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
+All 17 methods, per 100 with a likely range for each number (95% confidence interval), on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
 
 #### The other note sets
 

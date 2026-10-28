@@ -11,16 +11,22 @@ verdict: approve
 # PR Review: Fix Load results finding no result files on Databricks
 
 ## Summary
-This is a small fix with a regression test. Closes #71. In dev, the run output showed `CANNOT_INFER_EMPTY_SCHEMA`
-from `display()` on an empty list of files, even though the workspace listing shows 33 deployed files in
-`files/data/datasets/`. The notebook now reads the deployed files relative to itself, which is the path
-notebook 03 already uses successfully. It names the folder, stops clearly when the folder holds no files,
-and never displays an empty table.
+This is a small fix with a regression test. Closes #71. Load results succeeded once, at 11:29 on 2026-10-28, and
+loaded all 16 committed files: `result_files` has 16 rows, `ai_predictions` 3,600 rows (15 methods),
+`llm_reader_runs` 240 MedGemma rows. Every later run had nothing new and crashed in `display()` on the empty
+table (`CANNOT_INFER_EMPTY_SCHEMA`).
+
+The first diagnosis, that the job found no files through the package path, was wrong. The tables and the
+one successful run show the files were found. The fix:
+- skips display when nothing is new;
+- reads the files next to the notebook, as notebook 03 does;
+- stops with a clear message naming the folder if it finds no result files.
+
+The PR also records the renewed agent token in the secrets register (expires 2026-11-11) and adds
+`docs/model_inventory.md` (#85).
 
 ## Findings
-None blocking. One risk remains: the exact reason the package path found no files on serverless isn't proven.
-The fix no longer depends on that path, and if the relative path also finds nothing, the job now stops with
-the folder's name instead of a Spark error. The first run after merge will settle it.
+None blocking.
 
 ## Checks
 - `pytest -q tests`: 586 passed, 12 skipped.

@@ -38,9 +38,15 @@ def test_bad_branch_names_say_why(branch, why):
     assert problems and why in " ".join(problems).lower()
 
 
-@pytest.mark.parametrize("branch", ["claude/great-cerf-qwbqck", "dependabot/pip/pandas-3.0", "kaggle-results/medgemma-1.5-4b-it-123"])
+@pytest.mark.parametrize("branch", ["dependabot/pip/pandas-3.0", "kaggle-results/medgemma-1.5-4b-it-123"])
 def test_branches_named_by_a_tool_are_allowed(branch):
     assert pc.branch_problems(branch) == []
+
+
+def test_an_agent_sessions_claude_branch_is_not_allowed_and_says_what_to_do():
+    # issue #116: sessions are assigned claude/<name>; the work moves to <type>/<issue>-<slug> (AGENTS.md rule 4)
+    problems = pc.branch_problems("claude/focused-mccarthy-gy9rjp")
+    assert problems and "<type>/<issue>-<slug>" in problems[0] and "AGENTS.md" in problems[0]
 
 
 @pytest.mark.parametrize("body", ["Closes #71", "fixes #72.", "Part of the work.\n\nRefs #73", "Closes DENT-123", "Resolves #9"])
@@ -55,8 +61,6 @@ def test_no_issue_link(body):
 
 def test_check_needs_an_issue_link_except_on_tool_branches():
     assert pc.check("feat/71-x", "Closes #71") == []
-    assert pc.check("claude/great-cerf-qwbqck", "Closes #71") == []
-    assert any("issue" in p.lower() for p in pc.check("claude/great-cerf-qwbqck", "no link"))
     assert any("issue" in p.lower() for p in pc.check("feat/71-x", ""))
     assert pc.check("kaggle-results/x-1", "") == []          # made by a workflow from a run, not a story
     assert pc.check("dependabot/pip/x", "") == []

@@ -174,7 +174,7 @@ def test_kaggle_workflow_opens_a_pr_with_the_results():
 def test_load_results_job_runs_the_notebook_with_the_bundle_schema():
     import yaml
     jobs = yaml.safe_load(_text("databricks/resources/jobs.yml"))["resources"]["jobs"]
-    task = jobs["load_results"]["tasks"][0]["notebook_task"]
+    task = next(t for t in jobs["load_results"]["tasks"] if t["task_key"] == "load")["notebook_task"]
     assert task["notebook_path"] == "../notebooks/10_load_results.py"
     p = task["base_parameters"]
     assert p["catalog"] == "${resources.schemas.gold.catalog_name}" and p["schema"] == "${resources.schemas.gold.name}"
@@ -188,8 +188,9 @@ def test_deploy_starts_load_results_without_waiting():
 
 def test_load_notebook_appends_new_versions_to_the_three_tables():
     nb = _text("databricks/notebooks/10_load_results.py")
-    for t in ("result_files", "ai_predictions", "llm_reader_runs"):
+    for t in ("dim_result_file", "fact_prediction", "fact_llm_call"):     # spec 018 names
         assert f'"{t}"' in nb, t
+    assert "gold_names.to_gold(" in nb
     assert "new_files(" in nb and 'mode("append")' in nb and "mergeSchema" in nb
     assert "DELETE FROM" in nb            # a load that failed partway is redone, not duplicated
     assert "tracking.track(" in nb and "llm_run_metrics(" in nb
@@ -200,7 +201,7 @@ def test_reader_job_tags_its_rows_as_databricks():
 
 
 def test_load_notebook_finds_the_deployed_files_and_says_when_there_are_none():
-    # issue #71: the package path pointed away from the deployed files; it found none and crashed in display()
+    # issue #71: every run after the first had nothing new and crashed displaying the empty table
     nb = _text("databricks/notebooks/10_load_results.py")
     assert 'Path("../../data/datasets")' in nb          # next to the notebook, as notebook 03 finds them
     assert "No result files in" in nb                   # a clear stop, naming the folder
@@ -227,10 +228,39 @@ def test_load_results_never_deletes_the_reader_jobs_rows():
     # PR #92 review: the reader job's rows now carry the sha256 of their CSV; a committed file with the same bytes
     # (deterministic predictions) must not make Load results delete that run's rows
     nb = _text("databricks/notebooks/10_load_results.py")
-    assert "WHERE sha256 IN ({hashes}) AND source <> 'databricks'" in nb
+    assert "WHERE file_sha256 IN ({hashes}) AND source_code <> 'databricks'" in nb
 
 
 def test_reader_job_joins_the_answer_key_by_visit():
     nb = _text("databricks/notebooks/03_medgemma_reader.py")
     assert 'details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id"' in nb
     assert "d.truth.values" not in nb
+
+
+def test_load_results_skips_the_files_the_reader_job_loaded_itself():
+    # issue #94: the reader job's CSVs sit in the folder Load results reads; loading them again would add the
+    # same predictions a second time as source = repo
+    nb = _text("databricks/notebooks/10_load_results.py")
+    assert """reader.where("source_code = 'databricks'").select("file_sha256")""" in nb
+    assert "loaded |=" in nb
+
+
+def test_reader_job_writes_gold_names_keyed_by_its_run():
+    # spec 018: the rows go through gold_names and the batch key uses the gold column names
+    nb = _text("databricks/notebooks/03_medgemma_reader.py")
+    assert "gold_names.to_gold(" in nb
+    assert '{"source_code": "databricks", "run_id": run_id, "method_name": rung}' in nb
+    assert '"fact_prediction"' in nb and '"fact_llm_call"' in nb
+
+
+def test_load_results_job_migrates_the_old_gold_names_before_loading():
+    # spec 018 US2: the first task copies old-named tables to the new names, so their rows are kept
+    import yaml
+    tasks = yaml.safe_load(_text("databricks/resources/jobs.yml"))["resources"]["jobs"]["load_results"]["tasks"]
+    migrate, load = tasks[0], next(t for t in tasks if t["task_key"] == "load")
+    assert migrate["task_key"] == "migrate_gold_names"
+    assert migrate["notebook_task"]["notebook_path"] == "../notebooks/11_migrate_gold_names.py"
+    assert {"task_key": "migrate_gold_names"} in load["depends_on"]
+    nb = _text("databricks/notebooks/11_migrate_gold_names.py")
+    assert "gold_names.RENAMED" in nb and "DROP TABLE" in nb
+    assert "spark.sql(f\"DROP" not in nb                     # prints the drops, never runs them

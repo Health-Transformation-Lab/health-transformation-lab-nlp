@@ -191,7 +191,17 @@ resources:
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
+        # spec 018: copy tables still under their old names to the new ones first; does nothing once done
+        - task_key: migrate_gold_names
+          notebook_task:
+            notebook_path: ../notebooks/11_migrate_gold_names.py
+            base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
+              catalog: ${resources.schemas.gold.catalog_name}
+              schema: ${resources.schemas.gold.name}
         - task_key: load
+          depends_on:
+            - task_key: migrate_gold_names
           notebook_task:
             notebook_path: ../notebooks/10_load_results.py
             base_parameters:
