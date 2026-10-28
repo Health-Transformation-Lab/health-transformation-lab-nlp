@@ -42,7 +42,7 @@ only for the optional Synthea / full-OMOP path (step 6).
    repo root; every script uses paths relative to it.
 
    ```bash
-   git clone https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp
+   git clone https://github.com/healthtransformationlab/health-transformation-lab-nlp
    ```
 
 2. **Build the data once.** The note generator is Python-only for now:
