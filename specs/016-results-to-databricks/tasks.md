@@ -21,3 +21,4 @@
 ## Polish
 - [x] T011 Update `docs/results_storage.md`; run the full Python suite
 - [x] T012 Review fixes: full-run row minimum (`--min-rows`, default the answer key), `!cancelled()` guard, delete-then-append per file version, cast only empty columns, `show_log.py` keeps a one-line warning's next line
+- [x] T013 Issue #90: failing tests, then the reader job writes its run to `ai_predictions` and `llm_reader_runs` by batch key (`delta.replace_batch`, `results_store.run_rows`; source, job run id, method), Load results' delete leaves `source = databricks` rows alone, and the job passes the bundle's MLflow experiment (`tracking` checks it first and never fails a step)

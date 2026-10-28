@@ -110,6 +110,8 @@ resources:
               lora_train: ${var.reader_lora_train}
               hf_secret_scope: ${var.hf_secret_scope}
               telemetry: ${var.telemetry_exporter}
+              experiment_name: ${resources.experiments.dental_experiment.name}
+              run_id: "{{job.run_id}}"   # batch key for its Delta rows: the same for every retry of this run
 
     encoder_gpu:
       name: Encoders on GPU
