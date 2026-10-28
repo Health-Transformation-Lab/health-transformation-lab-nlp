@@ -53,7 +53,7 @@ from dental_omop_nlp import runlog  # noqa: E402
 
 # Scripts print as they go and into a log on the landing volume, which survives if this notebook's Python dies.
 log = f"{runlog.log_dir(catalog)}/medgemma_reader_{dbutils.widgets.get('rung')}.log"  # noqa: F821
-print("log:", log)
+print("logs:", log, "(each run after the first writes a time-stamped file next to it)")
 
 # Build the synthetic datasets if this is a fresh Git folder
 if not os.path.exists("../../data/datasets/answer_key/review_key.csv"):
