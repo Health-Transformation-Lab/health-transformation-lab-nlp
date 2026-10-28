@@ -17,11 +17,13 @@ Implementation starts after this spec, plan and tasks are reviewed.
 
 ## US3 #203: stepwise phenotype, scored
 
-- [ ] T007 [US3] Failing tests: stepwise order, deciding section, section and merged completeness
-- [ ] T008 [US3] `phenotype_patel2022`; `algorithm_patel2022` in grader tables, gold names, dashboards and the
-  order comparison
-- [ ] T009 [US3] Completeness CSV; confusion matrix with precision, recall and F1 for the Diagnoser and the
-  Extractor; R parity for the merge
+- [ ] T007 [US3] Failing tests: stepwise order, deciding section, section and merged completeness,
+  `confusion_scores` (one-vs-rest and pooled), script 18 still 24 orderings plus one row, existing datasets
+  unchanged
+- [ ] T008 [US3] `phenotype_patel2022`; `periodx_visits.csv`; `algorithm_patel2022` in grader tables, gold
+  names, dashboards and the order comparison
+- [ ] T009 [US3] Completeness CSV; `reliability.confusion_scores` (precision, recall, F1) for the Diagnoser and
+  the Extractor; R twins and parity for the merge and the scores
 - [ ] T010 [US3] Docs: results beside the paper's cited figures, labelled synthetic vs real records
 
 ## US4 #204: A2 checked, citations corrected

@@ -42,31 +42,59 @@ the published approach do on this benchmark" and fixes the attribution.
 
 ### User Story 1 - PerioDx Diagnoser: status, stage, extent and grade from the chart (Priority: P1) #201
 
-A function reads a synthetic chart (and age, smoking, diabetes, HbA1c) and follows Fig. 2 exactly:
+A function reads a synthetic chart (and age, smoking, diabetes, HbA1c) and follows Fig. 2 as drawn:
 
-- **Health or gingivitis.** It asks, in order:
-  - detectable marginal bone loss;
-  - interproximal CAL > 2 mm at 2+ non-adjacent teeth;
-  - buccal or lingual recession with CAL > 2 mm and PD > 3 mm at 2+ teeth.
-
-  With none of these, BOP decides: < 10% periodontal health, 10–30% localized gingivitis, > 30% generalized
-  gingivitis. With past loss but no PD ≥ 4 mm, BOP decides between "reduced but healthy periodontium"
-  (< 10%) and "gingival inflammation / past periodontitis" (≥ 10%).
-- **Stage.** It is stage III or IV if any of these holds:
+- **Entry.** It asks three questions:
+  - Is there detectable marginal bone loss?
+  - Is interproximal CAL > 2 mm at 2+ non-adjacent teeth?
+  - Is there buccal or lingual recession with CAL > 2 mm and PD > 3 mm at 2+ teeth?
+- **No to all three.** BOP decides: < 10% periodontal health, 10–30% localized gingivitis, > 30% generalized
+  gingivitis.
+- **Yes to any.** It asks "any PD ≥ 4 mm".
+  - Yes: a periodontitis case, so assess stage.
+  - No: BOP decides between "reduced but healthy periodontium" (< 10%) and "gingival inflammation / past
+    periodontitis" (≥ 10%).
+- **Stage.** It checks the four III/IV criteria in the figure's order:
   - bone loss into the middle third (> 33%);
   - CAL ≥ 5 mm at 2+ adjacent teeth;
   - furcation class II/III or vertical bone loss ≥ 3 mm;
   - PD > 5 mm at 2+ adjacent teeth.
 
-  Otherwise it is stage I (BL < 15%, PD ≤ 4 mm, CAL 1–2 mm) or stage II (BL 15–33%, PD 5 mm, CAL 3–4 mm).
-  III and IV are split by:
-  - fewer than 10 occluding pairs;
-  - secondary occlusal trauma (mobility ≥ 2) at ≥ 5 teeth;
-  - drifting, bite collapse, flaring or a severe ridge defect;
-  - teeth lost to periodontitis: 1–4 means III, 5+ means IV.
-- **Extent.** Under 30% of teeth involved is localized, 30% or more is generalized, or a molar/incisor pattern.
-- **Grade.** % bone loss / age, < 0.25, 0.25–1.0 and > 1.0, then smoking (current; ≥ 10 a day) and diabetes
-  (HbA1c ≥ 7.0) give A, B or C.
+  If any criterion holds ("stage III or IV"):
+  - Fewer than 10 occluding pairs gives IV.
+  - With 10 or more, secondary occlusal trauma (mobility degree ≥ 2) at ≥ 5 teeth gives IV.
+  - Under 5 such teeth, drifting, bite collapse, flaring or a severe ridge defect gives IV.
+  - Otherwise the case goes to "tooth loss due to perio".
+
+  If none holds, the case also goes to "tooth loss due to perio". Every path passes through this box, so stage
+  I or II is never decided before it:
+  - 1–4 teeth lost to periodontitis gives stage III;
+  - 5 or more gives stage IV;
+  - none goes to the bone-loss box: BL < 15%, PD 4 mm, CAL 1–2 mm is stage I; BL 15–33%, PD 5 mm, CAL 3–4 mm
+    is stage II.
+
+  The figure's dead end: a III/IV case with no complexity factor and no teeth lost reaches the bone-loss box,
+  which has no branch for BL > 33%. This is parameter `III_IV_NO_TOOTH_LOSS`, default stage III (the criteria
+  already placed it at III or IV, and nothing pointed to IV). Charts that meet the stage I and stage II
+  measures at once go to the higher stage.
+- **Extent.** Count the share of teeth lost to periodontitis or with CAL/PD at the case's stage. The figure
+  gives these pairs:
+
+  | Stage | A tooth is involved when |
+  |---|---|
+  | III/IV | CAL ≥ 5 and PD ≥ 4, or CAL 3–4 and PD ≥ 6 |
+  | II | CAL 3–4 and PD 4–5, or CAL 1–2 and PD ≥ 5 |
+  | I | CAL 1–2 and PD = 4 |
+
+  Under 30% is localized, 30% or more generalized, or a molar/incisor pattern.
+- **Grade.** It follows % bone loss / age.
+  - Under 0.25:
+    - A current smoker goes to "≥ 10 per day": yes is C, no goes on to "HbA1c ≥ 7.0".
+    - A non-smoker with diabetes goes to "HbA1c ≥ 7.0".
+    - A non-smoker without diabetes gets A.
+  - "HbA1c ≥ 7.0": yes is C, no is B.
+  - From 0.25 to 1.0: the arrow enters at "≥ 10 per day", so the result is C or B, never A.
+  - Over 1.0: C.
 
 Every threshold cites the figure. Where the figure's arrows leave a step open, the step is a named parameter
 whose default is the reading the spec records (FR-002).
@@ -82,7 +110,9 @@ twin gives the same labels on the parity inputs.
    runs, **Then** it returns localized gingivitis.
 2. **Given** bone loss of 40%, 12 occluding pairs, no mobility ≥ 2, no bite collapse and 2 teeth lost to
    periodontitis, **When** it runs, **Then** it returns stage III.
-3. **Given** the parity inputs, **When** `r/tests/test_parity.R` runs, **Then** Python and R agree on every
+3. **Given** bone loss of 10%, no III/IV criterion and 2 teeth lost to periodontitis, **When** it runs,
+   **Then** it returns stage III: tooth loss is checked before stage I or II.
+4. **Given** the parity inputs, **When** `r/tests/test_parity.R` runs, **Then** Python and R agree on every
    label.
 
 ---
@@ -141,7 +171,7 @@ section's share before and after.
 3. **Given** the results pages, **When** they show the paper's published figures, **Then** each is cited as
    the paper's own, on real records, beside this repo's synthetic result, never in the same column. The
    figures are: completeness of 36%, 18% and 80% by section, rising to 100%; Diagnoser F1 97%; Extractor
-   F1 95%.
+   F1 95% (as stated; inconsistent with its own 91% precision and 87% recall, see Edge Cases).
 
 ---
 
@@ -178,6 +208,8 @@ but it is quick to fix once US3 names the paper's own order.
 - **The paper's own inconsistencies,** recorded in the reference entry and not resolved by guessing:
   - **Fig. 1 vs the text.** The text puts diagnosis codes at 36% (n = 9,834) and notes at 18% (n = 4,867).
     Fig. 1 attaches those two figures to the other section.
+  - **Extractor scores.** The text gives 91% precision and 87% recall, which makes F1 0.89, not the 95% it
+    states. Table 1 shows recall 1.0 (0 false negatives).
   - **Table 1.** It gives 112 actual positives but 224 true positives with 0 false negatives, and a
     prevalence of 0.59 where 224/400 = 0.56.
   - **HbA1c annotation bands.** "Normal < 5" and "pre-diabetes 5.7–6.4" leave 5.0–5.7 unassigned.
@@ -194,11 +226,17 @@ but it is quick to fix once US3 names the paper's own order.
   synthetic abbreviations. It is built from the classification paper (Tonetti, Greenwell & Kornman 2018) and
   the synthetic note templates, never from real notes. It uses only libraries the repo already depends on, or
   a declared optional extra.
-- **FR-004** `algorithm_patel2022` joins `METHODS`-level outputs. That means `gold_names.py` declares its
+- **FR-004** `algorithm_patel2022` joins the method list (`grader_tables.EVIDENCE`). That means `gold_names.py` declares its
   gold column and the dashboards list it. It doesn't replace `algorithm_design` or `algorithm_v0`.
 - **FR-005** Completeness per section and after merging uses `completeness.py`, so it reads like spec 013 G7.
-- **FR-006** Precision, recall and F1 from the confusion matrix reuse the repo's existing metric functions if
-  they match the paper's definitions. Any new scoring function gets an R twin.
+- **FR-006** The confusion matrix is computed per status class, one-vs-rest. "Positive" means the reviewer
+  key's class, and the counts are also pooled over classes; for the Extractor, "no diagnosis" counts as a
+  negative prediction. Precision, recall and F1 are new scoring functions: they are written test first, with a
+  base-R twin and a parity check to 1e-9.
+- **FR-010** The per-visit PerioDx outputs go to a new file next to the study data (`periodx_visits.csv`), not
+  into `visits_structured.csv`, so existing datasets stay byte-identical (and spec 023's rebuild test holds in
+  either merge order). `scripts/18_phenotype_order.py` keeps its 24 orderings of the four design groups; the
+  paper's order is scored as one extra row, not added to the permutations.
 - **FR-007** Published figures appear only with a citation to the paper's figure or table and the words "real
   records, one dental school". They are never computed into this repo's results.
 - **FR-008** References item 4 gains the DOI, volume, pages and licence, what the method implements, and the
