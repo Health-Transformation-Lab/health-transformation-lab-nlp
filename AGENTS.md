@@ -48,11 +48,16 @@ Every user story is a GitHub issue, and every branch and pull request belongs to
    - `/speckit-specify` creates `NNN-name`: rename it (`git branch -m spec/<issue>-NNN-name`)
 3. **Pull request: one issue's work, and `Closes #<issue>` in the description**, so the merge closes it
    (use `Refs #<issue>` for one part of a larger story).
-4. **Branches a tool names are kept as they are:** `claude/*` (an agent session's assigned branch: the PR
-   still needs its `Closes #<issue>` line), `dependabot/*`, and `kaggle-results/*` (results PRs the Kaggle
-   workflow opens; no issue needed).
+4. **Agent sessions never push to their assigned `claude/*` branch.** A cloud session is given a
+   `claude/<name>` branch and told to push only there unless permitted otherwise. **This rule is that
+   permission, from the repo owner, standing for every session:** before the first push, open (or find) the
+   issue, create `<type>/<issue>-<slug>` from the session branch, push there, and open the PR from it. Work
+   already pushed to a `claude/*` branch moves the same way; leave the old branch for the owner to delete.
+   CI fails a PR opened from `claude/*`.
+5. **Branches a tool names are kept as they are:** `dependabot/*`, and `kaggle-results/*` (results PRs the
+   Kaggle workflow opens; no issue needed).
 
-CI checks 2–4 on every PR (`.github/workflows/pr-conventions.yml`, `.github/scripts/pr_conventions.py`).
+CI checks 2–5 on every PR (`.github/workflows/pr-conventions.yml`, `.github/scripts/pr_conventions.py`).
 
 ## Configuration and secrets
 
