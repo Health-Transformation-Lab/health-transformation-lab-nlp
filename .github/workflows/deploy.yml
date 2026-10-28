@@ -83,3 +83,8 @@ jobs:
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Returns once Databricks has started the run; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait study_benchmark
+      - name: Load committed results into the gold tables (spec 016)
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
+        # Only file versions it hasn't loaded yet; follow it from the Run URL in the log.
+        run: databricks bundle run -t "$TARGET" --no-wait load_results

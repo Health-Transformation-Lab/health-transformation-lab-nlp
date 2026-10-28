@@ -104,5 +104,8 @@ else:
 
 # Keep the run: Delta table for tracking across runs (prompt variant, shots, adapter)
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")  # noqa: F821
-spark.createDataFrame(d.assign(run_ts=pd.Timestamp.now(tz="UTC"))).write.mode("append").saveAsTable(  # noqa: F821
+# source and git_commit match the rows the Load results job adds from Kaggle and the repo (spec 016)
+rows = d.assign(run_ts=pd.Timestamp.now(tz="UTC"), source="databricks",
+                git_commit=dbutils.widgets.get("git_commit"))  # noqa: F821
+spark.createDataFrame(rows).write.mode("append").option("mergeSchema", "true").saveAsTable(  # noqa: F821
     f"{catalog}.{schema}.llm_reader_runs")

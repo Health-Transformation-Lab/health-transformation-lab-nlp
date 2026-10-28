@@ -29,6 +29,10 @@ on:
         description: "Don't run: only download the outputs of the last Kaggle run"
         type: boolean
         default: false
+      open_pr:
+        description: "Open a pull request that commits the results (a full run; a smaller test run is never committed)"
+        type: boolean
+        default: true
 
 concurrency: kaggle-medgemma
 
@@ -37,6 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     timeout-minutes: 350
+    permissions:
+      contents: write          # push the results branch
+      pull-requests: write     # open the PR (spec 016)
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -100,6 +107,34 @@ jobs:
           ls -la build/output
           log=$(ls build/output/*.log 2>/dev/null | head -1)
           if [ -n "$log" ]; then echo "---- end of the Kaggle log (warnings left out) ----"; python kaggle/show_log.py "$log"; fi
+
+      # Spec 016: commit the results so they're versioned and the Load results job puts them in Delta.
+      # The branch starts from main, so the PR holds the results only.
+      - name: Open a pull request with the results
+        if: ${{ always() && inputs.open_pr && (inputs.wait || inputs.collect_only) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BRANCH: kaggle-results/${{ inputs.rung }}-${{ github.run_id }}
+        run: |
+          git fetch --quiet --depth 1 origin main
+          git worktree add --quiet -b "$BRANCH" ../results origin/main
+          set +e; python kaggle/record_results.py --from build/output --to ../results/data/datasets --run-url "$RUN_URL"; rc=$?; set -e
+          if [ "$rc" = 3 ]; then echo "Nothing to commit (see above)"; exit 0; fi
+          [ "$rc" = 0 ] || exit "$rc"
+          cd ../results
+          if [ -z "$(git status --porcelain data/datasets)" ]; then echo "Results are the same as on main"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/datasets
+          git commit --quiet -m "Add MedGemma results from Kaggle (${{ inputs.rung }})" \
+            -m "Collected by the kaggle-medgemma workflow, $RUN_URL. Synthetic review notes only. Recorded in data/datasets/results_manifest.csv; the Load results job puts them in Delta after the merge deploys."
+          git push --quiet -u origin "$BRANCH"
+          body="MedGemma (\`${{ inputs.rung }}\`) answers on the synthetic review notes, collected from Kaggle by $RUN_URL (spec 016).
+
+          A pull request opened by the workflow token doesn't start CI: push a commit to this branch to run the checks before merging. After the merge, the dev deploy runs **Load results**, which appends these files to \`gold_dental_omop_perio.ai_predictions\` and \`llm_reader_runs\` with \`source = kaggle\`. Then \`python scripts/28_ladder_vs_truth.py && python scripts/35_readme_results.py\` refreshes the README scores."
+          gh pr create --base main --head "$BRANCH" --title "Add MedGemma results from Kaggle (${{ inputs.rung }})" --body "$body" \
+            || echo "::warning::Pushed $BRANCH but couldn't open the PR (Settings -> Actions -> General -> Allow GitHub Actions to create and approve pull requests). Open it here: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$BRANCH"
 
       - uses: actions/upload-artifact@v4
         if: ${{ always() && (inputs.wait || inputs.collect_only) }}
