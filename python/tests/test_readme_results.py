@@ -478,3 +478,18 @@ def test_full_page_explains_columns_as_lists(md):
         assert sum(x.startswith(f"- **{term}**") for x in ph.splitlines()) == 1, term
     de = md.split(rr.DEID_TITLE, 1)[1]
     assert sum(x.startswith(f"- **{rr.COL_LEAKED}**") for x in de.splitlines()) >= 1
+
+
+def test_readme_judge_and_ranges_are_in_plain_words(summary):
+    """"LLM judge (could an LLM replace the answer key?): its own reading matches..." and "95% CIs" were
+    unreadable. The README asks the question in plain words, says what the AI was asked to do, and calls
+    a confidence interval a likely range."""
+    assert "95% CIs" not in summary
+    assert "likely range" in summary
+    ph = _section(summary, rr.PHENOTYPE_TITLE)
+    if "**Can an AI check the answers?**" not in ph:
+        assert "not run yet" in ph.lower()
+        return
+    para = next(x for x in ph.split("\n\n") if x.startswith("**Can an AI check the answers?**"))
+    assert "answer key" in para and "hard notes" in para and "near-miss" in para
+    assert "LLM judgment;" not in para and "flags most" not in para
