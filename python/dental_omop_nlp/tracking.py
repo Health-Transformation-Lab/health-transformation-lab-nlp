@@ -10,6 +10,8 @@
 - Every run is tagged with the step, git commit, dataset fingerprint and whether
   it is simulated, so any number can be traced to the code and data that made it.
 - No-op when mlflow isn't installed or DENTAL_MLFLOW=0, so scripts run without it.
+- Never fails a step: settings are checked before a run starts (on Databricks the experiment must be an
+  absolute workspace path, the bundle's), and a logging call that fails warns instead of raising.
 """
 
 from __future__ import annotations
@@ -64,6 +66,14 @@ def dataset_fingerprint(files: tuple[str, ...] = ("train.csv", "answer_key/revie
     return h.hexdigest()[:12]
 
 
+def _quietly(what: str, call) -> None:
+    """Run one MLflow call; a failure (server rejects a value, connection drops) warns and the step carries on."""
+    try:
+        call()
+    except Exception as e:  # noqa: BLE001 - MlflowException, connection and auth errors alike
+        log.warning("MLflow %s failed, step carries on: %s", what, str(e).splitlines()[0][:200] if str(e) else type(e).__name__)
+
+
 class _Run:
     def __init__(self, run_id=None):
         self.run_id = run_id
@@ -72,25 +82,26 @@ class _Run:
     def log_metrics(self, m: dict):
         if self.run_id:
             import mlflow
-            mlflow.log_metrics({k: float(v) for k, v in m.items() if v is not None and not math.isnan(float(v))})
+            _quietly("log_metrics", lambda: mlflow.log_metrics(
+                {k: float(v) for k, v in m.items() if v is not None and not math.isnan(float(v))}))
 
     @traced
     def log_params(self, p: dict):
         if self.run_id:
             import mlflow
-            mlflow.log_params({k: str(v)[:500] for k, v in p.items()})
+            _quietly("log_params", lambda: mlflow.log_params({k: str(v)[:500] for k, v in p.items()}))
 
     @traced
     def set_tags(self, t: dict):
         if self.run_id:
             import mlflow
-            mlflow.set_tags({k: str(v) for k, v in t.items()})
+            _quietly("set_tags", lambda: mlflow.set_tags({k: str(v) for k, v in t.items()}))
 
     @traced
     def log_artifact(self, path):
         if self.run_id and Path(path).exists():
             import mlflow
-            mlflow.log_artifact(str(path))
+            _quietly("log_artifact", lambda: mlflow.log_artifact(str(path)))
 
 
 @traced
@@ -122,10 +133,15 @@ def pass_databricks_login() -> bool:
 
 def _setup():
     import mlflow
-    if not os.environ.get("MLFLOW_TRACKING_URI"):
+    uri = os.environ.get("MLFLOW_TRACKING_URI", "")
+    experiment = os.environ.get("DENTAL_MLFLOW_EXPERIMENT", EXPERIMENT)
+    if uri.startswith("databricks") and not experiment.startswith("/"):
+        raise ValueError(f"experiment {experiment!r} is not an absolute workspace path: set DENTAL_MLFLOW_EXPERIMENT "
+                         "to the bundle's experiment (the job's experiment_name parameter)")
+    if not uri:
         (REPO_ROOT / "mlruns").mkdir(exist_ok=True)
         mlflow.set_tracking_uri(f"sqlite:///{REPO_ROOT / 'mlruns' / 'mlflow.db'}")
-    mlflow.set_experiment(os.environ.get("DENTAL_MLFLOW_EXPERIMENT", EXPERIMENT))
+    mlflow.set_experiment(experiment)
     return mlflow
 
 
