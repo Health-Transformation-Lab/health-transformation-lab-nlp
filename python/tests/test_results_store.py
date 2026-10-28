@@ -165,6 +165,9 @@ def test_kaggle_workflow_opens_a_pr_with_the_results():
     assert perms["contents"] == "write" and perms["pull-requests"] == "write"
     text = _text(".github/workflows/kaggle-medgemma.yml")
     assert "kaggle/record_results.py" in text and "gh pr create" in text
+    step = next(s for s in wf["jobs"]["run"]["steps"] if "record_results.py" in s.get("run", ""))
+    run = step["run"]
+    assert run.index("pip install") < run.index("record_results.py")   # it needs pandas and the package
     assert "!cancelled()" in text and "always() && inputs.open_pr" not in text   # a cancelled run commits nothing
 
 

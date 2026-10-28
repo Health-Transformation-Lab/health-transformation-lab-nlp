@@ -117,6 +117,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           BRANCH: kaggle-results/${{ inputs.rung }}-${{ github.run_id }}
         run: |
+          pip install --quiet -e ./python   # record_results.py uses the package (pandas, the manifest code)
           git fetch --quiet --depth 1 origin main
           git worktree add --quiet -b "$BRANCH" ../results origin/main
           set +e; python kaggle/record_results.py --from build/output --to ../results/data/datasets --run-url "$RUN_URL"; rc=$?; set -e
