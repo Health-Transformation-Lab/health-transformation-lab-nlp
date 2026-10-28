@@ -195,6 +195,24 @@ models:
     paper_url: https://arxiv.org/abs/2507.05201
     note: Newer 4B; better document/EHR extraction reported. Default reader to try first.
 
+  # General-purpose LLM on a Databricks pay-per-token Foundation Model endpoint (spec 017 US3): the same
+  # reader prompt and quote gate as MedGemma, so a hosted general model sits next to it. Same family as
+  # the LLM judge's default endpoint, so its judge scores carry self-preference risk.
+  #   python scripts/11_ai_predict.py --rung llama-3.3-70b-instruct --backend openai
+  - id: llama-3.3-70b-instruct
+    hf: meta-llama/Llama-3.3-70B-Instruct
+    endpoint: databricks-meta-llama-3-3-70b-instruct
+    served_by: Databricks Foundation Model API (pay-per-token)
+    license: Llama 3.3 Community License, https://www.llama.com/llama3_3/license/; Databricks terms for the endpoint
+    org: Meta
+    year: 2024
+    domain: general
+    role: llm
+    family: llama
+    max_len: 128000
+    paper: "The Llama 3 Herd of Models (arXiv 2407.21783)"
+    paper_url: https://arxiv.org/abs/2407.21783
+
   - id: medgemma-4b-it
     hf: google/medgemma-4b-it
     license: Health AI Developer Foundations (HAI-DEF) terms of use, https://developers.google.com/health-ai-developer-foundations/terms

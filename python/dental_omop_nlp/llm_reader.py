@@ -19,7 +19,8 @@ Backends
              HAI-DEF terms, and ideally a GPU.
   openai     any OpenAI-compatible chat endpoint: Databricks Model Serving, vLLM,
              Ollama (http://localhost:11434/v1). READER_BASE_URL, READER_API_KEY,
-             READER_MODEL.
+             READER_MODEL; without READER_BASE_URL it uses the Databricks workspace in
+             DATABRICKS_HOST / DATABRICKS_TOKEN (Foundation Model endpoints).
   simulated  no model; errs at set rates by difficulty level. Dry runs only;
              output files are prefixed simulated_.
 """
@@ -166,6 +167,10 @@ class OpenAIChat:
     def __init__(self, model: str | None = None, base_url: str | None = None, api_key: str | None = None,
                  max_tokens: int = 300, max_retries: int = 3, timeout: int = 120):
         self.model = model or os.environ["READER_MODEL"]
+        host = os.environ.get("DATABRICKS_HOST", "").strip().rstrip("/")
+        if not (base_url or os.environ.get("READER_BASE_URL")) and host:   # Databricks Foundation Model endpoints
+            base_url = (host if host.startswith("http") else f"https://{host}") + "/serving-endpoints"
+            api_key = api_key or os.environ.get("DATABRICKS_TOKEN")
         self.base_url = (base_url or os.environ["READER_BASE_URL"]).rstrip("/")
         self.api_key = api_key or os.environ.get("READER_API_KEY", "none")
         self.max_tokens, self.max_retries, self.timeout = max_tokens, max_retries, timeout
@@ -315,7 +320,7 @@ def make_backend(entry: dict, kind: str, **kw):
                                "the terms on its Hugging Face page, then set HF_TOKEN to a read token from that account")
         return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"))
     if kind == "openai":
-        return OpenAIChat(model=kw.get("endpoint"))
+        return OpenAIChat(model=kw.get("endpoint") or entry.get("endpoint"))
     raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
 
 

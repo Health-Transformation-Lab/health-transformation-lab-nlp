@@ -26,3 +26,21 @@ def test_models_and_services_named_in_code_are_listed():
 
 def test_licence_gaps_are_called_out():
     assert DOC.count("none on the card") >= 2 and "HAI-DEF" in DOC
+
+
+def test_every_databricks_ai_function_called_is_listed():
+    srcs = [*(REPO_ROOT / "python").rglob("*.py"), *(REPO_ROOT / "databricks").rglob("*.py"),
+            *(REPO_ROOT / "databricks").rglob("*.sql")]
+    code = "".join(p.read_text() for p in srcs if "tests" not in p.parts)
+    called = set(re.findall(r"\b(ai_(?:query|classify|extract|mask|gen|analyze_sentiment|summarize|translate|"
+                            r"similarity|fix_grammar|forecast|parse_document))\(", code))
+    assert called >= {"ai_query", "ai_classify", "ai_mask"}
+    for f in called:
+        assert f"`{f}`" in DOC, f"{f} is called in code but missing from docs/model_inventory.md"
+
+
+def test_databricks_section_covers_the_platform_ai_features():
+    sec = DOC[DOC.index("## 6. Databricks AI features"):]
+    for feature in ("ai_query", "ai_classify", "ai_extract", "ai_mask", "Foundation Model", "make_judge",
+                    "Guidelines", "monitoring", "AI Gateway", "Genie", "Assistant"):
+        assert feature in sec, feature

@@ -79,7 +79,7 @@ Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned
 | 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (80% correctly assigned) | 2 of 240 | 45 of 240 | 14–31 |
 |  | Exam form | 149 of 240 | 10 of 84 (88% correctly ruled out) | 0 of 156 (87% correctly assigned) | 48 of 240 | 33 of 240 | 33 |
 
-All 38 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
+All 38 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 10 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
 
 **Can an AI check the answers?** On real notes there is no answer key, so we tested whether a general-purpose AI (a large language model) could stand in for one. It read each note and gave its own status, which matched the answer key on 83% of charts but only 53% of hard notes (they leave out what the answer key is built from). Asked whether a method's answer was right, it caught most mistakes of weak methods but only 26% of the best note model's, which are near-misses such as one stage off. So it can't replace the answer key yet. (These are LLM judgments, checked against the answer key.) Details: [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading); in Databricks, the *Scorecard* dashboard.
 

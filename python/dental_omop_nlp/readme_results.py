@@ -65,7 +65,7 @@ EVIDENCE = {"probing_chart": ("probing chart", "staged from the measurements"),
 
 PHENOTYPE_GROUPS = ("Rules on the whole record", "Trained AI on the note + stage 4 rule", "Trained AI on the note",
                     "Untrained medical AI on the note (MedGemma 1.5 4B)", "Simple text methods on the note",
-                    "One part of the record alone")
+                    "One part of the record alone", "Untrained general AI on the note (Databricks)")
 DEID_GROUPS = ("Several tools combined", "One AI tool", "Pattern matching only")
 
 # Plain names for the README; the full table keeps the code names.
@@ -78,7 +78,9 @@ _PLAIN = {"algorithm_v0": "Gum measurements first", "algorithm_design": "Exam fo
           "modernbert-base": "ModernBERT", "bio-clinicalbert": "Bio ClinicalBERT", "biomedbert": "BiomedBERT",
           "bioclinical-modernbert-base": "BioClinical ModernBERT", "scibert": "SciBERT",
           "modernbert-large": "ModernBERT large", "bioclinical-modernbert-large": "BioClinical ModernBERT large",
-          "longformer-base": "Longformer", "clinical-longformer": "Clinical-Longformer", "gatortron-base": "GatorTron"}
+          "longformer-base": "Longformer", "clinical-longformer": "Clinical-Longformer", "gatortron-base": "GatorTron",
+          "dbai-classify": "Databricks ai_classify", "llama-3.3-70b-instruct": "Llama 3.3 70B"}
+_GENERAL_LLMS = ("dbai-classify", "llama-3.3-70b-instruct")   # spec 017: Databricks-hosted, untrained on our notes
 _PLAIN_TOOL = {"hf_stanford": "Stanford AI", "hf_obi": "OBI AI", "presidio": "Presidio", "regex_v2": "patterns",
                "regex": "patterns (first version)", "guard": "dental-word guard", "routed": "routed by identifier type"}
 
@@ -114,6 +116,8 @@ def readme_label(system: str) -> str:
         return "Keyword rules (simple baseline)"
     if b.startswith("medgemma"):
         return f"Medical AI, untrained ({plain_system(system)}){rule}"
+    if b in _GENERAL_LLMS:
+        return f"General AI on Databricks, untrained ({plain_system(system)}){rule}"
     if b in _BASELINES:
         return plain_system(system) + rule
     if system in EVIDENCE:
@@ -158,6 +162,8 @@ def phenotype_group(system: str) -> str:
         return PHENOTYPE_GROUPS[5]
     if b.startswith("medgemma"):
         return PHENOTYPE_GROUPS[3]
+    if b in _GENERAL_LLMS:
+        return PHENOTYPE_GROUPS[6]
     if b in _BASELINES:
         return PHENOTYPE_GROUPS[4]
     return PHENOTYPE_GROUPS[1] if system.endswith("+rules4") else PHENOTYPE_GROUPS[2]
@@ -360,7 +366,7 @@ def _model_method(method: str) -> str:
     s = ("rules (regex)" if b == "note_rules" else
          "TF-IDF + logistic regression" if b == "tfidf_logreg" else
          "TF-IDF + radiograph features" if b == "fusion_tfidf_rad" else
-         "zero-shot LLM" if b.startswith("medgemma") else "fine-tuned encoder")
+         "zero-shot LLM" if b.startswith("medgemma") or b in _GENERAL_LLMS else "fine-tuned encoder")
     mods = {"cw": "class-weighted", "s1": "seed 1", "s2": "seed 2", "rules4": "+ rules for stage IV"}
     extra = [mods.get(m) or (f"learning rate {m[2:]}" if m.startswith("lr") else None) for m in method.split("+")[1:]]
     return ", ".join([s, *[e for e in extra if e]])
