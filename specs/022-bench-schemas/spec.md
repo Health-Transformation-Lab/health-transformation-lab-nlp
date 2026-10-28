@@ -53,9 +53,9 @@ Spec 021 rebuilt the catalog rather than copying it; this spec does the same. Af
 reloads every committed result into `gold_perio_bench`, and the jobs regenerate the study tables, the volume's
 files and the registered model (docs/deployment.md, spec 022 section).
 
-- The `<layer>_dental_omop_perio` schemas a target already has (uat, deployed with spec 021, and dev once its
-  deploy runs) stay declared there, under their old bundle keys, so the deploy neither fails on
-  `prevent_destroy` nor drops them. prod never had them, so it doesn't get them.
+- dev deployed the `<layer>_dental_omop_perio` schemas under spec 021; uat and prod never did. They stay
+  declared under the dev target only, with their old bundle keys, so the deploy neither fails on
+  `prevent_destroy` nor drops them.
 - Retiring them is a documented owner step: unbind, delete from the bundle, drop.
 
 ## Out of scope

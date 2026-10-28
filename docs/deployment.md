@@ -75,22 +75,22 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 
 ### Spec 022: from `<layer>_dental_omop_perio` to the bench schemas
 
-Spec 021 deployed `health_transformation_lab.<layer>_dental_omop_perio` to uat (and to dev, once its deploy
-runs). Spec 022 renames them to `<layer>_perio_bench` and adds the empty access_bench and oral_health_bench
+Spec 021 deployed `health_transformation_lab.<layer>_dental_omop_perio` to dev; uat and prod were never
+deployed. Spec 022 renames them to `<layer>_perio_bench` and adds the empty access_bench and oral_health_bench
 schemas. Like spec 021, it **rebuilds rather than copies**: after the deploy, Load results reloads every
 committed result into `gold_perio_bench`; run *Benchmark*, *Judge scorecard* and *NHANES perio* to regenerate
 the study tables, the volume's files and the registered model.
 
 The old schemas, their `data` volume and the old `perio_note_classifier` stay declared in `databricks.yml` under
-the dev and uat targets, with their old bundle keys (`landing`, `bronze`, `silver`, `gold`, `data`,
-`perio_note_classifier`), because `prevent_destroy` would fail a deploy that renamed or removed them. prod never
-had them.
+the dev target only, with their old bundle keys (`landing`, `bronze`, `silver`, `gold`, `data`,
+`perio_note_classifier`), because `prevent_destroy` would fail a deploy that renamed or removed them. uat and
+prod never had them, so their first deploy creates only the bench schemas.
 
-**Retiring them**, per target, once the perio_bench tables and model check out:
+**Retiring them** in dev, once the perio_bench tables and model check out:
 
-1. `databricks bundle deployment unbind <key> -t <target>` for `landing`, `bronze`, `silver`, `gold`, `data` and
+1. `databricks bundle deployment unbind <key> -t dev` for `landing`, `bronze`, `silver`, `gold`, `data` and
    `perio_note_classifier`, so the bundle stops managing them without deleting them.
-2. In a pull request, delete the legacy blocks (the `&legacy_*` anchors under dev and their uses under uat) and
+2. In a pull request, delete the legacy `schemas`, `volumes` and `registered_models` blocks under dev and
    the `legacy_domain` variable; trim the allow-list in `python/tests/test_no_legacy_schema_names.py`.
 3. Drop them in SQL: `DROP SCHEMA health_transformation_lab.<layer>_dental_omop_perio CASCADE;`
 
@@ -100,7 +100,7 @@ Kaggle names changed too (kaggle/README.md lists the old items to delete).
 
 | Variable | Default | What it sets |
 |---|---|---|
-| `catalog`, `legacy_domain` | `health_transformation_lab`, `dental_omop_perio` | the catalog, and the suffix of the old schemas dev and uat keep until retired (spec 022) |
+| `catalog`, `legacy_domain` | `health_transformation_lab`, `dental_omop_perio` | the catalog, and the suffix of the old schemas dev keeps until retired (spec 022) |
 | `n_people` | `300` | synthetic people in the benchmark job |
 | `run_encoder` | `false` (uat/prod `true`) | install CPU-only torch and train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |

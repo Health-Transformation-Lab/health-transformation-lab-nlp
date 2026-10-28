@@ -25,7 +25,7 @@ variables:
     description: Unity Catalog catalog the bundle creates
     default: health_transformation_lab
   legacy_domain:
-    description: Suffix of the old layer schemas dev and uat keep until retired (spec 022; docs/deployment.md)
+    description: Suffix of the old layer schemas dev keeps until retired (spec 022; docs/deployment.md)
     default: dental_omop_perio
   n_people:
     description: Synthetic people to generate in the benchmark job
@@ -121,10 +121,10 @@ targets:
           # dev has Default Storage: the catalog was made with SQL and adopted (docs/deployment.md), which
           # gives it the workspace's default storage root. Stating it keeps the plan from recreating the catalog.
           storage_root: s3://dbstorage-prod-ast0p/uc/556de223-f832-4c59-8269-f8bebde9a978/71a2bfe2-25ec-4dde-ad73-b6f34409fcef
-      # Spec 022: the old <layer>_dental_omop_perio schemas, their volume and model, which this target deployed
-      # under spec 021. They keep their bundle keys so a deploy neither fails on prevent_destroy nor drops them;
-      # retire them by hand (docs/deployment.md). uat reuses these through the anchors.
-      schemas: &legacy_schemas
+      # Spec 022: the old <layer>_dental_omop_perio schemas, their volume and model, which dev deployed under
+      # spec 021 (uat and prod never did). They keep their bundle keys so a deploy neither fails on
+      # prevent_destroy nor drops them; retire them by hand (docs/deployment.md).
+      schemas:
         landing:
           catalog_name: ${resources.catalogs.health_transformation_lab.name}
           name: landing_${var.legacy_domain}
@@ -149,7 +149,7 @@ targets:
           comment: Legacy (spec 022), replaced by gold_perio_bench. Synthetic data only.
           lifecycle:
             prevent_destroy: true
-      volumes: &legacy_volumes
+      volumes:
         data:
           catalog_name: ${resources.schemas.landing.catalog_name}
           schema_name: ${resources.schemas.landing.name}
@@ -158,7 +158,7 @@ targets:
           comment: Legacy (spec 022), replaced by landing_perio_bench.data. Synthetic data only.
           lifecycle:
             prevent_destroy: true
-      registered_models: &legacy_models
+      registered_models:
         perio_note_classifier:
           name: perio_note_classifier
           catalog_name: ${resources.schemas.gold.catalog_name}
@@ -181,9 +181,6 @@ targets:
       - group_name: ${var.users_group}
         level: CAN_VIEW
     resources:
-      schemas: *legacy_schemas            # spec 022: uat deployed the old schemas too (see dev)
-      volumes: *legacy_volumes
-      registered_models: *legacy_models
       jobs:
         judge_monitoring: &judge_monitoring_job
           name: Judge monitoring

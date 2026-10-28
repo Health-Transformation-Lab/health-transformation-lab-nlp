@@ -11,7 +11,7 @@ VAR = re.compile(r"\$\{var\.([a-z_]+)\}")
 GOLD_CATALOG = "${resources.schemas.perio_bench_gold.catalog_name}"
 GOLD_SCHEMA = "${resources.schemas.perio_bench_gold.name}"
 LANDING = "${resources.volumes.perio_bench_data.schema_name}"
-LEGACY_TARGETS = ("dev", "uat")   # spec 022: the targets that deployed <layer>_dental_omop_perio
+LEGACY_TARGETS = ("dev",)   # spec 022: the only target that deployed <layer>_dental_omop_perio (spec 021)
 WIDGET = re.compile(r"""widgets\.(?:text|dropdown)\(\s*["']([a-z_]+)["']|CREATE WIDGET TEXT ([a-z_]+)""")
 
 
@@ -53,7 +53,7 @@ def test_three_targets_with_expected_modes():
 def test_every_target_uses_the_same_catalog_and_legacy_domain():
     # dev, uat and prod are separate workspaces, so the Unity Catalog names are the
     # same everywhere: catalog health_transformation_lab, schemas <layer>_<bench> (spec 022). legacy_domain
-    # names the old <layer>_dental_omop_perio schemas dev and uat keep until they are retired.
+    # names the old <layer>_dental_omop_perio schemas dev keeps until they are retired.
     root, _ = _load()
     d = {k: v["default"] for k, v in root["variables"].items() if "default" in v}
     assert "domain" not in root["variables"]
@@ -193,8 +193,8 @@ def test_jobs_write_to_the_bundle_schema():
 
 
 def test_old_schemas_stay_declared_only_where_they_were_deployed():
-    """Spec 022: dev and uat deployed <layer>_dental_omop_perio (spec 021). Their bundle keys stay, under those
-    targets only, so a deploy neither fails on prevent_destroy nor drops them; prod never had them."""
+    """Spec 022: dev deployed <layer>_dental_omop_perio (spec 021). Their bundle keys stay, under dev only, so a
+    deploy neither fails on prevent_destroy nor drops them; uat and prod never had them."""
     root, _ = _load()
     for env, t in root["targets"].items():
         res = t.get("resources", {})

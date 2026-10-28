@@ -7,7 +7,7 @@ from health_transformation_lab_nlp.paths import REPO_ROOT
 OLD = "dental_omop_perio"
 ALLOWED = (
     "pull_requests/", "specs/0", ".specify/", "data/",    # history keeps the names it was written with
-    "databricks.yml",                                     # legacy_domain: dev and uat keep their old schemas
+    "databricks.yml",                                     # legacy_domain: dev keeps its old schemas
     "docs/deployment.md",                                 # what was renamed, and retiring the legacy schemas
     "python/tests/test_bundle.py", "python/tests/test_no_legacy_schema_names.py",
 )

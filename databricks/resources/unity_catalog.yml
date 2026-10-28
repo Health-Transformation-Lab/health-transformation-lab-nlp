@@ -10,8 +10,8 @@
 #     bronze_/silver_/gold_access_bench      empty until access_bench has a pipeline
 #     bronze_/silver_/gold_oral_health_bench empty until oral_health_bench has a pipeline
 #
-# The old schemas (<layer>_${var.legacy_domain}) stay declared in databricks.yml, under the dev and uat targets
-# that deployed them, until they are retired (docs/deployment.md).
+# The old schemas (<layer>_${var.legacy_domain}) stay declared in databricks.yml, under the dev target that
+# deployed them, until they are retired (docs/deployment.md).
 #
 # Each target is its own workspace, so the names are the same everywhere, with no
 # dev_ prefix (the dev target is not in development mode). Jobs reference these

@@ -10,7 +10,8 @@
    `oral_health_bench_*` schemas and a `perio_bench_data` volume, all `prevent_destroy`; `mlops.yml` declares
    `perio_bench_note_classifier` (name `perio_note_classifier`, in `gold_perio_bench`). Every job points at
    them. The old `landing`/`bronze`/`silver`/`gold` schemas, `data` volume and `perio_note_classifier` model keep
-   their keys, but only under `targets.dev` and `targets.uat` in `databricks.yml`, named with `legacy_domain`.
+   their keys, but only under `targets.dev` in `databricks.yml` (the one target that deployed them), named with
+   `legacy_domain`.
    The `domain` variable goes.
 3. **Rename.** Notebook defaults, dashboards and Genie spaces (rebuilt with `scripts/42_build_dashboards.py`),
    Python modules, docs, diagrams (rebuilt and re-rendered) and AGENTS.md use `<layer>_perio_bench`.
@@ -25,11 +26,11 @@ suffix (`legacy_domain`, read by nothing outside the bundle).
 ## Tests first
 
 - `test_schemas.py`: the ten names and the catalog.
-- `test_bundle.py`: bench schemas at the top level; legacy entries only in dev and uat; jobs, volume and model
+- `test_bundle.py`: bench schemas at the top level; legacy entries only in dev; jobs, volume and model
   use `perio_bench_*`.
 - `test_no_legacy_schema_names.py`: `dental_omop_perio` only in allowed files.
 - Kaggle tests: kernel ids and dataset slugs use the new names.
 
 ## Environments
 
-dev, uat and prod change the same way on their next deploy. dev and uat keep their old schemas until retired.
+dev, uat and prod get the bench schemas on their next deploy. dev keeps its old schemas until retired.
