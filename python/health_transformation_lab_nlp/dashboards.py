@@ -442,7 +442,10 @@ DQ_INSTRUCTIONS = [
     ("fact_case_profile_item is each visit's case profile (spec 026, after KEEPER): one row per visit and item, "
      "grouped by category_name in category_order_num order, items in item_order_num order. item_value_name is the "
      "value as shown, with item_unit_name; 'not recorded' means the record lacks it, 'not taken' means no probing "
-     "chart, 'no later visit' means the patient's last visit. Structured values only, never note text. To show a "
+     "chart, 'no later visit' means the patient's last visit. The item \"next visit's plausibility flags\" lists "
+     "the checks the next visit fails, or 'none': cal_drop (max CAL fell by more than 1.5 mm), rbl_drop (bone loss "
+     "fell by more than 5 points), teeth_regained (fewer teeth lost than before), perio_resolved (periodontitis "
+     "before, not now), stage_drop (a lower stage than before). Structured values only, never note text. To show a "
      "visit's profile, list category_name, item_name, item_value_name and item_unit_name for its visit_id in order. "
      "Recorded diagnosis codes are what the dentist recorded; we find gum disease in records, we don't diagnose."),
 ]

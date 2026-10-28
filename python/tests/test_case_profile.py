@@ -1,5 +1,6 @@
 """Spec 026 US1: a KEEPER-style case profile for every synthetic visit, structured values only."""
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -103,3 +104,36 @@ def test_the_built_study_has_one_complete_profile_per_visit():
     assert (per_visit == len(CATEGORIES)).all()
     assert len(p) == len(v) * len(cp.PROFILE_ITEMS)
     assert p["value"].notna().all()
+
+
+@pytest.mark.parametrize("value, shown", [
+    (np.True_, "yes"), (np.False_, "no"), (True, "yes"), (np.int64(3), "3"), (np.float64(2.5), "2.5"),
+    (np.float32("nan"), cp.NOT_RECORDED), (pd.NA, cp.NOT_RECORDED), (pd.NaT, cp.NOT_RECORDED), (None, cp.NOT_RECORDED),
+    ("unknown", cp.NOT_RECORDED), ("gingivitis", "gingivitis")])
+def test_values_show_the_same_whatever_their_numpy_or_pandas_type(value, shown):
+    assert cp._shown(value) == shown
+
+
+def test_the_first_visit_is_visit_1(two_visits):
+    p = cp.build_profiles(two_visits)
+    assert _value(p, 1, "visit number for the patient") == "1"
+    assert _value(p, 2, "visit number for the patient") == "2"
+
+
+def test_the_next_visit_is_the_next_by_date_as_the_plausibility_checks_order_them(two_visits):
+    # visit_seq says visit 2 comes first, but its date is later: the date decides, as in check_history
+    v = two_visits.assign(visit_seq=[1, 0])
+    p = cp.build_profiles(v)
+    assert _value(p, 1, "next visit's recorded code") == "periodontitis_stage_1"
+    assert _value(p, 2, "next visit's recorded code") == cp.NO_LATER_VISIT
+
+
+def test_nullable_dtypes_build_the_same_profiles(two_visits):
+    nullable = two_visits.convert_dtypes()
+    assert cp.build_profiles(nullable).equals(cp.build_profiles(two_visits))
+
+
+def test_treatment_items_say_they_are_statuses_read_from_procedure_codes(two_visits):
+    items = set(cp.build_profiles(two_visits).query("category == 'Treatment'")["item"])
+    assert items == {"status from periodontal procedure codes, completed",
+                     "status from periodontal procedure codes, planned"}

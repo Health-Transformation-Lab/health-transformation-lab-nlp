@@ -13,8 +13,7 @@ what the synthetic dentist recorded.
 
 from __future__ import annotations
 
-import math
-
+import numpy as np
 import pandas as pd
 
 from . import plausibility
@@ -33,7 +32,7 @@ PROFILE_ITEMS: list[tuple[str, str, str | None, str]] = [
     ("Presentation", "recorded diagnosis code, completed", "proc_dx_completed", ""),
     ("Presentation", "recorded diagnosis code, planned", "proc_dx_planned", ""),
     ("Presentation", "exam form", "exam_form", ""),
-    ("Visit context", "visit number for the patient", "visit_seq", ""),
+    ("Visit context", "visit number for the patient", "visit_seq", ""),   # shown from 1; visit_seq starts at 0
     ("Visit context", "probing chart taken", "charted", ""),
     ("Visit context", "treated before", "treated_before", ""),
     ("Measurements", "max probing depth", "rec_max_probing_depth_mm", "mm"),
@@ -47,8 +46,8 @@ PROFILE_ITEMS: list[tuple[str, str, str | None, str]] = [
     ("Risk factors", "cigarettes per day", "cigarettes_per_day", ""),
     ("Risk factors", "diabetes", "diabetes", ""),
     ("Risk factors", "HbA1c", "hba1c", "%"),
-    ("Treatment", "periodontal procedure codes, completed", "proc_codes_completed", ""),
-    ("Treatment", "periodontal procedure codes, planned", "proc_codes_planned", ""),
+    ("Treatment", "status from periodontal procedure codes, completed", "proc_codes_completed", ""),
+    ("Treatment", "status from periodontal procedure codes, planned", "proc_codes_planned", ""),
     ("Other readings", "note reader", "notes", ""),
     ("Other readings", "rules, gum measurements first", "algorithm_v0", ""),
     ("Other readings", "rules in the study design's order", "algorithm_design", ""),
@@ -60,12 +59,14 @@ CATEGORIES = list(dict.fromkeys(cat for cat, *_ in PROFILE_ITEMS))
 
 def _shown(value) -> str:
     """A value as the profile shows it: "not recorded" when missing or unknown, yes/no, numbers without trailing
-    zeros, statuses as their code."""
-    if value is None or (isinstance(value, float) and math.isnan(value)) or value == "unknown":
+    zeros, statuses as their code. Python, numpy and pandas scalars all show the same."""
+    if not isinstance(value, str) and pd.isna(value):
         return NOT_RECORDED
-    if isinstance(value, bool) or type(value).__name__ == "bool_":
+    if value == "unknown":
+        return NOT_RECORDED
+    if isinstance(value, (bool, np.bool_)):
         return "yes" if value else "no"
-    if isinstance(value, (int, float)) or hasattr(value, "item"):
+    if isinstance(value, (int, float, np.number)):
         return f"{float(value):g}"
     return str(value)
 
@@ -82,7 +83,7 @@ def _after(visits: pd.DataFrame) -> pd.DataFrame:
     flags = plausibility.check_history(history_frame(visits), "proc_dx_completed").set_index("visit_id")
     failed = flags[plausibility.FLAGS].apply(lambda r: ", ".join(f for f in plausibility.FLAGS if r[f]) or "none",
                                              axis=1)
-    v = visits.sort_values(["person_id", "visit_seq", "visit_id"])
+    v = visits.sort_values(["person_id", "visit_date", "visit_id"])   # the order check_history uses
     nxt = v.groupby("person_id").visit_id.shift(-1)
     out = pd.DataFrame({"visit_id": v.visit_id.to_numpy(), "next_id": nxt.to_numpy()})
     code = visits.set_index("visit_id").proc_dx_completed
@@ -102,6 +103,7 @@ def build_profiles(visits: pd.DataFrame) -> pd.DataFrame:
     after = _after(visits)
     order = {c: i + 1 for i, c in enumerate(CATEGORIES)}
     rows = []
+    visits = visits.astype(object).where(visits.notna(), None)   # one scalar type, whatever the dtypes
     for r in visits.itertuples(index=False):
         rec = r._asdict()
         for i, (cat, item, col, unit) in enumerate(PROFILE_ITEMS, start=1):
@@ -109,6 +111,8 @@ def build_profiles(visits: pd.DataFrame) -> pd.DataFrame:
                 value = after.at[r.visit_id, item]
             elif col == "probing_chart" and not rec["charted"]:
                 value = NOT_TAKEN
+            elif col == "visit_seq":
+                value = _shown(rec[col] + 1)
             else:
                 value = _shown(rec[col])
             rows.append({"visit_id": r.visit_id, "category": cat, "category_order": order[cat], "item": item,
