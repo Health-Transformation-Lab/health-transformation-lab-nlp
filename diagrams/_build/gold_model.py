@@ -81,6 +81,7 @@ TABLES = {
             C("visit_id", "bigint", "review chart", "PK,FK"),
             C("model_name", "string", "model id"),
             C("backend_code", "string", "hf (local weights) · openai (OpenAI-compatible endpoint)"),
+            C("model_revision_id", "string", "Kaggle Models handle or Hugging Face commit of the weights; empty before #214"),
             C("prompt_version_code", "string", "e.g. reader-v2"),
             C("shot_count", "bigint", "few-shot examples in the prompt"),
             C("input_token_count", "bigint", "prompt tokens"),
