@@ -12,13 +12,15 @@ whether an answer helps someone get care. The lab writes those benchmarks and pu
 
 Two benchmarks so far, each with a short pitch that drills down to the detail.
 
-## 1. PerioBench: can AI read the dental record the way a gum specialist does?
+## 1. PerioBench: better care for gum disease through more accurate diagnosis
 
 <a href="docs/edr/full_text_and_notes.md"><img src="docs/img/edr_deck_cover.png" alt="The diagnosis is in the dental record. Nobody can count it." width="480"></a>
 
-Gum disease is written down at almost every dental visit, but in pieces: notes, forms, codes and measurements
-that often disagree, so nobody can count it across clinics or link it to diabetes. This study reads the whole
-record, compares rules and AI with gum specialists, and runs end to end on **synthetic** records:
+The goal is better care for people with periodontitis. Gum disease is written down at almost every dental visit,
+but in pieces: notes, forms, codes and measurements that often disagree, so it is missed, can't be followed over
+time, and can't be linked to diabetes care. A diagnostic tool that reads the whole record accurately lets clinics
+find it earlier and treat it. PerioBench scores how accurately rules and AI diagnose it; agreement with gum
+specialists is how accuracy is checked, not the goal. It runs end to end on **synthetic** records:
 
 - the whole record, combined by rules that read the gum measurements first: **234 of 240** charts right;
 - the free-text note alone, read by a small trained model with a stage 4 rule: **219 of 240**;
