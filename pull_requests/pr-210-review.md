@@ -58,7 +58,7 @@ None.
 - **Fixed by #215.** The file's `revision` column had no gold name, so CI failed here and Load results would
   have failed too. The fix is merged into this branch and no-ops once #215 is on main.
 
-Outside this PR: Outside it, the workflow could not open its own PR, and its warning names the repo setting
+Outside this PR, the workflow could not open its own PR, and its warning names the repo setting
 (Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"). That setting is
 the owner's to change. Until then, results PRs are opened by hand.
 
