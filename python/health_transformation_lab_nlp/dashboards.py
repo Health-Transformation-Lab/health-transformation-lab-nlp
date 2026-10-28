@@ -413,7 +413,7 @@ def _space(tables: list[str], instructions: list[str], questions: list[str]) -> 
 
 
 DQ_TABLES = ["dq_check", "dq_column_missing", "dq_prevalence", "dq_temporal_change", "dq_stage_transition",
-             "dq_source_concordance", "fact_visit_evidence", "dq_injected_error"]
+             "dq_source_concordance", "fact_visit_evidence", "dq_injected_error", "fact_case_profile_item"]
 
 DQ_INSTRUCTIONS = [
     ("Every table holds synthetic data from the study's generator, scored against its own truth. Start every "
@@ -439,6 +439,12 @@ DQ_INSTRUCTIONS = [
      "simulated, so never report a reliability figure."),
     ("dq_check holds each check per clinic; clinic_code = 'All' is every clinic together. Do not add the clinic rows "
      "to the 'All' rows."),
+    ("fact_case_profile_item is each visit's case profile (spec 026, after KEEPER): one row per visit and item, "
+     "grouped by category_name in category_order_num order, items in item_order_num order. item_value_name is the "
+     "value as shown, with item_unit_name; 'not recorded' means the record lacks it, 'not taken' means no probing "
+     "chart, 'no later visit' means the patient's last visit. Structured values only, never note text. To show a "
+     "visit's profile, list category_name, item_name, item_value_name and item_unit_name for its visit_id in order. "
+     "Recorded diagnosis codes are what the dentist recorded; we find gum disease in records, we don't diagnose."),
 ]
 
 DQ_QUESTIONS = [
@@ -448,6 +454,7 @@ DQ_QUESTIONS = [
     "Which data quality checks failed at clinic 3?",
     "What share of later visits show the stage improving, by method?",
     "How well do the chart note and the exam form agree with each other?",
+    "Show the case profile of visit 1234.",
 ]
 
 
