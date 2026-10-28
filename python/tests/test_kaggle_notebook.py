@@ -42,6 +42,9 @@ def test_keras_backend_runs_on_torch_and_is_compared_with_the_hf_results():
     code = _code()
     assert 'os.environ["KERAS_BACKEND"] = "torch"' in code
     assert 'os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"' in code     # TensorFlow took GPU memory at import
+    # second run: Keras on torch put tensors on both T4s ("cuda:1 and cuda:0"); bfloat16 4B fits on one
+    assert 'os.environ["CUDA_VISIBLE_DEVICES"] = "0"' in code
+    assert "os.path.exists(new)" in code                                  # no keras file: say so, don't crash
     assert code.index('os.environ["KERAS_BACKEND"]') < code.index("11_ai_predict.py")
     assert "--backend {BACKEND}" in code
     assert "40_compare_backends.py" in code and code.index("--limit {TEST_NOTES}") < code.index("40_compare_backends.py")
