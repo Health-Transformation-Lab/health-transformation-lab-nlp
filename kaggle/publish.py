@@ -1,5 +1,5 @@
 """Build a Kaggle dataset folder (the files, and dataset-metadata.json with the card) and, with --upload,
-publish it: created public the first time, a new version after (spec 018). Used by
+publish it: created public the first time, a new version after (spec 020). Used by
 .github/workflows/kaggle-publish.yml; CC BY 4.0.
 
     python kaggle/publish.py --dataset notes|results --out build/notes --username <kaggle user> --commit <sha>

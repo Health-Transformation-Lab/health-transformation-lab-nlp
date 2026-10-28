@@ -1,4 +1,4 @@
-"""Publishing the synthetic data and results as Kaggle datasets (spec 018, kaggle/publish.py)."""
+"""Publishing the synthetic data and results as Kaggle datasets (spec 020, kaggle/publish.py)."""
 
 import importlib.util
 import json

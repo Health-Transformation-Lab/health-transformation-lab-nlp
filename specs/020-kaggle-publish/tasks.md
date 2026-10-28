@@ -1,4 +1,4 @@
-# Tasks: spec 018
+# Tasks: spec 020
 
 - [x] T001 Tests for the dataset builder and workflow (`test_kaggle_publish.py`), written first
 - [x] T002 `kaggle/publish.py` and the cards `kaggle/cards/notes.md`, `results.md` (US1 #120, US2 #121)

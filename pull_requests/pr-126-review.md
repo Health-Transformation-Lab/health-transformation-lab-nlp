@@ -1,6 +1,6 @@
 ---
 pr: 126
-branch: feat/120-018-kaggle-publish
+branch: feat/120-020-kaggle-publish
 title: "Publish the synthetic notes and benchmark results as Kaggle datasets"
 author: jcbowyer
 reviewed_at: 2026-10-28
@@ -11,7 +11,7 @@ verdict: approve-with-nits
 # PR Review: Publish the synthetic notes and benchmark results as Kaggle datasets
 
 ## Summary
-Spec 018 US1, US2 and US4. `kaggle/publish.py` builds two public CC BY 4.0 Kaggle datasets from a fixed set of
+Spec 020 US1, US2 and US4. `kaggle/publish.py` builds two public CC BY 4.0 Kaggle datasets from a fixed set of
 files: the synthetic notes and charts, and every real model's results on the review set. A data card written in
 `kaggle/cards/` carries the disclaimer. The `kaggle-publish` workflow creates each dataset the first time and
 adds a version after that. `kaggle/README.md` explains everything on Kaggle in one page.
@@ -95,7 +95,7 @@ None.
 | Simulated is labelled simulated | ✅ | simulated files and rows refused |
 | Seeds fixed | n/a | |
 | Paths | ✅ after fix | `DATASETS_DIR` |
-| Spec for big changes | ✅ | spec 018, issues #120–#123, branch `feat/120-018-kaggle-publish` |
+| Spec for big changes | ✅ | spec 020, issues #120–#123, branch `feat/120-020-kaggle-publish` |
 | Prices | ✅ after fix | the card says the cost columns are illustrative |
 | Commits | ✅ | |
 | Docs | ✅ | `kaggle/README.md`; the cards are the dataset pages |
@@ -114,7 +114,7 @@ None.
 - invalid tags warn.
 
 The full suite passes: 664 passed, 14 skipped. Not run here: the workflow itself, which can only be started
-once it is on `main`. The first publish after merge is the end-to-end check (spec 018 T005).
+once it is on `main`. The first publish after merge is the end-to-end check (spec 020 T005).
 
 ## Verdict
 **approve-with-nits.** Every finding is fixed on the branch. Merge when CI is green on the head commit, then

@@ -13,7 +13,7 @@ data only, and no token is ever stored in it.
 | Notebook `dental-omop-encoder-gpu` | Fine-tunes the large encoders (ModernBERT-large, Longformer, GatorTron) | *Fine-tune the GPU encoders on a free Kaggle GPU* | `encoder_gpu.ipynb` |
 | Dataset `synthetic-dental-perio-notes` | Synthetic notes, labels, structured visits, 240-note review set and answer key | *Publish datasets to Kaggle* | `publish.py`, `cards/notes.md` |
 | Dataset `dental-perio-benchmark-results` | Every model's answers on the review set, the leaderboard, the judge scorecard | *Publish datasets to Kaggle* | `publish.py`, `cards/results.md` |
-| Model (planned, spec 018 US3) | The best fine-tuned note classifier (ModernBERT-base, class-weighted) | | |
+| Model (planned, spec 020 US3) | The best fine-tuned note classifier (ModernBERT-base, class-weighted) | | |
 
 The notebook `dental-omop-medgemma-keras-test` was a one-off comparison (MedGemma through Keras vs converted to
 transformers; the decision is in PR #99) and can be deleted.
@@ -73,5 +73,5 @@ page's ⋮ menu → *Add to collection*). Make it public.
   `results_manifest.csv`.
 - `show_log.py` prints a Kaggle log without the warnings.
 
-More: `docs/medgemma.md` (why Kaggle, how MedGemma is loaded), spec 016 (results into Delta), spec 018
+More: `docs/medgemma.md` (why Kaggle, how MedGemma is loaded), spec 016 (results into Delta), spec 020
 (publishing).

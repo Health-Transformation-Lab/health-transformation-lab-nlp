@@ -1,6 +1,6 @@
 # Feature Specification: publish the synthetic data, results and best model on Kaggle
 
-**Feature Branch**: `feat/120-018-kaggle-publish`
+**Feature Branch**: `feat/120-018-kaggle-publish` (opened as 018; renumbered to 020 because spec 018 is gold naming)
 
 **Created**: 2026-10-28
 

@@ -1,4 +1,4 @@
-# Publish the synthetic notes and the benchmark results as public Kaggle datasets (spec 018, kaggle/publish.py).
+# Publish the synthetic notes and the benchmark results as public Kaggle datasets (spec 020, kaggle/publish.py).
 # Start it from the Actions tab: "Publish datasets to Kaggle" -> Run workflow. The first run creates each dataset
 # (public, CC BY 4.0); later runs add a version named after the commit; publish.py fails the run if Kaggle
 # refuses an upload. Same secrets as the notebook workflows:
