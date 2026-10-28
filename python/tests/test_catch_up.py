@@ -29,8 +29,9 @@ def _load(deployed="abc", runs=()):
             "runs": [{"git_commit": c, "life_cycle_state": lc, "result_state": rs} for c, lc, rs in runs]}
 
 
-def _decide(reachable=True, deploy=None, load=None):
-    return cu.decide(reachable, deploy, load, NOW)
+def _decide(reachable=True, deploy=None, load=None, down_hours=None):
+    last = NOW - timedelta(hours=down_hours) if down_hours is not None else None
+    return cu.decide(reachable, deploy, load, NOW, last)
 
 
 # ---- Databricks down ---------------------------------------------------------------------------------------
@@ -46,8 +47,30 @@ def test_still_behind_after_a_day_fails_so_the_owner_hears():
 
 
 def test_unreachable_after_a_good_deploy_only_warns():
-    d = _decide(reachable=False, deploy=_deploy("success"))
+    d = _decide(reachable=False, deploy=_deploy("success"), down_hours=5)
     assert d.action == "wait" and d.exit_code == 0
+
+
+def test_a_long_outage_escalates_even_after_a_good_deploy():
+    # PR review: a good deploy, a failed --no-wait load, then days down must not stay a quiet warning
+    for deploy in (_deploy("success"), None, _deploy(None, status="in_progress")):
+        d = _decide(reachable=False, deploy=deploy, down_hours=30)
+        assert d.exit_code == 1 and d.severity == "SEV2", deploy
+
+
+@pytest.mark.parametrize("host,ok", [("https://adb-123.4.azuredatabricks.net", True),
+                                     ("https://dbc-1a2b.cloud.databricks.com", True),
+                                     ("adb-123.azuredatabricks.net", False), ("https://", False), ("", False),
+                                     ("https://adb-1.azuredatabricks.net/", False)])
+def test_the_host_is_checked_before_any_work(host, ok):
+    assert (cu.check_host(host) is None) == ok
+
+
+def test_when_databricks_last_answered_survives_between_checks(tmp_path):
+    path = str(tmp_path / "s" / "dev.json")
+    assert cu.read_last_reachable(path) is None
+    cu.write_last_reachable(path, NOW)
+    assert cu.read_last_reachable(path) == NOW
 
 
 def test_a_rejected_credential_fails_at_once():
@@ -138,22 +161,26 @@ def test_the_deploy_job_for_the_target_is_found_in_the_newest_run_that_has_it():
             {"id": 1, "event": "push", "status": "completed", "run_attempt": 2, "head_sha": "m",
              "created_at": "2026-10-29T09:00:00Z", "jobs": [{"name": "deploy (dev)", "status": "completed",
                                                              "conclusion": "failure"}]}]
+    runs[1]["jobs"][0]["id"] = 501
     d = cu.pick_deploy(runs, "dev")
+    assert d["job_id"] == 501                     # re-run only this target's job, not uat's too
     assert d["run_id"] == 1 and d["conclusion"] == "failure" and d["attempt"] == 2 and d["head_sha"] == "m"
     assert d["created_at"] == datetime(2026, 10, 29, 9, tzinfo=timezone.utc)
 
 
 # ---- the workflow ------------------------------------------------------------------------------------------
 
-def test_workflow_runs_on_a_schedule_per_target_in_the_deploys_concurrency_group():
+def test_workflow_runs_on_a_schedule_per_target_without_cancelling_a_queued_deploy():
     wf = yaml.safe_load(WF.read_text())
     on = wf.get("on", wf.get(True))
     assert on["schedule"] and "workflow_dispatch" in on
     job = wf["jobs"]["catch-up"]
     deploy = yaml.safe_load((REPO_ROOT / ".github" / "workflows" / "deploy.yml").read_text())["jobs"]["deploy"]
-    assert job["concurrency"]["group"] == deploy["concurrency"]["group"]     # never races a deploy
+    # its own group: one shared with the deploy would cancel a deploy waiting in it (PR review)
+    assert job["concurrency"]["group"] == "catch-up-${{ matrix.target }}" != deploy["concurrency"]["group"]
     assert job["environment"] == "${{ matrix.target }}"
     assert set(job["strategy"]["matrix"]["target"]) == {"dev", "uat"}
     assert wf["permissions"]["actions"] == "write"                          # to re-run the failed deploy
     text = WF.read_text()
     assert ".github/scripts/catch_up.py" in text and "./.github/actions/databricks-signin" in text
+    assert "actions/cache/restore" in text and "actions/cache/save" in text and "CATCH_UP_STATE" in text

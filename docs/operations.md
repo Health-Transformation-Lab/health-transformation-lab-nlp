@@ -148,13 +148,14 @@ leave behind is the load: a merge deploys and starts Load results (`deploy.yml`)
 deploy fails; if Load results fails, nobody sees it, because the deploy starts it without waiting.
 
 `.github/workflows/catch-up.yml` (*Catch up Databricks after an outage*) runs `.github/scripts/catch_up.py` every
-3 hours for dev and uat, in the deploy's concurrency group, and can be started by hand:
+3 hours for dev and uat, and can be started by hand. It does nothing while a deploy of the target is queued or
+running, and keeps when Databricks last answered in the Actions cache:
 
 | What it finds | What it does |
 |---|---|
-| Databricks doesn't answer | warns (SEV3) and checks again in 3 hours; still behind 24 hours after a failed deploy, the run fails (SEV2, GitHub emails the owner) |
-| Databricks refuses the sign-in | fails at once (SEV2): renew `DATABRICKS_CLIENT_SECRET` |
-| it answers, and the last deploy of `main` failed | re-runs the deploy's failed jobs (up to 3 attempts; then it fails, SEV2: not an outage) |
+| Databricks doesn't answer | warns (SEV3) and checks again in 3 hours; no answer for 24 hours, or a deploy that failed 24 hours ago, fails the run (SEV2, GitHub emails the owner) |
+| Databricks refuses the sign-in, or `DATABRICKS_HOST` is malformed | fails at once (SEV2): renew `DATABRICKS_CLIENT_SECRET`, or fix the host |
+| it answers, and the last deploy of `main` failed | re-runs that target's deploy job (up to 3 attempts; then it fails, SEV2: a real failure, or Databricks flapping) |
 | deployed, but Load results has no successful run for the deployed commit | runs Load results and waits; fails after 3 failures for one commit |
 | otherwise | nothing |
 
