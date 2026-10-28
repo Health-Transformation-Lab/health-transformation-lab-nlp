@@ -172,3 +172,34 @@ def test_finished_checkpoint_has_googles_configs_and_medgemmas_chat_template(tmp
 
 def test_converter_finds_the_model_from_the_rung():
     assert _converter().kaggle_handle("medgemma-1.5-4b-it") == "keras/medgemma/keras/medgemma_1.5_instruct_4b/1"
+
+
+# ---- the notebook runs the commit the workflow was started from, not whatever a branch points to later
+
+def test_prepared_kernel_pins_the_commit(tmp_path):
+    sha = "e1455e441245fb86b27ccb54e3db4f1fba51b2f2"
+    _, _, nb = _prepare(tmp_path, "--branch", "claude/x", "--commit", sha)
+    assert f'COMMIT = "{sha}"' in _settings(nb)
+
+
+def test_prepared_kernel_without_a_commit_follows_the_branch(tmp_path):
+    _, _, nb = _prepare(tmp_path)
+    assert 'COMMIT = ""' in _settings(nb) and 'BRANCH = "main"' in _settings(nb)
+
+
+def test_notebook_checks_out_the_pinned_commit_and_says_which_code_it_runs():
+    code = _code()
+    assert "if COMMIT:" in code and "fetch --quiet --depth 1 origin {COMMIT}" in code
+    assert "log -1" in code                               # prints branch, short sha and date of the code it runs
+    assert code.index("log -1") < code.index("11_ai_predict.py")
+
+
+def test_workflow_defaults_to_the_branch_and_commit_it_was_started_from():
+    import yaml
+    path = REPO_ROOT / ".github" / "workflows" / "kaggle-medgemma.yml"
+    wf = yaml.safe_load(path.read_text())
+    inputs = wf.get("on", wf.get(True))["workflow_dispatch"]["inputs"]
+    assert inputs["branch"]["default"] == ""             # empty: the branch picked in "Use workflow from"
+    text = path.read_text()
+    assert "inputs.branch || github.ref_name" in text
+    assert "github.sha" in text                          # pinned when it runs its own branch

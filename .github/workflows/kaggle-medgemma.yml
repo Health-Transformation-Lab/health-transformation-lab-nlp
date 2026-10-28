@@ -20,8 +20,8 @@ on:
         description: "MedGemma version (models.yaml)"
         default: medgemma-1.5-4b-it
       branch:
-        description: "Branch the notebook clones"
-        default: main
+        description: "Branch the notebook clones (empty: the one picked in \"Use workflow from\", at this run's commit)"
+        default: ""
       wait:
         description: "Wait for Kaggle to finish and keep the outputs as an artifact"
         type: boolean
@@ -81,7 +81,8 @@ jobs:
         run: >
           python kaggle/prepare_kernel.py --out build/kernel --username "$KAGGLE_USERNAME"
           --rung "${{ inputs.rung }}" --shots "${{ inputs.shots }}" --limit "${{ inputs.limit }}"
-          --branch "${{ inputs.branch }}"
+          --branch "${{ inputs.branch || github.ref_name }}"
+          --commit "${{ (inputs.branch == '' || inputs.branch == github.ref_name) && github.sha || '' }}"
 
       - name: Push and run it on Kaggle (GPU T4 x2)
         if: ${{ !inputs.collect_only }}
