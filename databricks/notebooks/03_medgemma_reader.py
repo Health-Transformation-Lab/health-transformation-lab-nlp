@@ -14,7 +14,7 @@
 # MAGIC `29_medgemma_vs_bert.py` against the committed encoder predictions.
 # MAGIC
 # MAGIC **Before running:** accept the HAI-DEF terms for the model on Hugging Face and put a
-# MAGIC read token in a secret scope (`dental` / `hf_token`).
+# MAGIC read token in a secret scope (`health_transformation_lab` / `hf_token`).
 
 # COMMAND ----------
 

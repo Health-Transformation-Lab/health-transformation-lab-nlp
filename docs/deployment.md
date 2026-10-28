@@ -37,7 +37,8 @@ The bundle creates the catalog, all four schemas and the volume on deploy
 `bundle destroy` never drops them. Deploying needs Databricks CLI 0.288 or later
 and `CREATE CATALOG` on the metastore. (Older setups used `workspace.dental_dev`,
 `dental_uat.dental` and `dental_prod.dental`, made by hand or by an earlier version of
-the setup script. Nothing uses them now; drop them once the new catalog is deployed.)
+the setup script, then the catalog and secret scope that spec 021 renamed. Nothing uses
+them now; drop them once the new catalog is deployed.)
 
 No target uses `mode: development`. That mode prefixes every name (`[dev <user>]`
 on jobs, `dev_<user>_` on catalogs, schemas, volumes and registered models, which
@@ -82,7 +83,7 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 | `reader_shots`, `reader_lora_train` | `0`, `0` | MedGemma reader: few-shot examples per status, and LoRA fine-tune size (0 = off). Change these, or `reader_rung` (e.g. `medgemma-4b-it`), for one run with *Run now with different parameters* |
 | `telemetry_exporter` | `azure` | Pipeline telemetry for the GPU and NHANES jobs (spec 014): `azure` sends to Application Insights with the connection string from secret `health_transformation_lab/appinsights_connection_string` (telemetry off if the secret is missing), or `otlp`, `console`, `off`. Setup: [telemetry.md](telemetry.md) |
 | `deid_ai_engines`, `deid_llm_endpoint` | `llm`, `ai_mask` and their `+regex_v2+guard` versions; `databricks-meta-llama-3-3-70b-instruct` | De-id AI methods job |
-| `hf_secret_scope` | `dental` | secret scope with `hf_token` |
+| `hf_secret_scope` | `health_transformation_lab` | secret scope with `hf_token` |
 | `gpu_accelerator` | `GPU_1xA10` | serverless GPU for the GPU jobs (Free Edition offers A10) |
 | `gpu_environment_version` | `4` | serverless environment for the GPU jobs; Databricks requires one when a task sets `compute` |
 | `encoder_gpu_rungs`, `encoder_gpu_lr` | the five GPU encoders; `gatortron-base=2e-5` | what the encoder GPU job fine-tunes, and learning-rate overrides |
@@ -144,7 +145,7 @@ its own workspace: names are the same in all three, so they can't share one.
    principal), both at account level through the workspace's SCIM proxy, and assigns
    them to the workspace. It gives the principal `workspace-access` (every API call
    needs it) and `databricks-sql-access` (validate looks up the SQL warehouse), and
-   `READ` on the `dental` secret scope (created if missing). It gives the group
+   `READ` on the `health_transformation_lab` secret scope (created if missing). It gives the group
    `CREATE CATALOG` on the metastore and, with `--judge-endpoint`, `CAN_QUERY` on that
    endpoint. It does not create the catalog: the first deploy creates `health_transformation_lab`,
    its schemas and the volume, and grants the group `ALL PRIVILEGES` on the catalog.
@@ -173,7 +174,7 @@ its own workspace: names are the same in all three, so they can't share one.
 4. **Check the sign-in:** Actions → *Test that GitHub can log in to Databricks* → Run workflow, environment `uat`. It
    should print a `userName` equal to `DATABRICKS_CLIENT_ID`. Before the secret
    expires, repeat step 2 and `gh secret set`.
-5. **Secrets the jobs read**, in the `dental` scope: `hf_token` (MedGemma job) and
+5. **Secrets the jobs read**, in the `health_transformation_lab` scope: `hf_token` (MedGemma job) and
    `lakebase_url` (Lakebase load), e.g. `databricks secrets put-secret health_transformation_lab hf_token`.
    The Lakebase load also needs the principal to be able to connect to the target's
    Lakebase instance; the script doesn't set that up.
