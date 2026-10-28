@@ -2,8 +2,7 @@
 
 [Health Transformation Lab](../../README.md) › the dental record (EDR) · the executive version: [pitch with speaker notes](full_text_and_notes.md), [slides](deck.html)
 
-> **Personal learning project.** Built on my own time while waiting for internal
-> approvals. Not affiliated with or endorsed by any employer, institution or
+> **Personal learning project.** Built on my own time. Not affiliated with or endorsed by any employer, institution or
 > vendor, and nothing here reflects official business or research of any
 > organization. Synthetic data only. See [DISCLAIMER.md](../../DISCLAIMER.md).
 

@@ -33,8 +33,8 @@ def test_edr_deck_labels_its_numbers_synthetic_or_cites_them():
     # a dry run is never a result: every EDR slide with a figure says synthetic, illustrative, or names a source
     for sid, section, _ in build_decks.slides(REPO_ROOT / "docs" / "edr"):
         text = " ".join(build_decks.visible_text(section))
-        if re.search(r"\d+ of \d+|\d+%|\$\d", text):
-            assert re.search(r"[Ss]ynthetic|[Ii]llustrative|\b(19|20)\d\d\b", text), sid
+        if re.search(r"\d+ of \d+|\d+%|\d h\b|\$", text):
+            assert re.search(r"[Ss]ynthetic|[Ii]llustrative|simulated|dry run|et al\.|GlobalDentBench|consensus", text), sid
 
 
 def test_landing_readme_offers_two_paths_each_with_an_executive_and_a_detailed_route():

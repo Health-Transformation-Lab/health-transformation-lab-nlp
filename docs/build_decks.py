@@ -73,4 +73,7 @@ def main(decks):
 
 
 if __name__ == "__main__":
+    unknown = set(sys.argv[1:]) - set(DECKS)
+    if unknown:
+        sys.exit(f"unknown deck {', '.join(sorted(unknown))}: choose from {', '.join(sorted(DECKS))}")
     main(sys.argv[1:] or sorted(DECKS))
