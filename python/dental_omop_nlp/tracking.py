@@ -66,12 +66,19 @@ def dataset_fingerprint(files: tuple[str, ...] = ("train.csv", "answer_key/revie
     return h.hexdigest()[:12]
 
 
+def _short(e: Exception) -> str:
+    """One line for a warning: the start (where) and, for a long message, its end, where urllib3 and requests put
+    the cause ("... Max retries exceeded with url: <long path> (Caused by NameResolutionError ...)")."""
+    line = (str(e).splitlines() or [type(e).__name__])[0]
+    return line if len(line) <= 400 else f"{line[:150]} ... {line[-250:]}"
+
+
 def _quietly(what: str, call) -> None:
     """Run one MLflow call; a failure (server rejects a value, connection drops) warns and the step carries on."""
     try:
         call()
     except Exception as e:  # noqa: BLE001 - MlflowException, connection and auth errors alike
-        log.warning("MLflow %s failed, step carries on: %s", what, str(e).splitlines()[0][:200] if str(e) else type(e).__name__)
+        log.warning("MLflow %s failed, step carries on: %s", what, _short(e))
 
 
 class _Run:
