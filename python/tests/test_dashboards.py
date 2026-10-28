@@ -121,9 +121,13 @@ def test_genie_space_has_one_general_instruction_and_sorted_questions(name):
 
 
 def test_genie_spaces_are_in_the_bundle_and_ci_has_a_cli_that_knows_them():
-    bundle = (REPO_ROOT / "databricks" / "resources" / "genie.yml").read_text()
+    # issue #155: a space is created only once its tables exist, so the spaces are their own bundle
+    bundle = (REPO_ROOT / "databricks" / "genie" / "databricks.yml").read_text()
     for name in dash.GENIE_SPACES:
-        assert f"file_path: ../genie/{name}.geniespace.json" in bundle, name
+        assert f"file_path: ./{name}.geniespace.json" in bundle, name
+    assert not list((REPO_ROOT / "databricks" / "resources").glob("genie*.yml"))
+    for f in (REPO_ROOT / "databricks" / "resources").glob("*.yml"):
+        assert "genie_spaces:" not in f.read_text(), f.name
     for wf in ("ci.yml", "deploy.yml"):
         pins = re.findall(r"databricks/setup-cli@v(\d+)\.(\d+)", (REPO_ROOT / ".github" / "workflows" / wf).read_text())
         assert pins and all((int(a), int(b)) >= (1, 3) for a, b in pins), wf   # genie_spaces: CLI 1.3.0
@@ -187,3 +191,35 @@ def test_bundle_resource_keys_are_unique_across_resource_types():
             keys += [(k, f"{f.name}:{kind}") for k in items]
     names = [k for k, _ in keys]
     assert len(names) == len(set(names)), sorted(x for x in keys if names.count(x[0]) > 1)
+
+
+# ---------------------------------------------------------------- issue #155: the spaces wait for their tables
+
+def _missing_mod():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("genie_tables_missing",
+                                                  REPO_ROOT / ".github" / "scripts" / "genie_tables_missing.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_the_genie_check_lists_every_table_the_spaces_read_and_reports_the_missing():
+    m = _missing_mod()
+    tables = m.space_tables(REPO_ROOT / "databricks" / "genie")
+    assert {f"{dash.GOLD}.dq_check", f"{dash.GOLD}.fact_grader_answer"} <= set(tables)
+    assert m.missing(tables, exists=lambda t: True) == []
+    assert m.missing(tables, exists=lambda t: not t.endswith(".dq_check")) == [f"{dash.GOLD}.dq_check"]
+
+
+def test_deploy_creates_the_spaces_last_and_only_when_their_tables_exist():
+    import yaml
+    steps = yaml.safe_load((REPO_ROOT / ".github" / "workflows" / "deploy.yml").read_text())["jobs"]
+    steps = next(iter(steps.values()))["steps"]
+    runs = [s.get("run", "") for s in steps]
+    load = next(i for i, r in enumerate(runs) if "load_results" in r)
+    genie = next(i for i, r in enumerate(runs) if "databricks/genie" in r)
+    assert genie > load
+    assert "genie_tables_missing.py" in runs[genie] and "exit 0" in runs[genie]
+    ci = (REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text()
+    assert "cd databricks/genie && databricks bundle validate" in ci
