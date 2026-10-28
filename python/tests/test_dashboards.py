@@ -172,3 +172,14 @@ def test_lab_dashboard_and_space_say_simulated():
     assert "simulated" in instructions and "never rank" in instructions.lower()
     tables = {t["identifier"] for t in space["data_sources"]["tables"]}
     assert tables == {f"{dash.GOLD}.grader_questions", f"{dash.GOLD}.grader_answers"}
+
+
+def test_bundle_resource_keys_are_unique_across_resource_types():
+    # bundle validate: "multiple resources ... have been defined with the same key" (a dashboard and a space)
+    import yaml
+    keys = []
+    for f in sorted((REPO_ROOT / "databricks" / "resources").glob("*.yml")):
+        for kind, items in (yaml.safe_load(f.read_text()).get("resources") or {}).items():
+            keys += [(k, f"{f.name}:{kind}") for k in items]
+    names = [k for k, _ in keys]
+    assert len(names) == len(set(names)), sorted(x for x in keys if names.count(x[0]) > 1)
