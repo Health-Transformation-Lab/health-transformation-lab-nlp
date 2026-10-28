@@ -4,7 +4,7 @@
 > explores what a possible proof of concept *could* look like if structured
 > radiograph AI output were added to periodontal phenotyping. It uses simulated
 > data and public information only. It is not affiliated with or endorsed by
-> CareQuest, CareQuest Innovation Partners, Overjet or any other organization,
+> Overjet or any other organization,
 > does not reflect any organization's business, research or partnership work,
 > is not an integration with any vendor, uses no vendor data, files or APIs,
 > and implies no agreement to build one. See [DISCLAIMER](../DISCLAIMER.md).
@@ -28,11 +28,6 @@ to explain why radiograph-derived data is a natural thing to explore.
   K210187 ([Overjet](https://www.overjet.com/blog/how-to-detect-periodontal-disease-with-ai)).
   It also describes an AI-powered Oral Health Score for tracking outcomes over
   time ([Overjet, June 2025](https://www.overjet.com/blog/the-new-era-of-oral-healthcare-abundance-trust-and-outcomespowered-by-ai)).
-- **CareQuest Innovation Partners' ACCELERATE program** (with MATTER) lists an
-  Overjet pilot deploying "a peer-reviewed, AI-derived oral health score at
-  Capitol Dental Care" for adults on Medicaid, aimed at equitable care
-  standards and population-level risk identification
-  ([MATTER, June 2026](https://matter.health/posts/carequest-innovation-partners-2026-smile-health-cohort-accelerate-pilots/)).
 - **Research CNNs on bitewings** detect horizontal bone loss well but miss
   vertical defects; calculus and furcation detection reported at sensitivity
   0.82 and precision 0.66 (Yavuz et al., EuroPerio10, 2022;

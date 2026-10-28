@@ -3,7 +3,7 @@
 > **Personal learning project.** Built on my own time while waiting for internal
 > approvals. Not affiliated with or endorsed by any employer, institution or
 > vendor, and nothing here reflects official business or research of any
-> organization, including CareQuest. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
+> organization. Synthetic data only. See [DISCLAIMER.md](DISCLAIMER.md).
 
 Can periodontal status be phenotyped from a dental EHR, and can AI reading the
 chart notes match clinicians? (**OMOP** = a common format for health records; **NLP** = software
