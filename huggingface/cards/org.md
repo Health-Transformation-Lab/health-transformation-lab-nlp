@@ -5,7 +5,7 @@ benchmarks that check answers where medicine meets dentistry, and whether an ans
 
 | Benchmark | What it asks | Status |
 |---|---|---|
-| **PerioBench** | Can rules and AI diagnose gum disease accurately from the dental record? | Built, on synthetic records |
+| **PerioBench** | Can rules and AI find gum disease accurately in the dental record? | Built, on synthetic records |
 | **OralHealthBench** | Do AI answers connect the mouth to the rest of the body? | Proposed |
 | **AccessBench** | Does an answer help someone with no coverage, no car or no dentist nearby? | Proposed |
 
