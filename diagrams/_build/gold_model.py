@@ -36,10 +36,10 @@ class Relationship:
 
 
 C = Column
-PROV = [C("file_sha256", "string", "SHA-256 of the source file: its version", "FK"),
+PROV = [C("file_sha256", "string", "SHA-256 of the source file: its version (in dim_result_file for repo · kaggle rows only)", "FK"),
         C("source_code", "string", "repo · kaggle · databricks"),
         C("run_id", "string", "Databricks job run id (databricks rows)"),
-        C("run_ts", "timestamp", "when the reader job ran (databricks rows)"),
+        C("run_ts", "timestamp", "when the reader job ran (databricks rows); fact_llm_call: also the load time of Load results rows"),
         C("git_commit_sha", "string", "commit the job was deployed from"),
         C("loaded_ts", "timestamp", "when Load results wrote it (Load results rows)")]
 
@@ -52,7 +52,7 @@ TABLES = {
             C("note_text", "string", "de-identified note, through the leak gate"),
         ]),
     "dim_result_file": Table(
-        "results", "One per committed result file version", "Load results: append new versions, last", [
+        "results", "One per committed result file version", "Load results: delete-then-append by file_sha256, written last", [
             C("file_name", "string", "e.g. ai_predictions_bert-base.csv"),
             C("file_kind_code", "string", "predictions · llm_details"),
             C("method_name", "string", "method (rung) from the file name"),
@@ -64,7 +64,7 @@ TABLES = {
             C("loaded_ts", "timestamp", "when Load results wrote it"),
         ]),
     "fact_prediction": Table(
-        "results", "One per method and chart, per file version or reader run",
+        "results", "One per method and chart, per file version (key file_sha256 + visit_id) or reader run (key source_code + run_id + method_name + visit_id)",
         "Load results: delete-then-append by file_sha256 · MedGemma reader: replace (source_code, run_id, method_name)", [
             C("method_name", "string", "method (rung), e.g. modernbert-base+cw"),
             C("visit_id", "bigint", "review chart", "PK,FK"),
@@ -211,10 +211,11 @@ TABLES = {
 
 R = Relationship
 RELATIONSHIPS = [
-    R("dim_result_file", "fact_prediction", ("file_sha256",), ("file_sha256",), "file_sha256"),
-    R("dim_result_file", "fact_llm_call", ("file_sha256",), ("file_sha256",), "file_sha256"),
+    # the reader job's own rows (source_code databricks) carry their scratch CSV's sha256 but have no dim_result_file row
+    R("dim_result_file", "fact_prediction", ("file_sha256",), ("file_sha256",), "file_sha256 (repo · kaggle rows)", "|o--o{"),
+    R("dim_result_file", "fact_llm_call", ("file_sha256",), ("file_sha256",), "file_sha256 (repo · kaggle rows)", "|o--o{"),
     R("fact_prediction", "fact_llm_call", ("method_name", "visit_id", "source_code"),
-      ("method_name", "visit_id", "source_code"), "method_name, visit_id, source_code", "||..o|", derived=True),
+      ("method_name", "visit_id", "source_code"), "method_name, visit_id, source_code (per version or run)", "}o..o{", derived=True),
     R("review_key", "fact_prediction", ("visit_id",), ("visit_id",), "visit_id"),
     R("review_key", "fact_llm_call", ("visit_id",), ("visit_id",), "visit_id"),
     R("review_key", "fact_chart_answer", ("visit_id",), ("visit_id",), "visit_id"),

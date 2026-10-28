@@ -8,3 +8,4 @@
 - [x] T006 [US2] Migration notebook 11 as the first `load_results` task; bundle test
 - [x] T007 [US2] Dashboard queries on the new tables; bundle test
 - [x] T008 Docs and diagrams regenerated
+- [x] T009 [US2] Review fixes: `gold_names.migration_plan` (copy, merge, stale, rewrite, fail) tested; corpus-shaped `judgments` routed; row counts checked; scorecard waits for the migration; dashboard column test catches old names under old aliases

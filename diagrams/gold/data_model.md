@@ -8,9 +8,9 @@ Generated from [`_build/gold_model.py`](../_build/gold_model.py) by `_build/gold
 
 ```mermaid
 erDiagram
-    dim_result_file ||--o{ fact_prediction : "file_sha256"
-    dim_result_file ||--o{ fact_llm_call : "file_sha256"
-    fact_prediction ||..o| fact_llm_call : "method_name, visit_id, source_code"
+    dim_result_file |o--o{ fact_prediction : "file_sha256 (repo · kaggle rows)"
+    dim_result_file |o--o{ fact_llm_call : "file_sha256 (repo · kaggle rows)"
+    fact_prediction }o..o{ fact_llm_call : "method_name, visit_id, source_code (per version or run)"
     review_key ||--o{ fact_prediction : "visit_id"
     review_key ||--o{ fact_llm_call : "visit_id"
     review_key ||--o{ fact_chart_answer : "visit_id"
@@ -41,9 +41,9 @@ erDiagram
 
 ```mermaid
 erDiagram
-    dim_result_file ||--o{ fact_prediction : "file_sha256"
-    dim_result_file ||--o{ fact_llm_call : "file_sha256"
-    fact_prediction ||..o| fact_llm_call : "method_name, visit_id, source_code"
+    dim_result_file |o--o{ fact_prediction : "file_sha256 (repo · kaggle rows)"
+    dim_result_file |o--o{ fact_llm_call : "file_sha256 (repo · kaggle rows)"
+    fact_prediction }o..o{ fact_llm_call : "method_name, visit_id, source_code (per version or run)"
     review_key ||--o{ fact_prediction : "visit_id"
     review_key ||--o{ fact_llm_call : "visit_id"
     review_key ||--o{ fact_chart_answer : "visit_id"
@@ -75,10 +75,10 @@ erDiagram
         string method_name "method (rung), e.g. modernbert-base+cw"
         bigint visit_id PK, FK "review chart"
         string predicted_status_code "predicted status, one of six"
-        string file_sha256 PK, FK "SHA-256 of the source file: its version"
+        string file_sha256 PK, FK "SHA-256 of the source file: its version (in dim_result_file for repo · kaggle rows only)"
         string source_code "repo · kaggle · databricks"
         string run_id "Databricks job run id (databricks rows)"
-        timestamp run_ts "when the reader job ran (databricks rows)"
+        timestamp run_ts "when the reader job ran (databricks rows); fact_llm_call: also the load time of Load results rows"
         string git_commit_sha "commit the job was deployed from"
         timestamp loaded_ts "when Load results wrote it (Load results rows)"
     }
@@ -101,10 +101,10 @@ erDiagram
         boolean is_fallback "gate failed, so the rules answered"
         string predicted_status_code "final status (= fact_prediction.predicted_status_code)"
         string method_name "method (rung), with shot and adapter tags"
-        string file_sha256 PK, FK "SHA-256 of the source file: its version"
+        string file_sha256 PK, FK "SHA-256 of the source file: its version (in dim_result_file for repo · kaggle rows only)"
         string source_code "repo · kaggle · databricks"
         string run_id "Databricks job run id (databricks rows)"
-        timestamp run_ts "when the reader job ran (databricks rows)"
+        timestamp run_ts "when the reader job ran (databricks rows); fact_llm_call: also the load time of Load results rows"
         string git_commit_sha "commit the job was deployed from"
         timestamp loaded_ts "when Load results wrote it (Load results rows)"
         string truth_status_code "answer key truth (databricks rows)"
@@ -228,7 +228,7 @@ One per synthetic review chart (answer_key/review_key.csv, not a table). Written
 
 ### `dim_result_file`
 
-One per committed result file version. Written by: Load results: append new versions, last.
+One per committed result file version. Written by: Load results: delete-then-append by file_sha256, written last.
 
 | Key | Column | Type | Description |
 |---|---|---|---|
@@ -244,17 +244,17 @@ One per committed result file version. Written by: Load results: append new vers
 
 ### `fact_prediction`
 
-One per method and chart, per file version or reader run. Written by: Load results: delete-then-append by file_sha256 · MedGemma reader: replace (source_code, run_id, method_name).
+One per method and chart, per file version (key file_sha256 + visit_id) or reader run (key source_code + run_id + method_name + visit_id). Written by: Load results: delete-then-append by file_sha256 · MedGemma reader: replace (source_code, run_id, method_name).
 
 | Key | Column | Type | Description |
 |---|---|---|---|
 |  | `method_name` | string | method (rung), e.g. modernbert-base+cw |
 | PK,FK | `visit_id` | bigint | review chart |
 |  | `predicted_status_code` | string | predicted status, one of six |
-| PK,FK | `file_sha256` | string | SHA-256 of the source file: its version |
+| PK,FK | `file_sha256` | string | SHA-256 of the source file: its version (in dim_result_file for repo · kaggle rows only) |
 |  | `source_code` | string | repo · kaggle · databricks |
 |  | `run_id` | string | Databricks job run id (databricks rows) |
-|  | `run_ts` | timestamp | when the reader job ran (databricks rows) |
+|  | `run_ts` | timestamp | when the reader job ran (databricks rows); fact_llm_call: also the load time of Load results rows |
 |  | `git_commit_sha` | string | commit the job was deployed from |
 |  | `loaded_ts` | timestamp | when Load results wrote it (Load results rows) |
 
@@ -282,10 +282,10 @@ One per LLM reader call on a chart. Written by: as fact_prediction.
 |  | `is_fallback` | boolean | gate failed, so the rules answered |
 |  | `predicted_status_code` | string | final status (= fact_prediction.predicted_status_code) |
 |  | `method_name` | string | method (rung), with shot and adapter tags |
-| PK,FK | `file_sha256` | string | SHA-256 of the source file: its version |
+| PK,FK | `file_sha256` | string | SHA-256 of the source file: its version (in dim_result_file for repo · kaggle rows only) |
 |  | `source_code` | string | repo · kaggle · databricks |
 |  | `run_id` | string | Databricks job run id (databricks rows) |
-|  | `run_ts` | timestamp | when the reader job ran (databricks rows) |
+|  | `run_ts` | timestamp | when the reader job ran (databricks rows); fact_llm_call: also the load time of Load results rows |
 |  | `git_commit_sha` | string | commit the job was deployed from |
 |  | `loaded_ts` | timestamp | when Load results wrote it (Load results rows) |
 |  | `truth_status_code` | string | answer key truth (databricks rows) |

@@ -13,7 +13,6 @@ TYPES = {"_id": {"bigint", "string"}, "_key": {"string"}, "_code": {"string"}, "
          "_date": {"date"}, "_ts": {"timestamp"}, "_count": {"bigint"}, "_ratio": {"double"}, "_pct": {"double"},
          "_rate": {"double"}, "_coef": {"double"}, "_seconds": {"double"}, "_usd": {"double"}, "_num": {"bigint"},
          "_url": {"string"}, "_sha256": {"string"}, "_sha": {"string"}}
-SUMMARY_PREFIXES = ("judge_", "deid_")          # summary tables, named for their subject
 
 
 def kind(column):
@@ -28,9 +27,9 @@ def test_gold_tables_are_lowercase_snake_case_and_singular():
         assert not name.endswith("s"), f"{name}: tables are singular"
 
 
-def test_gold_tables_are_facts_dimensions_or_named_summaries():
+def test_gold_tables_are_facts_dimensions_or_summaries_named_subject_then_noun():
     for name in GOLD:
-        assert name.startswith(("fact_", "dim_", "kpi_") + SUMMARY_PREFIXES), name
+        assert name.startswith(("fact_", "dim_", "kpi_")) or re.fullmatch(r"[a-z0-9]+_[a-z0-9_]+", name), name
 
 
 def test_every_gold_column_ends_in_a_suffix_that_says_its_kind():

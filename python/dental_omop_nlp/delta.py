@@ -1,11 +1,11 @@
 """Idempotent Delta writes from notebooks: delete-then-append by batch key (AGENTS.md, docs/operations.md).
 
-    replace_batch(spark, rows, "dental_omop.gold_dental_omop_perio.ai_predictions",
-                  {"source": "databricks", "run_id": run_id, "method": method})
+    replace_batch(spark, rows, "dental_omop.gold_dental_omop_perio.fact_prediction",
+                  {"source_code": "databricks", "run_id": run_id, "method_name": method})
 
 A retry of the same batch replaces its rows instead of adding them again. Rows carry the key columns, so a bad
 batch can be found and removed. Rows written by other writers are untouched: their key columns are NULL or
-differ (Load results keys on sha256 and leaves source = databricks rows alone).
+differ (Load results keys on file_sha256 and leaves source_code = databricks rows alone).
 """
 
 from __future__ import annotations

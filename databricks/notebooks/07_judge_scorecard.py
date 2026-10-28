@@ -56,6 +56,12 @@ answers = js.chart_answers(inp)
 queue = js.judge_queue(answers, inp["key"])
 table = lambda name: f"{catalog}.{schema}.{name}"  # noqa: E731
 
+# Spec 018: earlier calls still under the old name would be missed and paid for again: migrate them first.
+old = {n: spark.table(table(n)).columns for n in ("judgments", "fact_judge_call") if spark.catalog.tableExists(table(n))}
+if ("copy", "judgments", "fact_judge_call") in gold_names.migration_plan(old):    # once merged, both exist: carry on
+    raise RuntimeError(f"{table('judgments')} holds judge calls not yet in fact_judge_call: run Load results first "
+                       "(its migrate_gold_names task moves them), then this job")
+
 done = None
 if spark.catalog.tableExists(table("fact_judge_call")) and endpoint != "none":
     done = js.reusable(gold_names.from_gold(spark.table(table("fact_judge_call")).toPandas(), "fact_judge_call"), endpoint)

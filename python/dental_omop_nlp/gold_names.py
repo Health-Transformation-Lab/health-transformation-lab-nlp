@@ -6,7 +6,8 @@ is written from, and the gold name of each.
 
     to_gold    rename for gold; an unknown column fails, naming it; _count columns become integers
     from_gold  the reverse, for a job that reads gold back into the analysis code (the judge resume)
-    RENAMED    old table name -> new (same name: columns renamed in place), for the migration (databricks/notebooks/11_migrate_gold_names.py)
+    RENAMED    old table name -> new (same name: columns renamed in place)
+    migration_plan  what databricks/notebooks/11_migrate_gold_names.py does with each old table
 """
 
 from __future__ import annotations
@@ -80,6 +81,17 @@ RENAMED = {"result_files": "dim_result_file", "ai_predictions": "fact_prediction
            "judge_agreement": "judge_agreement", "judge_run": "judge_cost", "deid_scores": "deid_score"}
 # judge_agreement keeps its name: the migration renames its columns in place
 
+# An old judgments table was written by the scorecard or, if it ran last, by the corpus judge (02): its columns say which.
+_TARGETS = {"judgments": ("fact_judge_call", "fact_corpus_judge_call")}
+
+# When a job has already written the new table, the old rows whose batch key it lacks are added; the other
+# new tables are rebuilt on every run, so an old copy is stale.
+MERGE_KEYS = {"dim_result_file": ("file_sha256",),
+              "fact_prediction": ("source_code", "run_id", "method_name", "file_sha256", "visit_id"),
+              "fact_llm_call": ("source_code", "run_id", "method_name", "file_sha256", "visit_id"),
+              "fact_judge_call": ("visit_id", "call_kind_code", "answer_status_code", "endpoint_name",
+                                  "prompt_version_code")}
+
 
 @traced
 def to_gold(df: pd.DataFrame, table: str) -> pd.DataFrame:
@@ -100,3 +112,32 @@ def to_gold(df: pd.DataFrame, table: str) -> pd.DataFrame:
 def from_gold(df: pd.DataFrame, table: str) -> pd.DataFrame:
     """The reverse of to_gold: gold names back to the analysis names."""
     return df.rename(columns={v: k for k, v in TABLES[table].items()})
+
+
+def _unknown(columns, table: str) -> list[str]:
+    names = TABLES[table]
+    return [c for c in columns if c not in names and c not in names.values()]
+
+
+@traced
+def migration_plan(existing: dict[str, list[str]]) -> list[tuple[str, str, str]]:
+    """(action, old, new) for each old-named table in existing (table name -> its columns):
+    copy (no new table yet), merge (a job wrote the new table first: add the old rows whose MERGE_KEYS it lacks),
+    stale (the new table is rebuilt every run), rewrite (same name, old columns) or fail (new is then the
+    unknown columns, comma-separated). Tables already under their new names need nothing."""
+    plan = []
+    for old, new in RENAMED.items():
+        if old not in existing:
+            continue
+        cols = existing[old]
+        target = next((t for t in _TARGETS.get(old, (new,)) if not _unknown(cols, t)), None)
+        if target is None:
+            plan.append(("fail", old, ", ".join(_unknown(cols, new))))
+        elif old == target:
+            if not set(cols) <= set(TABLES[target].values()):
+                plan.append(("rewrite", old, target))
+        elif target not in existing:
+            plan.append(("copy", old, target))
+        else:
+            plan.append(("merge" if target in MERGE_KEYS else "stale", old, target))
+    return plan

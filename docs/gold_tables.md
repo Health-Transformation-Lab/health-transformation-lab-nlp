@@ -26,7 +26,7 @@ page covers who writes what, how, and what to watch.
 
 | Table | Was (before spec 018) | Grain (one row per) | Logical key | Written by | Write mode |
 |---|---|---|---|---|---|
-| `dim_result_file` | `result_files` | committed result file version | `file_sha256` | Load results (`10_load_results.py`) | append new versions, written last |
+| `dim_result_file` | `result_files` | committed result file version | `file_sha256` | Load results (`10_load_results.py`) | delete-then-append by `file_sha256`, written last |
 | `fact_prediction` | `ai_predictions` | method × chart × file version (or reader run) | `file_sha256, visit_id`; reader rows: `source_code, run_id, method_name, visit_id` | Load results; MedGemma reader (`03`) | delete-then-append by `file_sha256`; reader: `replace_batch` on `(source_code, run_id, method_name)` |
 | `fact_llm_call` | `llm_reader_runs` | LLM reader call on one chart | as `fact_prediction` | Load results; MedGemma reader | as `fact_prediction` |
 | `fact_chart_answer` | `chart_answers` | system × review chart | `visit_id, system_name` | Judge scorecard (`07`) | overwrite |
@@ -47,8 +47,13 @@ analysis names (`gate_ok`, `pred`), so the R parity and the README are unchanged
 frame as a job writes it, and fails on a column it doesn't know: a new column gets its gold name there first.
 
 **Migration.** The Load results job's first task, `migrate_gold_names` (`11_migrate_gold_names.py`), copies each
-table still under its old name to the new name with its columns renamed, once, and prints the `DROP TABLE`
-statements for the old tables. It doesn't drop them: run those after checking the new tables' row counts.
+table still under its old name to the new name with its columns renamed, and fails if the row counts differ. If a
+job already wrote the new table, it adds the old rows whose batch key the new table lacks, so the reader's runs and
+the judge's earlier calls are never lost; a summary table rebuilt since is left as it is. An old `judgments` goes to
+`fact_judge_call`, or to `fact_corpus_judge_call` when the corpus judge wrote it. The judge scorecard refuses to run
+while old judge calls are unmigrated, so it never pays for them twice. The decisions are
+`gold_names.migration_plan` (tested). Old tables aren't dropped: the task prints the `DROP TABLE` statements to run
+after checking.
 
 Jobs that haven't run in the workspace yet write more tables to gold: `study_benchmark`
 (`01_run_benchmark.py`) writes `person`, `visit_occurrence`, `measurement`, `note` (OMOP, official names),
@@ -76,7 +81,9 @@ partway is redone on the next run.
 The status each method gave each review chart. Class probabilities (`p_*`) stay in the committed CSV.
 
 A changed file is a new version, and the old version's rows stay. For one answer per method, take the
-latest `file_sha256` per `(source_code, method_name)`, or one `run_id`:
+latest `file_sha256` per `(source_code, method_name)`, or one `run_id`. The reader job's own rows
+(`source_code = databricks`) carry the SHA-256 of their scratch CSV but have no `dim_result_file` row, so pick those
+by `run_id`; two runs with the same answers even share a `file_sha256`. This query covers the `repo` and `kaggle` rows:
 
 ```sql
 with latest as (
@@ -93,8 +100,9 @@ inner join latest l on l.file_sha256 = p.file_sha256;
 ### `fact_llm_call`
 
 One row per LLM reader call: the columns of `llm_details_<method>.csv` under their gold names, plus provenance.
-It matches `fact_prediction` one to one on `method_name, visit_id, source_code` (and `run_id` for `databricks`
-rows). A column that is empty in a whole file takes the type the table already has.
+It matches `fact_prediction` one to one on `method_name, visit_id, source_code` within one file version or
+one `run_id`. Across versions there are several rows per key on both sides, and the two files have different
+`file_sha256` values, so pair the latest version of each (by `loaded_ts`) or one run. A column that is empty in a whole file takes the type the table already has.
 
 ## Judge scorecard (spec 012)
 
@@ -148,5 +156,10 @@ two jobs replaced each other's table; each now has its own.
 
 ## Cautions
 
+- The scorecard keeps an earlier judge call only for the same endpoint and the current prompt version
+  (`judge_scorecard.reusable`); a new endpoint asks, and pays for, every call again.
+- `encoder_gpu_predictions` (the `encoder_gpu` job) is written by plain append with no batch key
+  (`08_encoder_gpu.py`), so a rerun adds the same predictions again: against AGENTS.md, "Failures, retries
+  and reruns". It isn't in the data model yet.
 - `simulated_*` files are never loaded. `fact_judge_call.is_simulated = true` marks a simulated judge's rows:
   label anything built from them as simulated wherever it's shown.

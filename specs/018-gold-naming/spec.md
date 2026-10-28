@@ -55,9 +55,12 @@ Columns are renamed by `python/dental_omop_nlp/gold_names.py`, one mapping per t
 - A frame with a column the mapping doesn't know fails before writing, naming the column, so a new column is
   declared and named on purpose instead of arriving under its pandas name.
 - **Migration:** the Load results job's first task copies each old table that exists to its new name, columns
-  renamed, when the new table doesn't exist yet. The MedGemma reader's Databricks rows and the judge's earlier
-  calls (which a rerun resumes from) are kept. Running it again does nothing. Old tables are not dropped: the
-  task prints the `DROP TABLE` statements for the owner to run after checking.
+  renamed, and fails if the row counts differ. If a job wrote the new table first, the old rows whose batch key it
+  lacks are added; summary tables rebuilt since are left. An old `judgments` goes to `fact_judge_call` or, when the
+  corpus judge wrote it, `fact_corpus_judge_call`. The MedGemma reader's Databricks rows and the judge's earlier
+  calls (which a rerun resumes from) are kept, and the judge scorecard won't run while its old calls are
+  unmigrated. Running it again adds nothing. Old tables are not dropped: the task prints the `DROP TABLE`
+  statements for the owner to run after checking.
 - The Scorecard dashboard reads the new tables; its widgets show the same fields.
 - Notebook 02's corpus judge writes `fact_corpus_judge_call`, not `judgments`, so the two judge jobs no longer
   overwrite each other's table.
