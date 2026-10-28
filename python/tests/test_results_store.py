@@ -234,3 +234,11 @@ def test_reader_job_joins_the_answer_key_by_visit():
     nb = _text("databricks/notebooks/03_medgemma_reader.py")
     assert 'details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id"' in nb
     assert "d.truth.values" not in nb
+
+
+def test_load_results_skips_the_files_the_reader_job_loaded_itself():
+    # issue #94: the reader job's CSVs sit in the folder Load results reads; loading them again would add the
+    # same predictions a second time as source = repo
+    nb = _text("databricks/notebooks/10_load_results.py")
+    assert """reader.where("source = 'databricks'").select("sha256")""" in nb
+    assert "loaded |=" in nb
