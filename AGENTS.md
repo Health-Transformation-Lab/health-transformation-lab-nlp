@@ -49,6 +49,12 @@ Every user story is a GitHub issue, and every branch and pull request belongs to
    `<spec number> US<n>: <story>` (e.g. `016 US2: every committed result is in the gold tables`), and write
    the issue number next to the story in `spec.md` (`### US2 - ... (P1) #71`). A fix or chore without a spec
    gets its own issue too, describing the problem.
+   **Every issue title starts with a Jira-style key, `<spec> <kind><n>: `**, so the backlog groups by spec:
+   - kind: `US` user story, `AI` action item, `BUG` fix, `CHORE` chore, `DOCS` docs; `n` counts up within
+     the spec and kind (`004 AI2: MedGemma accuracy per field`, `004 BUG1: ...`).
+   - spec: the spec the work belongs to, or the one it touches most (MedGemma items are `004`); `000` for
+     repo-wide work with no spec (`000 CHORE2: two scripts are numbered 42`).
+   - Spec numbers are unique: take the next free `specs/NNN-*` number on `main` *and* on open PRs.
 2. **Branch: `<type>/<issue>-<slug>`**, e.g. `feat/71-016-results-loader` or `fix/72-volume-log-append`.
    - type: `feat`, `fix`, `docs`, `data`, `ci`, `chore`, `spec`
    - issue: the GitHub issue number (a Jira key like `DENT-123` also passes, if a Jira project is ever used)
