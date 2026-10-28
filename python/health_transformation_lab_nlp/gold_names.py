@@ -26,6 +26,7 @@ TABLES: dict[str, dict[str, str]] = {
     "fact_prediction": {"method": "method_name", "visit_id": "visit_id", "pred": "predicted_status_code",
                         **_PROVENANCE},
     "fact_llm_call": {"visit_id": "visit_id", "model": "model_name", "backend": "backend_code",
+                      "revision": "model_revision_id",
                       "prompt_version": "prompt_version_code", "shots": "shot_count",
                       "input_tokens": "input_token_count", "output_tokens": "output_token_count",
                       "latency_s": "latency_seconds", "raw": "raw_response_text", "status": "answered_status_code",
