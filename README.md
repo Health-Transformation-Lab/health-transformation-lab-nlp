@@ -207,3 +207,4 @@ Also: [how we work](AGENTS.md) · [references](docs/references.md) · [protocol]
 | MLflow, Unity Catalog models gated by the acceptance test, LLM judge; deploying to **dev, UAT, prod** | [mlops.md](docs/mlops.md), [deployment.md](docs/deployment.md) |
 | Results storage and Lakebase; retrieval with OMOP synonyms and ancestors | [results_storage.md](docs/results_storage.md), [rag_and_vocabulary.md](docs/rag_and_vocabulary.md) |
 | De-identification methods and cost, human review in Label Studio; financial trade-offs; radiographs; MedGemma | [deidentification.md](docs/deidentification.md), [deid_review_protocol.md](docs/deid_review_protocol.md), [financial_tradeoffs.md](docs/financial_tradeoffs.md), [radiograph.md](docs/radiograph.md), [medgemma.md](docs/medgemma.md) |
+| The idea this repo tests: a personal Shark Tank pitch for an open lab that writes the missing AI test questions on medical-dental care and access to care | [pitch/](docs/pitch/README.md) |
