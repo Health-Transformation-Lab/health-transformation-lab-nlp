@@ -48,8 +48,12 @@ kaggle.com groups them (Kaggle's API has no collections, so its steps are in the
 
 ## Requirements
 
-- **FR-001** Files to publish are listed in code (`kaggle/publish.py`), not globbed from the whole tree; a
-  test fails if a listed file is missing, simulated, or under `data/external/` or `data/raw/`.
+- **FR-001** Files to publish are named in code (`kaggle/publish.py`): listed, or globbed inside named folders
+  with `simulated_*` dropped, never from the whole tree. A test fails, and the build refuses, if a file is
+  missing, simulated, under `data/external/` or `data/raw/`, holds a `sim:`/`calib:` row, or is a prediction
+  file that isn't a full run of the review notes.
+- **FR-004** A refused upload fails the workflow (the Kaggle CLI only prints it): uploads go through the Python
+  API and its status is checked.
 - **FR-002** Cards are markdown files in `kaggle/cards/`, reviewed like code; each states: synthetic, personal
   learning project not affiliated with any organization, not for clinical use, how it was generated (link to
   the repo), licence, and how to cite.

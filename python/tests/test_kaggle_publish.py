@@ -61,9 +61,84 @@ def test_no_simulated_file_reaches_the_results_dataset():
     assert "ai_predictions_medgemma-1.5-4b-it.csv" in names
 
 
-def test_workflow_creates_public_then_versions_and_names_the_commit():
+def test_workflow_uploads_through_publish_py_with_the_commit():
     text = (REPO_ROOT / ".github" / "workflows" / "kaggle-publish.yml").read_text()
-    assert "kaggle datasets create" in text and "--public" in text
-    assert "kaggle datasets version" in text and "kaggle datasets status" in text
-    assert "kaggle/publish.py" in text and "github.sha" in text
+    assert "kaggle/publish.py" in text and "--upload" in text and "github.sha" in text
+    assert "kaggle datasets create" not in text      # the CLI prints a refused upload and exits 0: publish.py checks
     assert "environment: dev" in text
+
+
+# ---- review of #126: partial or simulated files, and failed uploads that looked like successes
+
+def _review_rows():
+    import pandas as pd
+    return len(pd.read_csv(pub.DATA / "answer_key" / "review_key.csv", usecols=["visit_id"]))
+
+
+def test_every_prediction_file_is_a_full_run():
+    # 11_ai_predict.py --limit N writes the same file name: a smoke test must never be published as a result
+    import pandas as pd
+    for dest, src in pub.files_of("results").items():
+        if dest.startswith(("ai_predictions_", "llm_details_")):
+            assert len(pd.read_csv(src)) == _review_rows(), dest
+
+
+@pytest.mark.parametrize("name", sorted(pub.DATASETS))
+def test_no_published_row_is_simulated(name):
+    import pandas as pd
+    for dest, src in pub.files_of(name).items():
+        if src.suffix == ".csv":
+            d = pd.read_csv(src, dtype=str)
+            hit = d.apply(lambda c: c.str.startswith(("sim:", "calib:"), na=False)).any().any()
+            assert not hit, dest
+
+
+def test_build_refuses_a_partial_prediction_file(tmp_path, monkeypatch):
+    bad = tmp_path / "ai_predictions_x.csv"
+    bad.write_text("visit_id,pred\n1,healthy\n")
+    monkeypatch.setattr(pub, "files_of", lambda name: {"ai_predictions_x.csv": bad})
+    with pytest.raises(SystemExit, match="ai_predictions_x.csv"):
+        pub.check("results")
+
+
+class _Result:
+    def __init__(self, status="ok", error="", invalid=None):
+        self.status, self.error, self.invalidTags, self.url = status, error, invalid or [], "https://kaggle/x"
+
+
+class _Api:
+    def __init__(self, exists, result):
+        self.exists, self.result, self.calls = exists, result, []
+
+    def dataset_status(self, ref):
+        if not self.exists:
+            raise RuntimeError("404")
+        return "ready"
+
+    def dataset_create_new(self, folder, public, **kw):
+        self.calls.append(("create", public, kw.get("dir_mode")))
+        return self.result
+
+    def dataset_create_version(self, folder, notes, **kw):
+        self.calls.append(("version", notes, kw.get("dir_mode")))
+        return self.result
+
+
+def test_upload_creates_public_then_versions(tmp_path):
+    api = _Api(False, _Result())
+    assert pub.upload(tmp_path, "o/d", "note (abc)", api) == "https://kaggle/x"
+    assert api.calls == [("create", True, "zip")]
+    api = _Api(True, _Result())
+    pub.upload(tmp_path, "o/d", "note (abc)", api)
+    assert api.calls == [("version", "note (abc)", "zip")]
+
+
+@pytest.mark.parametrize("result", [_Result("error", "bad licence"), None])
+def test_upload_fails_when_kaggle_says_no(tmp_path, result):
+    with pytest.raises(SystemExit, match="Kaggle"):
+        pub.upload(tmp_path, "o/d", "n", _Api(True, result))
+
+
+def test_invalid_tags_warn_but_do_not_fail(tmp_path, capsys):
+    pub.upload(tmp_path, "o/d", "n", _Api(True, _Result(invalid=["model comparison"])))
+    assert "model comparison" in capsys.readouterr().out

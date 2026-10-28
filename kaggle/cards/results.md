@@ -1,13 +1,15 @@
 # Dental periodontal note classifier benchmark results
 
-What rule-based methods, fine-tuned encoders (BERT, ModernBERT, clinical and biomedical variants) and large
-language models (MedGemma, Llama) answered on the same 240 synthetic dental review notes, with their scores
-against the generator's truth. Pair it with the notes dataset (*Synthetic dental periodontal notes and
-charts*) to compare a new model without rerunning these.
+What rule-based methods, classical machine learning (TF-IDF with logistic regression), fine-tuned encoders
+(BERT, ModernBERT, clinical and biomedical variants) and large language models (MedGemma, Llama) answered on
+the same 240 synthetic dental review notes, with their scores against the generator's truth. Pair it with the
+notes dataset (*Synthetic dental periodontal notes and charts*) to compare a new model without rerunning these.
 
 **These are measurements on synthetic notes**, made by a personal learning project that is **not affiliated**
 with any employer, institution or company. They are exercises, not findings: not evidence about any model,
-product or population, and **not for clinical use**. Simulated dry-run outputs are left out.
+product or population, and **not for clinical use**. Simulated dry-run outputs are left out. Cost columns
+(`corpus_usd_illustrative` in `ladder/`, `usd` in `judge/judge_run.csv`) are **illustrative**: placeholder
+rates from the repo's `costs.yaml` and the judge endpoint's per-token price at the time, not quotes.
 
 ## Files
 
