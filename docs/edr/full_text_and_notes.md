@@ -1,17 +1,17 @@
-# Health Transformation Lab: the dental record (EDR) study, executive pitch: full text and notes
+# Health Transformation Lab: PerioBench, the dental record (EDR) study, executive pitch: full text and notes
 A personal idea, not affiliated with or endorsed by any organization. Built from `slides/` by `docs/build_decks.py`; edit the slides, then rebuild.
 
 ## Slide 1 — cover
 
-Executive pitch · the dental record (EDR) · October 2026
+PerioBench · executive pitch · the dental record (EDR) · October 2026
 The diagnosis is in the dental record.
 Nobody can count it.
-Can software read the chart the way a gum specialist does, at the scale of millions of visits, and prove it is right? This study builds and tests that, end to end, on synthetic records.
+PerioBench: can more accurate diagnosis from the dental record improve care for gum disease, for millions of patients? Checked against gum specialists, built and tested end to end on synthetic records.
 Health Transformation Lab
 Working name · synthetic data only
 John Bowyer · personal project, not affiliated with any organization
 
-**Speaker notes:** Gum disease is one of the most common chronic diseases in adults, and it is written down at almost every dental visit. But it is written down in pieces: a checkbox here, a billing code there, measurements, and a free-text note. Nobody can count it across clinics, so nobody can study it at scale, link it to diabetes, or see whether care is working. This study asks one question: can software read the dental record the way a gum specialist does, and can we prove it is right? Everything shown is on synthetic records, built so the right answer is known; it is a rehearsal of the real study, not a result on real patients. This is a personal project, not any organization's plan.
+**Speaker notes:** Gum disease is one of the most common chronic diseases in adults, and it is written down at almost every dental visit. But it is written down in pieces: a checkbox here, a billing code there, measurements, and a free-text note. Nobody can count it across clinics, so nobody can study it at scale, link it to diabetes, or see whether care is working. PerioBench asks one question: can a more accurate diagnosis from the dental record improve care for people with gum disease, so it is found earlier, treated, followed over time and managed alongside diabetes? Agreement with gum specialists is how we check the diagnosis is accurate; better patient care is the goal. Everything shown is on synthetic records, built so the right answer is known; it is a rehearsal of the real study, not a result on real patients. This is a personal project, not any organization's plan.
 
 ## Slide 2 — problem
 

@@ -17,7 +17,7 @@ PERSONAL = "A personal idea, not affiliated with or endorsed by any organization
 DECKS = {
     "pitch": ("Health Transformation Lab: Shark Tank pitch",
               f'{PERSONAL} Figures are cited on each slide; nothing marked "to measure" has been measured.'),
-    "edr": ("Health Transformation Lab: the dental record (EDR) study, executive pitch",
+    "edr": ("Health Transformation Lab: PerioBench, the dental record (EDR) study, executive pitch",
             (f"{PERSONAL} Synthetic data only: results are scored against the generator's truth, not clinical "
              "performance, and costs use illustrative prices.")),
 }
