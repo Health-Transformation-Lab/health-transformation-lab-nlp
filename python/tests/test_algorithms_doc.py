@@ -35,7 +35,18 @@ def test_every_rule_phenotype_and_evidence_reader_has_a_row():
 def test_every_row_names_its_source():
     for name, cells in _rows().items():
         source = cells[3]
-        assert re.search(r"this repo's own|\[\[\d+(, \d+)*\]\]\(references\.md", source), (name, source)
+        assert re.search(r"this repo's own|\[\[\d+(, \d+)*\]\]\(#sources\)", source), (name, source)
+
+
+def test_every_cited_number_is_in_the_sources_list_with_its_full_reference():
+    text = DOC.read_text(encoding="utf-8")
+    listed = text[text.index("## Sources"):]
+    refs = (REPO_ROOT / "docs" / "references.md").read_text(encoding="utf-8")
+    for group in re.findall(r"\[\[([\d, ]+)\]\]\(#sources\)", text):
+        for n in group.split(", "):
+            first_author = re.search(rf"^{n}\. \*\*([^,.*]+)", refs, flags=re.M).group(1)
+            entry = re.search(rf"^{n}\. (.+)$", listed, flags=re.M)
+            assert entry and entry.group(1).startswith(first_author), (n, first_author)
 
 
 def test_every_number_matches_the_results_page():
