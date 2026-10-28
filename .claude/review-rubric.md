@@ -23,7 +23,13 @@ verified findings only, mandatory secrets scan), with this repo's rules from `AG
 4. **Verify.** Use Superpowers `receiving-code-review`: reproduce or trace each finding against the
    code before writing it down. Drop what doesn't survive. Severity: Critical → 🔴 Blocking,
    Important → 🟡 Should fix, Minor → 🔵 Nit.
-5. **Checks.** Read CI on `HEAD_SHA` (`python`, `postgres`, `r-parity`, `bundle`). Run locally what CI
+5. **Deck figures (when a PR touches `docs/<deck>/slides/` or `docs/claims.yaml`).** For each changed figure, open
+   the source its `docs/claims.yaml` entry names and re-derive the number: a measured figure from the repo file, a
+   cited one from the source itself (set `checked` to today's date only after reading it), a derived one from its
+   inputs. Then read the slide's sentence against the entry's `covers`: the wording must not claim more than the
+   source shows (a wider population, a larger model, "even", "any", "cheap"). An unchecked or widened claim is
+   🟡 Should fix; a figure that doesn't match its source is 🔴 Blocking.
+6. **Checks.** Read CI on `HEAD_SHA` (`python`, `postgres`, `r-parity`, `bundle`). Run locally what CI
    can't show: `cd python && pytest -q tests`, `ruff check` on changed Python files.
 
 ## Repo rules (the compliance table)
@@ -40,6 +46,7 @@ verified findings only, mandatory secrets scan), with this repo's rules from `AG
 | Paths | `health_transformation_lab_nlp.paths`, never a hard-coded `data/` |
 | Spec for big changes | A dataset, metric, label rule or review-workflow change has a `specs/NNN-*/` entry (spec, tasks updated) |
 | Prices | Service prices name their source and date; placeholders say ILLUSTRATIVE |
+| Deck figures | Every slide figure is in `docs/claims.yaml` (`test_deck_claims.py`); changed figures re-derived from their sources (step 5) |
 | Commits | Imperative subject, body says why, co-author trailer when an agent wrote it |
 | Docs | README stays about 3 printed pages; plain-language docs updated when behaviour changes |
 | Configuration | New or changed settings are declared once (bundle variable or documented env var), checked before work starts, and the PR says which environments change |

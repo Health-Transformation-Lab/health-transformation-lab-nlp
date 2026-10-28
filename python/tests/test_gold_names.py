@@ -44,12 +44,30 @@ def test_load_results_frames_become_the_declared_result_tables(tmp_path):
         "fact_prediction")
 
 
+# Files written before the reader recorded the weights' revision (#214) have no revision column.
+NOT_IN_OLDER_READER_FILES = {"model_revision_id"}
+
+
+def _with_provenance(d):
+    return d.assign(method="m", sha256="0" * 64, source="databricks", run_id="1", run_ts=pd.Timestamp.now(),
+                    git_commit="abc", loaded_at=pd.Timestamp.now(), truth="healthy", difficulty="L1")
+
+
 def test_every_llm_details_file_with_its_provenance_becomes_fact_llm_call():
     for path in sorted((ROOT / "data" / "datasets").glob("*llm_details_*.csv")):
-        d = pd.read_csv(path).assign(
-            method="m", sha256="0" * 64, source="databricks", run_id="1", run_ts=pd.Timestamp.now(), git_commit="abc",
-            loaded_at=pd.Timestamp.now(), truth="healthy", difficulty="L1")
-        assert list(gold_names.to_gold(d, "fact_llm_call").columns) == declared("fact_llm_call"), path.name
+        out = list(gold_names.to_gold(_with_provenance(pd.read_csv(path)), "fact_llm_call").columns)
+        expected = [c for c in declared("fact_llm_call") if c in out or c not in NOT_IN_OLDER_READER_FILES]
+        assert out == expected, path.name
+
+
+def test_the_readers_revision_column_has_a_gold_name():
+    # #214: the reader writes the Kaggle Models handle or Hugging Face commit its weights came from
+    assert '"revision":' in (ROOT / "python" / "health_transformation_lab_nlp" / "llm_reader.py").read_text()
+    d = pd.read_csv(ROOT / "data" / "datasets" / "llm_details_medgemma-1.5-4b-it.csv").head(2)
+    d.insert(3, "revision", "keras/medgemma/keras/medgemma_instruct_4b/1")
+    out = gold_names.to_gold(_with_provenance(d), "fact_llm_call")
+    assert list(out.columns) == declared("fact_llm_call")
+    assert out["model_revision_id"].iloc[0] == "keras/medgemma/keras/medgemma_instruct_4b/1"
 
 
 def test_a_column_the_mapping_does_not_know_fails_naming_it():

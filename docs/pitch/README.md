@@ -2,7 +2,7 @@
 
 > **A personal idea**, written on my own time like the rest of this repo. Not affiliated with or endorsed by any
 > employer, institution or company, and not any organization's plan ([DISCLAIMER.md](../../DISCLAIMER.md)). No
-> partner named here has been contacted or has agreed to anything. "Health Transformation Lab" is a working name.
+> partner named here has been contacted or has agreed to anything.
 > Figures come from the public sources cited on each slide; nothing marked "to measure" has been measured.
 
 **The pitch in one line:** AI passes the dental exam and fails the real patient, and no test checks whether it
