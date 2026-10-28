@@ -3,5 +3,7 @@ ai_predictions_bioclinical-modernbert-large.csv,kaggle,https://github.com/health
 ai_predictions_clinical-longformer.csv,kaggle,https://github.com/healthtransformationlab/health-transformation-lab-nlp/actions/runs/40762796130,2026-10-28T22:14:11Z
 ai_predictions_longformer-base.csv,kaggle,https://github.com/healthtransformationlab/health-transformation-lab-nlp/actions/runs/40762796130,2026-10-28T22:14:11Z
 ai_predictions_medgemma-1.5-4b-it.csv,kaggle,https://github.com/jcbowyer/dental-omop-nlp/actions/runs/40689485733,2026-10-28T13:41:18Z
+ai_predictions_medgemma-4b-it.csv,kaggle,https://github.com/healthtransformationlab/health-transformation-lab-nlp/actions/runs/40769250182,2026-10-28T21:53:26Z
 ai_predictions_modernbert-large.csv,kaggle,https://github.com/healthtransformationlab/health-transformation-lab-nlp/actions/runs/40762796130,2026-10-28T22:14:11Z
 llm_details_medgemma-1.5-4b-it.csv,kaggle,https://github.com/jcbowyer/dental-omop-nlp/actions/runs/40689485733,2026-10-28T13:41:18Z
+llm_details_medgemma-4b-it.csv,kaggle,https://github.com/healthtransformationlab/health-transformation-lab-nlp/actions/runs/40769250182,2026-10-28T21:53:26Z

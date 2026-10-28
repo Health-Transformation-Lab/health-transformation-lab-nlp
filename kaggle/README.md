@@ -11,8 +11,9 @@ data only, and no token is ever stored in it.
 |---|---|---|---|
 | Notebook `perio-bench-medgemma-reader` | MedGemma 1.5 4B reads the 240 review notes | *Run MedGemma on a free Kaggle GPU* | `medgemma_reader.ipynb`, `keras_to_hf.py`, `hf_config/`, `gemma3_chat_template.jinja` |
 | Notebook `perio-bench-encoder-gpu` | Fine-tunes the large encoders (ModernBERT-large, Longformer, GatorTron) | *Fine-tune the GPU encoders on a free Kaggle GPU* | `encoder_gpu.ipynb` |
-| Dataset `perio-bench-notes` | Synthetic notes, labels, structured visits, 240-note review set and answer key | *Publish datasets to Kaggle* | `publish.py`, `cards/notes.md` |
-| Dataset `perio-bench-results` | Every model's answers on the review set, the leaderboard, the judge scorecard | *Publish datasets to Kaggle* | `publish.py`, `cards/results.md` |
+| Dataset `perio-bench-notes` | Synthetic notes, labels, structured visits, 240-note review set and answer key | *Publish datasets (Kaggle and Hugging Face)* | `publish.py`, `cards/notes.md` |
+| Dataset `perio-bench-results` | Every model's answers on the review set, the leaderboard, the judge scorecard | *Publish datasets (Kaggle and Hugging Face)* | `publish.py`, `cards/results.md` |
+| Notebook `perio-bench-quickstart` (spec 025) | Loads both datasets, trains a baseline on a CPU in about a minute, scores it beside the leaderboard | *Publish datasets (Kaggle and Hugging Face)* | `../notebooks/perio_bench_quickstart.ipynb`, `prepare_kernel.py --job quickstart` |
 | Model `perio-bench-note-classifier` (spec 020 US3) | The top fine-tuned note classifier, ModernBERT-base class-weighted, in transformers format (Apache 2.0) | *Fine-tune the GPU encoders on a free Kaggle GPU* with `save_model` | `publish_model.py`, `cards/model.md` |
 
 The notebook `dental-omop-medgemma-keras-test` was a one-off comparison (MedGemma through Keras vs converted to
@@ -48,7 +49,10 @@ The workflow prints the end of the Kaggle log (`show_log.py`) and keeps the outp
 
 ## Publishing the datasets
 
-Actions → *Publish datasets to Kaggle* → Run workflow (`both`, `notes` or `results`). The first run creates
+Actions → *Publish datasets (Kaggle and Hugging Face)* → Run workflow, with `platform` `both` or `kaggle`
+and `dataset` `both`, `notes` or `results`. With `both` datasets, it also pushes the quickstart notebook and
+waits for its run on Kaggle (a minute or two), which proves it works there. The same datasets go to Hugging Face
+from the same workflow ([huggingface/README.md](../huggingface/README.md)). The first run creates
 each dataset, public and CC BY 4.0; later runs add a version that names the commit. `publish.py` lists
 exactly which files go in. Nothing from `data/external/` (others' datasets) and no `simulated_*` file is ever
 included. The cards in `cards/` become the dataset pages; edit them there, not on kaggle.com, or the next
