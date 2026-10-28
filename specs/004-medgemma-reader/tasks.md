@@ -28,4 +28,7 @@
   - [x] T018a Comparison script `29_medgemma_vs_bert.py` (paired CI vs best encoder, by difficulty, fallback, cost), tagged output files per variant, R twin; notebook 03 runs LoRA + comparison. Dry run only so far.
 - [ ] T019 27B text via a paid GPU endpoint, if 4B is promising
 - [x] T020 `keras` backend (KerasHub, Kaggle Models `keras/medgemma`, no Hugging Face token) for Kaggle runs pushed from GitHub; files tagged `+keras`; `40_compare_backends.py`; workflow `backend` input (default keras)
-- [ ] T021 10-note keras run compared with the hf results on the same notes; full keras run only if they agree
+- [x] T021 10-note keras run compared with the hf results on the same notes; full keras run only if they agree.
+  Kaggle, 2026-10-28, bfloat16 on one T4 (torch): same prediction on 10/10 notes, gate pass 100% for both,
+  agreement with the answer key 7/10 for both, 35.5 s/note (hf 28.3). Ten notes only: a full run is next.
+- [ ] T022 Full 240-note keras run (workflow, backend keras, limit 0); compare with hf on all 240 before using it
