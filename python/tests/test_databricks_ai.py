@@ -106,7 +106,7 @@ def test_llama_reader_is_in_the_registry_with_its_endpoint():
 
 def test_new_methods_have_plain_names_and_an_llm_group():
     from dental_omop_nlp import readme_results as rr
-    assert rr.plain_system("dbai-classify") == "Databricks ai_classify"
+    assert rr.plain_system("dbai-classify") == "Databricks AI classify"
     assert rr.plain_system("llama-3.3-70b-instruct") == "Llama 3.3 70B"
     for m in ("dbai-classify", "llama-3.3-70b-instruct"):
         assert rr.phenotype_group(m) == rr.PHENOTYPE_GROUPS[6]
@@ -155,3 +155,9 @@ def test_ai_mask_uses_the_waiting_executor():
     src = (REPO_ROOT / "python" / "dental_omop_nlp" / "deid.py").read_text()
     body = src[src.index("def _ai_mask_sql"):src.index("def detect_ai_mask")]
     assert "sql_execute(" in body and "urlopen" not in body
+
+
+def test_ai_mask_has_a_plain_name_and_counts_as_an_ai_tool():
+    from dental_omop_nlp import readme_results as rr
+    assert rr.plain_tool("ai_mask+regex_v2+guard") == "Databricks AI mask + patterns + dental-word guard"
+    assert rr.deid_group("ai_mask") == rr.DEID_GROUPS[1]
