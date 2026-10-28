@@ -27,7 +27,11 @@ DECKS = {
              "performance, and costs use illustrative prices.")),
 }
 REVEAL = "https://cdn.jsdelivr.net/npm/reveal.js@5.1.0"
-HEAD = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500..700&display=swap"><link rel="stylesheet" href="{reveal}/dist/reveal.css">
+# Subresource integrity for those files (sha384 of the npm package's own files): a changed file is refused
+SRI = {"css": "sha384-YgvgKeZJykuztG+iQPoZHNZENTFZvOcOJ/uRzmJTje6GHYN9zAw+y5rx/L8MQKA/",
+       "js": "sha384-M/JtqCVlLcK9lwVnBnMXP0V577CBULkjodKsR/PITOe4MSKNbbwqCemEyluOw0+5",
+       "notes": "sha384-vGIe90H8q0nlnrw/zr9vn+r39OtjvzBfai9voOybn5Bx+KmKLtSxhM+YIfcrsfI3"}
+HEAD = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500..700&display=swap"><link rel="stylesheet" href="{reveal}/dist/reveal.css" integrity="{sri[css]}" crossorigin="anonymous">
 <style>html,body{{height:100%}}body{{margin:0;background:#2b2b2b;font-family:Arial,sans-serif}}*{{box-sizing:border-box;margin:0}}
 td,th{{padding:12px 16px;border-bottom:1px solid #D9D3C4}}ul{{padding-left:1.2em}}
 .topnav{{position:fixed;top:0;left:0;right:0;z-index:50;height:56px;background:#0F2A33;border-bottom:1px solid rgba(213,227,225,.14);font-family:'Public Sans',Arial,sans-serif}}
@@ -40,36 +44,41 @@ td,th{{padding:12px 16px;border-bottom:1px solid #D9D3C4}}ul{{padding-left:1.2em
 .topnav .links a:hover,.topnav button:hover{{color:#F7F5EF;background:rgba(255,255,255,.07)}}.topnav .links a.active,.topnav button[aria-pressed=true]{{color:#F2A070}}
 .topnav .links a.cta{{background:#F2A070;color:#0F2A33;margin-left:6px}}.topnav .links a.cta:hover{{background:#F7F5EF}}
 .topnav select{{max-width:280px;min-width:0;font:600 14px 'Public Sans',Arial,sans-serif;color:#F7F5EF;background:#15303A;border:1px solid rgba(213,227,225,.3);border-radius:8px;padding:6px 8px}}
-.disclaimer{{position:fixed;top:56px;left:0;right:0;z-index:40;height:28px;padding:0 16px;background:#15303A;color:#D5E3E1;font:13px/28px 'Public Sans',Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.disclaimer{{position:fixed;top:56px;left:0;right:0;z-index:40;padding:6px 16px;background:#15303A;color:#D5E3E1;font:13px/1.45 'Public Sans',Arial,sans-serif}}
 .reveal-viewport,.reveal{{background:#2b2b2b}}.reveal{{position:fixed;top:84px;left:0;right:0;bottom:0;width:auto;height:auto}}
 .reveal .slides{{text-align:left}}.reveal .slides>section{{height:1080px}}.reveal .controls{{color:#F2A070}}.reveal .progress{{color:#F2A070}}
 .reveal .slide-number{{font:600 14px 'Public Sans',Arial,sans-serif;background:rgba(15,42,51,.8);color:#F7F5EF}}
 .notes-panel{{position:fixed;left:0;right:0;bottom:0;z-index:45;max-height:35vh;overflow:auto;background:#f4f1ea;color:#222;padding:16px 20px 28px;font-size:15px;line-height:1.5;box-shadow:0 -8px 24px rgba(0,0,0,.3)}}
 .notes-panel[hidden]{{display:none}}
-@media (max-width:820px){{.home .name,.topnav .links a.deck,.topnav .hint{{display:none}}.topnav select{{max-width:40vw}}}}</style></head><body>
+@media (max-width:820px){{.home .name,.topnav .links a.deck{{display:none}}.topnav select{{max-width:40vw}}}}</style></head><body>
 <nav class="topnav" aria-label="Main"><div class="bar">
 <a class="home" href="{site}/" title="Back to the Health Transformation Lab home page"><span class="mark" aria-hidden="true">←</span><span class="name">Health Transformation Lab</span></a>
-<div class="links">{decks}<select id="jump" aria-label="Go to slide">{options}</select>
-<button id="notes-btn" aria-pressed="false" title="Speaker notes (N)">Notes</button>
+<div class="links">{decks}<select id="deck-jump" aria-label="Go to slide">{options}</select>
+<button id="deck-notes-btn" aria-pressed="false" title="Speaker notes (N)">Notes</button>
 <a class="cta" href="{repo}" target="_blank" rel="noopener">GitHub ↗</a></div></div></nav>
-<p class="disclaimer" title="{note}">{note}</p>
+<p class="disclaimer" id="deck-disclaimer">{note}</p>
 <div class="reveal"><div class="slides">
 """
 TAIL = """</div></div>
-<div class="notes-panel" id="notes" hidden></div>
-<script src="{reveal}/dist/reveal.js"></script><script src="{reveal}/plugin/notes/notes.js"></script>
+<div class="notes-panel" id="deck-notes" hidden></div>
+<script src="{reveal}/dist/reveal.js" integrity="{sri[js]}" crossorigin="anonymous"></script><script src="{reveal}/plugin/notes/notes.js" integrity="{sri[notes]}" crossorigin="anonymous"></script>
 <script>
 document.querySelectorAll('.slides a[href^="http"]').forEach(a=>{{a.target='_blank';a.rel='noopener'}})
-var jump=document.getElementById('jump'),panel=document.getElementById('notes'),btn=document.getElementById('notes-btn')
+var jump=document.getElementById('deck-jump'),panel=document.getElementById('deck-notes'),btn=document.getElementById('deck-notes-btn'),
+  bar=document.getElementById('deck-disclaimer'),deck=document.querySelector('.reveal')
 function sync(){{var s=Reveal.getCurrentSlide();if(!s)return;var i=Reveal.getIndices().h;jump.selectedIndex=i;var n=s.querySelector('aside.notes');panel.innerHTML='<b>Slide '+(i+1)+' notes:</b> '+(n?n.innerHTML:'');if(!panel.hidden)fit()}}
-function fit(){{document.querySelector('.reveal').style.bottom=(panel.hidden?0:panel.offsetHeight)+'px';Reveal.layout()}}
+// the slide area sits between the disclaimer (it wraps on narrow screens) and the notes panel, when open
+function fit(){{deck.style.top=(56+bar.offsetHeight)+'px';deck.style.bottom=(panel.hidden?0:panel.offsetHeight)+'px';if(Reveal.isReady())Reveal.layout()}}
 function toggleNotes(){{var on=panel.hidden;panel.hidden=!on;btn.setAttribute('aria-pressed',on);fit()}}
 jump.addEventListener('change',()=>{{Reveal.slide(jump.selectedIndex);jump.blur()}})
 btn.addEventListener('click',toggleNotes)
+fit()
 Reveal.initialize({{width:1920,height:1080,margin:0.03,center:false,display:'flex',hash:true,history:false,
+  // scrollActivationWidth:null: phones page by swipe too, not reveal's scroll view below 435 px
   slideNumber:'c/t',scrollActivationWidth:null,controls:true,controlsTutorial:false,progress:true,transition:'fade',transitionSpeed:'fast',
-  keyboard:{{78:toggleNotes}},plugins:[RevealNotes]}}).then(sync)
+  keyboard:{{78:toggleNotes}},keyboardCondition:e=>!e.target.closest('.topnav'),plugins:[RevealNotes]}}).then(sync)
 Reveal.on('slidechanged',sync)
+addEventListener('resize',fit)
 </script></body></html>
 """
 
@@ -100,7 +109,7 @@ def nav(deck: str) -> dict:
                     for d, (page, name) in SITE_PAGES.items())
     options = "".join(f'<option value="{sid}">{n}. {html.escape(heading(section, sid))}</option>'
                       for n, (sid, section, _) in enumerate(slides(DOCS / deck), 1))
-    return {"site": SITE, "repo": REPO, "reveal": REVEAL, "decks": decks, "options": options}
+    return {"site": SITE, "repo": REPO, "reveal": REVEAL, "sri": SRI, "decks": decks, "options": options}
 
 
 def render(deck: str) -> tuple[str, str]:

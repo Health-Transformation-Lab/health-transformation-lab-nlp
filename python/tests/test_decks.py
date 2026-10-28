@@ -56,3 +56,10 @@ def test_deck_pages_one_slide_at_a_time_with_a_way_home(deck):
     assert re.findall(r'<option value="([^"]+)">', html) == ids
     assert html.count('<aside class="notes">') == len(ids)
     assert 'href="' + build_decks.REPO + '" target="_blank" rel="noopener"' in html
+    assert html.count('integrity="sha384-') == 3 and html.count('crossorigin="anonymous"') == 3
+
+
+def test_deck_disclaimer_is_never_cut_off():
+    # the synthetic-data line wraps on a narrow screen instead of ending in an ellipsis (PR #179 review)
+    rule = re.search(r"\.disclaimer\{[^}]*\}", build_decks.HEAD).group(0)
+    assert "nowrap" not in rule and "ellipsis" not in rule and "height" not in rule
