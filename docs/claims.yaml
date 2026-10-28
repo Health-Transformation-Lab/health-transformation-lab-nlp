@@ -1,0 +1,287 @@
+# Every figure on a deck slide (docs/<deck>/slides/), what kind of number it is, and where it comes from (issue #207).
+# python/tests/test_deck_claims.py fails if a slide shows a figure that isn't here, if a measured figure isn't in
+# the repo file named, or if a cost tier doesn't recompute from its tokens and list prices.
+#
+# kind:
+#   measured     run in this repo, on synthetic data; `file` reports it (`match` is the text found there)
+#   cited        from an outside source; `source` names it; `checked` is the date it was last read against the
+#                source, or null when it is as the slide cites it and not yet re-checked
+#   derived      computed from other figures here; `from` says how
+#   illustrative an assumed or placeholder figure, labelled so on the slide
+#   proposal     a term of what is being asked for (days, dollars), not a fact
+#   identifier   a number that names something (a report number)
+# covers: what the number is about, in words, so a slide can't quietly widen it.
+# Speaker notes are not scanned for figures (only for absolute wording); the review rubric's deck step covers them.
+
+tiers:
+  # Software cost for a million visits, by model: tokens per call x list price x calls per visit.
+  # Note tokens: 103 a synthetic note, from the committed sim:llm_challenger cost in
+  # data/corpus/simulated_cost_effectiveness.csv ($256.61 = 1e6 x ((103 + 350) x $0.50 + 20 x $1.50) / 1e6), with
+  # costs.yaml's 350-token prompt and 20-token answer. Real notes are longer than synthetic ones.
+  open_llm_note:
+    model: Llama 3.3 70B, Databricks pay-per-token
+    in_tokens: 453
+    out_tokens: 20
+    usd_per_1m_in: 0.50
+    usd_per_1m_out: 1.50
+    calls: 1
+    tokens: assumed
+    price_source: "databricks.com/product/pricing/foundation-model-serving: $0.07/DBU x 7.143 / 21.429 DBU per 1M tokens (costs.yaml)"
+    price_checked: 2026-10-26
+    usd_per_1m_visits: 256.5
+  frontier_llm_note:
+    model: Claude Fable 5.1 (Anthropic API, standard; batch is 50% less)
+    in_tokens: 453
+    out_tokens: 20
+    usd_per_1m_in: 10.0
+    usd_per_1m_out: 50.0
+    calls: 1
+    tokens: assumed
+    price_source: "claude.com/pricing: Fable 5.1 $10 / MTok input, $50 / MTok output"
+    price_checked: 2026-10-28
+    usd_per_1m_visits: 5530
+  frontier_llm_whole_record:
+    model: Claude Fable 5.1, reading the whole record with worked examples and reasoning, three calls a visit
+    in_tokens: 20000
+    out_tokens: 4000
+    usd_per_1m_in: 10.0
+    usd_per_1m_out: 50.0
+    calls: 3
+    tokens: assumed
+    price_source: "claude.com/pricing: Fable 5.1 $10 / MTok input, $50 / MTok output"
+    price_checked: 2026-10-28
+    usd_per_1m_visits: 1200000
+
+edr:
+  problem:
+    - value: "42%"
+      kind: cited
+      source: "Eke et al., J Am Dent Assoc 2018 (NHANES 2009-2014)"
+      checked: null
+      covers: US adults 30 and over with periodontitis, any severity
+    - value: "7.8%"
+      kind: cited
+      source: "Eke et al., J Am Dent Assoc 2018 (NHANES 2009-2014)"
+      checked: null
+      covers: US adults 30 and over with severe periodontitis
+  solution:
+    - value: "240"
+      kind: measured
+      file: docs/edr/README.md
+      match: "the 240 review charts"
+      covers: synthetic review charts that periodontists (simulated so far) label
+  results:
+    - value: "234"
+      kind: measured
+      file: docs/edr/README.md
+      match: "234 of 240"
+      covers: synthetic charts the whole-record rules (gum measurements first) got right
+    - value: "219"
+      kind: measured
+      file: docs/edr/README.md
+      match: "219 of 240"
+      covers: synthetic charts ModernBERT on the note, plus the stage 4 rule, got right
+    - value: "185"
+      kind: measured
+      file: docs/edr/README.md
+      match: "185 of 240"
+      covers: synthetic charts MedGemma 1.5 4B (untrained) plus the stage 4 rule got right
+    - value: "189"
+      kind: measured
+      file: docs/edr/README.md
+      match: "189 of 240"
+      covers: synthetic charts the keyword rules got right
+    - value: "193"
+      kind: measured
+      file: docs/edr/README.md
+      match: "193 of 240"
+      covers: synthetic charts the gum measurements alone got right
+    - value: "240"
+      kind: measured
+      file: docs/edr/README.md
+      match: "the 240 review charts"
+      covers: synthetic review charts scored
+  economics:
+    - value: "33,333 h"
+      kind: derived
+      from: "1,000,000 visits x 2 minutes / 60 (docs/financial_tradeoffs.md, review pace from the labelling protocol)"
+      covers: specialist hours to review a million visits by hand, one read each
+    - value: "31 h"
+      kind: derived
+      from: "233 charts x 4 reviewers x 2 minutes / 60 (docs/financial_tradeoffs.md)"
+      covers: specialist hours for the acceptance test
+    - value: "233"
+      kind: derived
+      from: "validation set as built (docs/financial_tradeoffs.md)"
+      covers: charts in the acceptance test
+    - value: "$15"
+      kind: illustrative
+      from: "sim:BioClinical ModernBERT base $13.41 for 1M notes (data/corpus/simulated_cost_effectiveness.csv): 1M / 150 notes/s = 1.85 GPU h plus 1.5 h training, at $4/GPU h; throughput and price both assumed (costs.yaml)"
+      covers: a small trained model on own hardware, the note only (shown as 'under $15')
+    - value: "$260"
+      kind: derived
+      from: "tiers.open_llm_note ($256.50)"
+      covers: open LLM hosted per token, the note only, a million visits
+    - value: "$5,500"
+      kind: derived
+      from: "tiers.frontier_llm_note ($5,530)"
+      covers: frontier commercial LLM, the note only, a million visits
+    - value: "20k"
+      kind: illustrative
+      from: "tiers.frontier_llm_whole_record in_tokens, assumed"
+      covers: tokens in per call when the model reads the whole record with examples
+    - value: "4k"
+      kind: illustrative
+      from: "tiers.frontier_llm_whole_record out_tokens, assumed"
+      covers: tokens out per call, including reasoning
+    - value: "$1.2M"
+      kind: derived
+      from: "tiers.frontier_llm_whole_record ($1,200,000)"
+      covers: frontier commercial LLM, whole record with examples and reasoning, three calls a visit (assumed tokens)
+  evidence:
+    - value: "234"
+      kind: measured
+      file: docs/edr/README.md
+      match: "234 of 240"
+      covers: synthetic charts right with the gum measurements read first
+    - value: "240"
+      kind: measured
+      file: docs/edr/README.md
+      match: "the 240 review charts"
+      covers: synthetic review charts scored
+    - value: "72%"
+      kind: measured
+      file: docs/results.md
+      match: "`algorithm_design` | whole record | rules, study-design order: exam form, diagnosis codes, note, chart | **72.1**"
+      covers: synthetic charts right with the study design's source order (72.1%)
+    - value: "173"
+      kind: derived
+      from: "72.1% x 240 (docs/results.md, algorithm_design)"
+      covers: synthetic charts right with the study design's source order
+    - value: "4×"
+      kind: derived
+      from: "four evidence groups can be ordered 4 x 3 x 2 x 1 = 24 ways"
+      covers: the number of source orders scored
+    - value: "3×"
+      kind: derived
+      from: "as 4×"
+      covers: the number of source orders scored
+    - value: "2×"
+      kind: derived
+      from: "as 4×"
+      covers: the number of source orders scored
+  acceptance:
+    - value: "83%"
+      kind: measured
+      file: docs/edr/README.md
+      match: "matched the answer key on 83% of charts"
+      covers: synthetic charts where an LLM's own reading matched the answer key
+    - value: "53%"
+      kind: measured
+      file: docs/edr/README.md
+      match: "only 53% of hard notes"
+      covers: the same, on hard synthetic notes
+    - value: "26%"
+      kind: measured
+      file: docs/edr/README.md
+      match: "only 26% of the best note model's"
+      covers: mistakes of the best note model that the LLM judge caught
+  privacy:
+    - value: "115"
+      kind: measured
+      file: docs/edr/README.md
+      match: "115 of 2,714"
+      covers: fake identifiers leaked by the best tool combination on synthetic notes
+    - value: "2,714"
+      kind: measured
+      file: docs/edr/README.md
+      match: "115 of 2,714"
+      covers: fake identifiers in the synthetic de-identification notes
+    - value: "41"
+      kind: measured
+      file: docs/edr/README.md
+      match: "41 of 2,462"
+      covers: dental look-alike words wrongly removed by the best tool combination
+    - value: "2,462"
+      kind: measured
+      file: docs/edr/README.md
+      match: "41 of 2,462"
+      covers: dental look-alike words in the same notes (41 wrongly removed)
+    - value: "400"
+      kind: measured
+      file: docs/edr/README.md
+      match: "the 400 synthetic notes"
+      covers: synthetic notes used to choose the de-identification combination
+
+pitch:
+  problem:
+    - value: "81%"
+      kind: cited
+      source: "GlobalDentBench 2026 (arXiv 2605.24636), averages for 12 AI models"
+      checked: null
+      covers: AI scores on dental licensing-exam questions
+    - value: "22%"
+      kind: cited
+      source: "GlobalDentBench 2026 (arXiv 2605.24636), averages for 12 AI models"
+      checked: null
+      covers: AI scores on real patient cases
+  example:
+    - value: "22%"
+      kind: cited
+      source: "GlobalDentBench 2026 (arXiv 2605.24636)"
+      checked: null
+      covers: AI scores on real patient cases
+  mdi:
+    - value: "1.9M"
+      kind: cited
+      source: "CDC NCHS Data Brief 531 (2025): tooth disorders, annual average of 1,944,000 ED visits, 2020-2022"
+      checked: 2026-10-28
+      covers: US emergency department visits a year for tooth disorders
+    - value: "531"
+      kind: identifier
+      covers: the CDC NCHS Data Brief number
+  reach:
+    - value: "40 million"
+      kind: cited
+      source: "OpenAI, January 2026 (global)"
+      checked: null
+      covers: people a day asking OpenAI's assistant health questions, worldwide
+  tests:
+    - value: "8,000"
+      kind: cited
+      source: "a UK public health guidance benchmark (arXiv list on the slide: a first search, not a full review)"
+      checked: null
+      covers: questions in that benchmark
+  proof:
+    - value: "8,000"
+      kind: cited
+      source: "Vanderbilt CTTC (REDCap)"
+      checked: null
+      covers: institutions using REDCap
+    - value: "163"
+      kind: cited
+      source: "Vanderbilt CTTC (REDCap)"
+      checked: null
+      covers: countries with REDCap institutions
+  ask:
+    - value: "180"
+      kind: proposal
+      covers: days for the first step
+    - value: "$50,000"
+      kind: proposal
+      covers: the funding asked for
+  pilot:
+    - value: "180"
+      kind: proposal
+      covers: days for the first step
+    - value: "$50,000"
+      kind: proposal
+      covers: the funding asked for
+  trajectory:
+    - value: "180"
+      kind: proposal
+      covers: days for the first step
+  close:
+    - value: "180"
+      kind: proposal
+      covers: days for the first step

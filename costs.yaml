@@ -30,7 +30,7 @@ methods:
   medgemma-1.5-4b-it:   {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 8}
   medgemma-27b-text-it: {kind: local, hardware: gpu, throughput_source: assumed, notes_per_sec: 1.5}
   llm_challenger:      {kind: llm, usd_per_1m_input_tokens: 0.50, usd_per_1m_output_tokens: 1.50,
-                        prompt_overhead_tokens: 350, output_tokens: 20}       # ILLUSTRATIVE
+                        prompt_overhead_tokens: 350, output_tokens: 20}       # prices: Llama 3.3 70B list price (deid section); prompt and output ASSUMED
 
 judge:                         # the LLM judge itself (used on samples, not the whole corpus)
   usd_per_1m_input_tokens: 3.00   # ILLUSTRATIVE (a stronger model than the classifier)
