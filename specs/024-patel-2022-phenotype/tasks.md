@@ -24,7 +24,9 @@ Implementation starts after this spec, plan and tasks are reviewed.
   names, dashboards and the order comparison
 - [ ] T009 [US3] Completeness CSV; `reliability.confusion_scores` (precision, recall, F1) for the Diagnoser and
   the Extractor; R twins and parity for the merge and the scores
-- [ ] T010 [US3] Docs: results beside the paper's cited figures, labelled synthetic vs real records
+- [ ] T010 [US3] Docs: results beside the paper's cited figures, labelled synthetic vs real records; when `algorithm_patel2022`
+  joins `readme_results.PHENOTYPES`, update its row in `docs/algorithms.md` (source [4], accuracy from
+  results.md), which `test_algorithms_doc.py` checks (#213)
 
 ## US4 #204: A2 checked, citations corrected
 
