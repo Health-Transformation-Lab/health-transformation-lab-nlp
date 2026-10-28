@@ -37,7 +37,9 @@ from dental_omop_nlp.paths import DEID_DIR, EXTERNAL_DIR, RAW_DIR
 DEFAULT = ["regex", "regex+guard", "regex_v2", "regex_v2+guard", "presidio", "presidio+guard",
            "presidio+regex_v2+guard", "hf_stanford", "hf_stanford+guard", "hf_stanford+regex_v2+guard",
            "hf_obi", "hf_obi+regex_v2+guard", "hf_stanford+presidio+regex_v2+guard",
-           "hf_stanford+hf_obi+regex_v2+guard", "routed+guard"]   # every method scored by 26_deid_benchmark.py
+           "hf_stanford+hf_obi+regex_v2+guard", "routed+guard",
+           "ai_mask", "ai_mask+regex_v2+guard"]   # every method scored by 26_deid_benchmark.py; ai_mask needs
+                                                  # DATABRICKS_HOST, _TOKEN and _WAREHOUSE_ID, else it's listed as not run
 ap = argparse.ArgumentParser()
 ap.add_argument("--source", choices=["brat", "bio"], default="brat")
 ap.add_argument("--path", default=None, help="the zip or folder (brat), or the JSONL (bio)")

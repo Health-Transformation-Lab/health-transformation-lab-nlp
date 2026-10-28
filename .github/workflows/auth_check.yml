@@ -25,5 +25,5 @@ jobs:
           host: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
           client_id: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
           client_secret: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
-      - uses: databricks/setup-cli@v0.297.2
+      - uses: databricks/setup-cli@v1.3.0
       - run: databricks current-user me

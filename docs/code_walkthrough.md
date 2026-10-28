@@ -240,6 +240,40 @@ barely register, because the synthetic histories are too short for them to show 
 - Code: [`prediction.py`](../python/dental_omop_nlp/prediction.py); [`scripts/21_predict_progression.py`](../python/scripts/21_predict_progression.py); R [`09_spec005.R`](../r/R/09_spec005.R) (same model; parity-tested).
 - Output: `data/datasets/prediction/`.
 
+### Classify status from the chart, explained with SHAP (spec 013 G10)
+
+**Question:** from today's chart alone, which status is this visit, and *which measurements made the
+model say so*?
+
+- **Model:** gradient-boosted trees (XGBoost), after Patel et al. 2022: 80% of patients train, 20% test;
+  depth, learning rate, regularization and class weighting picked by 5-fold cross-validation within the
+  training patients. Two schemes: 5 levels (healthy or gingivitis, stage I-IV) and 3 levels (healthy or
+  gingivitis, stage I-II, stage III-IV). Only charted visits: without a chart there is nothing to read.
+- **SHAP, in plain words:** for each visit, SHAP splits the model's answer into a share per input. Start from
+  the average answer (the "bias"); each input pushes it up or down; the pushes add up exactly to the
+  model's score for that visit. Averaged over visits (mean |SHAP|) it ranks the inputs; per visit, it says
+  why *this* visit got *this* stage, which is what a reviewer wants next to a disagreement.
+- **Reading the figure** (`classify_status/<outcome>_<scheme>_shap.png`): left, how much each input moves the
+  answer, split by class; right, one dot per test visit for the most severe class, red when the input is
+  high. Dots right of zero push towards that class.
+- **What to expect on synthetic data:** the labels come from the 2017 AAP/EFP rules on the same chart, so
+  the stage criteria should lead and smoking and diabetes (which set the *grade*, not the stage) should be
+  near zero. Each input is tagged with its role in the rules so this can be checked at a glance.
+
+**Simulated dry run (synthetic data, not a result), outcome `algorithm_design`, 5 levels:** accuracy 0.80,
+macro F1 0.75 on 713 held-out visits (the label also uses notes and codes, so the chart can't explain all of
+it; on `truth_status` accuracy is 0.99). SHAP ranks attachment loss first, then % of teeth involved: it is 0
+when no tooth has attachment loss, so it separates healthy and gingivitis from periodontitis. Bone loss,
+teeth lost and probing depth follow; smoking and diabetes are near zero, as the rules say. On `truth_status`
+bone loss falls to 0.08 (5 levels) and to zero (3 levels), because the rules use it only when CAL is missing
+and every charted visit has CAL. One oddity it surfaces: older age pulls *away* from stage IV (mean |SHAP|
+0.135 for stage IV, 0.05 over all classes); unexplained so far.
+
+- Code: [`classify_status.py`](../python/dental_omop_nlp/classify_status.py);
+  [`scripts/42_classify_status.py`](../python/scripts/42_classify_status.py). Needs the `ml` extra
+  (`pip install -e "python[ml]"`). No R twin (spec 013 FR-007: model outputs are outside label/scoring parity).
+- Output: `data/datasets/classify_status/`.
+
 ## 13. Site-level charts, both classifications
 
 32 teeth × 6 sites per charted exam, generated to reproduce the visit chart; the

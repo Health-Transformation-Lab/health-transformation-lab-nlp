@@ -273,7 +273,8 @@ def test_tables_use_the_readme_names(inp, answers):
         assert label.split(":")[0] in header, label          # the README's column names, verbatim
     assert set(m.loc[m.metric == "incorrectly_assigned", "metric_label"]) == {rr.COL_ASSIGNED}
     assert set(m.loc[m.metric == "correct_L3", "metric_label"]) == {"Correct: hard note"}
-    assert set(m["group"]) == set(rr.PHENOTYPE_GROUPS)
+    assert set(m["group"]) <= set(rr.PHENOTYPE_GROUPS)                  # a group with no results yet is absent
+    assert set(rr.PHENOTYPE_GROUPS[:6]) <= set(m["group"])
     assert (m["group"] == m["system"].map(rr.phenotype_group)).all()
     a = js.judge_agreement(inp, _perfect_judgments(inp, answers), n_boot=20)
     assert set(a.loc[a.group == "difficulty", "label"]) == {"Easy note", "Medium note", "Hard note"}
