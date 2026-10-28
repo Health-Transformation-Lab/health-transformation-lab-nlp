@@ -8,7 +8,7 @@ AI passes the dental exam.
 It fails the real patient.
 And no one tests whether it links the mouth to the rest of the body, or helps people get care. Oral health for all means fixing the test.
 Health Transformation Lab
-Working name · a personal idea
+A personal idea
 John Bowyer · personal project, not affiliated with any organization
 
 **Speaker notes:** AI passes the dental exam, and it fails the real patient. And no one tests whether it connects oral health to the rest of a person's health, or whether it helps people actually get care. I am proposing an independent, open lab, called the Health Transformation Lab for now. Its mission: better oral health for millions of Americans, and better overall health through the links between medical and dental care. It does that by making AI accurate on two things today's tests leave out. One is where medicine meets dentistry: medicines, chronic disease such as diabetes, and emergencies. The other is the social factors that decide whether people get care: cost, coverage, distance and transportation, what researchers call the social determinants of health. This is a personal idea: nothing has been registered or built, no organization is behind it, and no partner has agreed to anything.
