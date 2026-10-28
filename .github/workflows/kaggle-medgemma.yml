@@ -99,7 +99,7 @@ jobs:
           kaggle kernels output "$KERNEL" -p build/output || true
           ls -la build/output
           log=$(ls build/output/*.log 2>/dev/null | head -1)
-          if [ -n "$log" ]; then echo "---- last lines of the Kaggle log ----"; tail -c 6000 "$log"; fi
+          if [ -n "$log" ]; then echo "---- end of the Kaggle log (warnings left out) ----"; python kaggle/show_log.py "$log"; fi
 
       - uses: actions/upload-artifact@v4
         if: ${{ always() && (inputs.wait || inputs.collect_only) }}
