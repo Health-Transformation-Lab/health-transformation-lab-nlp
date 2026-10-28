@@ -223,10 +223,22 @@ def test_run_rows_label_one_runs_files_with_their_batch_key(tmp_path):
     assert preds.sha256.iloc[0] != details.sha256.iloc[0]          # each file's own version
 
 
-def test_load_notebook_leaves_the_reader_jobs_rows_alone():
-    # the reader job writes its CSVs next to the loader's and its rows carry sha256 (issue #94): the loader
-    # counts those versions as loaded, and deletes only rows it wrote, never the reader's
+def test_load_results_never_deletes_the_reader_jobs_rows():
+    # PR #92 review: the reader job's rows now carry the sha256 of their CSV; a committed file with the same bytes
+    # (deterministic predictions) must not make Load results delete that run's rows
     nb = _text("databricks/notebooks/10_load_results.py")
-    assert "source = 'databricks'" in nb                 # the reader's versions count as loaded
-    assert "AND source <> 'databricks'" in nb           # the delete never reaches them
-    assert "the reader job's own rows have no sha256" not in nb
+    assert "WHERE sha256 IN ({hashes}) AND source <> 'databricks'" in nb
+
+
+def test_reader_job_joins_the_answer_key_by_visit():
+    nb = _text("databricks/notebooks/03_medgemma_reader.py")
+    assert 'details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id"' in nb
+    assert "d.truth.values" not in nb
+
+
+def test_load_results_skips_the_files_the_reader_job_loaded_itself():
+    # issue #94: the reader job's CSVs sit in the folder Load results reads; loading them again would add the
+    # same predictions a second time as source = repo
+    nb = _text("databricks/notebooks/10_load_results.py")
+    assert """reader.where("source = 'databricks'").select("sha256")""" in nb
+    assert "loaded |=" in nb

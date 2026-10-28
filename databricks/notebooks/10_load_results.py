@@ -59,7 +59,7 @@ loaded = set()
 if spark.catalog.tableExists(table("result_files")):  # noqa: F821
     loaded = {r.sha256 for r in spark.table(table("result_files")).select("sha256").collect()}  # noqa: F821
 # The reader job (03) writes its CSVs into this folder and loads them itself, source 'databricks': those
-# versions are already in the tables, so loading them again would duplicate its rows.
+# versions are already in the tables, so loading them again would duplicate its rows as source 'repo'.
 if spark.catalog.tableExists(table("ai_predictions")):  # noqa: F821
     reader = spark.table(table("ai_predictions"))  # noqa: F821
     if {"source", "sha256"} <= set(reader.columns):
@@ -87,8 +87,8 @@ def append(df: pd.DataFrame, name: str):
         schema = spark.table(table(name)).schema  # noqa: F821
         hashes = ", ".join(f"'{h}'" for h in sorted(set(df.sha256)) if re.fullmatch(r"[0-9a-f]{64}", h))
         if hashes and "sha256" in schema.fieldNames():
-            mine = " AND source <> 'databricks'" if "source" in schema.fieldNames() else ""  # not the reader job's
-            spark.sql(f"DELETE FROM {table(name)} WHERE sha256 IN ({hashes}){mine}")  # noqa: F821
+            # the reader job's own rows carry their CSV's sha256 too, keyed by run: never touch them here
+            spark.sql(f"DELETE FROM {table(name)} WHERE sha256 IN ({hashes}) AND source <> 'databricks'")  # noqa: F821
         for field in schema:
             if field.name in empty:
                 sdf = sdf.withColumn(field.name, F.col(field.name).cast(field.dataType))
