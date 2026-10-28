@@ -69,6 +69,31 @@ as before.
 
 A test (`tests/test_telemetry_calls.py`) fails if a new public function lacks `@traced`.
 
+### Verbosity levels
+
+`DENTAL_TELEMETRY_LEVEL` sets how far down the call tree spans go:
+
+| Level | What gets a span | Site build (22_build_sites), spans |
+|---|---|---|
+| `step` | script runs and `pipeline_step` blocks | 1 |
+| `call` (default) | also functions marked `call`: the pipeline-level work | 6 |
+| `detail` | also functions marked `detail`: per chart, per note, per site helpers | 20,691 (before the per-parent budget) |
+
+Below the chosen level `@traced` is a direct call, so hot helpers cost nothing even with telemetry on.
+
+Each function's level is **measured, not guessed**: `python scripts/39_telemetry_levels.py` runs
+representative pipelines, each in its own process, with `DENTAL_TELEMETRY_PROFILE` set, counts every
+traced call (calls per parent call, time per call) and marks a function `detail` when it is called
+more than 20 times under one parent call, or costs under 0.5 ms and is called that often. The result
+is `python/dental_omop_nlp/telemetry_levels.yaml`, one entry per function with the measured reason.
+Edit a level by hand and add `manual: true` to keep it; functions the runs don't reach default to
+`call`. Rerun the script after adding pipelines or changing hot paths.
+
+Why measured and not an LLM: the question is how often a function runs and how long it takes, which a
+profiler answers exactly, for free and the same way every time. An LLM reading function names would
+guess. AI is better spent on what the telemetry is for: reading failures and suggesting a fix (the
+next spec, the pipeline doctor).
+
 ## Set up Azure (once, from your laptop)
 
 The Azure resources are Terraform in `infra/azure/` (the azurerm provider). You need an Azure

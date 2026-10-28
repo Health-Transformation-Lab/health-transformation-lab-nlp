@@ -103,6 +103,15 @@ def reml_components(d: pd.DataFrame) -> dict:
 
 
 @traced
+def write_charts(d: pd.DataFrame, path) -> None:
+    """CSV, gzipped without a timestamp or file name in the header: the same charts give the same bytes, so
+    rerunning the script doesn't show up as a change in git."""
+    import gzip
+    from pathlib import Path
+    Path(path).write_bytes(gzip.compress(d.to_csv(index=False).encode(), mtime=0))
+
+
+@traced
 def icc_report(c: dict) -> dict:
     vp, vt, vs, ve = (c[k] for k in COMPONENTS)
     total = vp + vt + vs + ve

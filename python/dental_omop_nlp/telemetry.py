@@ -28,12 +28,17 @@ from __future__ import annotations
 
 import atexit
 import functools
+import itertools
+import json
 import logging
 import os
 import sys
 import time
+from collections import defaultdict
 from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import ClassVar
 
 from opentelemetry import context, metrics, trace
@@ -42,6 +47,8 @@ from opentelemetry.trace import Status, StatusCode
 SERVICE = "dental-omop-nlp"                 # service.namespace: the code base
 DATA_PRODUCT = "dental_omop_perio"          # service.name: the data product, as in the Databricks schemas
 MAX_SPANS_PER_CALLER = int(os.environ.get("DENTAL_TELEMETRY_MAX_CALLS", "3"))
+LEVELS = ("step", "call", "detail")         # DENTAL_TELEMETRY_LEVEL: how far down the call tree to trace
+LEVELS_FILE = Path(__file__).with_name("telemetry_levels.yaml")
 LOGGER = "dental_omop_nlp"
 EXPORTERS = ("off", "console", "azure", "otlp", "memory")
 log = logging.getLogger(LOGGER)
@@ -54,12 +61,15 @@ class TelemetryConfig:
     sampling_ratio: float = 1.0
     environment: str = "dev"
     data_product_id: str = field(default_factory=lambda: os.environ.get("DENTAL_DATA_PRODUCT_ID", DATA_PRODUCT))
+    level: str = field(default_factory=lambda: os.environ.get("DENTAL_TELEMETRY_LEVEL", "call").strip().lower())
 
     def __post_init__(self):
         if self.exporter not in EXPORTERS:
             raise ValueError(f"DENTAL_TELEMETRY must be one of {EXPORTERS}")
         if not 0.0 <= self.sampling_ratio <= 1.0:
             raise ValueError("DENTAL_TELEMETRY_SAMPLING must be between 0 and 1")
+        if self.level not in LEVELS:
+            raise ValueError(f"DENTAL_TELEMETRY_LEVEL must be one of {LEVELS}")
 
 
 def _clean(value: str) -> str:
@@ -87,6 +97,8 @@ class _State:
     instruments: ClassVar[dict] = {}
     calls: ClassVar[dict] = {}
     header: ClassVar[dict] = {}
+    level = LEVELS.index("call")
+    profile = None                          # dict while telemetry.profile() is running
     script = None
 
 
@@ -134,6 +146,7 @@ def setup(config: TelemetryConfig | None = None):
     c = config or config_from_env()
     _State.instruments, _State.calls = {}, {}
     _State.header = _header(c)
+    _State.level = LEVELS.index(c.level)
     logging.getLogger(LOGGER).setLevel(logging.INFO)
     out = None
     if c.exporter == "azure" and not c.connection_string:
@@ -266,13 +279,13 @@ class _HeaderLogger(logging.LoggerAdapter):
 
 
 @contextmanager
-def trace_call(name: str, **attrs):
+def trace_call(name: str, level: str = "call", **attrs):
     """`with telemetry.trace_call("module.function") as log:` - one span per call with the common header,
     and a logger that carries it (cdh-lava-core's `with tracer.start_as_current_span(...)` pattern).
     A function called more than MAX_SPANS_PER_CALLER times under the same parent span stops making spans
     and is only counted (`function.calls`), so hot loops can't flood the ingestion allowance."""
     logger = _HeaderLogger(log, {"function": name})
-    if _State.exporter == "off":
+    if _State.exporter == "off" or LEVELS.index(level) > _State.level:
         yield logger
         return
     parent = trace.get_current_span().get_span_context().span_id
@@ -300,18 +313,129 @@ def trace_call(name: str, **attrs):
 
 def traced(fn):
     """Decorator form of trace_call for every public function: the body runs inside
-    `with trace_call("<module>.<function>")`. When telemetry is off it is a direct call."""
+    `with trace_call("<module>.<function>")`. The function's level comes from telemetry_levels.yaml
+    (default `call`); below DENTAL_TELEMETRY_LEVEL, or with telemetry off, it is a direct call."""
     module = fn.__module__.rsplit(".", 1)[-1]
     qual = fn.__qualname__.split(".<locals>.")[-1]
     name = f"{module}.{qual}"
-    attrs = {"code.function": fn.__name__, "code.namespace": fn.__module__}
+    level = function_levels().get(name, "call")
+    rank = LEVELS.index(level)
+    attrs = {"code.function": fn.__name__, "code.namespace": fn.__module__, "telemetry.level": level}
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        if _State.exporter == "off":
+        if _State.profile is not None:
+            return _profiled(name, fn, args, kwargs)
+        if _State.exporter == "off" or rank > _State.level:
             return fn(*args, **kwargs)
-        with trace_call(name, **attrs):
+        with trace_call(name, level, **attrs):
             return fn(*args, **kwargs)
 
     wrapper.__traced__ = True
     return wrapper
+
+
+# ---- levels: measured, kept in telemetry_levels.yaml (scripts/39_telemetry_levels.py) -------------
+
+_LEVEL_CACHE: dict | None = None
+_parent: ContextVar[int] = ContextVar("dental_traced_parent", default=0)   # id of the enclosing call
+_call_ids = itertools.count(1)
+
+
+def function_levels() -> dict:
+    """{"module.function": level} from telemetry_levels.yaml (read once)."""
+    global _LEVEL_CACHE
+    if _LEVEL_CACHE is None:
+        import yaml
+        data = yaml.safe_load(LEVELS_FILE.read_text()) if LEVELS_FILE.exists() else {}
+        _LEVEL_CACHE = {k: v["level"] for k, v in (data or {}).items()}
+    return _LEVEL_CACHE
+
+
+def _profiled(name, fn, args, kwargs):
+    parent = _parent.get()
+    token = _parent.set(next(_call_ids))
+    start = time.perf_counter()
+    try:
+        return fn(*args, **kwargs)
+    finally:
+        _parent.reset(token)
+        p = _State.profile
+        p["time"][name] += time.perf_counter() - start
+        p["calls"][(parent, name)] += 1
+
+
+def _summarize(p: dict) -> dict:
+    per_name: dict = defaultdict(list)
+    for (_, name), n in p["calls"].items():
+        per_name[name].append(n)
+    return {name: {"calls": sum(c), "total_ms": 1000 * p["time"][name], "max_calls_per_parent": max(c)}
+            for name, c in per_name.items()}
+
+
+def merge_profiles(rows: list[dict]) -> dict:
+    """Combine profiles from several processes: calls and time add up, calls per parent take the max."""
+    out: dict = {}
+    for row in rows:
+        for name, s in row.items():
+            o = out.setdefault(name, {"calls": 0, "total_ms": 0.0, "max_calls_per_parent": 0})
+            o["calls"] += s["calls"]
+            o["total_ms"] += s["total_ms"]
+            o["max_calls_per_parent"] = max(o["max_calls_per_parent"], s["max_calls_per_parent"])
+    for o in out.values():
+        o["mean_ms"] = o["total_ms"] / o["calls"]
+    return out
+
+
+@contextmanager
+def profile():
+    """Count every @traced call (whatever the exporter or level): calls, time, and calls per parent call.
+    Yields a dict filled when the block ends: {name: {calls, mean_ms, max_calls_per_parent}}."""
+    _State.profile = {"time": defaultdict(float), "calls": defaultdict(int)}
+    out: dict = {}
+    try:
+        yield out
+    finally:
+        p, _State.profile = _State.profile, None
+        out.update(merge_profiles([_summarize(p)]))
+
+
+def _profile_from_env() -> None:
+    """DENTAL_TELEMETRY_PROFILE=<file>: profile this whole process and append its summary to the file at
+    exit (scripts/39_telemetry_levels.py runs each pipeline in its own process, as CI does)."""
+    path = os.environ.get("DENTAL_TELEMETRY_PROFILE")
+    if not path:
+        return
+    _State.profile = {"time": defaultdict(float), "calls": defaultdict(int)}
+
+    def dump():
+        if _State.profile is not None:
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(_summarize(_State.profile)) + "\n")
+
+    atexit.register(dump)
+
+
+def classify(stats: dict, max_calls_per_parent: int = 20, min_ms: float = 0.5) -> dict:
+    """`detail` for functions called more than max_calls_per_parent times under one parent call, or cheap
+    (< min_ms per call) and called that often in total: tracing them costs more than it tells. Else `call`."""
+    out = {}
+    for name, s in sorted(stats.items()):
+        hot = s["max_calls_per_parent"] > max_calls_per_parent
+        cheap = s["mean_ms"] < min_ms and s["calls"] > max_calls_per_parent
+        why = f"{s['max_calls_per_parent']} calls per parent, {s['calls']} in total, {s['mean_ms']:.3f} ms per call"
+        out[name] = {"level": "detail" if hot or cheap else "call", "reason": why}
+    return out
+
+
+def merge_levels(old: dict, new: dict) -> dict:
+    """New measurements win, except entries marked `manual: true` (hand-edited) and functions this run
+    didn't reach (their old level stays)."""
+    merged = {**old}
+    for name, v in new.items():
+        if not (old.get(name) or {}).get("manual"):
+            merged[name] = v
+    return dict(sorted(merged.items()))
+
+
+_profile_from_env()
