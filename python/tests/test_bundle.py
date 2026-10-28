@@ -385,3 +385,11 @@ def test_every_job_and_run_shows_the_commit_it_was_deployed_from():
                 assert t["notebook_task"]["base_parameters"]["git_commit"] == "${bundle.git.commit}", (name, nb)
                 text = (ROOT / "databricks" / "notebooks" / nb.rsplit("/", 1)[1]).read_text()
                 assert "tracking.use_git_commit(dbutils)" in text, nb
+
+
+def test_a_new_gpu_run_does_not_queue_behind_an_old_one_waiting_to_retry():
+    """GPU runs retry for hours when no GPU is free. With one run allowed at a time, a run started after a
+    deploy (new code) sat "Queued" behind an old run "Waiting for retry". Two at a time lets it start."""
+    _, jobs = _load()
+    for name in ("medgemma_reader", "encoder_gpu"):
+        assert jobs[name][0].get("max_concurrent_runs") == 2, name
