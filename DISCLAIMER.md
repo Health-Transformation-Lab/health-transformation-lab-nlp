@@ -6,8 +6,7 @@ Databricks, while waiting for any internal approvals that real work in this
 area would need.
 
 - **Not affiliated.** This repository is not affiliated with, endorsed by, or
-  produced for any employer, institution, company or research group, including
-  CareQuest Institute for Oral Health, CareQuest Innovation Partners, or any
+  produced for any employer, institution, company or research group, or any
   vendor mentioned in the docs.
 - **Not official business or research.** Nothing here reflects the plans,
   methods, data, findings, priorities or positions of any organization. It is
