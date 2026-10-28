@@ -45,6 +45,7 @@ erDiagram
         bigint visit_id PK, FK "review chart"
         string model_name "model id"
         string backend_code "hf (local weights) · openai (OpenAI-compatible endpoint)"
+        string model_revision_id "Kaggle Models handle or Hugging Face commit of the weights; empty before #214"
         string prompt_version_code "e.g. reader-v2"
         bigint shot_count "few-shot examples in the prompt"
         bigint input_token_count "prompt tokens"
