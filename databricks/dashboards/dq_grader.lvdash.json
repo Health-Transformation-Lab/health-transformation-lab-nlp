@@ -1,0 +1,1287 @@
+{
+  "datasets": [
+    {
+      "name": "tiles",
+      "displayName": "tiles",
+      "queryLines": [
+        "SELECT\n",
+        "  ROUND(100 * AVG(CASE WHEN exam_form <> 'unknown' AND proc_dx_completed <> 'unknown' AND probing_chart <> 'unknown'\n",
+        "                       THEN 1.0 ELSE 0.0 END), 1) AS completeness_pct,\n",
+        "  ROUND(100 * AVG(CASE WHEN algorithm_v0 = truth_status THEN 1.0 ELSE 0.0 END), 1) AS accuracy_pct,\n",
+        "  ROUND(100 * AVG(CASE WHEN algorithm_design = truth_status THEN 1.0 ELSE 0.0 END), 1) AS accuracy_design_pct,\n",
+        "  (SELECT ROUND(100 * (MAX(periodontitis) - MIN(periodontitis)), 1) FROM health_transformation_lab.gold_health_transformation_lab.dq_prevalence\n",
+        "    WHERE level = 'clinic' AND method = 'algorithm_design') AS consistency_pts,\n",
+        "  (SELECT ROUND(100 * better, 1) FROM health_transformation_lab.gold_health_transformation_lab.dq_temporal WHERE method = 'algorithm_design') AS implausible_pct,\n",
+        "  COUNT(*) AS n_visits\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n"
+      ]
+    },
+    {
+      "name": "missingness",
+      "displayName": "missingness",
+      "queryLines": [
+        "SELECT evidence_column, ROUND(pct_missing, 1) AS pct_missing, n_missing, n_rows\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_completeness\n",
+        "ORDER BY pct_missing DESC\n"
+      ]
+    },
+    {
+      "name": "checks",
+      "displayName": "checks",
+      "queryLines": [
+        "SELECT clinic, category, check_name, n_checked, n_fail, ROUND(100 * pass_rate, 2) AS pass_pct, status\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_checks\n",
+        "ORDER BY CASE WHEN clinic = 'All' THEN 0 ELSE 1 END, clinic, category, check_name\n"
+      ]
+    },
+    {
+      "name": "accuracy",
+      "displayName": "accuracy",
+      "queryLines": [
+        "SELECT clinic, 'Exam form' AS evidence_source,\n",
+        "  CASE WHEN exam_form <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN exam_form = 'unknown' THEN NULL WHEN exam_form = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "UNION ALL\n",
+        "\n",
+        "SELECT clinic, 'Diagnosis codes, done' AS evidence_source,\n",
+        "  CASE WHEN proc_dx_completed <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN proc_dx_completed = 'unknown' THEN NULL WHEN proc_dx_completed = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "UNION ALL\n",
+        "\n",
+        "SELECT clinic, 'Diagnosis codes, planned' AS evidence_source,\n",
+        "  CASE WHEN proc_dx_planned <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN proc_dx_planned = 'unknown' THEN NULL WHEN proc_dx_planned = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "UNION ALL\n",
+        "\n",
+        "SELECT clinic, 'Chart note' AS evidence_source,\n",
+        "  CASE WHEN notes <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN notes = 'unknown' THEN NULL WHEN notes = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "UNION ALL\n",
+        "\n",
+        "SELECT clinic, 'Gum measurements' AS evidence_source,\n",
+        "  CASE WHEN probing_chart <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN probing_chart = 'unknown' THEN NULL WHEN probing_chart = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "UNION ALL\n",
+        "\n",
+        "SELECT clinic, 'Rules, measurements first (v0)' AS evidence_source,\n",
+        "  CASE WHEN algorithm_v0 <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN algorithm_v0 = 'unknown' THEN NULL WHEN algorithm_v0 = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n",
+        "UNION ALL\n",
+        "\n",
+        "SELECT clinic, 'Rules, exam form first (design)' AS evidence_source,\n",
+        "  CASE WHEN algorithm_design <> 'unknown' THEN 100.0 ELSE 0.0 END AS answered_pct,\n",
+        "  CASE WHEN algorithm_design = 'unknown' THEN NULL WHEN algorithm_design = truth_status THEN 100.0 ELSE 0.0 END AS agree_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_visits\n"
+      ]
+    },
+    {
+      "name": "concordance",
+      "displayName": "concordance",
+      "queryLines": [
+        "SELECT method_a, method_b, ROUND(100 * pct_agree, 1) AS pct_agree, ROUND(kappa, 2) AS kappa, n\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_concordance\n",
+        "WHERE level = 'status'\n"
+      ]
+    },
+    {
+      "name": "prevalence_clinic",
+      "displayName": "prevalence_clinic",
+      "queryLines": [
+        "SELECT group_name AS clinic, ROUND(100 * periodontitis, 1) AS periodontitis_pct,\n",
+        "  ROUND(100 * periodontitis_ci_low, 1) AS ci_low, ROUND(100 * periodontitis_ci_high, 1) AS ci_high, n\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_prevalence\n",
+        "WHERE level = 'clinic' AND method = 'algorithm_design'\n",
+        "ORDER BY clinic\n"
+      ]
+    },
+    {
+      "name": "prevalence_scale",
+      "displayName": "prevalence_scale",
+      "queryLines": [
+        "SELECT method, group_name AS scale, n, ROUND(100 * periodontitis, 1) AS periodontitis_pct,\n",
+        "  ROUND(100 * stage3_4, 1) AS stage3_4_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_prevalence\n",
+        "WHERE level = 'scale'\n",
+        "ORDER BY method, scale\n"
+      ]
+    },
+    {
+      "name": "transitions",
+      "displayName": "transitions",
+      "queryLines": [
+        "SELECT from_status, to_status, n, ROUND(row_pct, 1) AS row_pct, direction\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_transitions\n"
+      ]
+    },
+    {
+      "name": "temporal",
+      "displayName": "temporal",
+      "queryLines": [
+        "SELECT method, pairs, ROUND(100 * better, 1) AS improved_pct, ROUND(100 * same, 1) AS same_pct,\n",
+        "  ROUND(100 * worse, 1) AS worse_pct, ROUND(100 * perio_resolved, 1) AS resolved_pct,\n",
+        "  ROUND(100 * stage_drop, 1) AS stage_drop_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_temporal\n",
+        "ORDER BY improved_pct\n"
+      ]
+    },
+    {
+      "name": "injected",
+      "displayName": "injected",
+      "queryLines": [
+        "SELECT injected_errors, ROUND(100 * caught_share, 1) AS caught_pct,\n",
+        "  ROUND(100 * flag_rate_without_error, 2) AS false_flag_pct\n",
+        "FROM health_transformation_lab.gold_health_transformation_lab.dq_injected_errors\n"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "dq_grader",
+      "displayName": "EHR DQ grader",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "banner",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## EHR DQ grader: is this dental record fit for periodontal phenotyping?\n",
+                "**Synthetic data** from the study's generator, scored against its own truth: **not clinical performance**. The\n",
+                "light version of the Perio DQ Monitor design: five domains (Zozus completeness, accuracy and consistency; Kahn\n",
+                "temporal plausibility; Liaw reliability), then one section per domain. Ask the **EHR DQ grader** Genie space for\n",
+                "anything not shown.\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "f_clinic",
+            "queries": [
+              {
+                "name": "f_f_clinic_accuracy",
+                "query": {
+                  "datasetName": "accuracy",
+                  "fields": [
+                    {
+                      "name": "clinic",
+                      "expression": "`clinic`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f_f_clinic_prevalence_clinic",
+                "query": {
+                  "datasetName": "prevalence_clinic",
+                  "fields": [
+                    {
+                      "name": "clinic",
+                      "expression": "`clinic`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "clinic",
+                    "displayName": "Clinic",
+                    "queryName": "f_f_clinic_accuracy"
+                  },
+                  {
+                    "fieldName": "clinic",
+                    "displayName": "Clinic",
+                    "queryName": "f_f_clinic_prevalence_clinic"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Clinic"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "how",
+            "multilineTextboxSpec": {
+              "lines": [
+                "Tiles are for all clinics; the clinic filter applies to accuracy by source and prevalence. The checks table lists every clinic and All. Per-visit evidence is in `dq_visits` (statuses only, never note text).\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 3,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "t_complete",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "tiles",
+                  "fields": [
+                    {
+                      "name": "completeness_pct",
+                      "expression": "`completeness_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "completeness_pct",
+                  "displayName": "Completeness (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Completeness (%)",
+                "showDescription": true,
+                "description": "Visits with exam form, diagnosis codes and gum measurements all present. All clinics."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "t_accuracy",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "tiles",
+                  "fields": [
+                    {
+                      "name": "accuracy_pct",
+                      "expression": "`accuracy_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "accuracy_pct",
+                  "displayName": "Accuracy (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Accuracy (%)",
+                "showDescription": true,
+                "description": "Rules on the whole record, measurements first (v0), against the truth, all visits."
+              }
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 5,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "t_consistency",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "tiles",
+                  "fields": [
+                    {
+                      "name": "consistency_pts",
+                      "expression": "`consistency_pts`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "consistency_pts",
+                  "displayName": "Consistency (points)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Consistency (points)",
+                "showDescription": true,
+                "description": "Spread of periodontitis prevalence across the 8 clinics (design rules). Smaller is steadier."
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 5,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "t_temporal",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "tiles",
+                  "fields": [
+                    {
+                      "name": "implausible_pct",
+                      "expression": "`implausible_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "implausible_pct",
+                  "displayName": "Temporal plausibility (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Temporal plausibility (%)",
+                "showDescription": true,
+                "description": "Visit pairs 1–2 years apart, no treatment between, whose stage improved (design rules). Lower is better."
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 5,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "t_reliability",
+            "multilineTextboxSpec": {
+              "lines": [
+                "**Reliability** (Liaw)\n",
+                "\n",
+                "**Not assessed**: needs real reviewers to label charts. Simulated reviewers are a dry run.\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 5,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "t_accuracy_design",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "tiles",
+                  "fields": [
+                    {
+                      "name": "accuracy_design_pct",
+                      "expression": "`accuracy_design_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "accuracy_design_pct",
+                  "displayName": "Accuracy, exam form first (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Accuracy, exam form first (%)",
+                "showDescription": true,
+                "description": "Rules in the study design's order. The order changes the answer."
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 5,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "s_complete",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Completeness\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "b_missing",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "missingness",
+                  "fields": [
+                    {
+                      "name": "evidence_column",
+                      "expression": "`evidence_column`"
+                    },
+                    {
+                      "name": "pct_missing",
+                      "expression": "`pct_missing`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "evidence_column",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Evidence column"
+                },
+                "y": {
+                  "fieldName": "pct_missing",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Missing (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Missing by evidence column (%)",
+                "showDescription": true,
+                "description": "Share of visits where the column is empty. Diagnosis codes done are missing as often as planned (29.5%); the per-source share answered is under Accuracy."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_checks",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "checks",
+                  "fields": [
+                    {
+                      "name": "clinic",
+                      "expression": "`clinic`"
+                    },
+                    {
+                      "name": "category",
+                      "expression": "`category`"
+                    },
+                    {
+                      "name": "check_name",
+                      "expression": "`check_name`"
+                    },
+                    {
+                      "name": "n_checked",
+                      "expression": "`n_checked`"
+                    },
+                    {
+                      "name": "n_fail",
+                      "expression": "`n_fail`"
+                    },
+                    {
+                      "name": "pass_pct",
+                      "expression": "`pass_pct`"
+                    },
+                    {
+                      "name": "status",
+                      "expression": "`status`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "clinic",
+                    "displayName": "Clinic"
+                  },
+                  {
+                    "fieldName": "category",
+                    "displayName": "Category"
+                  },
+                  {
+                    "fieldName": "check_name",
+                    "displayName": "Check"
+                  },
+                  {
+                    "fieldName": "n_checked",
+                    "displayName": "Checked"
+                  },
+                  {
+                    "fieldName": "n_fail",
+                    "displayName": "Failed"
+                  },
+                  {
+                    "fieldName": "pass_pct",
+                    "displayName": "Pass (%)"
+                  },
+                  {
+                    "fieldName": "status",
+                    "displayName": "Status"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Conformance, completeness and plausibility checks",
+                "showDescription": true,
+                "description": "All = every clinic together. PASS: no failures allowed and none found; REPORT: a rate to read, with no pass mark."
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 9,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "s_accuracy",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Accuracy\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "b_answered",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "accuracy",
+                  "fields": [
+                    {
+                      "name": "evidence_source",
+                      "expression": "`evidence_source`"
+                    },
+                    {
+                      "name": "answered",
+                      "expression": "AVG(`answered_pct`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "evidence_source",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Evidence source"
+                },
+                "y": {
+                  "fieldName": "answered",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Answered (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Visits each source gives a status for (%)"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 2,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "b_agree",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "accuracy",
+                  "fields": [
+                    {
+                      "name": "evidence_source",
+                      "expression": "`evidence_source`"
+                    },
+                    {
+                      "name": "agree",
+                      "expression": "AVG(`agree_pct`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "evidence_source",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Evidence source"
+                },
+                "y": {
+                  "fieldName": "agree",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Agrees with truth (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Agreement with the truth where it answers (%)",
+                "showDescription": true,
+                "description": "Comparison to truth, the top rung of the accuracy hierarchy."
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 16,
+            "width": 2,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "h_concord",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "concordance",
+                  "fields": [
+                    {
+                      "name": "method_a",
+                      "expression": "`method_a`"
+                    },
+                    {
+                      "name": "method_b",
+                      "expression": "`method_b`"
+                    },
+                    {
+                      "name": "pct_agree",
+                      "expression": "`pct_agree`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "method_a",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "method_a"
+                },
+                "y": {
+                  "fieldName": "method_b",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "method_b"
+                },
+                "color": {
+                  "fieldName": "pct_agree",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Agree (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Concordance between sources (%)",
+                "showDescription": true,
+                "description": "Comparison to independent measurement, truth excluded."
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 16,
+            "width": 2,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "s_consistency",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Consistency\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 22,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "b_clinic",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "prevalence_clinic",
+                  "fields": [
+                    {
+                      "name": "clinic",
+                      "expression": "`clinic`"
+                    },
+                    {
+                      "name": "periodontitis_pct",
+                      "expression": "`periodontitis_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "clinic",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Clinic"
+                },
+                "y": {
+                  "fieldName": "periodontitis_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Periodontitis (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Periodontitis prevalence by clinic (%)",
+                "showDescription": true,
+                "description": "Design rules; 95% intervals in the table."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 23,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_clinic",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "prevalence_clinic",
+                  "fields": [
+                    {
+                      "name": "clinic",
+                      "expression": "`clinic`"
+                    },
+                    {
+                      "name": "n",
+                      "expression": "`n`"
+                    },
+                    {
+                      "name": "periodontitis_pct",
+                      "expression": "`periodontitis_pct`"
+                    },
+                    {
+                      "name": "ci_low",
+                      "expression": "`ci_low`"
+                    },
+                    {
+                      "name": "ci_high",
+                      "expression": "`ci_high`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "clinic",
+                    "displayName": "Clinic"
+                  },
+                  {
+                    "fieldName": "n",
+                    "displayName": "People"
+                  },
+                  {
+                    "fieldName": "periodontitis_pct",
+                    "displayName": "Periodontitis (%)"
+                  },
+                  {
+                    "fieldName": "ci_low",
+                    "displayName": "95% CI low"
+                  },
+                  {
+                    "fieldName": "ci_high",
+                    "displayName": "95% CI high"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "By clinic, with intervals"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 23,
+            "width": 1,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_scale",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "prevalence_scale",
+                  "fields": [
+                    {
+                      "name": "method",
+                      "expression": "`method`"
+                    },
+                    {
+                      "name": "scale",
+                      "expression": "`scale`"
+                    },
+                    {
+                      "name": "n",
+                      "expression": "`n`"
+                    },
+                    {
+                      "name": "periodontitis_pct",
+                      "expression": "`periodontitis_pct`"
+                    },
+                    {
+                      "name": "stage3_4_pct",
+                      "expression": "`stage3_4_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "method",
+                    "displayName": "Method"
+                  },
+                  {
+                    "fieldName": "scale",
+                    "displayName": "Scale"
+                  },
+                  {
+                    "fieldName": "n",
+                    "displayName": "Visits"
+                  },
+                  {
+                    "fieldName": "periodontitis_pct",
+                    "displayName": "Periodontitis (%)"
+                  },
+                  {
+                    "fieldName": "stage3_4_pct",
+                    "displayName": "Stage III–IV (%)"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "By scale: all visits, complete cases, reference set"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 23,
+            "width": 2,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "s_temporal",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Temporal plausibility\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 29,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "h_trans",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "transitions",
+                  "fields": [
+                    {
+                      "name": "to_status",
+                      "expression": "`to_status`"
+                    },
+                    {
+                      "name": "from_status",
+                      "expression": "`from_status`"
+                    },
+                    {
+                      "name": "row_pct",
+                      "expression": "`row_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "to_status",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Next visit"
+                },
+                "y": {
+                  "fieldName": "from_status",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Earlier visit"
+                },
+                "color": {
+                  "fieldName": "row_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "% of row"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Stage at one visit (rows) and the next (columns), % of the row",
+                "showDescription": true,
+                "description": "Cells where the next visit's stage is lower than the earlier one show improvement: a charting or rule error unless treated."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 30,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_temporal",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "temporal",
+                  "fields": [
+                    {
+                      "name": "method",
+                      "expression": "`method`"
+                    },
+                    {
+                      "name": "pairs",
+                      "expression": "`pairs`"
+                    },
+                    {
+                      "name": "improved_pct",
+                      "expression": "`improved_pct`"
+                    },
+                    {
+                      "name": "same_pct",
+                      "expression": "`same_pct`"
+                    },
+                    {
+                      "name": "worse_pct",
+                      "expression": "`worse_pct`"
+                    },
+                    {
+                      "name": "resolved_pct",
+                      "expression": "`resolved_pct`"
+                    },
+                    {
+                      "name": "stage_drop_pct",
+                      "expression": "`stage_drop_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "method",
+                    "displayName": "Method"
+                  },
+                  {
+                    "fieldName": "pairs",
+                    "displayName": "Visit pairs"
+                  },
+                  {
+                    "fieldName": "improved_pct",
+                    "displayName": "Improved (%)"
+                  },
+                  {
+                    "fieldName": "same_pct",
+                    "displayName": "Same (%)"
+                  },
+                  {
+                    "fieldName": "worse_pct",
+                    "displayName": "Worse (%)"
+                  },
+                  {
+                    "fieldName": "resolved_pct",
+                    "displayName": "Resolved (%)"
+                  },
+                  {
+                    "fieldName": "stage_drop_pct",
+                    "displayName": "Stage dropped (%)"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Implausible change by method",
+                "showDescription": true,
+                "description": "Lower improved and resolved shares are more plausible."
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 30,
+            "width": 3,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_injected",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "injected",
+                  "fields": [
+                    {
+                      "name": "injected_errors",
+                      "expression": "`injected_errors`"
+                    },
+                    {
+                      "name": "caught_pct",
+                      "expression": "`caught_pct`"
+                    },
+                    {
+                      "name": "false_flag_pct",
+                      "expression": "`false_flag_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "injected_errors",
+                    "displayName": "Errors injected"
+                  },
+                  {
+                    "fieldName": "caught_pct",
+                    "displayName": "Caught (%)"
+                  },
+                  {
+                    "fieldName": "false_flag_pct",
+                    "displayName": "Flagged without an error (%)"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Injected charting errors the temporal checks catch (synthetic only)"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 34,
+            "width": 3,
+            "height": 3
+          }
+        }
+      ]
+    }
+  ]
+}

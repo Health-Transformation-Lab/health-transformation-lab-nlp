@@ -75,7 +75,8 @@ jobs:
           host: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
           client_id: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
           client_secret: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
-      - uses: databricks/setup-cli@v0.297.2   # >= 0.288 for the catalogs resource
+      - uses: databricks/setup-cli@v1.3.0   # >= 0.288 for the catalogs resource; >= 1.3.0 for genie_spaces (spec 019)
       - name: bundle validate (all targets)
         if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}   # as deploy.yml; the catalog and Genie resources need it
         run: for t in dev uat prod; do databricks bundle validate -t $t; done

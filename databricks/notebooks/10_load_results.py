@@ -32,7 +32,7 @@ import re
 from pathlib import Path
 
 import pandas as pd
-from health_transformation_lab_nlp import gold_names, results_store, tracking
+from health_transformation_lab_nlp import gold_names, grader_tables, results_store, tracking
 from pyspark.sql import functions as F
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
@@ -120,3 +120,13 @@ if experiment and len(details):
             run.log_metrics(results_store.llm_run_metrics(d, truth))
 
 print("loaded:", list(new.file) or "nothing new")
+
+# COMMAND ----------
+
+# The graders' tables (spec 019): data quality now, the lab grader later. Each is small and built whole from the
+# deployed CSVs, so it is overwritten on every run: a rerun leaves the same rows. sha256 says which files it holds.
+for name, df in grader_tables.dq_tables(data_dir).items():
+    empty = [c for c in df.columns if df[c].isna().all()]
+    spark.createDataFrame(df.astype({c: "string" for c in empty}).assign(git_commit=commit, loaded_at=now)) \
+        .write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(table(name))  # noqa: F821
+    print(f"{name}: {len(df)} rows")
