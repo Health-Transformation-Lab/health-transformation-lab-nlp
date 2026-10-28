@@ -105,3 +105,13 @@ jobs:
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Only file versions it hasn't loaded yet; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait load_results
+      - name: Genie spaces, once the tables they read exist (spec 019, issue #155)
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+        env: {DATABRICKS_BUNDLE_ENGINE: direct}
+        # A space can't be created before its tables (403), and Load results (above) writes them after the deploy.
+        # So the spaces are their own bundle, deployed only when every table exists; otherwise skip, and the next
+        # deploy creates them.
+        run: |
+          missing=$(python .github/scripts/genie_tables_missing.py)
+          if [ -n "$missing" ]; then echo "::notice::Genie spaces wait for their tables: $missing"; exit 0; fi
+          cd databricks/genie && databricks bundle deploy -t "$TARGET"

@@ -54,6 +54,8 @@ shares.
   Never edit the JSON by hand: a test checks the committed files match the builder.
 - **Tests:** every dashboard query runs in DuckDB on the same tables under the same names, so the SQL is checked
   before deploy.
-- **Deploy:** the bundle deploys the dashboards (`databricks/resources/dashboards.yml`) and the Genie spaces
-  (`databricks/resources/genie.yml`; Databricks CLI 1.3.0 or later, direct engine) in every target, under the
-  same names.
+- **Deploy:** the main bundle deploys the dashboards (`databricks/resources/dashboards.yml`) in every target, under
+  the same names. The Genie spaces are their own bundle, `databricks/genie/databricks.yml` (Databricks CLI 1.3.0 or
+  later, direct engine), because a space can't be created before the tables it reads. The deploy workflow deploys
+  it last, once *Load results* has written every table; until then it skips with a notice, and a later deploy
+  creates the spaces (issue #155).

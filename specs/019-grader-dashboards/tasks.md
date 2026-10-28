@@ -10,7 +10,7 @@
 
 ## US5 (DQ part) - Genie space (#106)
 - [x] T005 Failing tests: the space lists only `dq_*` tables, its instructions define each tile's measure and say synthetic
-- [x] T006 `databricks/genie/dq_grader.geniespace.json`, `databricks/resources/genie.yml`; CI CLI pin
+- [x] T006 `databricks/genie/dq_grader.geniespace.json`, `databricks/genie/databricks.yml` (its own bundle, deployed once its tables exist: issue #155); CI CLI pin
 
 ## US3 - Lab grader tables (#104)
 - [x] T007 Failing tests: the seeded sample is reproducible, every row simulated, `sim:` models, harm in S0–S2, score = covered / key points

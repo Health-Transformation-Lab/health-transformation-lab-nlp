@@ -79,4 +79,4 @@ jobs:
       - name: bundle validate (all targets)
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}   # as deploy.yml; the catalog and Genie resources need it
-        run: for t in dev uat prod; do databricks bundle validate -t $t; done
+        run: for t in dev uat prod; do databricks bundle validate -t $t && (cd databricks/genie && databricks bundle validate -t $t); done

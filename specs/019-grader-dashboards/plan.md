@@ -12,7 +12,8 @@
   (an attached `dental_omop` database with a `gold_dental_omop_perio` schema) and run every dataset query. So the
   SQL keeps to what DuckDB and Databricks SQL share: no `QUALIFY`, no Databricks-only functions.
 - **Genie (US5):** `databricks/genie/<space>.geniespace.json` (tables, text instructions, sample questions),
-  declared in `databricks/resources/genie.yml` with `file_path`. This needs a Databricks CLI with the
+  declared in their own bundle, `databricks/genie/databricks.yml`, with `file_path` (issue #155: a space can be created only
+  after its tables exist, so CI deploys that bundle last, when they do). This needs a Databricks CLI with the
   `genie_spaces` resource and the direct engine, which the bundle already uses. Tests check that each space lists
   only tables `grader_tables` writes, and that its instructions name every measure its dashboard shows.
 - **Simulated sample (US3):** `43_simulated_grader.py` is seeded. Its rows say `simulated = true` and its models
