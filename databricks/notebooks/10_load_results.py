@@ -27,10 +27,10 @@ dbutils.library.restartPython()  # noqa: F821
 
 import os
 import re
+from pathlib import Path
 
 import pandas as pd
 from dental_omop_nlp import results_store, tracking
-from dental_omop_nlp.paths import DATASETS_DIR
 from pyspark.sql import functions as F
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
@@ -48,13 +48,20 @@ def table(name: str) -> str:
 
 # COMMAND ----------
 
-files = results_store.result_files(DATASETS_DIR)
+# The files deployed with the bundle, next to this notebook (as notebook 03 reads them). The installed
+# package's own path can point elsewhere on serverless, which found nothing (issue #71).
+data_dir = Path("../../data/datasets").resolve()
+if not data_dir.is_dir() or not (files := results_store.result_files(data_dir)).shape[0]:
+    raise RuntimeError(f"No result files in {data_dir}: expected ai_predictions_*.csv / llm_details_*.csv "
+                       "deployed with the bundle (data/datasets/). Check the deploy synced data/.")
+print("reading", data_dir)
 loaded = set()
 if spark.catalog.tableExists(table("result_files")):  # noqa: F821
     loaded = {r.sha256 for r in spark.table(table("result_files")).select("sha256").collect()}  # noqa: F821
 new = results_store.new_files(files, loaded)
 print(f"{len(files)} result files deployed, {len(new)} new or changed")
-display(new)  # noqa: F821
+if len(new):
+    display(new)  # noqa: F821
 
 # COMMAND ----------
 
@@ -83,8 +90,8 @@ def append(df: pd.DataFrame, name: str):
 
 preds = new[new.kind == "predictions"]
 details = new[new.kind == "llm_details"]
-append(results_store.prediction_rows(preds, DATASETS_DIR), "ai_predictions")
-append(results_store.detail_rows(details, DATASETS_DIR).assign(run_ts=now), "llm_reader_runs")
+append(results_store.prediction_rows(preds, data_dir), "ai_predictions")
+append(results_store.detail_rows(details, data_dir).assign(run_ts=now), "llm_reader_runs")
 append(new, "result_files")              # last: a failure above leaves these versions to load next time
 
 # COMMAND ----------
@@ -93,9 +100,9 @@ append(new, "result_files")              # last: a failure above leaves these ve
 if experiment and len(details):
     os.environ["MLFLOW_TRACKING_URI"] = "databricks"
     os.environ["DENTAL_MLFLOW_EXPERIMENT"] = experiment
-    truth = pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv").set_index("visit_id").truth_status
+    truth = pd.read_csv(data_dir / "answer_key" / "review_key.csv").set_index("visit_id").truth_status
     for f in details.itertuples():
-        d = pd.read_csv(DATASETS_DIR / f.file)
+        d = pd.read_csv(data_dir / f.file)
         first = d.iloc[0]
         params = {"method": f.method, "source": f.source, "run_url": f.run_url, "file_sha256": f.sha256,
                   "prompt_version": first.get("prompt_version", ""), "shots": first.get("shots", "")}
