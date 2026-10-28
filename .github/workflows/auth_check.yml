@@ -1,6 +1,6 @@
 # Can GitHub sign in as the environment's service principal? Run by hand before the first deploy;
 # it prints the principal's application id (docs/deployment.md).
-name: auth_check
+name: Check Databricks sign-in for an environment
 on:
   workflow_dispatch:
     inputs:

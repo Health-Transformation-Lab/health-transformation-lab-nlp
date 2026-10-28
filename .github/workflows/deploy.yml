@@ -7,7 +7,7 @@
 # (an older setup with HOST / CLIENT_ID as secrets still works), and variables passed to the
 # bundle as BUNDLE_VAR_<name>, e.g.
 #   SERVICE_PRINCIPAL, JUDGE_ENDPOINT, WAREHOUSE_NAME, USERS_GROUP
-name: deploy
+name: Deploy to Databricks (dev and uat on merge, prod by hand)
 on:
   push:
     branches: [main]

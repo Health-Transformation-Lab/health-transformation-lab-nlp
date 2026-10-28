@@ -1,10 +1,11 @@
 # Run the MedGemma reader on a free Kaggle GPU (kaggle/medgemma_reader.ipynb), for when Databricks
-# Free Edition has no GPU. Start it from the Actions tab: "kaggle-medgemma" -> Run workflow.
+# Free Edition has no GPU. Start it from the Actions tab: "Run MedGemma on a free Kaggle GPU" -> Run workflow.
 #
 # Needs, in the GitHub environment `dev`: KAGGLE_USERNAME (variable or secret) and either KAGGLE_API_TOKEN
 # or KAGGLE_KEY (secret). The Hugging Face token is NOT passed from here: attach it once on kaggle.com
 # (open the notebook, Add-ons -> Secrets -> HF_TOKEN); the first run without it stops with that message.
-name: kaggle-medgemma
+name: Run MedGemma on a free Kaggle GPU
+run-name: "MedGemma on Kaggle: ${{ inputs.rung }}, ${{ inputs.limit == '0' && 'all 240 notes' || format('{0}-note test', inputs.limit) }}${{ inputs.collect_only && ' (collect results only)' || '' }}"
 
 on:
   workflow_dispatch:

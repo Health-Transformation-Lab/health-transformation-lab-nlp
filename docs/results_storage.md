@@ -75,7 +75,7 @@ in between.
 
 ## Results from anywhere, in one place (spec 016)
 
-MedGemma runs where a GPU is free: a Databricks job, Kaggle (the `kaggle-medgemma` workflow) or a laptop.
+MedGemma runs where a GPU is free: a Databricks job, Kaggle (the *Run MedGemma on a free Kaggle GPU* workflow) or a laptop.
 All three end in the same gold tables:
 
 1. **Kaggle**: when the workflow collects a run (`wait` or `collect_only`, with `open_pr` on), it opens a pull

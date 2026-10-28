@@ -152,3 +152,11 @@ def test_every_workflow_can_be_started_by_hand():
         doc = yaml.safe_load(f.read_text())
         on = doc.get("on", doc.get(True))           # YAML 1.1 reads a bare `on:` key as True
         assert isinstance(on, dict) and "workflow_dispatch" in on, f.name
+
+
+def test_workflow_names_say_what_they_do():
+    """The Actions sidebar shows only `name` (no description), so it has to say what the workflow does:
+    a few plain words, not a file-style id like "ci" or "auth_check"."""
+    for f in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+        name = yaml.safe_load(f.read_text())["name"]
+        assert len(name.split()) >= 4 and "_" not in name and name[0].isupper(), (f.name, name)
