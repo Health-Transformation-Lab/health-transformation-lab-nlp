@@ -4,6 +4,17 @@
 
 The rules above (in `AGENTS.md`) apply to every agent. This file adds Claude Code's own workflow.
 
+## Organization names: never CareQuest
+
+Never reference CareQuest anywhere in this repo: CareQuest Institute for Oral Health, CareQuest Innovation
+Partners, their programs, people, data, plans or strategy. That covers code, docs, tests, data, slide decks, commit
+messages, issues and pull requests, and disclaimers too: write "any employer or organization" instead. Content that
+came from CareQuest work is made generic before it comes in, with nothing that identifies it.
+
+This file is the only place the name may appear, to state this rule. An exception needs this section changed first,
+naming the file and why. `python/tests/test_no_org_references.py` fails CI if the name appears in any other tracked
+file.
+
 ## Workflow: Spec Kit + Superpowers
 
 | Stage | Tool | Output |
