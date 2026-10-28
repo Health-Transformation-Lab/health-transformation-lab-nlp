@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
+import logging
 import math
 import os
 import subprocess
@@ -24,6 +25,7 @@ from pathlib import Path
 from .paths import DATASETS_DIR, REPO_ROOT
 
 EXPERIMENT = "dental-omop-nlp"
+log = logging.getLogger(__name__)
 
 
 def enabled() -> bool:
@@ -78,6 +80,21 @@ class _Run:
             mlflow.log_artifact(str(path))
 
 
+def pass_databricks_login() -> bool:
+    """In a Databricks notebook: put its host and token in the environment so the scripts it starts (separate
+    processes, without the notebook's login) can log to MLflow. Never raises; False if it couldn't."""
+    try:
+        from databricks.sdk import WorkspaceClient
+
+        cfg = WorkspaceClient().config
+        os.environ.setdefault("DATABRICKS_HOST", cfg.host)
+        os.environ.setdefault("DATABRICKS_TOKEN", cfg.authenticate()["Authorization"].split(" ", 1)[1])
+        return True
+    except Exception as e:  # noqa: BLE001 - the scripts then run with tracking off (track() warns)
+        log.warning("Databricks login not passed to scripts: %s", type(e).__name__)
+        return False
+
+
 def _setup():
     import mlflow
     if not os.environ.get("MLFLOW_TRACKING_URI"):
@@ -92,8 +109,14 @@ def track(step: str, run_name: str, params: dict | None = None, simulated: bool 
     if not enabled():
         yield _Run()
         return
-    mlflow = _setup()
-    with mlflow.start_run(run_name=run_name, nested=nested) as r:
+    try:                    # tracking never fails a step: no store or no credentials -> run untracked
+        mlflow = _setup()
+        ctx = mlflow.start_run(run_name=run_name, nested=nested)
+    except Exception as e:  # noqa: BLE001 - MlflowException, connection and auth errors alike
+        log.warning("MLflow tracking off for %s: %s", run_name, str(e).splitlines()[0][:200])
+        yield _Run()
+        return
+    with ctx as r:
         run = _Run(r.info.run_id)
         run.set_tags({"step": step, "git_commit": git_commit(), "dataset": dataset_fingerprint(),
                       "simulated": str(bool(simulated)).lower(), "project": "dental-omop-nlp", "data": "synthetic"})

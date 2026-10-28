@@ -36,9 +36,10 @@ dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
 dbutils.widgets.text("telemetry", "azure")           # noqa: F821  spec 014: off / console / azure / otlp
-from dental_omop_nlp import telemetry  # noqa: E402
+from dental_omop_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"),  # noqa: F821  scripts inherit it
                                 scope=dbutils.widgets.get("hf_secret_scope"))  # noqa: F821
+tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
 
 import torch  # noqa: E402
 

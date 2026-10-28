@@ -40,8 +40,9 @@ dbutils.widgets.text("catalog", "dental_omop")                          # noqa: 
 dbutils.widgets.text("schema", "gold_dental_omop_perio")                # noqa: F821
 dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")     # noqa: F821
 dbutils.widgets.text("telemetry", "azure")                              # noqa: F821  spec 014
-from dental_omop_nlp import telemetry  # noqa: E402
+from dental_omop_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"))  # noqa: F821  scripts inherit it
+tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
 w = {k: dbutils.widgets.get(k) for k in ("rungs", "lr_overrides", "epochs", "max_len", "catalog",  # noqa: F821
                                           "schema", "landing_schema")}
 
