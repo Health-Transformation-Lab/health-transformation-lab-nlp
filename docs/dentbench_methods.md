@@ -12,7 +12,7 @@ reuse **methods, not data**.
 
 ## In plain words
 
-**How can a diagnosis be unsafe?** The label itself doesn't hurt anyone; what's done because of it
+**How can a wrong label be unsafe?** The label itself doesn't hurt anyone; what's done because of it
 can. Every wrong label is graded by what would happen if a dentist acted on it:
 
 | Mistake | Example | What could happen | Grade |

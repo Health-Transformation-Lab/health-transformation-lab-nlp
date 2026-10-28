@@ -18,9 +18,10 @@ Two benchmarks so far, each with a short pitch that drills down to the detail.
 
 The goal is better care for people with periodontitis. Gum disease is written down at almost every dental visit,
 but in pieces: notes, forms, codes and measurements that often disagree, so it is missed, can't be followed over
-time, and can't be linked to diabetes care. A case-finding tool that reads the whole record accurately (what
-researchers call phenotyping) lets clinics find it earlier and treat it. PerioBench scores how well rules and AI find
-it in the record; agreement with gum specialists reviewing the same record is how that is checked, not the goal. It runs end to end on **synthetic** records:
+time, and can't be linked to diabetes care. A tool that reads the whole record and finds gum disease accurately
+(phenotyping, to researchers) lets clinics find it earlier and treat it. PerioBench scores how well rules and AI find
+it in the record; agreement with gum specialists reviewing the same record is how that is checked, not the goal.
+It runs end to end on **synthetic** records:
 
 - the whole record, combined by rules that read the gum measurements first: **234 of 240** charts right;
 - the free-text note alone, read by a small trained model with a stage 4 rule: **219 of 240**;
