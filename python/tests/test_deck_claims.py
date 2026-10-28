@@ -17,14 +17,17 @@ _spec.loader.exec_module(build_decks)
 
 REGISTER = yaml.safe_load((REPO_ROOT / "docs" / "claims.yaml").read_text(encoding="utf-8"))
 KINDS = {"measured", "cited", "derived", "illustrative", "proposal", "identifier"}
-# a figure: money, a percent, hours, a multiple, millions, a number of 3+ digits or with thousands commas
-FIGURE = re.compile(r"\$[\d,.]+\s?[kKM]?|\d[\d,.]*\s?(?:%|h\b|×|M\b|million\b|billion\b)|\b\d{1,3}(?:,\d{3})+\b|\b\d{3,}\b")
+# a figure: money, a percent, hours, a multiple, millions, thousands ("20k"), a number of 3+ digits or with thousands
+# commas, or the count in "41 of 2,462"
+FIGURE = re.compile(r"\$[\d,.]+\s?[kKM]?|\d[\d,.]*\s?(?:%|h\b|×|M\b|million\b|billion\b)|\b\d+k\b|\b\d{1,3}(?:,\d{3})+\b|\b\d{3,}\b"
+                    r"|\b\d+(?= of \d)")
 ARXIV = re.compile(r"\b\d{4}\.\d{4,5}\b")
 YEAR = re.compile(r"(?:19|20)\d\d")
 # wording that claims more than any source can show; a slide says what was measured or priced instead. "never" is
 # left out: the decks use it to describe an example answer ("it never asks about the medicine") or a rule a test
 # enforces (simulated numbers are never shown as results)
-ABSOLUTE = re.compile(r"\b(?:cheap|always|any model|even the largest|guarantee[sd]?|zero cost|free of errors)\b", re.I)
+ABSOLUTE = re.compile(r"\b(?:cheap\w*|always|any model|even the largest|guarantee[sd]?|zero cost|free of errors|"
+                      r"no one tests|nothing tests|no scorecard checks|have to answer)\b", re.IGNORECASE)
 
 
 def figures(section: str) -> set[str]:
