@@ -54,8 +54,6 @@ Everything this repo relies on, and what it's used for.
 
 19. **Overjet.** *How to detect periodontal disease with AI* (bone level measurement, FDA 510(k) K210187).
     [overjet.com](https://www.overjet.com/blog/how-to-detect-periodontal-disease-with-ai)
-20. **MATTER / CareQuest Innovation Partners.** *2026 SMILE Health cohort and newest ACCELERATE pilots*, June 2026.
-    [matter.health](https://matter.health/posts/carequest-innovation-partners-2026-smile-health-cohort-accelerate-pilots/)
 21. **Yavuz MB, et al.** AI detection of periodontal status in bitewing radiographs. EuroPerio10, 2022.
     [Dental Tribune summary](https://www.dental-tribune.com/news/artificial-intelligence-shows-promise-for-detecting-periodontal-status-in-bitewing-radiographs/)
 
