@@ -43,8 +43,8 @@ dbutils.widgets.text("lr_overrides", "gatortron-base=2e-5")             # noqa: 
 dbutils.widgets.text("epochs", "3")                                     # noqa: F821
 dbutils.widgets.text("max_len", "256")                                  # noqa: F821
 dbutils.widgets.text("catalog", "dental_omop")                          # noqa: F821  set by databricks.yml
-dbutils.widgets.text("schema", "gold_dental_omop_perio")                # noqa: F821
-dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")     # noqa: F821
+dbutils.widgets.text("schema", "gold_perio_bench")                # noqa: F821
+dbutils.widgets.text("landing_schema", "landing_perio_bench")     # noqa: F821
 dbutils.widgets.text("telemetry", "azure")                              # noqa: F821  spec 014
 from dental_omop_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"))  # noqa: F821  scripts inherit it

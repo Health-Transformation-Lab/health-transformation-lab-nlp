@@ -27,7 +27,7 @@ from pyspark.sql import functions as F
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
 tracking.use_git_commit(dbutils)  # noqa: F821
 dbutils.widgets.text("catalog", "dental_omop")  # noqa: F821
-dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
+dbutils.widgets.text("schema", "gold_perio_bench")  # noqa: F821
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 
 

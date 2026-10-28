@@ -55,7 +55,7 @@ def build_study(seed=7):
 ```
 
 **Common header.** Every span and every log line carries `data_product_id` (default
-`dental_omop_perio`, `DENTAL_DATA_PRODUCT_ID`), `environment` (`DENTAL_ENVIRONMENT`) and
+`perio_bench`, `DENTAL_DATA_PRODUCT_ID`; renamed in spec 019, docs/deployment.md), `environment` (`DENTAL_ENVIRONMENT`) and
 `service.namespace` (`dental-omop-nlp`); spans add `code.namespace` (module) and `code.function`. The
 resource names the data product as the service, so in a shared Application Insights resource one
 data product and one environment are a filter away (`customDimensions.data_product_id`,
@@ -165,7 +165,7 @@ Every call of one data product in one environment (the common header):
 ```kusto
 AppDependencies
 | where TimeGenerated > ago(1d)
-| where tostring(Properties["data_product_id"]) == "dental_omop_perio" and tostring(Properties["environment"]) == "dev"
+| where tostring(Properties["data_product_id"]) == "perio_bench" and tostring(Properties["environment"]) == "dev"
 | summarize calls = count(), failures = countif(Success == false), p95_ms = percentile(DurationMs, 95)
     by function = Name
 | order by calls desc

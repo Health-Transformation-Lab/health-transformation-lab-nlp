@@ -30,7 +30,7 @@ dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was dep
 from dental_omop_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("catalog", "dental_omop")
-dbutils.widgets.text("schema", "gold_dental_omop_perio")
+dbutils.widgets.text("schema", "gold_perio_bench")
 dbutils.widgets.text("judge_endpoint", "none")
 dbutils.widgets.text("experiment_id", "")
 dbutils.widgets.text("usd_per_million_in", "")    # the endpoint's list price; required to call it

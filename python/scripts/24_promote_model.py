@@ -1,8 +1,8 @@
 """Promote a registered model version to champion only if it passes the acceptance test (docs/mlops.md).
 
-    python scripts/11_ai_predict.py --rung tfidf_logreg --register dental_omop.gold_dental_omop_perio.perio_note_classifier
+    python scripts/11_ai_predict.py --rung tfidf_logreg --register dental_omop.gold_perio_bench.perio_note_classifier
     python scripts/13_reliability.py                       # writes agreement_vs_humans.csv
-    python scripts/24_promote_model.py --model dental_omop.gold_dental_omop_perio.perio_note_classifier --version 3 \
+    python scripts/24_promote_model.py --model dental_omop.gold_perio_bench.perio_note_classifier --version 3 \
         --rater ai:tfidf_logreg [--simulated]
 
 Sets the alias 'champion' when the verdict is non-inferior; always writes the verdict

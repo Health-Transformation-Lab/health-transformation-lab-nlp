@@ -177,7 +177,8 @@ def test_load_results_job_runs_the_notebook_with_the_bundle_schema():
     task = next(t for t in jobs["load_results"]["tasks"] if t["task_key"] == "load")["notebook_task"]
     assert task["notebook_path"] == "../notebooks/10_load_results.py"
     p = task["base_parameters"]
-    assert p["catalog"] == "${resources.schemas.gold.catalog_name}" and p["schema"] == "${resources.schemas.gold.name}"
+    assert p["catalog"] == "${resources.schemas.perio_bench_gold.catalog_name}"
+    assert p["schema"] == "${resources.schemas.perio_bench_gold.name}"
     assert p["git_commit"] == "${bundle.git.commit}"
 
 
@@ -254,10 +255,12 @@ def test_reader_job_writes_gold_names_keyed_by_its_run():
 
 
 def test_load_results_job_migrates_the_old_gold_names_before_loading():
-    # spec 018 US2: the first task copies old-named tables to the new names, so their rows are kept
+    # spec 018 US2: a task before the load copies old-named tables to the new names, so their rows are kept
+    # (after spec 019's schema move: test_bundle.test_load_results_moves_the_old_schemas_first)
     import yaml
     tasks = yaml.safe_load(_text("databricks/resources/jobs.yml"))["resources"]["jobs"]["load_results"]["tasks"]
-    migrate, load = tasks[0], next(t for t in tasks if t["task_key"] == "load")
+    migrate = next(t for t in tasks if t["task_key"] == "migrate_gold_names")
+    load = next(t for t in tasks if t["task_key"] == "load")
     assert migrate["task_key"] == "migrate_gold_names"
     assert migrate["notebook_task"]["notebook_path"] == "../notebooks/11_migrate_gold_names.py"
     assert {"task_key": "migrate_gold_names"} in load["depends_on"]

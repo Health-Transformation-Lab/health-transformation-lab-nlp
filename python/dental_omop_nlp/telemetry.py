@@ -45,7 +45,7 @@ from opentelemetry import context, metrics, trace
 from opentelemetry.trace import Status, StatusCode
 
 SERVICE = "dental-omop-nlp"                 # service.namespace: the code base
-DATA_PRODUCT = "dental_omop_perio"          # service.name: the data product, as in the Databricks schemas
+DATA_PRODUCT = "perio_bench"          # service.name: the data product, as in the Databricks schemas
 MAX_SPANS_PER_CALLER = int(os.environ.get("DENTAL_TELEMETRY_MAX_CALLS", "3"))
 LEVELS = ("step", "call", "detail")         # DENTAL_TELEMETRY_LEVEL: how far down the call tree to trace
 LEVELS_FILE = Path(__file__).with_name("telemetry_levels.yaml")

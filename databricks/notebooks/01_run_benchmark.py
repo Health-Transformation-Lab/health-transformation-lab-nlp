@@ -50,8 +50,8 @@ dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was dep
 from dental_omop_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("catalog", "dental_omop")
-dbutils.widgets.text("schema", "gold_dental_omop_perio")              # tables
-dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")   # data volume
+dbutils.widgets.text("schema", "gold_perio_bench")              # tables
+dbutils.widgets.text("landing_schema", "landing_perio_bench")   # data volume
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
 dbutils.widgets.text("experiment_id", "")   # set per target by the bundle (resources/jobs.yml)

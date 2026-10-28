@@ -1,5 +1,5 @@
 # MLflow experiment and Unity Catalog registered model, one per target (docs/mlops.md).
-# Experiments live under the target's root path; the model in the gold schema (unity_catalog.yml).
+# Experiments live under the target's root path; the model in gold_perio_bench (unity_catalog.yml).
 resources:
   experiments:
     dental_experiment:
@@ -11,6 +11,16 @@ resources:
           value: synthetic
 
   registered_models:
+    perio_bench_note_classifier:
+      name: perio_note_classifier
+      catalog_name: ${resources.schemas.perio_bench_gold.catalog_name}
+      schema_name: ${resources.schemas.perio_bench_gold.name}
+      comment: >-
+        Note -> periodontal status (any rung, MLflow pyfunc). Alias challenger = newest
+        version; champion = passed the acceptance test (non-inferior to reviewers).
+        Synthetic data only.
+    # Legacy (spec 019): the old model, kept so a deploy doesn't drop its versions before Load results copies
+    # them into perio_bench_note_classifier. Retire by hand (docs/deployment.md).
     perio_note_classifier:
       name: perio_note_classifier
       catalog_name: ${resources.schemas.gold.catalog_name}

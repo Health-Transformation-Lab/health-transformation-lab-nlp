@@ -86,7 +86,7 @@ def test_azure_uses_the_distro_with_sampling_live_metrics_and_the_package_logger
     tm.setup(tm.TelemetryConfig(exporter="azure", connection_string="InstrumentationKey=x", sampling_ratio=0.5))
     assert seen["connection_string"] == "InstrumentationKey=x" and seen["sampling_ratio"] == 0.5
     assert seen["enable_live_metrics"] is True and seen["logger_name"] == "dental_omop_nlp"
-    assert seen["resource"].attributes["service.name"] == "dental_omop_perio"           # the data product
+    assert seen["resource"].attributes["service.name"] == "perio_bench"           # the data product
     assert seen["resource"].attributes["service.namespace"] == "dental-omop-nlp"
     assert len(seen["span_processors"]) == 1                                         # the common header
     assert logging.getLogger("dental_omop_nlp").level == logging.INFO          # no DEBUG shipped

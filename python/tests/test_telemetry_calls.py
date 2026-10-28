@@ -20,7 +20,7 @@ NOT_TRACED_MODULES = {"__init__", "paths", "telemetry"}       # telemetry can't 
 
 @pytest.fixture
 def mem(monkeypatch):
-    monkeypatch.setenv("DENTAL_DATA_PRODUCT_ID", "dental_omop_perio")
+    monkeypatch.setenv("DENTAL_DATA_PRODUCT_ID", "perio_bench")
     exporter = tm.setup(tm.TelemetryConfig(exporter="memory", environment="dev"))
     yield exporter
     tm.setup(tm.TelemetryConfig(exporter="off"))
@@ -31,9 +31,9 @@ def test_every_span_carries_the_common_header(mem):
         pass
     (span,) = mem.get_finished_spans()
     a = span.attributes
-    assert a["data_product_id"] == "dental_omop_perio" and a["environment"] == "dev"
+    assert a["data_product_id"] == "perio_bench" and a["environment"] == "dev"
     assert a["service.namespace"] == "dental-omop-nlp"
-    assert span.resource.attributes["service.name"] == "dental_omop_perio"
+    assert span.resource.attributes["service.name"] == "perio_bench"
     assert span.resource.attributes["service.namespace"] == "dental-omop-nlp"
 
 
@@ -41,7 +41,7 @@ def test_with_statement_gives_a_logger_that_carries_the_header(mem, caplog):
     with caplog.at_level(logging.INFO, logger="dental_omop_nlp"), tm.trace_call("study.build_study") as log:
         log.info("built %d visits", 3)
     rec = next(r for r in caplog.records if r.getMessage() == "built 3 visits")
-    assert rec.data_product_id == "dental_omop_perio" and rec.environment == "dev"
+    assert rec.data_product_id == "perio_bench" and rec.environment == "dev"
     assert rec.function == "study.build_study"
 
 
