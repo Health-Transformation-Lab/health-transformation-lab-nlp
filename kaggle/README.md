@@ -13,7 +13,7 @@ data only, and no token is ever stored in it.
 | Notebook `perio-bench-encoder-gpu` | Fine-tunes the large encoders (ModernBERT-large, Longformer, GatorTron) | *Fine-tune the GPU encoders on a free Kaggle GPU* | `encoder_gpu.ipynb` |
 | Dataset `perio-bench-notes` | Synthetic notes, labels, structured visits, 240-note review set and answer key | *Publish datasets to Kaggle* | `publish.py`, `cards/notes.md` |
 | Dataset `perio-bench-results` | Every model's answers on the review set, the leaderboard, the judge scorecard | *Publish datasets to Kaggle* | `publish.py`, `cards/results.md` |
-| Model `perio-bench-note-classifier` (planned, spec 020 US3, #122) | The best fine-tuned note classifier (ModernBERT-base, class-weighted) | | |
+| Model `perio-bench-note-classifier` (spec 020 US3) | The top fine-tuned note classifier, ModernBERT-base class-weighted, in transformers format (Apache 2.0) | *Fine-tune the GPU encoders on a free Kaggle GPU* with `save_model` | `publish_model.py`, `cards/model.md` |
 
 The notebook `dental-omop-medgemma-keras-test` was a one-off comparison (MedGemma through Keras vs converted to
 transformers; the decision is in PR #99) and can be deleted.
@@ -54,11 +54,22 @@ exactly which files go in. Nothing from `data/external/` (others' datasets) and 
 included. The cards in `cards/` become the dataset pages; edit them there, not on kaggle.com, or the next
 version overwrites your edit.
 
+## Publishing the note classifier
+
+Actions → *Fine-tune the GPU encoders on a free Kaggle GPU* → Run workflow with **`rungs`** `modernbert-base+cw`,
+**`lr_overrides`** empty, **`save_model`** `modernbert-base+cw` and **`limit`** `0`. The notebook keeps that rung's
+fine-tuned weights (`/kaggle/working/model`), and after the full run the workflow publishes them with
+`publish_model.py`: the model `perio-bench-note-classifier` public the first time, its transformers instance
+`modernbert-base-cw`, then a new version per run. The card is `cards/model.md` plus the scores of that same run's
+review-set predictions (the leaderboard's scoring); a test run (`limit` 10) is never published. The weights go to
+Kaggle, not the workflow artifact. A full run takes hours: to collect it later, run the workflow again with
+**`collect_only`** on and the same `save_model` and `limit` 0. The card names the commit the notebook trained.
+
 ## The collection
 
 Kaggle's API can't make collections, so do this once on kaggle.com: your profile → **Collections** → **New
 collection** "Health Transformation Lab: Perio Bench", then add the two notebooks, the two datasets and, later,
-the model `perio-bench-note-classifier` (#122) (each page's ⋮ menu → *Add to collection*). Make it public.
+the model `perio-bench-note-classifier` (each page's ⋮ menu → *Add to collection*). Make it public.
 
 ## When something fails
 
