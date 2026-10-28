@@ -46,6 +46,11 @@ bundle and appends the ones it hasn't loaded yet to:
   version, and the old rows stay (time-stamped history, like the existing append tables).
 - `source` comes from `results_manifest.csv`; a file not listed there is `repo` (made locally and
   committed). Rows the MedGemma reader job writes itself carry `source = databricks`.
+- The MedGemma reader job writes its own run to `ai_predictions` and `llm_reader_runs` (method, visit_id,
+  pred, `run_id` = the job run, `run_ts`, `sha256` of its CSV, `git_commit`), deleting the rows of the same
+  (source, run_id, method) first, so a retry doesn't duplicate them. It logs to the bundle's MLflow
+  experiment (`experiment_name` job parameter); tracking checks that setting before a run starts and never
+  fails the job.
 - Probability columns are not loaded (they differ per method); the CSV stays the full record.
 
 ### US3 - Each loaded LLM run is an MLflow run (P2)

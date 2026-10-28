@@ -24,6 +24,7 @@
 # COMMAND ----------
 
 import os
+import time
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
 from dental_omop_nlp import tracking as _tracking
@@ -35,13 +36,21 @@ dbutils.widgets.text("lora_train", "0")              # noqa: F821  >0: LoRA fine
 dbutils.widgets.text("catalog", "dental_omop")      # noqa: F821  set by databricks.yml
 dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
 dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
+dbutils.widgets.text("experiment_name", "")          # noqa: F821  the bundle's MLflow experiment; empty: yours
+dbutils.widgets.text("run_id", "")                   # noqa: F821  the job run ({{job.run_id}}): every retry shares it
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
+run_id = dbutils.widgets.get("run_id") or f"manual-{time.strftime('%Y%m%dT%H%M%S')}"  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
 dbutils.widgets.text("telemetry", "azure")           # noqa: F821  spec 014: off / console / azure / otlp
 from dental_omop_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"),  # noqa: F821  scripts inherit it
                                 scope=dbutils.widgets.get("hf_secret_scope"))  # noqa: F821
 tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
+# ... to the bundle's experiment: on Databricks the name must be an absolute path (tracking checks it)
+os.environ["MLFLOW_TRACKING_URI"] = "databricks"
+os.environ["DENTAL_MLFLOW_EXPERIMENT"] = (dbutils.widgets.get("experiment_name")  # noqa: F821
+                                          or f"/Users/{spark.sql('select current_user()').first()[0]}/dental-omop-nlp")  # noqa: F821
+print("MLflow experiment:", os.environ["DENTAL_MLFLOW_EXPERIMENT"])
 
 import torch  # noqa: E402
 
@@ -102,11 +111,17 @@ else:
 
 # COMMAND ----------
 
-# Keep the run: Delta table for tracking across runs (prompt variant, shots, adapter)
+# Keep the run in Unity Catalog, next to every other method's results (spec 016): predictions in
+# ai_predictions, per-note details in llm_reader_runs. Keyed by (source, run_id, method): a retry of this job
+# run replaces its rows instead of adding them again. The CSVs in the Git folder are scratch.
+from dental_omop_nlp.delta import replace_batch
+from dental_omop_nlp.results_store import run_rows
+
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")  # noqa: F821
-# source and git_commit match the rows the Load results job adds from Kaggle and the repo (spec 016)
-rows = d.assign(run_ts=pd.Timestamp.now(tz="UTC"), source="databricks",
-                git_commit=dbutils.widgets.get("git_commit"))  # noqa: F821
-rows = rows.astype({c: "string" for c in rows.columns if rows[c].isna().all()})  # empty `error`: text, not a number
-spark.createDataFrame(rows).write.mode("append").option("mergeSchema", "true").saveAsTable(  # noqa: F821
-    f"{catalog}.{schema}.llm_reader_runs")
+preds, details = run_rows("../../data/datasets", rung, source="databricks", run_id=run_id,
+                          git_commit=dbutils.widgets.get("git_commit"), run_ts=pd.Timestamp.now(tz="UTC"))  # noqa: F821
+details = details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id", validate="one_to_one")
+key = {"source": "databricks", "run_id": run_id, "method": rung}
+for rows, name in ((preds, "ai_predictions"), (details, "llm_reader_runs")):
+    n = replace_batch(spark, rows, f"{catalog}.{schema}.{name}", key)  # noqa: F821
+    print(f"{catalog}.{schema}.{name}: {n} rows for run {run_id}, {rung}")

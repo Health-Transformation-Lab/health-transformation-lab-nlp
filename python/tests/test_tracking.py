@@ -89,3 +89,82 @@ def test_notebook_hands_the_deployed_commit_to_the_code(monkeypatch):
     monkeypatch.delenv("DENTAL_GIT_COMMIT", raising=False)
     assert tracking.use_git_commit(DBUtils()) == "abc1234def"
     assert os.environ["DENTAL_GIT_COMMIT"] == "abc1234def" and tracking.git_commit() == "abc1234"
+
+
+# ---- the MedGemma reader job: 'For input string: "None"' in its log; tracking must check its settings first
+
+class _FakeMlflow:
+    """Stands in for mlflow: records calls; log_metrics can be made to fail like the Databricks server does."""
+    def __init__(self, fail_on=None):
+        import types
+        self.calls, self.fail_on = [], fail_on
+        self.module = types.ModuleType("mlflow")
+        for name in ("set_tracking_uri", "set_experiment", "log_params", "set_tags", "log_metrics", "log_artifact"):
+            setattr(self.module, name, self._recorder(name))
+        self.module.start_run = self.start_run
+
+    def _recorder(self, name):
+        def call(*a, **kw):
+            self.calls.append(name)
+            if name == self.fail_on:
+                raise RuntimeError('INVALID_PARAMETER_VALUE: For input string: "None"')
+        return call
+
+    def start_run(self, **kw):
+        import contextlib
+        import types
+        self.calls.append("start_run")
+        return contextlib.nullcontext(types.SimpleNamespace(info=types.SimpleNamespace(run_id="r1")))
+
+
+def _with_mlflow(monkeypatch, fake):
+    import sys
+    monkeypatch.setitem(sys.modules, "mlflow", fake.module)
+    monkeypatch.delenv("DENTAL_MLFLOW", raising=False)
+
+
+def test_on_databricks_the_experiment_must_be_an_absolute_path(monkeypatch, caplog):
+    fake = _FakeMlflow()
+    _with_mlflow(monkeypatch, fake)
+    monkeypatch.setenv("MLFLOW_TRACKING_URI", "databricks")
+    monkeypatch.delenv("DENTAL_MLFLOW_EXPERIMENT", raising=False)
+    with caplog.at_level(logging.WARNING), tracking.track("unit", "x") as run:
+        pass
+    assert run.run_id is None and "start_run" not in fake.calls
+    assert "DENTAL_MLFLOW_EXPERIMENT" in caplog.text and "absolute" in caplog.text
+
+
+def test_on_databricks_the_bundle_experiment_is_used(monkeypatch):
+    fake = _FakeMlflow()
+    _with_mlflow(monkeypatch, fake)
+    monkeypatch.setenv("MLFLOW_TRACKING_URI", "databricks")
+    monkeypatch.setenv("DENTAL_MLFLOW_EXPERIMENT", "/Workspace/Users/x/.bundle/dental/dev/dental-omop-nlp-experiment")
+    with tracking.track("unit", "x", params={"shots": None}) as run:
+        run.log_metrics({"a": 1.0})
+    assert run.run_id == "r1" and "log_metrics" in fake.calls
+
+
+def test_a_logging_error_never_fails_the_step(monkeypatch, caplog):
+    fake = _FakeMlflow(fail_on="log_metrics")
+    _with_mlflow(monkeypatch, fake)
+    monkeypatch.setenv("MLFLOW_TRACKING_URI", "databricks")
+    monkeypatch.setenv("DENTAL_MLFLOW_EXPERIMENT", "/Shared/dental")
+    ran = []
+    with caplog.at_level(logging.WARNING), tracking.track("unit", "x") as run:
+        run.log_metrics({"a": 1.0})
+        ran.append(True)
+    assert ran and 'For input string' in caplog.text
+
+
+def test_reader_job_logs_to_the_bundle_experiment():
+    import yaml
+
+    from dental_omop_nlp.paths import REPO_ROOT
+    nb = (REPO_ROOT / "databricks" / "notebooks" / "03_medgemma_reader.py").read_text()
+    assert 'os.environ["MLFLOW_TRACKING_URI"] = "databricks"' in nb
+    assert 'os.environ["DENTAL_MLFLOW_EXPERIMENT"]' in nb
+    assert nb.index('os.environ["DENTAL_MLFLOW_EXPERIMENT"]') < nb.index("11_ai_predict.py")
+    jobs = yaml.safe_load((REPO_ROOT / "databricks" / "resources" / "jobs.yml").read_text())
+    params = jobs["resources"]["jobs"]["medgemma_reader"]["tasks"][0]["notebook_task"]["base_parameters"]
+    assert params["experiment_name"] == "${resources.experiments.dental_experiment.name}"
+    assert params["run_id"] == "{{job.run_id}}"          # the batch key: the same for every retry of a run
