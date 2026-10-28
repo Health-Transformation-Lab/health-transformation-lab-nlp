@@ -11,6 +11,7 @@ OLD = re.compile(r"dental_omop_nlp|dental-omop-nlp|dental_omop\b(?!_)|dental-omo
                  r"\| `hf_secret_scope` \| `dental`|scope dental\b|\"dental\"\)")
 KEPT = ("dental-omop-ci", "dental-omop-medgemma-keras-test") + tuple(f"dental_omop_nlp_{t}_{k}" for t in ("${bundle.target}", "${target}", "${TARGET}",
         "{target}", "<target>", "dev", "uat", "prod") for k in ("admin", "sp"))   # identities keep their names
+KEPT += ("dental_omop.gold_dental_omop_perio",)   # issue #228: the old catalog's gold schema, read by the migration
 HISTORY = ("pull_requests/", "specs/0", ".specify/", "data/")   # past records keep the names they had
 
 

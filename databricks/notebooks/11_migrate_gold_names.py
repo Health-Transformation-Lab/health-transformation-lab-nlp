@@ -9,6 +9,11 @@
 # MAGIC it lacks are added (by batch key), so running it again adds nothing. An old `judgments` table goes to
 # MAGIC `fact_judge_call` or, if the corpus judge wrote it, `fact_corpus_judge_call`. What to do with each table is
 # MAGIC `gold_names.migration_plan`. Old tables are not dropped: it prints the `DROP TABLE` statements.
+# MAGIC
+# MAGIC Then the old gold schemas in `legacy_gold_schemas` (issue #228): specs 021 and 022 rebuilt gold in a new
+# MAGIC catalog and schema from committed files, which can't bring back rows only Databricks wrote (the MedGemma
+# MAGIC reader's). Each batch-keyed table's rows the current one lacks are added (`gold_names.legacy_plan`), every
+# MAGIC old key is checked to have arrived, and `DROP TABLE` is printed only for the tables that pass.
 # MAGIC Synthetic data only. Serverless CPU.
 
 # COMMAND ----------
@@ -28,18 +33,20 @@ dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit
 tracking.use_git_commit(dbutils)  # noqa: F821
 dbutils.widgets.text("catalog", "health_transformation_lab")  # noqa: F821
 dbutils.widgets.text("schema", "gold_perio_bench")  # noqa: F821
+dbutils.widgets.text("legacy_gold_schemas", "")  # noqa: F821  set by the job: catalog.schema, comma-separated
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
+legacy = gold_names.legacy_schemas(dbutils.widgets.get("legacy_gold_schemas"))  # noqa: F821  malformed: fails here
 
 
-def table(name: str) -> str:
-    return f"{catalog}.{schema}.{name}"
+def table(name: str, where: str = "") -> str:
+    return f"{where or f'{catalog}.{schema}'}.{name}"
 
 
-def renamed(old: str, new: str):
-    """The old table under new's column names, _count columns as bigint. A value the cast can't keep fails
-    instead of turning into null."""
+def renamed(old: str, new: str, where: str = ""):
+    """The old table (in schema where, default the current one) under new's column names, _count columns as
+    bigint. A value the cast can't keep fails instead of turning into null."""
     names = gold_names.TABLES[new]
-    sdf = spark.table(table(old))  # noqa: F821
+    sdf = spark.table(table(old, where))  # noqa: F821
     sdf = sdf.withColumnsRenamed({c: names[c] for c in sdf.columns if c in names})
     counts = [c for c in sdf.columns if c.endswith("_count") and not c.startswith("avg_")]
     if counts:
@@ -56,6 +63,25 @@ def renamed(old: str, new: str):
 
 def rows(name: str) -> int:
     return spark.table(table(name)).count()  # noqa: F821
+
+
+def merge_missing(src, new: str) -> None:
+    """Append src's rows whose MERGE_KEYS the current table new lacks. A key column new doesn't have yet (the
+    reader's run_id, before a reader run) counts as null; mergeSchema adds it."""
+    current = spark.table(table(new))  # noqa: F821
+    key = gold_names.MERGE_KEYS[new]
+    have = current.select(*[current[k] if k in current.columns else F.lit(None).cast(src.schema[k].dataType).alias(k)
+                            for k in key]).distinct()
+    cond = [src[k].eqNullSafe(have[k]) for k in key]
+    src.join(have, cond, "left_anti").write.mode("append").option("mergeSchema", "true").saveAsTable(table(new))
+
+
+def not_carried(src, new: str) -> int:
+    """src's rows whose MERGE_KEYS are still missing from the current table new."""
+    current = spark.table(table(new))  # noqa: F821
+    key = gold_names.MERGE_KEYS[new]
+    have = current.select(*key).distinct()
+    return src.join(have, [src[k].eqNullSafe(have[k]) for k in key], "left_anti").count()
 
 
 # Which old tables exist, with their columns; the decision is gold_names.migration_plan (tested).
@@ -78,15 +104,47 @@ for action, old, new in plan:
         if rows(new) != n:
             raise RuntimeError(f"{old}: row counts differ after renaming its columns ({n} vs {rows(new)})")
     elif action == "merge":         # a job wrote the new table first: add the old rows whose batch key it lacks
-        key = gold_names.MERGE_KEYS[new]
-        current = spark.table(table(new)).select(*key).distinct()  # noqa: F821
-        src = renamed(old, new)
-        cond = [src[k].eqNullSafe(current[k]) for k in key]
-        missing = src.join(current, cond, "left_anti")
-        missing.write.mode("append").option("mergeSchema", "true").saveAsTable(table(new))
+        merge_missing(renamed(old, new), new)
     print(f"{action}: {old} -> {new}" + ("" if action != "stale" else " (the new table is rebuilt each run; old copy left)"))
 
 drops = [f"DROP TABLE {table(old)};" for _, old, new in plan if old != new]
 print("migrated:", "nothing to do" if not plan else len(plan))
+
+# COMMAND ----------
+
+# The old gold schemas (issue #228). Missing ones (uat and prod never had them) are skipped.
+current = {t.name: spark.table(table(t.name)).columns  # noqa: F821
+           for t in spark.catalog.listTables(f"{catalog}.{schema}")}  # noqa: F821
+for cat, sch in legacy:
+    where = f"{cat}.{sch}"
+    if not spark.catalog.databaseExists(where):  # noqa: F821
+        print(f"{where}: not found, skipped")
+        continue
+    found = {t.name: spark.table(table(t.name, where)).columns  # noqa: F821
+             for t in spark.catalog.listTables(where)}  # noqa: F821
+    lplan = gold_names.legacy_plan(found, current)
+    failed = [f"{where}.{old}: no gold name for column(s) {cols}" for action, old, cols in lplan if action == "fail"]
+    if failed:
+        raise ValueError("add them to health_transformation_lab_nlp/gold_names.py first: " + "; ".join(failed))
+    for old, cols in found.items():   # one at a time: an earlier copy makes a later table to the same target a merge
+        for action, _, new in gold_names.legacy_plan({old: cols}, current):
+            n_old = spark.table(table(old, where)).count()  # noqa: F821
+            if action == "copy":
+                renamed(old, new, where).write.mode("overwrite").saveAsTable(table(new))
+                current[new] = spark.table(table(new)).columns  # noqa: F821
+                if rows(new) != n_old:
+                    raise RuntimeError(f"{where}.{old} -> {new}: row counts differ ({n_old} vs {rows(new)})")
+            elif action == "merge":
+                merge_missing(renamed(old, new, where), new)
+                left = not_carried(renamed(old, new, where), new)
+                if left:
+                    raise RuntimeError(f"{where}.{old} -> {new}: {left} rows not carried")
+            print(f"{action}: {where}.{old} ({n_old} rows) -> {new} ({rows(new)} rows)"
+                  + (" (rebuilt each run from committed files; old copy left)" if action == "stale" else ""))
+            drops.append(f"DROP TABLE {table(old, where)};")
+    others = sorted(set(found) - {old for _, old, _ in lplan})
+    if others:
+        print(f"{where}: not gold tables this migration knows, left as they are: {', '.join(others)}")
+
 if drops:
     print("Old tables left in place. After checking the new ones, drop them with:\n" + "\n".join(drops))
