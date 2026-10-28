@@ -144,3 +144,11 @@ def test_deploy_adopts_a_catalog_made_by_hand_before_deploying():
     bind = next(i for i, s in enumerate(steps) if "bundle deployment bind dental_omop dental_omop" in s.get("run", ""))
     assert bind < names.index("Deploy") and "--auto-approve" in steps[bind]["run"]
     assert steps[bind].get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct"
+
+
+def test_every_workflow_can_be_started_by_hand():
+    """Actions -> pick the workflow -> Run workflow: every workflow has a manual trigger."""
+    for f in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+        doc = yaml.safe_load(f.read_text())
+        on = doc.get("on", doc.get(True))           # YAML 1.1 reads a bare `on:` key as True
+        assert isinstance(on, dict) and "workflow_dispatch" in on, f.name

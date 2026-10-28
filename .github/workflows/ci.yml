@@ -8,6 +8,7 @@ on:
     paths-ignore: ["docs/**", "**/*.md", "diagrams/**"]
   pull_request:
     paths-ignore: ["docs/**", "**/*.md", "diagrams/**"]
+  workflow_dispatch:      # Actions -> ci -> Run workflow: rerun the checks on any branch by hand
 
 # A new push to the same PR cancels the run still going for the previous push.
 concurrency:
