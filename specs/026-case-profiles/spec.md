@@ -178,7 +178,8 @@ read only the new gold tables.
   Python and R agree on every flag and score.
 - **SC-004**: Together the rules flag at least half of the injected charting errors; the measured share is
   reported either way.
-- **SC-005**: No dashboard page, Genie answer or doc describes a flag as a wrong or inaccurate diagnosis.
+- **SC-005**: Every dashboard page, Genie answer and doc calls a flag a record mismatch, and none uses the phrases
+  `AGENTS.md` "Words" lists to avoid (`test_wording.py` passes).
 
 ## Assumptions
 
