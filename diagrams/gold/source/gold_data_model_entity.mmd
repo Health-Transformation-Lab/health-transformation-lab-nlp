@@ -12,6 +12,7 @@ erDiagram
     fact_prediction }o..o{ fact_chart_answer : "method_name = system_name"
     fact_prediction ||..o| judge_queue : "sampled from"
     judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
+    dim_grader_question ||--o{ fact_grader_answer : "question_id"
     review_key
     dim_result_file
     fact_prediction
@@ -24,3 +25,13 @@ erDiagram
     deid_score
     judge_queue
     fact_corpus_judge_call
+    dq_check
+    dq_column_missing
+    dq_prevalence
+    dq_temporal_change
+    dq_stage_transition
+    dq_source_concordance
+    fact_visit_evidence
+    dq_injected_error
+    dim_grader_question
+    fact_grader_answer
