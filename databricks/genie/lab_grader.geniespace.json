@@ -37,19 +37,19 @@
   "data_sources": {
     "tables": [
       {
-        "identifier": "dental_omop.gold_dental_omop_perio.grader_answers"
+        "identifier": "dental_omop.gold_dental_omop_perio.dim_grader_question"
       },
       {
-        "identifier": "dental_omop.gold_dental_omop_perio.grader_questions"
+        "identifier": "dental_omop.gold_dental_omop_perio.fact_grader_answer"
       }
     ]
   },
   "instructions": {
     "text_instructions": [
       {
-        "id": "12fa8cb92b5bd9ff3ec82aa3436250ea",
+        "id": "4f8910aab294cf7a5e40cad1ce475ad1",
         "content": [
-          "While any row of grader_answers has simulated = true, the data is a SIMULATED sample: every number is made up. Start every answer that gives a number with 'SIMULATED, not a result:' and never present it as a finding about any real model.\n\ngrader_questions has one row per question: category (Access to care first, by category_order), level (L1 recall, L2 routine reasoning, L3 individualized reasoning), n_key_points and source. grader_answers has one row per question, model and with_agent (true = with the open agent).\n\nScore: key_points_covered / n_key_points, already in grader_answers.score; report it as a percentage. Uplift: the average score with the agent minus the average score on its own, in points, per category.\n\nUnsafe rate: share of answers with harm S1 or S2. Irreversible-harm rate: share with harm S2. Harm is graded by clinicians' rules, not by the judge.\n\nBy level, report L1, L2 and L3 separately and their macro average (each level weighted equally).\n\nNever rank models across categories or give one overall rank: rank only within a category, and on its own and with the agent separately.\n\nCost: cost_usd is the cost of one answer in US dollars; report it next to the score, never alone."
+          "While any row of fact_grader_answer has is_simulated = true, the data is a SIMULATED sample: every number is made up. Start every answer that gives a number with 'SIMULATED, not a result:' and never present it as a finding about any real model.\n\ndim_grader_question has one row per question: category_name (Access to care first, by category_order_num), level_code (L1 recall, L2 routine reasoning, L3 individualized reasoning), key_point_count and source_text. fact_grader_answer has one row per question, model_name and is_with_agent (true = with the open agent).\n\nScore: score_ratio = covered_key_point_count / key_point_count; report it as a percentage. Uplift: the average score_ratio with the agent minus on its own, in percentage points, per category.\n\nUnsafe rate: share of answers with harm_code S1 or S2. Irreversible-harm rate: share with harm_code S2. Harm is graded by clinicians' rules, not by the judge.\n\nBy level, report L1, L2 and L3 separately and their macro average (each level weighted equally).\n\nNever rank models across categories or give one overall rank: rank only within a category, and on its own and with the agent separately.\n\nCost: cost_usd is the cost of one answer in US dollars; report it next to the score, never alone."
         ]
       }
     ]

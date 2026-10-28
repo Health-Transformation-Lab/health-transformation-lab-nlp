@@ -17,7 +17,11 @@ def test_the_model_declares_the_gold_tables_the_jobs_write():
     gold = {n for n, t in gm.TABLES.items() if t.area != "file"}
     assert gold == {"dim_result_file", "fact_prediction", "fact_llm_call", "fact_chart_answer", "fact_judge_call",
                     "judge_metric", "judge_agreement", "judge_cost", "deid_score", "judge_queue",
-                    "fact_corpus_judge_call"}
+                    "fact_corpus_judge_call",
+                    # spec 019: the EHR DQ grader
+                    "dq_check", "dq_column_missing", "dq_prevalence", "dq_temporal_change", "dq_stage_transition",
+                    "dq_source_concordance", "fact_visit_evidence", "dq_injected_error",
+                    "dim_grader_question", "fact_grader_answer"}
 
 
 def test_every_relationship_joins_declared_columns():

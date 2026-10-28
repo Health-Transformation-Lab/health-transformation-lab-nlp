@@ -6,19 +6,19 @@ from dental_omop_nlp import grader_tables as gt
 from dental_omop_nlp.paths import DATASETS_DIR
 
 DQ = {
-    "dq_checks": {"check_name", "category", "clinic", "n_checked", "n_fail", "pass_rate", "status"},
-    "dq_completeness": {"evidence_column", "n_rows", "n_missing", "pct_missing"},
+    "dq_check": {"check_name", "category", "clinic", "n_checked", "n_fail", "pass_rate", "status"},
+    "dq_column_missing": {"evidence_column", "n_rows", "n_missing", "pct_missing"},
     "dq_prevalence": {"method", "level", "group_name", "n", "periodontitis", "periodontitis_ci_low",
                       "periodontitis_ci_high", "stage3_4"},
-    "dq_temporal": {"method", "n_later_visits", "perio_resolved", "stage_drop", "pairs", "better", "same", "worse"},
-    "dq_transitions": {"method", "from_status", "to_status", "n", "row_pct", "direction"},
-    "dq_concordance": {"method_a", "method_b", "n", "pct_agree", "kappa"},
-    "dq_visits": {"visit_id", "person_id", "clinic", "visit_date", "visit_seq", "truth_status", "notes",
+    "dq_temporal_change": {"method", "n_later_visits", "perio_resolved", "stage_drop", "pairs", "better", "same", "worse"},
+    "dq_stage_transition": {"method", "from_status", "to_status", "n", "row_pct", "direction"},
+    "dq_source_concordance": {"method_a", "method_b", "n", "pct_agree", "kappa"},
+    "fact_visit_evidence": {"visit_id", "person_id", "clinic", "visit_date", "visit_seq", "truth_status", "notes",
                   "exam_form", "proc_dx_completed", "proc_dx_planned", "probing_chart", "algorithm_v0",
                   "algorithm_design"},
-    "dq_injected_errors": {"injected_errors", "caught_share", "flag_rate_without_error"},
+    "dq_injected_error": {"injected_errors", "caught_share", "flag_rate_without_error"},
 }
-PROVENANCE = {"sha256", "source_files"}
+PROVENANCE = {"sha256", "source_files"}   # analysis names; gold_names.to_gold renames them for gold
 
 
 @pytest.fixture(scope="module")
@@ -39,18 +39,18 @@ def test_no_note_text_reaches_a_dq_table(dq):
     # the evidence columns are statuses, never the note itself
     statuses = {"unknown", "healthy_gingivitis", "healthy", "gingivitis"} | {f"periodontitis_stage_{i}" for i in range(1, 5)}
     for col in ("notes", "exam_form", "probing_chart", "algorithm_design", "truth_status"):
-        assert set(dq["dq_visits"][col].dropna()) <= statuses, col
+        assert set(dq["fact_visit_evidence"][col].dropna()) <= statuses, col
     assert "text" not in " ".join(c for df in dq.values() for c in df.columns)
 
 
 def test_checks_hold_the_overall_rows_and_every_clinic(dq):
-    c = dq["dq_checks"]
+    c = dq["dq_check"]
     overall = c[c.clinic == "All"]
     assert len(overall) == 16 and c.clinic.nunique() == 1 + 8
 
 
 def test_transitions_are_long_form_with_row_shares_and_direction(dq):
-    t = dq["dq_transitions"]
+    t = dq["dq_stage_transition"]
     assert len(t) == 25
     sums = t.groupby("from_status").row_pct.sum()
     assert ((sums - 100).abs() < 1e-6).all()
@@ -77,13 +77,30 @@ def test_load_results_overwrites_every_grader_table():
     nb = (REPO_ROOT / "databricks" / "notebooks" / "10_load_results.py").read_text()
     assert "grader_tables.dq_tables(data_dir)" in nb and "grader_tables.lab_tables(data_dir)" in nb
     assert '.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(table(name))' in nb
+    assert "gold_names.to_gold(df.assign(git_commit=commit, loaded_at=now), name)" in nb   # gold names
+
+
+def test_every_dq_table_becomes_its_declared_gold_table(dq):
+    # AGENTS.md "SQL and data names": the frames keep analysis names; to_gold gives the declared gold columns
+    import importlib.util
+
+    import pandas as pd
+
+    from dental_omop_nlp import gold_names
+    from dental_omop_nlp.paths import REPO_ROOT
+    spec = importlib.util.spec_from_file_location("gold_model", REPO_ROOT / "diagrams" / "_build" / "gold_model.py")
+    gm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gm)
+    for name, df in dq.items():
+        gold = gold_names.to_gold(df.assign(git_commit="abc", loaded_at=pd.Timestamp("2026-10-28", tz="UTC")), name)
+        assert list(gold.columns) == [c.name for c in gm.TABLES[name].columns], name
 
 
 # ---------------------------------------------------------------- the lab grader (US3)
 
 LAB = {
-    "grader_questions": {"question_id", "category", "category_order", "level", "n_key_points", "source", "simulated"},
-    "grader_answers": {"question_id", "model", "with_agent", "key_points_covered", "score", "harm", "cost_usd",
+    "dim_grader_question": {"question_id", "category", "category_order", "level", "n_key_points", "source", "simulated"},
+    "fact_grader_answer": {"question_id", "model", "with_agent", "key_points_covered", "score", "harm", "cost_usd",
                        "judge", "run_id", "simulated"},
 }
 
@@ -97,11 +114,11 @@ def test_simulated_sample_is_seeded_and_reproducible(sim):
     again = gt.simulate_grader(seed=2026)
     for name in sim:
         assert sim[name].equals(again[name]), name
-    assert not sim["grader_answers"].equals(gt.simulate_grader(seed=7)["grader_answers"])
+    assert not sim["fact_grader_answer"].equals(gt.simulate_grader(seed=7)["fact_grader_answer"])
 
 
 def test_simulated_sample_has_the_spec_shape(sim):
-    q, a = sim["grader_questions"], sim["grader_answers"]
+    q, a = sim["dim_grader_question"], sim["fact_grader_answer"]
     assert set(sim) == set(LAB)
     for name, cols in LAB.items():
         assert cols <= set(sim[name].columns), (name, cols - set(sim[name].columns))
@@ -118,10 +135,25 @@ def test_simulated_sample_has_the_spec_shape(sim):
 
 def test_lab_tables_use_real_files_when_present_else_the_sample(tmp_path, sim):
     out = gt.lab_tables(tmp_path)                                            # nothing there: the seeded sample
-    assert out["grader_answers"].simulated.all() and (out["grader_answers"].sha256.str.len() == 64).all()
+    assert out["fact_grader_answer"].simulated.all() and (out["fact_grader_answer"].sha256.str.len() == 64).all()
     (tmp_path / "grader").mkdir()
-    for name, df in sim.items():
-        df.assign(simulated=False).to_csv(tmp_path / "grader" / f"{name}.csv", index=False)
+    for name, f in (("dim_grader_question", "grader_questions"), ("fact_grader_answer", "grader_answers")):
+        sim[name].assign(simulated=False).to_csv(tmp_path / "grader" / f"{f}.csv", index=False)
     real = gt.lab_tables(tmp_path)
-    assert not real["grader_answers"].simulated.any()
-    assert real["grader_answers"].source_files.iloc[0] == "grader/grader_answers.csv"
+    assert not real["fact_grader_answer"].simulated.any()
+    assert real["fact_grader_answer"].source_files.iloc[0] == "grader/grader_answers.csv"
+
+
+def test_the_lab_tables_become_their_declared_gold_tables(sim):
+    import importlib.util
+
+    import pandas as pd
+
+    from dental_omop_nlp import gold_names
+    from dental_omop_nlp.paths import REPO_ROOT
+    spec = importlib.util.spec_from_file_location("gold_model", REPO_ROOT / "diagrams" / "_build" / "gold_model.py")
+    gm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gm)
+    for name, df in gt.lab_tables(DATASETS_DIR).items():
+        gold = gold_names.to_gold(df.assign(git_commit="abc", loaded_at=pd.Timestamp("2026-10-28", tz="UTC")), name)
+        assert list(gold.columns) == [c.name for c in gm.TABLES[name].columns], name

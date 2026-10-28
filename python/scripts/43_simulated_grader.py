@@ -16,6 +16,7 @@ a = ap.parse_args()
 
 out = DATASETS_DIR / "grader"
 out.mkdir(exist_ok=True)
+FILES = {"dim_grader_question": "simulated_grader_questions.csv", "fact_grader_answer": "simulated_grader_answers.csv"}
 for name, df in grader_tables.simulate_grader(seed=a.seed).items():
-    df.to_csv(out / f"simulated_{name}.csv", index=False)
-    print(f"SIMULATED, not a result: {out / f'simulated_{name}.csv'} ({len(df)} rows)")
+    df.to_csv(out / FILES[name], index=False)
+    print(f"SIMULATED, not a result: {out / FILES[name]} ({len(df)} rows)")

@@ -7,8 +7,8 @@ exist.
 
 | Grader | Dashboard | Genie space | Tables (`dental_omop.gold_dental_omop_perio`) |
 |---|---|---|---|
-| **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_checks`, `dq_completeness`, `dq_prevalence`, `dq_temporal`, `dq_transitions`, `dq_concordance`, `dq_visits`, `dq_injected_errors` |
-| **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | *Lab grader* | *Lab grader* | `grader_questions`, `grader_answers` |
+| **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_check`, `dq_column_missing`, `dq_prevalence`, `dq_temporal_change`, `dq_stage_transition`, `dq_source_concordance`, `fact_visit_evidence`, `dq_injected_error` |
+| **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | *Lab grader* | *Lab grader* | `dim_grader_question`, `fact_grader_answer` |
 
 ## EHR DQ grader
 
@@ -22,7 +22,7 @@ Five domain tiles, then one section per domain:
 | Temporal plausibility | Kahn | Later visits whose stage improved (design rules); the full stage-to-stage matrix |
 | Reliability | Liaw | **Not assessed**: needs real reviewers |
 
-`dq_visits` holds statuses only (what each evidence source says, and the truth), never note text.
+`fact_visit_evidence` holds statuses only (what each evidence source says, and the truth), never note text.
 
 ## Lab grader
 

@@ -4,9 +4,11 @@ DuckDB, on the tables grader_tables builds from the committed CSVs, under the sa
 import json
 import re
 
+import pandas as pd
 import pytest
 
 from dental_omop_nlp import dashboards as dash
+from dental_omop_nlp import gold_names
 from dental_omop_nlp import grader_tables as gt
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
 
@@ -19,7 +21,9 @@ def con():
     c = duckdb.connect()
     c.execute("ATTACH ':memory:' AS dental_omop")
     c.execute("CREATE SCHEMA dental_omop.gold_dental_omop_perio")
-    for name, df in {**gt.dq_tables(DATASETS_DIR), **gt.lab_tables(DATASETS_DIR)}.items():
+    now = pd.Timestamp("2026-10-28", tz="UTC")
+    for name, df in {**gt.dq_tables(DATASETS_DIR), **gt.lab_tables(DATASETS_DIR)}.items():   # under their gold names
+        df = gold_names.to_gold(df.assign(git_commit="abc1234", loaded_at=now), name)
         c.register(f"src_{name}", df)
         c.execute(f"CREATE TABLE dental_omop.gold_dental_omop_perio.{name} AS SELECT * FROM src_{name}")
     return c
@@ -46,7 +50,7 @@ def test_every_dq_dataset_runs_and_returns_rows(con):
 def test_dq_tiles_give_the_values_the_tables_hold(con):
     sql = {d["name"]: "".join(d["queryLines"]) for d in _datasets("dq_grader")}
     tiles = dict(zip([c[0] for c in con.execute(sql["tiles"]).description], con.execute(sql["tiles"]).fetchone()))
-    visits = gt.dq_tables(DATASETS_DIR)["dq_visits"]
+    visits = gt.dq_tables(DATASETS_DIR)["fact_visit_evidence"]
     known = (visits[["exam_form", "proc_dx_completed", "probing_chart"]] != "unknown").all(axis=1)
     assert tiles["completeness_pct"] == pytest.approx(round(100 * known.mean(), 1))
     acc = (visits.algorithm_v0 == visits.truth_status).mean()
@@ -141,7 +145,7 @@ def test_uplift_is_the_with_agent_score_minus_the_own_score_access_to_care_first
     up = _run(con, "lab_grader", "uplift")
     assert up.category.iloc[0] == "Access to care"
     lab = gt.lab_tables(DATASETS_DIR)
-    m = lab["grader_answers"].merge(lab["grader_questions"][["question_id", "category"]], on="question_id")
+    m = lab["fact_grader_answer"].merge(lab["dim_grader_question"][["question_id", "category"]], on="question_id")
     mean = m.groupby(["category", "with_agent"]).score.mean().unstack()
     for r in up.itertuples():
         assert r.own_pct == pytest.approx(round(100 * mean.loc[r.category, False], 1))
@@ -171,7 +175,7 @@ def test_lab_dashboard_and_space_say_simulated():
     instructions = " ".join(" ".join(i["content"]) for i in space["instructions"]["text_instructions"])
     assert "simulated" in instructions and "never rank" in instructions.lower()
     tables = {t["identifier"] for t in space["data_sources"]["tables"]}
-    assert tables == {f"{dash.GOLD}.grader_questions", f"{dash.GOLD}.grader_answers"}
+    assert tables == {f"{dash.GOLD}.dim_grader_question", f"{dash.GOLD}.fact_grader_answer"}
 
 
 def test_bundle_resource_keys_are_unique_across_resource_types():
