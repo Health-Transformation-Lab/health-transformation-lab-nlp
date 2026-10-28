@@ -80,8 +80,9 @@ def append(df: pd.DataFrame, name: str):
     if spark.catalog.tableExists(table(name)):  # noqa: F821
         schema = spark.table(table(name)).schema  # noqa: F821
         hashes = ", ".join(f"'{h}'" for h in sorted(set(df.sha256)) if re.fullmatch(r"[0-9a-f]{64}", h))
-        if hashes and "sha256" in schema.fieldNames():   # the reader job's own rows have no sha256
-            spark.sql(f"DELETE FROM {table(name)} WHERE sha256 IN ({hashes})")  # noqa: F821
+        if hashes and "sha256" in schema.fieldNames():
+            # the reader job's own rows carry their CSV's sha256 too, keyed by run: never touch them here
+            spark.sql(f"DELETE FROM {table(name)} WHERE sha256 IN ({hashes}) AND source <> 'databricks'")  # noqa: F821
         for field in schema:
             if field.name in empty:
                 sdf = sdf.withColumn(field.name, F.col(field.name).cast(field.dataType))

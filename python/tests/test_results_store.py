@@ -221,3 +221,16 @@ def test_run_rows_label_one_runs_files_with_their_batch_key(tmp_path):
         assert set(d.method) == {"medgemma-x+k2"} and set(d.source) == {"databricks"} and set(d.run_id) == {"77"}
         assert d.sha256.str.fullmatch(r"[0-9a-f]{64}").all()
     assert preds.sha256.iloc[0] != details.sha256.iloc[0]          # each file's own version
+
+
+def test_load_results_never_deletes_the_reader_jobs_rows():
+    # PR #92 review: the reader job's rows now carry the sha256 of their CSV; a committed file with the same bytes
+    # (deterministic predictions) must not make Load results delete that run's rows
+    nb = _text("databricks/notebooks/10_load_results.py")
+    assert "WHERE sha256 IN ({hashes}) AND source <> 'databricks'" in nb
+
+
+def test_reader_job_joins_the_answer_key_by_visit():
+    nb = _text("databricks/notebooks/03_medgemma_reader.py")
+    assert 'details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id"' in nb
+    assert "d.truth.values" not in nb

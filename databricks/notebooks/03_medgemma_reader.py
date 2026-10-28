@@ -120,7 +120,7 @@ from dental_omop_nlp.results_store import run_rows
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")  # noqa: F821
 preds, details = run_rows("../../data/datasets", rung, source="databricks", run_id=run_id,
                           git_commit=dbutils.widgets.get("git_commit"), run_ts=pd.Timestamp.now(tz="UTC"))  # noqa: F821
-details = details.assign(truth=d.truth.values, difficulty=d.difficulty.values)
+details = details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id", validate="one_to_one")
 key = {"source": "databricks", "run_id": run_id, "method": rung}
 for rows, name in ((preds, "ai_predictions"), (details, "llm_reader_runs")):
     n = replace_batch(spark, rows, f"{catalog}.{schema}.{name}", key)  # noqa: F821

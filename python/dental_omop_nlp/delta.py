@@ -4,7 +4,8 @@
                   {"source": "databricks", "run_id": run_id, "method": method})
 
 A retry of the same batch replaces its rows instead of adding them again. Rows carry the key columns, so a bad
-batch can be found and removed. Rows written by other writers (Load results keys on sha256) are untouched.
+batch can be found and removed. Rows written by other writers are untouched: their key columns are NULL or
+differ (Load results keys on sha256 and leaves source = databricks rows alone).
 """
 
 from __future__ import annotations
