@@ -20,12 +20,12 @@ DASH_DIR = REPO_ROOT / "databricks" / "dashboards"
 def con():
     c = duckdb.connect()
     c.execute("ATTACH ':memory:' AS health_transformation_lab")
-    c.execute("CREATE SCHEMA health_transformation_lab.gold_dental_omop_perio")
+    c.execute("CREATE SCHEMA health_transformation_lab.gold_perio_bench")
     now = pd.Timestamp("2026-10-28", tz="UTC")
     for name, df in {**gt.dq_tables(DATASETS_DIR), **gt.lab_tables(DATASETS_DIR)}.items():   # under their gold names
         df = gold_names.to_gold(df.assign(git_commit="abc1234", loaded_at=now), name)
         c.register(f"src_{name}", df)
-        c.execute(f"CREATE TABLE health_transformation_lab.gold_dental_omop_perio.{name} AS SELECT * FROM src_{name}")
+        c.execute(f"CREATE TABLE health_transformation_lab.gold_perio_bench.{name} AS SELECT * FROM src_{name}")
     return c
 
 

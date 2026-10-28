@@ -1,4 +1,4 @@
-# Gold tables: `health_transformation_lab.gold_dental_omop_perio`
+# Gold tables: `health_transformation_lab.gold_perio_bench`
 
 > Personal learning project; synthetic data only. See [DISCLAIMER](../DISCLAIMER.md).
 
@@ -88,12 +88,12 @@ by `run_id`; two runs with the same answers even share a `file_sha256`. This que
 ```sql
 with latest as (
   select file_sha256
-  from health_transformation_lab.gold_dental_omop_perio.dim_result_file
+  from health_transformation_lab.gold_perio_bench.dim_result_file
   where file_kind_code = 'predictions'
   qualify row_number() over (partition by source_code, method_name order by loaded_ts desc) = 1
 )
 select p.method_name, p.visit_id, p.predicted_status_code
-from health_transformation_lab.gold_dental_omop_perio.fact_prediction p
+from health_transformation_lab.gold_perio_bench.fact_prediction p
 inner join latest l on l.file_sha256 = p.file_sha256;
 ```
 
@@ -122,10 +122,10 @@ chart drill-down joins them:
 
 ```sql
 select a.system_name, a.visit_id, a.answer_status_code, a.truth_status_code, s.judge_status_code, v.verdict_code
-from health_transformation_lab.gold_dental_omop_perio.fact_chart_answer a
-left join health_transformation_lab.gold_dental_omop_perio.fact_judge_call s
+from health_transformation_lab.gold_perio_bench.fact_chart_answer a
+left join health_transformation_lab.gold_perio_bench.fact_judge_call s
   on s.visit_id = a.visit_id and s.call_kind_code = 'status'
-left join health_transformation_lab.gold_dental_omop_perio.fact_judge_call v
+left join health_transformation_lab.gold_perio_bench.fact_judge_call v
   on v.visit_id = a.visit_id and v.call_kind_code = 'verdict' and v.answer_status_code = a.answer_status_code;
 ```
 

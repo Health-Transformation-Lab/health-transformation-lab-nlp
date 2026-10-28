@@ -1,8 +1,8 @@
 """Models as MLflow pyfunc in Unity Catalog, with champion / challenger aliases (docs/mlops.md).
 
-    v = log_and_register(rung, "tfidf_logreg", "health_transformation_lab.gold_dental_omop_perio.perio_note_classifier", example)
-    promote_if_accepted("health_transformation_lab.gold_dental_omop_perio.perio_note_classifier", v, "ai:tfidf_logreg", agreement_vs_humans)
-    model = load_alias("health_transformation_lab.gold_dental_omop_perio.perio_note_classifier", "champion")   # batch scoring / serving
+    v = log_and_register(rung, "tfidf_logreg", "health_transformation_lab.gold_perio_bench.perio_note_classifier", example)
+    promote_if_accepted("health_transformation_lab.gold_perio_bench.perio_note_classifier", v, "ai:tfidf_logreg", agreement_vs_humans)
+    model = load_alias("health_transformation_lab.gold_perio_bench.perio_note_classifier", "champion")   # batch scoring / serving
 
 - Any fitted rung (rules, TF-IDF, fusion, fine-tuned encoder) is wrapped as one pyfunc:
   input a DataFrame with note_text (and radiograph features for fusion), output a status.

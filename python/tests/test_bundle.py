@@ -8,8 +8,10 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 VAR = re.compile(r"\$\{var\.([a-z_]+)\}")
-GOLD_CATALOG = "${resources.schemas.gold.catalog_name}"
-GOLD_SCHEMA = "${resources.schemas.gold.name}"
+GOLD_CATALOG = "${resources.schemas.perio_bench_gold.catalog_name}"
+GOLD_SCHEMA = "${resources.schemas.perio_bench_gold.name}"
+LANDING = "${resources.volumes.perio_bench_data.schema_name}"
+LEGACY_TARGETS = ("dev", "uat")   # spec 022: the targets that deployed <layer>_dental_omop_perio
 WIDGET = re.compile(r"""widgets\.(?:text|dropdown)\(\s*["']([a-z_]+)["']|CREATE WIDGET TEXT ([a-z_]+)""")
 
 
@@ -48,13 +50,15 @@ def test_three_targets_with_expected_modes():
         assert "/Shared/" in t[env]["workspace"]["root_path"]
 
 
-def test_every_target_uses_the_same_catalog_and_domain():
+def test_every_target_uses_the_same_catalog_and_legacy_domain():
     # dev, uat and prod are separate workspaces, so the Unity Catalog names are the
-    # same everywhere: catalog health_transformation_lab, schemas <layer>_health_transformation_lab.
+    # same everywhere: catalog health_transformation_lab, schemas <layer>_<bench> (spec 022). legacy_domain
+    # names the old <layer>_dental_omop_perio schemas dev and uat keep until they are retired.
     root, _ = _load()
     d = {k: v["default"] for k, v in root["variables"].items() if "default" in v}
+    assert "domain" not in root["variables"]
     places = {env: (t.get("variables", {}).get("catalog", d["catalog"]),
-                    t.get("variables", {}).get("domain", d["domain"])) for env, t in root["targets"].items()}
+                    t.get("variables", {}).get("legacy_domain", d["legacy_domain"])) for env, t in root["targets"].items()}
     assert set(places.values()) == {("health_transformation_lab", "dental_omop_perio")}, places
 
 
@@ -118,7 +122,9 @@ def test_mlflow_experiment_and_uc_model_per_target():
     m = yaml.safe_load((ROOT / "databricks/resources/mlops.yml").read_text())["resources"]
     assert "${bundle.target}" in "".join(m["experiments"]["dental_experiment"]["name"]) or \
         "${workspace.root_path}" in m["experiments"]["dental_experiment"]["name"]
-    rm = m["registered_models"]["perio_note_classifier"]
+    assert set(m["registered_models"]) == {"perio_bench_note_classifier"}
+    rm = m["registered_models"]["perio_bench_note_classifier"]
+    assert rm["name"] == "perio_note_classifier"
     assert rm["catalog_name"] == GOLD_CATALOG and rm["schema_name"] == GOLD_SCHEMA
 
 
@@ -148,18 +154,20 @@ def test_judge_monitoring_job_only_in_uat_and_prod():
         assert t["base_parameters"]["sample_rate"] == "${var.judge_sample_rate}"
 
 
-def test_bundle_creates_the_catalog_layer_schemas_and_landing_volume():
-    """One catalog (health_transformation_lab) with landing / bronze / silver / gold schemas, all
-    bundle resources so a deploy creates them; the data volume lives in landing.
+def test_bundle_creates_the_catalog_bench_schemas_and_landing_volume():
+    """One catalog (health_transformation_lab) with a schema per bench and layer (spec 022), all bundle
+    resources so a deploy creates them; the data volume lives in landing_perio_bench.
     prevent_destroy keeps `bundle destroy` from dropping data."""
+    from health_transformation_lab_nlp import schemas
     uc = yaml.safe_load((ROOT / "databricks/resources/unity_catalog.yml").read_text())["resources"]
     assert {k: c["name"] for k, c in uc["catalogs"].items()} == {"health_transformation_lab": "${var.catalog}"}
-    layers = ("landing", "bronze", "silver", "gold")
-    assert {k: sc["name"] for k, sc in uc["schemas"].items()} == {k: f"{k}_${{var.domain}}" for k in layers}
+    bench = {f"{b}_{layer}": schemas.schema(b, layer) for b, layers in schemas.LAYERS.items() for layer in layers}
+    assert {k: sc["name"] for k, sc in uc["schemas"].items()} == bench
     assert {sc["catalog_name"] for sc in uc["schemas"].values()} == {"${resources.catalogs.health_transformation_lab.name}"}
-    vol = uc["volumes"]["data"]
-    assert vol["catalog_name"] == "${resources.schemas.landing.catalog_name}"
-    assert vol["schema_name"] == "${resources.schemas.landing.name}" and vol["volume_type"] == "MANAGED"
+    assert set(uc["volumes"]) == {"perio_bench_data"}
+    vol = uc["volumes"]["perio_bench_data"]
+    assert vol["catalog_name"] == "${resources.schemas.perio_bench_landing.catalog_name}" and vol["name"] == "data"
+    assert vol["schema_name"] == "${resources.schemas.perio_bench_landing.name}" and vol["volume_type"] == "MANAGED"
     # the admin group create_service_principal.sh makes gets the catalog; the deployer owns it
     assert uc["catalogs"]["health_transformation_lab"]["grants"] == [
         {"principal": "dental_omop_nlp_${bundle.target}_admin", "privileges": ["ALL_PRIVILEGES"]}]
@@ -178,10 +186,28 @@ def test_jobs_write_to_the_bundle_schema():
             assert (p["catalog"], p["schema"]) == (GOLD_CATALOG, GOLD_SCHEMA), name
             seen += 1
         if "landing_schema" in p:
-            assert p["landing_schema"] == "${resources.volumes.data.schema_name}", name
+            assert p["landing_schema"] == LANDING, name
     assert seen >= 3
     bench = jobs["study_benchmark"][0]["tasks"][0]["notebook_task"]["base_parameters"]
-    assert bench["landing_schema"] == "${resources.volumes.data.schema_name}"
+    assert bench["landing_schema"] == LANDING
+
+
+def test_old_schemas_stay_declared_only_where_they_were_deployed():
+    """Spec 022: dev and uat deployed <layer>_dental_omop_perio (spec 021). Their bundle keys stay, under those
+    targets only, so a deploy neither fails on prevent_destroy nor drops them; prod never had them."""
+    root, _ = _load()
+    for env, t in root["targets"].items():
+        res = t.get("resources", {})
+        if env not in LEGACY_TARGETS:
+            assert not {"schemas", "volumes", "registered_models"} & set(res), env
+            continue
+        assert {k: s["name"] for k, s in res["schemas"].items()} == {
+            k: f"{k}_${{var.legacy_domain}}" for k in ("landing", "bronze", "silver", "gold")}, env
+        assert all(s["lifecycle"]["prevent_destroy"] is True for s in res["schemas"].values())
+        vol = res["volumes"]["data"]
+        assert vol["schema_name"] == "${resources.schemas.landing.name}" and vol["lifecycle"]["prevent_destroy"] is True
+        model = res["registered_models"]["perio_note_classifier"]
+        assert model["schema_name"] == "${resources.schemas.gold.name}"
 
 
 def test_encoder_rung_off_in_dev_on_in_uat_and_prod():
@@ -212,7 +238,7 @@ def test_judge_scorecard_job_and_dev_judge_endpoint():
     job, _ = jobs["judge_scorecard"]
     p = job["tasks"][0]["notebook_task"]["base_parameters"]
     assert p["judge_endpoint"] == "${var.judge_endpoint}"
-    assert p["catalog"] == "${resources.schemas.gold.catalog_name}" and p["schema"] == "${resources.schemas.gold.name}"
+    assert p["catalog"] == GOLD_CATALOG and p["schema"] == GOLD_SCHEMA
     assert p["experiment_id"] == "${resources.experiments.dental_experiment.id}"
     assert root["variables"]["judge_endpoint"]["default"] == "none"
     assert root["targets"]["dev"]["variables"]["judge_endpoint"] == "databricks-meta-llama-3-3-70b-instruct"
@@ -233,7 +259,7 @@ def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
     tables = {"fact_chart_answer", "fact_judge_call", "judge_metric", "judge_agreement", "judge_cost", "deid_score"}
     for ds in dash["datasets"]:
         sql = " ".join(ds["queryLines"])
-        used = set(re.findall(r"health_transformation_lab\.gold_dental_omop_perio\.(\w+)", sql))
+        used = set(re.findall(r"health_transformation_lab\.gold_perio_bench\.(\w+)", sql))
         assert used and used <= tables, ds["name"]
     for page in dash["pages"]:
         for item in page["layout"]:
@@ -260,7 +286,7 @@ def test_encoder_gpu_job_runs_the_gpu_encoders():
     root, jobs = _load()
     p = jobs["encoder_gpu"][0]["tasks"][0]["notebook_task"]["base_parameters"]
     assert p["rungs"] == "${var.encoder_gpu_rungs}" and p["lr_overrides"] == "${var.encoder_gpu_lr}"
-    assert p["landing_schema"] == "${resources.volumes.data.schema_name}"
+    assert p["landing_schema"] == LANDING
     assert set(root["variables"]["encoder_gpu_rungs"]["default"].split(",")) == GPU_ENCODERS
     lr = dict(x.split("=") for x in root["variables"]["encoder_gpu_lr"]["default"].split(","))
     assert set(lr) == {"gatortron-base"} and 1e-5 <= float(lr["gatortron-base"]) <= 2e-5
@@ -314,7 +340,7 @@ def test_deid_ai_job_runs_the_databricks_methods_and_keeps_results_on_the_volume
     assert set(root["variables"]["deid_ai_engines"]["default"].split(",")) == {
         "llm", "llm+regex_v2+guard", "ai_mask", "ai_mask+regex_v2+guard"}
     assert p["llm_endpoint"] == "${var.deid_llm_endpoint}" and p["sql_warehouse_id"] == "${var.warehouse_id}"
-    assert p["save_to_repo"] == "no" and p["out_dir"].startswith("/Volumes/${resources.volumes.data.catalog_name}/")
+    assert p["save_to_repo"] == "no" and p["out_dir"].startswith("/Volumes/${resources.volumes.perio_bench_data.catalog_name}/")
     nb = (ROOT / "databricks/notebooks/06_deid_benchmark.py").read_text()
     assert 'dbutils.widgets.text("out_dir"' in nb
 
@@ -336,7 +362,7 @@ def test_nhanes_job_downloads_public_files_to_the_volume_and_keeps_only_aggregat
     t = j["tasks"][0]
     p = t["notebook_task"]["base_parameters"]
     assert t["notebook_task"]["notebook_path"].endswith("09_nhanes_perio.py")
-    assert p["data_dir"].startswith("/Volumes/${resources.volumes.data.catalog_name}/") and p["data_dir"].endswith("/nhanes_raw")
+    assert p["data_dir"].startswith("/Volumes/${resources.volumes.perio_bench_data.catalog_name}/") and p["data_dir"].endswith("/nhanes_raw")
     assert p["out_dir"].endswith("/nhanes")
     assert j["tags"]["data"] == "public"
     nb = (ROOT / "databricks/notebooks/09_nhanes_perio.py").read_text()

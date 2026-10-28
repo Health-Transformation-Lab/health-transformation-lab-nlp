@@ -25,8 +25,8 @@ from keras_to_hf import kaggle_handle
 
 HERE = Path(__file__).resolve().parent
 JOBS = {   # notebook, slug, title: Kaggle derives the slug from the title, so keep them in step
-    "medgemma": ("medgemma_reader.ipynb", "health-transformation-lab-medgemma-reader", "health transformation lab medgemma reader"),
-    "encoders": ("encoder_gpu.ipynb", "dental-omop-encoder-gpu", "dental omop encoder gpu"),
+    "medgemma": ("medgemma_reader.ipynb", "perio-bench-medgemma-reader", "perio bench medgemma reader"),
+    "encoders": ("encoder_gpu.ipynb", "perio-bench-encoder-gpu", "perio bench encoder gpu"),
 }
 
 

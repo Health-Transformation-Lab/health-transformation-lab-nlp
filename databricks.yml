@@ -19,13 +19,13 @@ include:
 
 variables:
   # dev, uat and prod are separate workspaces, so the names are the same in every
-  # target: catalog health_transformation_lab, schemas landing_/bronze_/silver_/gold_<domain>
-  # (databricks/resources/unity_catalog.yml).
+  # target: catalog health_transformation_lab, schemas <layer>_<bench> (spec 022: perio_bench, access_bench,
+  # oral_health_bench; databricks/resources/unity_catalog.yml).
   catalog:
     description: Unity Catalog catalog the bundle creates
     default: health_transformation_lab
-  domain:
-    description: Suffix of the layer schemas (landing_, bronze_, silver_, gold_)
+  legacy_domain:
+    description: Suffix of the old layer schemas dev and uat keep until retired (spec 022; docs/deployment.md)
     default: dental_omop_perio
   n_people:
     description: Synthetic people to generate in the benchmark job
@@ -121,6 +121,49 @@ targets:
           # dev has Default Storage: the catalog was made with SQL and adopted (docs/deployment.md), which
           # gives it the workspace's default storage root. Stating it keeps the plan from recreating the catalog.
           storage_root: s3://dbstorage-prod-ast0p/uc/556de223-f832-4c59-8269-f8bebde9a978/71a2bfe2-25ec-4dde-ad73-b6f34409fcef
+      # Spec 022: the old <layer>_dental_omop_perio schemas, their volume and model, which this target deployed
+      # under spec 021. They keep their bundle keys so a deploy neither fails on prevent_destroy nor drops them;
+      # retire them by hand (docs/deployment.md). uat reuses these through the anchors.
+      schemas: &legacy_schemas
+        landing:
+          catalog_name: ${resources.catalogs.health_transformation_lab.name}
+          name: landing_${var.legacy_domain}
+          comment: Legacy (spec 022), replaced by landing_perio_bench. Synthetic data only.
+          lifecycle:
+            prevent_destroy: true
+        bronze:
+          catalog_name: ${resources.catalogs.health_transformation_lab.name}
+          name: bronze_${var.legacy_domain}
+          comment: Legacy (spec 022), replaced by bronze_perio_bench. Synthetic data only.
+          lifecycle:
+            prevent_destroy: true
+        silver:
+          catalog_name: ${resources.catalogs.health_transformation_lab.name}
+          name: silver_${var.legacy_domain}
+          comment: Legacy (spec 022), replaced by silver_perio_bench. Synthetic data only.
+          lifecycle:
+            prevent_destroy: true
+        gold:
+          catalog_name: ${resources.catalogs.health_transformation_lab.name}
+          name: gold_${var.legacy_domain}
+          comment: Legacy (spec 022), replaced by gold_perio_bench. Synthetic data only.
+          lifecycle:
+            prevent_destroy: true
+      volumes: &legacy_volumes
+        data:
+          catalog_name: ${resources.schemas.landing.catalog_name}
+          schema_name: ${resources.schemas.landing.name}
+          name: data
+          volume_type: MANAGED
+          comment: Legacy (spec 022), replaced by landing_perio_bench.data. Synthetic data only.
+          lifecycle:
+            prevent_destroy: true
+      registered_models: &legacy_models
+        perio_note_classifier:
+          name: perio_note_classifier
+          catalog_name: ${resources.schemas.gold.catalog_name}
+          schema_name: ${resources.schemas.gold.name}
+          comment: Legacy (spec 022), replaced by gold_perio_bench.perio_note_classifier. Synthetic data only.
 
   # Shared test environment. Deployed by CI from main, runs as the service principal.
   uat:
@@ -138,6 +181,9 @@ targets:
       - group_name: ${var.users_group}
         level: CAN_VIEW
     resources:
+      schemas: *legacy_schemas            # spec 022: uat deployed the old schemas too (see dev)
+      volumes: *legacy_volumes
+      registered_models: *legacy_models
       jobs:
         judge_monitoring: &judge_monitoring_job
           name: Judge monitoring

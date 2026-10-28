@@ -23,16 +23,19 @@ variables.
 | GPU jobs (MedGemma reader, encoders) | yes, serverless GPU | yes, serverless GPU | yes, serverless GPU, all review notes |
 
 Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
-schema names are the same everywhere. One catalog, one schema per layer:
+schema names are the same everywhere. One catalog, one schema per bench and layer (spec 022,
+`health_transformation_lab_nlp.schemas`):
 
 | Schema in `health_transformation_lab` | Holds |
 |---|---|
-| `landing_dental_omop_perio` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
-| `bronze_dental_omop_perio` | raw tables (empty for now) |
-| `silver_dental_omop_perio` | cleaned tables (empty for now) |
-| `gold_dental_omop_perio` | OMOP and study tables, `benchmark_results`; results `dim_result_file`, `fact_prediction`, `fact_llm_call` (spec 016); judge scorecard `fact_chart_answer`, `fact_judge_call`, `judge_metric`, `judge_agreement`, `judge_cost`, `deid_score` (spec 012); names: spec 018, [gold_tables.md](gold_tables.md), `perio_note_classifier` |
+| `landing_perio_bench` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
+| `bronze_perio_bench` | raw tables (empty for now) |
+| `silver_perio_bench` | cleaned tables (empty for now) |
+| `bronze_`/`silver_`/`gold_access_bench` | empty until access_bench has a pipeline |
+| `bronze_`/`silver_`/`gold_oral_health_bench` | empty until oral_health_bench has a pipeline |
+| `gold_perio_bench` | OMOP and study tables, `benchmark_results`; results `dim_result_file`, `fact_prediction`, `fact_llm_call` (spec 016); judge scorecard `fact_chart_answer`, `fact_judge_call`, `judge_metric`, `judge_agreement`, `judge_cost`, `deid_score` (spec 012); names: spec 018, [gold_tables.md](gold_tables.md), `perio_note_classifier` |
 
-The bundle creates the catalog, all four schemas and the volume on deploy
+The bundle creates the catalog, all the schemas and the volume on deploy
 (`databricks/resources/unity_catalog.yml`), each with `prevent_destroy` so
 `bundle destroy` never drops them. Deploying needs Databricks CLI 0.288 or later
 and `CREATE CATALOG` on the metastore. (Older setups used `workspace.dental_dev`,
@@ -70,11 +73,34 @@ direct engine once, by hand, before CI can deploy it:
 CI doesn't try this itself: a migrate that failed for a real reason would let the deploy treat the
 target as new and duplicate its jobs. dev is already migrated; uat and prod were never deployed.
 
+### Spec 022: from `<layer>_dental_omop_perio` to the bench schemas
+
+Spec 021 deployed `health_transformation_lab.<layer>_dental_omop_perio` to uat (and to dev, once its deploy
+runs). Spec 022 renames them to `<layer>_perio_bench` and adds the empty access_bench and oral_health_bench
+schemas. Like spec 021, it **rebuilds rather than copies**: after the deploy, Load results reloads every
+committed result into `gold_perio_bench`; run *Benchmark*, *Judge scorecard* and *NHANES perio* to regenerate
+the study tables, the volume's files and the registered model.
+
+The old schemas, their `data` volume and the old `perio_note_classifier` stay declared in `databricks.yml` under
+the dev and uat targets, with their old bundle keys (`landing`, `bronze`, `silver`, `gold`, `data`,
+`perio_note_classifier`), because `prevent_destroy` would fail a deploy that renamed or removed them. prod never
+had them.
+
+**Retiring them**, per target, once the perio_bench tables and model check out:
+
+1. `databricks bundle deployment unbind <key> -t <target>` for `landing`, `bronze`, `silver`, `gold`, `data` and
+   `perio_note_classifier`, so the bundle stops managing them without deleting them.
+2. In a pull request, delete the legacy blocks (the `&legacy_*` anchors under dev and their uses under uat) and
+   the `legacy_domain` variable; trim the allow-list in `python/tests/test_no_legacy_schema_names.py`.
+3. Drop them in SQL: `DROP SCHEMA health_transformation_lab.<layer>_dental_omop_perio CASCADE;`
+
+Kaggle names changed too (kaggle/README.md lists the old items to delete).
+
 ## Variables
 
 | Variable | Default | What it sets |
 |---|---|---|
-| `catalog`, `domain` | `health_transformation_lab`, `health_transformation_lab` | the catalog, and the suffix of the `landing_`/`bronze_`/`silver_`/`gold_` schemas |
+| `catalog`, `legacy_domain` | `health_transformation_lab`, `dental_omop_perio` | the catalog, and the suffix of the old schemas dev and uat keep until retired (spec 022) |
 | `n_people` | `300` | synthetic people in the benchmark job |
 | `run_encoder` | `false` (uat/prod `true`) | install CPU-only torch and train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |

@@ -177,7 +177,7 @@ def test_load_results_job_runs_the_notebook_with_the_bundle_schema():
     task = next(t for t in jobs["load_results"]["tasks"] if t["task_key"] == "load")["notebook_task"]
     assert task["notebook_path"] == "../notebooks/10_load_results.py"
     p = task["base_parameters"]
-    assert p["catalog"] == "${resources.schemas.gold.catalog_name}" and p["schema"] == "${resources.schemas.gold.name}"
+    assert p["catalog"] == "${resources.schemas.perio_bench_gold.catalog_name}" and p["schema"] == "${resources.schemas.perio_bench_gold.name}"
     assert p["git_commit"] == "${bundle.git.commit}"
 
 

@@ -43,28 +43,28 @@
   "data_sources": {
     "tables": [
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_check"
+        "identifier": "health_transformation_lab.gold_perio_bench.dq_check"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_column_missing"
+        "identifier": "health_transformation_lab.gold_perio_bench.dq_column_missing"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_injected_error"
+        "identifier": "health_transformation_lab.gold_perio_bench.dq_injected_error"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_prevalence"
+        "identifier": "health_transformation_lab.gold_perio_bench.dq_prevalence"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_source_concordance"
+        "identifier": "health_transformation_lab.gold_perio_bench.dq_source_concordance"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_stage_transition"
+        "identifier": "health_transformation_lab.gold_perio_bench.dq_stage_transition"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dq_temporal_change"
+        "identifier": "health_transformation_lab.gold_perio_bench.dq_temporal_change"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.fact_visit_evidence"
+        "identifier": "health_transformation_lab.gold_perio_bench.fact_visit_evidence"
       }
     ]
   },

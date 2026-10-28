@@ -142,3 +142,11 @@ def test_upload_fails_when_kaggle_says_no(tmp_path, result):
 def test_invalid_tags_warn_but_do_not_fail(tmp_path, capsys):
     pub.upload(tmp_path, "o/d", "n", _Api(True, _Result(invalid=["model comparison"])))
     assert "model comparison" in capsys.readouterr().out
+
+
+def test_datasets_and_collection_are_named_for_the_bench():
+    """Spec 022: the Kaggle names follow perio_bench."""
+    assert {k: d["slug"] for k, d in pub.DATASETS.items()} == {"notes": "perio-bench-notes",
+                                                                   "results": "perio-bench-results"}
+    readme = (REPO_ROOT / "kaggle" / "README.md").read_text()
+    assert '"Health Transformation Lab: Perio Bench"' in readme and "perio-bench-note-classifier" in readme

@@ -25,7 +25,7 @@ from health_transformation_lab_nlp.paths import DATASETS_DIR as DATA
 
 REPO = HERE.parent
 DATASETS = {
-    "notes": {"slug": "synthetic-dental-perio-notes", "title": "Synthetic Dental Periodontal Notes and Charts",
+    "notes": {"slug": "perio-bench-notes", "title": "Synthetic Dental Periodontal Notes and Charts",
               "subtitle": "Synthetic dental chart notes labelled with 2017 AAP/EFP periodontal status",
               "keywords": ["nlp", "health", "medicine"],
               "files": [("train.csv", "train.csv"), ("visits_structured.csv", "visits_structured.csv"),
@@ -33,7 +33,7 @@ DATASETS = {
                         ("answer_key/visits_truth.csv", "visits_truth.csv"),
                         ("answer_key/clinic_profiles.csv", "clinic_profiles.csv"),
                         ("review_tasks.json", "review_tasks.json")]},
-    "results": {"slug": "dental-perio-benchmark-results", "title": "Dental Perio Note Classifier Benchmark",
+    "results": {"slug": "perio-bench-results", "title": "Dental Perio Note Classifier Benchmark",
                 "subtitle": "What rules, encoders and LLMs answered on 240 synthetic dental review notes",
                 "keywords": ["nlp", "health", "medicine"],
                 "globs": [("", "ai_predictions_*.csv"), ("", "llm_details_*.csv"), ("ladder", "*.csv"),

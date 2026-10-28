@@ -1,5 +1,5 @@
 """Spec 021: the old project names are gone from code, config, tests and current docs. Schema names
-(`<layer>_dental_omop_perio`) are left to spec 022, which sets them per bench."""
+are spec 022's (`<layer>_<bench>`, test_no_legacy_schema_names.py)."""
 
 import re
 import subprocess
