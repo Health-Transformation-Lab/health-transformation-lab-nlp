@@ -28,6 +28,7 @@ import argparse
 
 import pandas as pd
 
+from dental_omop_nlp import telemetry
 from dental_omop_nlp.labels import LABELS
 from dental_omop_nlp.paths import DATASETS_DIR
 from dental_omop_nlp.radiograph import FEATURES as RAD_FEATURES
@@ -53,6 +54,8 @@ llm.add_argument("--limit", type=int, default=None, help="only the first N revie
 ap.add_argument("--register", default=None, metavar="CATALOG.SCHEMA.MODEL",
                 help="log the fitted rung as an MLflow pyfunc and register a version (alias: challenger)")
 a = ap.parse_args()
+telemetry.setup()
+telemetry.start_script("11_ai_predict", data_label="synthetic", rung=a.rung)
 
 train = pd.read_csv(DATASETS_DIR / "train.csv").rename(columns={a.label: "target"})
 train = train.drop(columns=[c for c in ("label",) if c in train]).rename(columns={"target": "label"})

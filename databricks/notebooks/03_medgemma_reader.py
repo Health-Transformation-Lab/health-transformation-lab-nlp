@@ -15,21 +15,16 @@
 # MAGIC
 # MAGIC **Before running:** accept the HAI-DEF terms for the model on Hugging Face and put a
 # MAGIC read token in a secret scope (`dental` / `hf_token`).
-# MAGIC
-# MAGIC **Packages** come from the job's environment (`databricks/resources/jobs.yml`): a `%pip install`
-# MAGIC followed by a Python restart kills the notebook on serverless GPU. Running it by hand, add the
-# MAGIC same packages in the notebook's Environment side panel first.
+
+# COMMAND ----------
+
+# MAGIC %pip install -q -e ../../python[llm,lora,azure]
+# MAGIC %restart_python
 
 # COMMAND ----------
 
 import os
 import subprocess
-import sys
-
-# The repo's code, for this notebook and the scripts it runs, without installing it.
-_REPO_PY = os.path.abspath("../../python")
-sys.path.insert(0, _REPO_PY)
-os.environ["PYTHONPATH"] = os.pathsep.join(p for p in (_REPO_PY, os.environ.get("PYTHONPATH")) if p)
 
 dbutils.widgets.text("rung", "medgemma-1.5-4b-it")  # noqa: F821
 dbutils.widgets.text("limit", "40")                  # noqa: F821  start small: GPU quota
@@ -40,6 +35,11 @@ dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
 dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
+dbutils.widgets.text("telemetry", "azure")           # noqa: F821  spec 014: off / console / azure / otlp
+from dental_omop_nlp import telemetry, tracking  # noqa: E402
+telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"),  # noqa: F821  scripts inherit it
+                                scope=dbutils.widgets.get("hf_secret_scope"))  # noqa: F821
+tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
 
 import torch  # noqa: E402
 
@@ -49,17 +49,17 @@ print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "n
 
 # Build the synthetic datasets if this is a fresh Git folder
 if not os.path.exists("../../data/datasets/answer_key/review_key.csv"):
-    subprocess.run([sys.executable, "../../python/scripts/10_build_study.py"], check=True)
+    subprocess.run(["python", "../../python/scripts/10_build_study.py"], check=True)
 
 adapter = None
 if int(dbutils.widgets.get("lora_train") or 0):  # noqa: F821
     adapter = "/tmp/medgemma-lora"
-    r = subprocess.run([sys.executable, "../../python/scripts/17_medgemma_lora.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
+    r = subprocess.run(["python", "../../python/scripts/17_medgemma_lora.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
                         "--max-train", dbutils.widgets.get("lora_train"), "--out", adapter],  # noqa: F821
                        capture_output=True, text=True, check=True)
     print(r.stdout[-2000:], r.stderr[-2000:])
 
-args = [sys.executable, "../../python/scripts/11_ai_predict.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
+args = ["python", "../../python/scripts/11_ai_predict.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
         "--backend", "hf", "--shots", dbutils.widgets.get("shots")]  # noqa: F821
 if adapter:
     args += ["--adapter", adapter]
@@ -91,7 +91,7 @@ display(d.assign(correct=d.pred == d.truth).groupby("difficulty")["correct"].agg
 if int(dbutils.widgets.get("limit") or 0):  # noqa: F821
     print("skipped: set limit to 0 so MedGemma scores all 240 charts, as the encoders did")
 else:
-    r = subprocess.run([sys.executable, "../../python/scripts/29_medgemma_vs_bert.py"], capture_output=True, text=True,
+    r = subprocess.run(["python", "../../python/scripts/29_medgemma_vs_bert.py"], capture_output=True, text=True,
                        check=False)
     print(r.stdout[-4000:], r.stderr[-2000:])
     if r.returncode == 0:

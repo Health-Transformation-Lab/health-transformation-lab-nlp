@@ -313,6 +313,28 @@ if (file.exists(vs) && file.exists(pf)) {
   stopifnot(nrow(m) == nrow(py), bad == 0)
 } else cat("plausibility: skipped (run 20_data_quality.py)\n")
 
+tp <- "data/datasets/data_quality/transition_pairs_algorithm_design.csv"
+if (file.exists(vs) && file.exists(tp)) {
+  v <- read.csv(vs, stringsAsFactors = FALSE)
+  r <- transition_pairs(v, "algorithm_design")
+  py <- read.csv(tp, stringsAsFactors = FALSE)
+  m <- merge(py, r, by = "visit_id", suffixes = c(".py", ".r"))
+  bad <- sum(m$next_visit_id.py != m$next_visit_id.r | m$change.py != m$change.r | m$to_status.py != m$to_status.r)
+  cat(sprintf("transitions:  %d pairs, %d mismatches\n", nrow(m), bad))
+  stopifnot(nrow(m) == nrow(py), nrow(r) == nrow(py), bad == 0)
+} else cat("transitions: skipped (run 20_data_quality.py)\n")
+
+ps <- "data/datasets/data_quality/prevalence_by_scale.csv"
+if (file.exists(vs) && file.exists(ps)) {
+  v <- read.csv(vs, stringsAsFactors = FALSE)
+  py <- read.csv(ps, stringsAsFactors = FALSE)
+  r <- do.call(rbind, lapply(unique(py$status_col), function(m) prevalence_by_scale(v, m)))
+  num <- c("n_visits", "n_known", "periodontitis", "stage3_4")
+  d <- max(abs(as.matrix(r[num]) - as.matrix(py[num])), na.rm = TRUE)
+  cat(sprintf("scales:       max |R - Python| = %.2e over %d rows\n", d, nrow(py)))
+  stopifnot(nrow(r) == nrow(py), all(r$scale == py$scale), d < 1e-9)
+} else cat("scales: skipped (run 20_data_quality.py)\n")
+
 pp <- "data/datasets/prevalence/prevalence_by_clinic.csv"
 if (file.exists(vs) && file.exists(pp)) {
   v <- read.csv(vs, stringsAsFactors = FALSE)
@@ -382,3 +404,36 @@ for (pfx in c("", "simulated_")) {
   }
 }
 cat("parity OK (spec 012)\n")
+
+# 7b. Spec 013: CAL reliability (nested ANOVA, ICCs, stage-band flips).
+cg <- "data/datasets/reliability_cal/simulated_cal_charts.csv.gz"
+cr <- "data/datasets/reliability_cal/simulated_cal_reliability.csv"
+if (file.exists(cg) && file.exists(cr)) {
+  source("r/R/12_spec013.R")
+  d <- read.csv(gzfile(cg), stringsAsFactors = FALSE)
+  py <- read.csv(cr); py <- py[py$sd_error_true == 0.8, ]
+  r <- c(cal_nested_components(d), cal_icc(cal_nested_components(d)), stage_band_flips(d))
+  num <- c("slope_mm_per_year", "var_patient", "var_tooth", "var_site", "var_error",
+           "icc_patient", "icc_tooth", "icc_site", "sem_mm", "flip_rate", "down_rate")
+  dd <- max(abs(unlist(r[num]) - unlist(py[num])))
+  cat(sprintf("CAL reliability: max |R - Python| = %.2e\n", dd))
+  stopifnot(dd < 1e-9)
+} else cat("CAL reliability: skipped (run 37_cal_reliability.py)\n")
+if (file.exists("data/sites/parity_sites.csv") && file.exists("data/sites/derived.csv")) {
+  source("r/R/12_spec013.R")
+  s <- read.csv("data/sites/parity_sites.csv", stringsAsFactors = FALSE)
+  t <- read.csv("data/sites/parity_teeth.csv", stringsAsFactors = FALSE)
+  t$missing_reason[is.na(t$missing_reason)] <- ""
+  py <- read.csv("data/sites/derived.csv", stringsAsFactors = FALSE)
+  ids <- sort(unique(t$visit_id)); S <- split(s, s$visit_id); Tt <- split(t, t$visit_id)
+  variants <- list(aces = list(), aces_teeth20 = list(stage4_rule = "teeth20"),
+                   aces_no_complexity = list(complexity = FALSE), aces_case_cal3 = list(case_cal = 3))
+  bad <- 0
+  for (v in names(variants)) {
+    r <- sapply(ids, function(k) do.call(aces_exam, c(list(S[[as.character(k)]], Tt[[as.character(k)]]), variants[[v]])))
+    bad <- bad + sum(r != py[[v]][match(ids, py$visit_id)])
+  }
+  cat(sprintf("ACES:         %d exams x %d variants, %d mismatches\n", length(ids), length(variants), bad))
+  stopifnot(bad == 0)
+} else cat("ACES: skipped (run 22_build_sites.py)\n")
+cat("parity OK (spec 013)\n")

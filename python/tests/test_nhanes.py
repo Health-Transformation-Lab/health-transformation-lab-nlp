@@ -1,0 +1,83 @@
+"""Spec 013 G4: NHANES 2009-2014 periodontal exam -> site/tooth tables -> weighted prevalence."""
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from dental_omop_nlp.nhanes import (
+    nhanes_cdc_aap_published,
+    sites_from_labels,
+    to_site_tables,
+    weighted_prevalence,
+)
+
+LABELS = {"OHX03PCD": "Pocket depth: upper right 1st molar, distofacial",
+          "OHX03PCM": "Pocket depth: upper right 1st molar, midfacial",
+          "OHX03PCS": "Pocket depth: upper right 1st molar, mesiofacial",
+          "OHX03PCP": "Pocket depth: upper right 1st molar, distolingual",
+          "OHX03PCL": "Pocket depth: upper right 1st molar, midlingual",
+          "OHX03PCA": "Pocket depth: upper right 1st molar, mesiolingual",
+          "OHX03LAD": "Loss of attachment: upper right 1st molar, distofacial"}
+
+
+def test_site_letters_are_read_from_the_variable_labels():
+    m = sites_from_labels(LABELS)
+    assert m[("03", "PC", "D")] == "DB" and m[("03", "PC", "M")] == "B" and m[("03", "PC", "S")] == "MB"
+    assert m[("03", "PC", "P")] == "DL" and m[("03", "PC", "L")] == "L" and m[("03", "PC", "A")] == "ML"
+    assert m[("03", "LA", "D")] == "DB"
+
+
+def test_unrecognised_label_is_an_error_not_a_guess():
+    with pytest.raises(ValueError):
+        sites_from_labels({"OHX03PCD": "Pocket depth: upper right 1st molar, somewhere"})
+
+
+def test_wide_exam_becomes_site_and_tooth_tables():
+    per = pd.DataFrame({"SEQN": [1, 2], "OHX03PCD": [3.0, 99.0], "OHX03LAD": [4.0, 99.0]})
+    den = pd.DataFrame({"SEQN": [1, 2], "OHX03TC": [2.0, 4.0], "OHX04TC": [5.0, 2.0]})
+    sites, teeth = to_site_tables(per, den, {"OHX03PCD": LABELS["OHX03PCD"], "OHX03LAD": LABELS["OHX03LAD"]})
+    s = sites.set_index(["SEQN", "tooth", "site"])
+    assert s.loc[(1, 3, "DB"), "pd_mm"] == 3.0 and s.loc[(1, 3, "DB"), "cal_mm"] == 4.0
+    assert (2, 3, "DB") not in s.index or np.isnan(s.loc[(2, 3, "DB"), "pd_mm"])     # 99 = not assessed
+    t = teeth.set_index(["SEQN", "tooth"])
+    assert t.loc[(1, 3), "present"] and t.loc[(1, 4), "present"]                        # 2 permanent, 5 root
+    assert not t.loc[(2, 3), "present"] and t.loc[(2, 4), "present"]
+
+
+def test_weighted_prevalence_with_linearized_ci():
+    # two strata, two PSUs each; weights make person 1 count double
+    d = pd.DataFrame({"y": ["a", "b", "a", "a", "b", "b", "a", "b"],
+                      "w": [2, 1, 1, 1, 1, 1, 1, 1], "strata": [1, 1, 1, 1, 2, 2, 2, 2],
+                      "psu": [1, 1, 2, 2, 1, 1, 2, 2], "domain": [True] * 8})
+    p = weighted_prevalence(d, "y").set_index("category")
+    assert p.loc["a", "pct"] == pytest.approx(100 * 5 / 9)
+    assert p.loc["a", "ci_low"] < p.loc["a", "pct"] < p.loc["a", "ci_high"]
+    assert p["pct"].sum() == pytest.approx(100)
+
+
+def test_published_targets_are_cited():
+    t = nhanes_cdc_aap_published()
+    assert set(t["source"]) >= {"Eke et al. 2018 (PMC8094373)", "Tay et al. 2025 (PMC12176459)"}
+    assert t.loc[(t.source.str.startswith("Eke")) & (t.category == "total"), "pct"].item() == 42.2
+
+
+def test_classify_people_end_to_end_on_nhanes_shaped_tables():
+    from dental_omop_nlp.nhanes import classify_people
+    letters = {"D": "distofacial", "M": "midfacial", "S": "mesiofacial", "P": "distolingual", "L": "midlingual",
+               "A": "mesiolingual"}
+    teeth = [t for t in range(2, 32) if t not in (16, 17)]
+    labels = {f"OHX{t:02d}{m}{x}": f"{'Pocket depth' if m == 'PC' else 'Loss of attachment'}: tooth {t}, {w}"
+              for t in teeth for m in ("PC", "LA") for x, w in letters.items()}
+    per = pd.DataFrame([{"SEQN": s, "OHDPDSTS": 1, **{v: 2.0 for v in labels}} for s in (1, 2)])
+    for t in (3, 8):                                   # person 2: interproximal CAL 6 on two teeth, PD 5
+        per.loc[1, f"OHX{t:02d}LAS"] = 6.0
+        per.loc[1, f"OHX{t:02d}PCS"] = 5.0
+    den = pd.DataFrame([{"SEQN": s, **{f"OHX{t:02d}TC": 2.0 for t in range(1, 33)}} for s in (1, 2, 3)])
+    den.loc[2, [c for c in den if c != "SEQN"]] = 4.0  # person 3: no teeth
+    demo = pd.DataFrame({"SEQN": [1, 2, 3], "RIDAGEYR": [40, 55, 70], "WTMEC2YR": [1e4] * 3,
+                         "SDMVSTRA": [1, 1, 2], "SDMVPSU": [1, 2, 1]})
+    p = classify_people(per, den, demo, labels).set_index("SEQN")
+    assert p.loc[1, "cdc_aap"] == "none" and p.loc[1, "aces"] == "periodontitis_stage_1"   # CAL 2 everywhere
+    assert p.loc[2, "cdc_aap"] == "severe"
+    assert p.loc[2, "aces"] == "periodontitis_stage_3" and p.loc[2, "aces_no_complexity"] == "periodontitis_stage_3_4"
+    assert p.loc[3, "edentulous"] and p.loc[3, "aces"] == "edentulous"

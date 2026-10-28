@@ -38,6 +38,12 @@ synthetic sets.
 |---------|-------------|--------|----------|
 | **MACCROBAT** (Caufield 2019, [figshare](https://doi.org/10.6084/m9.figshare.9764942.v2), MACCROBAT2020.zip; BIO mirror [`ktgiahieu/maccrobat2018_2020`](https://huggingface.co/datasets/ktgiahieu/maccrobat2018_2020)) | 200 clinical case reports from PubMed Central, edited to the case details, with hand-annotated entities (41 types: symptoms, diseases, procedures, drugs, lab values, dates, ages ...). The mirror holds the 2018 and 2020 releases of the same 200 | CC BY 4.0; committed in [`data/external/maccrobat/`](../data/external/maccrobat/README.md) (original zip, BIO splits) | De-identification test pass on real prose (original brat release by default): date recall and clinical over-redaction ([deidentification.md](deidentification.md#results-on-maccrobat-200-real-case-reports-external-spec-009), spec 009). Not dental, not chart notes |
 
+## Public real charts (no notes)
+
+| Dataset | What it has | Access | Used for |
+|---------|-------------|--------|----------|
+| **NHANES 2009–2014 oral health – periodontal** (CDC/NCHS; files OHXPER_F/G/H, OHXDEN_F/G/H, DEMO_F/G/H) | Full-mouth periodontal exam of ~11,000 US adults 30+: pocket depth and attachment loss at six sites on every tooth but third molars; tooth counts; age, sex, smoking, diabetes; survey weights and design | Public domain; downloaded at run time by `scripts/38_nhanes_perio.py --download` or the Databricks job `nhanes_perio` (cdc.gov is not reachable from every environment). Raw files are not committed | Real charts for the chart algorithms (CDC/AAP 2012, ACES); checks this repo's code against the published prevalence (Eke 2018; Tay 2025). No notes, no clinician diagnosis, no bleeding on probing, no follow-up visits (spec 013 G4) |
+
 ## Not usable for notes
 
 | Source | Why not |

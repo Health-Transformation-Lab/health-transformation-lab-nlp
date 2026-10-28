@@ -84,3 +84,7 @@ Fourth revision: "Periodontitis incorrectly not assigned (present)" becomes **Pe
 incorrectly ruled out (present)**.
 
 Fifth revision: the brackets read **(when not present)** and **(when present)**.
+
+Sixth revision: the README's brackets say **"95% correctly ruled out"** (specificity) and **"99% correctly
+assigned"** (sensitivity), in the same correctly / incorrectly pattern as the counts; the standard names
+stay in the definitions ("The standard name is specificity") and in the full table for statisticians.

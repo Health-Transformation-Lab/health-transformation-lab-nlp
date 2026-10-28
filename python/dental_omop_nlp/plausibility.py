@@ -62,3 +62,54 @@ def flag_rates(flags: pd.DataFrame, by: pd.Series | None = None) -> pd.DataFrame
     f = flags.copy()
     f["group"] = "all" if by is None else by.reindex(f["visit_id"]).to_numpy()
     return f.groupby("group")[[*FLAGS, "any_flag"]].mean().reset_index()
+
+
+# Transitions over time (spec 013 G8; Kahn et al. 2016 temporal plausibility). Each visit is paired with
+# the same person's first later visit 1-2 years on; pairs with periodontal therapy in between are dropped,
+# since only then is an improvement implausible. Statuses are compared on five categories.
+FIVE = ["healthy_gingivitis", "periodontitis_stage_1", "periodontitis_stage_2",
+        "periodontitis_stage_3", "periodontitis_stage_4"]
+MIN_DAYS, MAX_DAYS = 365, 730
+
+
+def _five(s: str) -> str:
+    return "healthy_gingivitis" if s in ("healthy", "gingivitis") else s
+
+
+def transition_pairs(visits: pd.DataFrame, status_col: str = "status",
+                     min_days: int = MIN_DAYS, max_days: int = MAX_DAYS) -> pd.DataFrame:
+    """visits: visit_id, person_id, visit_date, treated_before, <status_col>. Returns one row per
+    pair: person_id, visit_id, next_visit_id, days, from_status, to_status, change (better/same/worse)."""
+    v = visits[visits[status_col].isin(LABELS)].copy()
+    v["date"] = pd.to_datetime(v["visit_date"])
+    v["five"] = v[status_col].map(_five)
+    rows = []
+    for pid, g in v.sort_values(["person_id", "date", "visit_id"]).groupby("person_id", sort=False):
+        g = list(g.itertuples())
+        for i, a in enumerate(g):
+            for b in g[i + 1:]:
+                days = (b.date - a.date).days
+                if days > max_days:
+                    break
+                if days < min_days:
+                    continue
+                if bool(b.treated_before) and not bool(a.treated_before):
+                    break                              # therapy between the two visits
+                ra, rb = FIVE.index(a.five), FIVE.index(b.five)
+                rows.append({"person_id": pid, "visit_id": a.visit_id, "next_visit_id": b.visit_id,
+                             "days": days, "from_status": a.five, "to_status": b.five,
+                             "change": "better" if rb < ra else "worse" if rb > ra else "same"})
+                break
+    return pd.DataFrame(rows, columns=["person_id", "visit_id", "next_visit_id", "days",
+                                       "from_status", "to_status", "change"])
+
+
+def transition_summary(pairs: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """Five-by-five counts (rows: earlier visit) and the share of pairs better / same / worse."""
+    m = pd.crosstab(pd.Categorical(pairs["from_status"], FIVE), pd.Categorical(pairs["to_status"], FIVE),
+                    dropna=False)
+    m.index.name, m.columns.name = "from_status", "to_status"
+    n = len(pairs)
+    shares = {"pairs": n, **{c: float((pairs["change"] == c).mean()) if n else 0.0
+                             for c in ("better", "same", "worse")}}
+    return m, shares

@@ -626,12 +626,13 @@ def results_markdown(inp: dict) -> str:
             "status: [rules for each evidence type](docs/evidence_rules.md)."), "",
            "What the columns mean:", "",
            _bullets(PHENOTYPE_TERMS[:2] + [
-               ("Specificity", f"(in brackets) of the {n_neg} charts without periodontitis, the share correctly "
-                               "called \"no\". Periodontitis incorrectly assigned is what lowers it.")]
+               ("Periodontitis correctly ruled out", f"(in brackets) of the {n_neg} charts without periodontitis, "
+                                                     "the share the method said don't have it. The standard name "
+                                                     "is specificity.")]
                + PHENOTYPE_TERMS[2:3] + [
-               ("Sensitivity", f"(in brackets) of the {n_charts - n_neg} charts with periodontitis, the share "
-                               "correctly called \"yes\". Periodontitis incorrectly ruled out lowers it, and so does no "
-                               "answer.")]
+               ("Periodontitis correctly assigned", f"(in brackets) of the {n_charts - n_neg} charts with "
+                                                    "periodontitis, the share the method said have it. No answer "
+                                                    "counts against it. The standard name is sensitivity.")]
                + PHENOTYPE_TERMS[3:] + [
                ("Rank", f"where it plausibly ranks among all {len(ph)} methods."),
                ("Stage 4 rule", "keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 "
@@ -648,8 +649,8 @@ def results_markdown(inp: dict) -> str:
         c, yes, no, st, na = [round(n_charts * r[k]) for k in ("correct", "dx_said_yes", "dx_said_no", "stage",
                                                                 "no_answer")]
         out.append(f"| {q if q != last_q else ''} | {readme_label(s)} | {c} of {n_charts} | "
-                   f"{yes} of {n_neg} (specificity {_pct(r['specificity'])}) | "
-                   f"{no} of {n_charts - n_neg} (sensitivity {_pct(r['sensitivity'])}) | {st} of {n_charts} | "
+                   f"{yes} of {n_neg} ({_pct(r['specificity'])} correctly ruled out) | "
+                   f"{no} of {n_charts - n_neg} ({_pct(r['sensitivity'])} correctly assigned) | {st} of {n_charts} | "
                    f"{na} of {n_charts} | {r['rank']} |")
         last_q = q
     out += ["", f"All {len(ph)} methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, "

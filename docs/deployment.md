@@ -80,6 +80,7 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
 | `reader_shots`, `reader_lora_train` | `0`, `0` | MedGemma reader: few-shot examples per status, and LoRA fine-tune size (0 = off). Change these, or `reader_rung` (e.g. `medgemma-4b-it`), for one run with *Run now with different parameters* |
+| `telemetry_exporter` | `azure` | Pipeline telemetry for the GPU and NHANES jobs (spec 014): `azure` sends to Application Insights with the connection string from secret `dental/appinsights_connection_string` (telemetry off if the secret is missing), or `otlp`, `console`, `off`. Setup: [telemetry.md](telemetry.md) |
 | `deid_ai_engines`, `deid_llm_endpoint` | `llm`, `ai_mask` and their `+regex_v2+guard` versions; `databricks-meta-llama-3-3-70b-instruct` | De-id AI methods job |
 | `hf_secret_scope` | `dental` | secret scope with `hf_token` |
 | `gpu_accelerator` | `GPU_1xA10` | serverless GPU for the GPU jobs (Free Edition offers A10) |
@@ -102,6 +103,7 @@ Override any variable with `--var name=value`, or the environment variable
 | `medgemma_reader` | `03_medgemma_reader.py`: MedGemma note reader, run log to Delta | serverless GPU; retried twice, 2 minutes apart, if the GPU fails to start or Python fails to restart |
 | `encoder_gpu` | `08_encoder_gpu.py`: fine-tunes the encoders that need a GPU (large ModernBERTs, Longformers, GatorTron-base at a lower learning rate; spec 002 T017); predictions to the landing volume and `encoder_gpu_predictions` | serverless GPU; retried like the reader |
 | `deid_ai` (De-id AI methods) | `06_deid_benchmark.py` with the de-identification methods that need Databricks services: `llm` (serving endpoint `deid_llm_endpoint`) and `ai_mask` (the SQL warehouse), each alone and with patterns + guard; result CSVs to the landing volume (`deid_ai/`) | serverless |
+| `nhanes_perio` (NHANES perio) | `09_nhanes_perio.py`: downloads the public NHANES 2009–2014 periodontal files to the landing volume (`nhanes_raw/`), runs `38_nhanes_perio.py` (CDC/AAP 2012 and ACES, survey-weighted) and writes `nhanes/nhanes_prevalence.csv` next to the published figures; copy that CSV to `data/datasets/nhanes/` | serverless |
 
 ## Run in dev from your laptop
 

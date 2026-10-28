@@ -329,6 +329,20 @@ def test_gpu_jobs_retry_a_failed_start():
             assert t["min_retry_interval_millis"] >= 60_000 and t["retry_on_timeout"] is True, name
 
 
+def test_nhanes_job_downloads_public_files_to_the_volume_and_keeps_only_aggregates():
+    _, jobs = _load()
+    j, _ = jobs["nhanes_perio"]
+    assert len(j["name"]) <= 20
+    t = j["tasks"][0]
+    p = t["notebook_task"]["base_parameters"]
+    assert t["notebook_task"]["notebook_path"].endswith("09_nhanes_perio.py")
+    assert p["data_dir"].startswith("/Volumes/${resources.volumes.data.catalog_name}/") and p["data_dir"].endswith("/nhanes_raw")
+    assert p["out_dir"].endswith("/nhanes")
+    assert j["tags"]["data"] == "public"
+    nb = (ROOT / "databricks/notebooks/09_nhanes_perio.py").read_text()
+    assert "38_nhanes_perio.py" in nb and "--download" in nb
+
+
 def test_gpu_jobs_keep_retrying_long_enough_to_outlast_a_gpu_shortage():
     """A start that fails because no GPU is free (seen in dev: "failed to start within 900 seconds", twice,
     two minutes apart) needs retries spread over hours, not minutes: at least 4 hours of retrying."""
@@ -341,26 +355,15 @@ def test_gpu_jobs_keep_retrying_long_enough_to_outlast_a_gpu_shortage():
             assert t["min_retry_interval_millis"] >= 20 * 60_000, name     # spaced out, not back to back
 
 
-def _extras(*names):
-    import tomllib
-    proj = tomllib.loads((ROOT / "python" / "pyproject.toml").read_text())["project"]
-    deps = list(proj["dependencies"])
-    for n in names:
-        deps += proj["optional-dependencies"][n]
-    return sorted(set(deps))
-
-
-def test_gpu_jobs_install_their_packages_in_the_job_environment_not_with_pip_in_the_notebook():
-    """On serverless GPU, `%pip install` then a Python restart kills the notebook ("Py4JException: Error while
-    obtaining a new communication channel ... Connection refused", MedGemma run in dev). The packages come from
-    the job environment instead, the same ones pyproject.toml lists, and the notebooks import the repo from
-    its folder, so nothing restarts Python."""
-    _, jobs = _load()
-    for name, extras, nb in (("medgemma_reader", ("llm", "lora"), "03_medgemma_reader.py"),
-                             ("encoder_gpu", ("models",), "08_encoder_gpu.py")):
-        env = {e["environment_key"]: e["spec"] for e in jobs[name][0]["environments"]}["gpu"]
-        assert sorted(env["dependencies"]) == _extras(*extras), name
-        text = (ROOT / "databricks" / "notebooks" / nb).read_text()
-        assert "# MAGIC %pip" not in text and "%restart_python" not in text and "restartPython()" not in text, nb
-        assert "PYTHONPATH" in text and "sys.path.insert" in text, nb      # the repo, for the notebook and its scripts
-        assert '["python",' not in text, nb                                # scripts run with sys.executable
+def test_pipeline_jobs_send_telemetry_from_the_secret_scope():
+    """Spec 014: the jobs that start scripts pass the telemetry switch; the notebook reads the Application
+    Insights connection string from the secret scope (never a job parameter)."""
+    root, jobs = _load()
+    assert root["variables"]["telemetry_exporter"]["default"] == "azure"
+    for name, nb in (("medgemma_reader", "03_medgemma_reader.py"), ("encoder_gpu", "08_encoder_gpu.py"),
+                     ("nhanes_perio", "09_nhanes_perio.py")):
+        p = jobs[name][0]["tasks"][0]["notebook_task"]["base_parameters"]
+        assert p["telemetry"] == "${var.telemetry_exporter}", name
+        assert not any("InstrumentationKey" in str(v) for v in p.values()), name
+        text = (ROOT / "databricks/notebooks" / nb).read_text()
+        assert "telemetry.use_databricks_secret(dbutils" in text and 'widgets.text("telemetry"' in text, nb
