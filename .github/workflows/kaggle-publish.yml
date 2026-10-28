@@ -1,0 +1,61 @@
+# Publish the synthetic notes and the benchmark results as public Kaggle datasets (spec 020, kaggle/publish.py).
+# Start it from the Actions tab: "Publish datasets to Kaggle" -> Run workflow. The first run creates each dataset
+# (public, CC BY 4.0); later runs add a version named after the commit; publish.py fails the run if Kaggle
+# refuses an upload. Same secrets as the notebook workflows:
+# KAGGLE_USERNAME and KAGGLE_API_TOKEN (or KAGGLE_KEY) in the GitHub environment `dev`.
+name: Publish datasets to Kaggle
+run-name: "Publish to Kaggle: ${{ inputs.dataset }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset:
+        description: "Which dataset"
+        type: choice
+        options: [both, notes, results]
+        default: both
+      message:
+        description: "Version note (the commit is added)"
+        default: "Update from the repository"
+
+concurrency: kaggle-publish
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: dev
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - run: pip install --quiet "kaggle==2.2.5" -e ./python   # publish.py uses dental_omop_nlp.paths
+
+      - name: Kaggle credentials (values stay masked)
+        env:
+          U: ${{ vars.KAGGLE_USERNAME || secrets.KAGGLE_USERNAME }}
+          T: ${{ secrets.KAGGLE_API_TOKEN }}
+          K: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          [ -n "$U" ] || { echo "::error::KAGGLE_USERNAME is not set in the GitHub environment 'dev' (variable or secret)"; exit 1; }
+          echo "KAGGLE_USERNAME=$U" >> "$GITHUB_ENV"
+          tok="${T:-$K}"
+          [ -n "$tok" ] || { echo "::error::Set KAGGLE_API_TOKEN (or KAGGLE_KEY) in the GitHub environment 'dev'"; exit 1; }
+          echo "KAGGLE_API_TOKEN=$tok" >> "$GITHUB_ENV"
+          [ -n "$K" ] && echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"
+          true
+
+      - name: Build and publish
+        env:
+          WHICH: ${{ inputs.dataset }}
+          MESSAGE: ${{ inputs.message }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -o pipefail                      # a refused upload must fail the step, not tee
+          [ "$WHICH" = both ] && names="notes results" || names="$WHICH"
+          for name in $names; do
+            python kaggle/publish.py --dataset "$name" --out "build/$name" --username "$KAGGLE_USERNAME" \
+              --commit "$SHA" --upload --message "$MESSAGE" | tee -a "$GITHUB_STEP_SUMMARY"
+          done
