@@ -43,3 +43,16 @@ def test_landing_readme_offers_two_paths_each_with_an_executive_and_a_detailed_r
     for link in ("docs/edr/deck.html", "docs/edr/README.md", "docs/pitch/deck.html", "docs/pitch/README.md"):
         assert f"]({link}" in readme, link
     assert len(readme.splitlines()) <= 80                     # a landing page, not the study
+
+
+@pytest.mark.parametrize("deck", sorted(build_decks.DECKS))
+def test_deck_pages_one_slide_at_a_time_with_a_way_home(deck):
+    # issue #178: a reveal.js deck at a pinned version, a link back to the site on every slide, every slide in
+    # the jump menu with its notes kept for the speaker view, and links off the site in a new tab
+    html, _ = build_decks.render(deck)
+    assert re.search(r"reveal\.js@\d+\.\d+\.\d+/dist/reveal\.js", html)
+    assert f'class="home" href="{build_decks.SITE}/"' in html
+    ids = [sid for sid, _, _ in build_decks.slides(REPO_ROOT / "docs" / deck)]
+    assert re.findall(r'<option value="([^"]+)">', html) == ids
+    assert html.count('<aside class="notes">') == len(ids)
+    assert 'href="' + build_decks.REPO + '" target="_blank" rel="noopener"' in html
