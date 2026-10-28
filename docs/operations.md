@@ -137,8 +137,9 @@ once:
   same file versions (SHA-256), then appends, and records each loaded file in `result_files` last.
 - Every written row carries its batch key (file SHA, run id, `git_commit`, load time), so a bad batch can
   be found and removed.
-- Plain `append` is allowed only for a log, where every row is a distinct event (`llm_reader_runs` from
-  the reader job, with `run_ts`).
+- Plain `append` is allowed only for a log, where every row is a distinct event. The MedGemma reader job
+  writes `ai_predictions` and `llm_reader_runs` by batch key instead (`delta.replace_batch`, keyed by
+  source, job run id and method), so one of its retries replaces the run's rows.
 
 ## 5. Ingestion with Auto Loader, and schema drift
 

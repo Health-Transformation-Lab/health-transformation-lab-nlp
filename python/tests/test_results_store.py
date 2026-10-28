@@ -205,3 +205,32 @@ def test_load_notebook_finds_the_deployed_files_and_says_when_there_are_none():
     assert 'Path("../../data/datasets")' in nb          # next to the notebook, as notebook 03 finds them
     assert "No result files in" in nb                   # a clear stop, naming the folder
     assert "if len(new):" in nb                         # never display an empty table
+
+
+def test_run_rows_label_one_runs_files_with_their_batch_key(tmp_path):
+    # the MedGemma reader job writes its own run to ai_predictions and llm_reader_runs (spec 016)
+    from dental_omop_nlp.results_store import run_rows
+    _preds(tmp_path / "ai_predictions_medgemma-x+k2.csv", 3)
+    pd.DataFrame({"visit_id": [1, 2, 3], "pred": "healthy", "gate_ok": True, "error": None}).to_csv(
+        tmp_path / "llm_details_medgemma-x+k2.csv", index=False)
+    preds, details = run_rows(tmp_path, "medgemma-x+k2", source="databricks", run_id="77", git_commit="abc1234",
+                              run_ts=pd.Timestamp("2026-10-28", tz="UTC"))
+    assert list(preds.columns) == ["method", "visit_id", "pred", "sha256", "source", "run_id", "run_ts", "git_commit"]
+    assert len(preds) == len(details) == 3
+    for d in (preds, details):
+        assert set(d.method) == {"medgemma-x+k2"} and set(d.source) == {"databricks"} and set(d.run_id) == {"77"}
+        assert d.sha256.str.fullmatch(r"[0-9a-f]{64}").all()
+    assert preds.sha256.iloc[0] != details.sha256.iloc[0]          # each file's own version
+
+
+def test_load_results_never_deletes_the_reader_jobs_rows():
+    # PR #92 review: the reader job's rows now carry the sha256 of their CSV; a committed file with the same bytes
+    # (deterministic predictions) must not make Load results delete that run's rows
+    nb = _text("databricks/notebooks/10_load_results.py")
+    assert "WHERE sha256 IN ({hashes}) AND source <> 'databricks'" in nb
+
+
+def test_reader_job_joins_the_answer_key_by_visit():
+    nb = _text("databricks/notebooks/03_medgemma_reader.py")
+    assert 'details.merge(d[["visit_id", "truth", "difficulty"]], on="visit_id"' in nb
+    assert "d.truth.values" not in nb
