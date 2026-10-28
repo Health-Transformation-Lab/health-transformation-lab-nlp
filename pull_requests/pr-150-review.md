@@ -1,18 +1,18 @@
 ---
-pr: 139
-branch: claude/great-cerf-qwbqck
-title: "Rename the project to Health Transformation Lab (spec 019)"
+pr: 150
+branch: chore/127-021-rename
+title: "021: rename the project to Health Transformation Lab (merge last)"
 author: jcbowyer
 reviewed_at: 2026-10-28
 reviewer: coordinator verification
-verdict: approve once the owner has done steps 1-4 (repo rename, catalog, secret scope, Azure)
+verdict: approve; merge last (after #101 and #108), once the owner has done steps 1-4
 ---
 
-# PR Review: Rename the project to Health Transformation Lab (spec 019)
+# PR Review: 021: rename the project to Health Transformation Lab
 
 ## Summary
-This is a mechanical rename, closing #127. Every one of the 219 changed files was checked to differ from `main`
-only by the name substitution. The new files are spec 019 and `test_rename.py`. Data is unchanged.
+This is a mechanical rename, closing #127. Every changed file was checked to differ from `main`
+only by the name substitution. The new files are spec 021 and `test_rename.py`. Data is unchanged.
 
 ## Findings
 - **Fixed in the branch (dcc13b9): data overwritten by the parity setup.** `make_parity_inputs.sh` rewrote
@@ -29,15 +29,15 @@ only by the name substitution. The new files are spec 019 and `test_rename.py`. 
   until they're removed by hand. That's intended: a rebuild, with `prevent_destroy` protecting both catalogs.
 
 ## Checks
-- `pytest -q tests`: 688 passed, 13 skipped. R parity: OK in every section. `ruff check`: clean.
+- `pytest -q tests`: 714 passed, 14 skipped. R parity: OK in every section. `ruff check`: clean.
 - Scans: no secrets, no PHI.
 
 ## Compliance
 | Rule | Result |
 |---|---|
-| Spec for big changes | Pass (spec 019; 018 was taken) |
+| Spec for big changes | Pass (spec 021, per the owner's decision on #127; schema names are spec 022's) |
 | Test first | Pass (`test_rename.py`) |
 | Python/R parity | Pass |
 | Configuration | Pass: names are one declaration each (`catalog`, `domain`, `hf_secret_scope` variables) |
 | Secrets register | Pass: scope and Azure names updated; no values |
-| Branches and issues | Pass (`claude/*`, `Closes #127`) |
+| Branches and issues | Pass (`chore/127-021-rename`, `Closes #127`; replaces #139, opened from `claude/*`) |
