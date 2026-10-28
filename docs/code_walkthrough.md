@@ -18,11 +18,11 @@ Pictures of the same: [medallion architecture](../diagrams/d0_medallion_architec
 
 | # | Step | Command | README section |
 |---|---|---|---|
-| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Evidence types](../README.md#dental-omop-nlp) |
+| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Evidence types](../README.md#health-transformation-lab-nlp) |
 | 2 | [De-identify and gate](#2-de-identify-and-gate) | (inside step 1) | [Ground rules](../README.md#ground-rules) |
-| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Evidence types](../README.md#dental-omop-nlp) |
+| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Evidence types](../README.md#health-transformation-lab-nlp) |
 | 4 | [Compare the evidence](#4-compare-the-evidence) | (inside step 1) | [Study process](process.md) |
-| 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#dental-omop-nlp) |
+| 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#health-transformation-lab-nlp) |
 | 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml) |
 | 7 | [Reviewers stage charts](#7-reviewers-stage-charts) | Label Studio, then `12_import_review.py` | [How results are measured](../README.md#how-results-are-measured) |
 | 8 | [Reliability and the acceptance test](#8-reliability-and-the-acceptance-test) | `python scripts/13_reliability.py` | [How results are measured](../README.md#how-results-are-measured) |
@@ -50,11 +50,11 @@ visits get a charting error (answer key only). Each visit gets a chart note, an
 exam form, procedure codes and diagnosis codes (completed and planned), a probing
 chart, and a structured radiograph AI read.
 
-- Code: [`study.py`](../python/dental_omop_nlp/study.py) `generate_visits`, `build_study`;
-  [`synthetic.py`](../python/dental_omop_nlp/synthetic.py) `draw_history`, `draw_chart`, `draw_risk`;
-  [`clinical_notes.py`](../python/dental_omop_nlp/clinical_notes.py) (published note styles, [note_realism.md](note_realism.md));
-  [`sources.py`](../python/dental_omop_nlp/sources.py) (forms, CDT, ICD-10); [`radiograph.py`](../python/dental_omop_nlp/radiograph.py).
-- Truth: [`labels.py`](../python/dental_omop_nlp/labels.py), the AAP worksheet ([staging_grading.md](staging_grading.md)).
+- Code: [`study.py`](../python/health_transformation_lab_nlp/study.py) `generate_visits`, `build_study`;
+  [`synthetic.py`](../python/health_transformation_lab_nlp/synthetic.py) `draw_history`, `draw_chart`, `draw_risk`;
+  [`clinical_notes.py`](../python/health_transformation_lab_nlp/clinical_notes.py) (published note styles, [note_realism.md](note_realism.md));
+  [`sources.py`](../python/health_transformation_lab_nlp/sources.py) (forms, CDT, ICD-10); [`radiograph.py`](../python/health_transformation_lab_nlp/radiograph.py).
+- Truth: [`labels.py`](../python/health_transformation_lab_nlp/labels.py), the AAP worksheet ([staging_grading.md](staging_grading.md)).
 - Output: `data/datasets/train.csv`, `review_tasks.json`, `visits_structured.csv`; `answer_key/` (truth; reviewers never see it).
 - Check: `build_summary.json` (counts, de-id recall, errors injected, review mix).
 
@@ -79,7 +79,7 @@ record numbers, phone numbers), put there on purpose so we can test removing the
    still shaped like an identifier. With real notes, where nothing is known in advance, this
    and a human review sample are what's left.
 
-- Code: [`phi.py`](../python/dental_omop_nlp/phi.py), [`deid.py`](../python/dental_omop_nlp/deid.py) (`deidentify`, `leak_check`, `residual_scan`); `study.apply_deid`.
+- Code: [`phi.py`](../python/health_transformation_lab_nlp/phi.py), [`deid.py`](../python/health_transformation_lab_nlp/deid.py) (`deidentify`, `leak_check`, `residual_scan`); `study.apply_deid`.
 - Output: `data/datasets/deid_report.csv`. Raw notes with fake PHI stay in `data/raw/` (gitignored).
 - Check: recall 1.0, nothing blocked, over-redaction 0 in `build_summary.json`.
 - That check is easy by design: the regex was written against the same note shapes. A harder,
@@ -91,7 +91,7 @@ record numbers, phone numbers), put there on purpose so we can test removing the
 
 One status per type of diagnostic evidence per visit, or `unknown` when it's silent.
 
-- Code: [`note_reader.py`](../python/dental_omop_nlp/note_reader.py) (stated diagnosis in any scheme, else findings; copy-forward ignored);
+- Code: [`note_reader.py`](../python/health_transformation_lab_nlp/note_reader.py) (stated diagnosis in any scheme, else findings; copy-forward ignored);
   `sources.READERS` (exam form, CDT completed/planned, ICD-10 completed/planned); probing chart staged from the **recorded** chart;
   `radiograph.read_radiograph` (stage II–III lower bound only).
 - Output: one column per evidence type in `answer_key/review_key.csv` and `visits_structured.csv`.
@@ -101,7 +101,7 @@ One status per type of diagnostic evidence per visit, or `unknown` when it's sil
 Pairwise agreement and kappa between evidence types, and how often each says anything.
 This is the input to the qualitative review.
 
-- Code: [`phenotype.py`](../python/dental_omop_nlp/phenotype.py) `agreement_matrix`, `coverage`.
+- Code: [`phenotype.py`](../python/health_transformation_lab_nlp/phenotype.py) `agreement_matrix`, `coverage`.
 - Output: `data/datasets/method_agreement.csv`, `method_coverage.csv`.
 
 ## 5. Rule-based phenotype
@@ -119,8 +119,8 @@ Every model reads **only** the de-identified note. Baselines (rules, TF-IDF,
 TF-IDF + radiograph features), the 12-model BERT ladder, and LLM readers.
 What a BERT model is, in plain words: [bert.md](bert.md).
 
-- Code: [`rungs.py`](../python/dental_omop_nlp/rungs.py) `make_rung`; [`models.yaml`](../models.yaml) (Hugging Face ids, papers);
-  [`llm_reader.py`](../python/dental_omop_nlp/llm_reader.py); [`scripts/11_ai_predict.py`](../python/scripts/11_ai_predict.py).
+- Code: [`rungs.py`](../python/health_transformation_lab_nlp/rungs.py) `make_rung`; [`models.yaml`](../models.yaml) (Hugging Face ids, papers);
+  [`llm_reader.py`](../python/health_transformation_lab_nlp/llm_reader.py); [`scripts/11_ai_predict.py`](../python/scripts/11_ai_predict.py).
 - Output: `data/datasets/ai_predictions_<rung>.csv` (LLMs also `llm_details_<rung>.csv`).
 - Status: baselines and six encoders run on CPU: 77-82% correct on the synthetic review charts, not distinguishable from the note rules (79%); all miss nearly every stage IV chart (7 training examples). With the note rules deciding stage IV (`+rules4`) they reach 87-91%. The Longformers, large ModernBERTs and MedGemma need a GPU.
 - Compare against the truth: [`scripts/28_ladder_vs_truth.py`](../python/scripts/28_ladder_vs_truth.py) → `data/datasets/ladder/ladder_vs_truth.csv` (accuracy with bootstrap CIs, difference from note rules, stage IV recall, unsafe rate, calibration); R twin `r/R/10_ladder.R`.
@@ -138,7 +138,7 @@ for the answers. Each reviewer gets their own project with `review_tasks.json` a
 written protocol.
 
 - Code / config: [`labelstudio/chart_review.xml`](../labelstudio/chart_review.xml), [`labelstudio/README.md`](../labelstudio/README.md),
-  [`labeling_protocol.md`](labeling_protocol.md); [`labelstudio.py`](../python/dental_omop_nlp/labelstudio.py), [`scripts/12_import_review.py`](../python/scripts/12_import_review.py).
+  [`labeling_protocol.md`](labeling_protocol.md); [`labelstudio.py`](../python/health_transformation_lab_nlp/labelstudio.py), [`scripts/12_import_review.py`](../python/scripts/12_import_review.py).
 - Dry run: `12_import_review.py --simulate 4` writes `simulated_*` files.
 - Output: `data/review/[simulated_]reviewer_labels.csv`.
 
@@ -153,7 +153,7 @@ against the reviewers; errors by clinical severity and by difficulty; and the
 **acceptance test**: does the method agree with the reviewers at least as much
 as they agree with each other ([process.md](process.md#validation-criterion-as-reliable-as-a-human-reviewer), [statistics.md](statistics.md)).
 
-- Code: [`reliability.py`](../python/dental_omop_nlp/reliability.py) (`reliability_report`, `agreement_vs_humans`), [`harm.py`](../python/dental_omop_nlp/harm.py);
+- Code: [`reliability.py`](../python/health_transformation_lab_nlp/reliability.py) (`reliability_report`, `agreement_vs_humans`), [`harm.py`](../python/health_transformation_lab_nlp/harm.py);
   [`scripts/13_reliability.py`](../python/scripts/13_reliability.py); R [`r/R/04_reliability.R`](../r/R/04_reliability.R).
 - Output: `data/review/[simulated_]reliability/` (`methods_vs_reviewers.csv`, `agreement_vs_humans.csv`, `by_level.csv`).
 
@@ -190,7 +190,7 @@ checks caught a third of them, while flagging only 0.2% of clean records. The st
 phenotype dropped a stage at 24% of follow-up visits (action item B2), because forms and codes
 vary visit to visit.
 
-- Code: [`plausibility.py`](../python/dental_omop_nlp/plausibility.py), [`dq.py`](../python/dental_omop_nlp/dq.py); [`scripts/20_data_quality.py`](../python/scripts/20_data_quality.py); R [`r/R/06_validation.R`](../r/R/06_validation.R), [`09_spec005.R`](../r/R/09_spec005.R) (`run_checks_r`).
+- Code: [`plausibility.py`](../python/health_transformation_lab_nlp/plausibility.py), [`dq.py`](../python/health_transformation_lab_nlp/dq.py); [`scripts/20_data_quality.py`](../python/scripts/20_data_quality.py); R [`r/R/06_validation.R`](../r/R/06_validation.R), [`09_spec005.R`](../r/R/09_spec005.R) (`run_checks_r`).
 - Output: `data/datasets/data_quality/` (`dq_overall.csv`, `dq_by_clinic.csv`, `temporal_by_method.csv`, `injected_error_recall.csv`).
 
 ## 11. Clinic prevalence
@@ -209,7 +209,7 @@ truth), clinics ranging from 50% to 65%. That's above NHANES's 42% mostly becaus
 system counts mild stage I cases that the CDC/AAP definitions call "no periodontitis"
 (step 13 compares the two on the same charts).
 
-- Code: [`prevalence.py`](../python/dental_omop_nlp/prevalence.py); [`scripts/19_prevalence.py`](../python/scripts/19_prevalence.py); R `06_validation.R`.
+- Code: [`prevalence.py`](../python/health_transformation_lab_nlp/prevalence.py); [`scripts/19_prevalence.py`](../python/scripts/19_prevalence.py); R `06_validation.R`.
 - Output: `data/datasets/prevalence/`.
 
 ## 12. Predict progression
@@ -237,7 +237,7 @@ AUROC 0.70 (95% CI 0.66–0.74). Today's stage matters most (people already at a
 have less room to move up), then attachment loss and prior treatment. Smoking and diabetes
 barely register, because the synthetic histories are too short for them to show (action item D3).
 
-- Code: [`prediction.py`](../python/dental_omop_nlp/prediction.py); [`scripts/21_predict_progression.py`](../python/scripts/21_predict_progression.py); R [`09_spec005.R`](../r/R/09_spec005.R) (same model; parity-tested).
+- Code: [`prediction.py`](../python/health_transformation_lab_nlp/prediction.py); [`scripts/21_predict_progression.py`](../python/scripts/21_predict_progression.py); R [`09_spec005.R`](../r/R/09_spec005.R) (same model; parity-tested).
 - Output: `data/datasets/prediction/`.
 
 ### Classify status from the chart, explained with SHAP (spec 013 G10)
@@ -269,7 +269,7 @@ bone loss falls to 0.08 (5 levels) and to zero (3 levels), because the rules use
 and every charted visit has CAL. One oddity it surfaces: older age pulls *away* from stage IV (mean |SHAP|
 0.135 for stage IV, 0.05 over all classes); unexplained so far.
 
-- Code: [`classify_status.py`](../python/dental_omop_nlp/classify_status.py);
+- Code: [`classify_status.py`](../python/health_transformation_lab_nlp/classify_status.py);
   [`scripts/42_classify_status.py`](../python/scripts/42_classify_status.py). Needs the `ml` extra
   (`pip install -e "python[ml]"`). No R twin (spec 013 FR-007: model outputs are outside label/scoring parity).
 - Output: `data/datasets/classify_status/`.
@@ -280,7 +280,7 @@ and every charted visit has CAL. One oddity it surfaces: older age pulls *away* 
 derived-measure layer; the 2017 AAP/EFP stage and the 2012 CDC/AAP category from
 the same sites.
 
-- Code: [`sites.py`](../python/dental_omop_nlp/sites.py) (`draw_mouth`, `derive`, `aap_from_derived`, `cdc_aap`);
+- Code: [`sites.py`](../python/health_transformation_lab_nlp/sites.py) (`draw_mouth`, `derive`, `aap_from_derived`, `cdc_aap`);
   [`scripts/22_build_sites.py`](../python/scripts/22_build_sites.py); R [`r/R/07_sites.R`](../r/R/07_sites.R).
 - Output: `data/sites/derived.csv`, `aap_vs_cdc.csv` (site rows in gitignored Parquet).
 
@@ -289,7 +289,7 @@ the same sites.
 The same mouths stored three ways (SITE/SITE_EVENT; pre-coordinated concepts;
 site columns), the same derived query on each, results checked against Python.
 
-- Code: [`site_designs.py`](../python/dental_omop_nlp/site_designs.py); SQL [`omop/sql/site_designs/`](../omop/sql/site_designs/);
+- Code: [`site_designs.py`](../python/health_transformation_lab_nlp/site_designs.py); SQL [`omop/sql/site_designs/`](../omop/sql/site_designs/);
   [`scripts/23_site_designs.py`](../python/scripts/23_site_designs.py). Findings: [site_level_omop.md](site_level_omop.md).
 - Output: `data/sites/site_designs.csv`.
 
@@ -298,7 +298,7 @@ site columns), the same derived query on each, results checked against Python.
 OMOP CDM 5.4 (OHDSI Postgres DDL) + dental extension + synthetic data into any
 Postgres, including Lakebase; `perio_chart` view.
 
-- Code: [`db.py`](../python/dental_omop_nlp/db.py); [`scripts/05_load_omop_db.py`](../python/scripts/05_load_omop_db.py);
+- Code: [`db.py`](../python/health_transformation_lab_nlp/db.py); [`scripts/05_load_omop_db.py`](../python/scripts/05_load_omop_db.py);
   notebook [`04_load_lakebase.py`](../databricks/notebooks/04_load_lakebase.py); DDL [`omop/ddl/`](../omop/ddl/); R full CDM [`r/R/01_etl_synthea.R`](../r/R/01_etl_synthea.R).
 - Storage overall: [results_storage.md](results_storage.md).
 
@@ -307,7 +307,7 @@ Postgres, including Lakebase; `perio_chart` view.
 A judge calibrated against the reviewers estimates each method's accuracy on
 a corpus sample; a cost model prices each method over every note.
 
-- Code: [`judge.py`](../python/dental_omop_nlp/judge.py), [`cost_effectiveness.py`](../python/dental_omop_nlp/cost_effectiveness.py);
+- Code: [`judge.py`](../python/health_transformation_lab_nlp/judge.py), [`cost_effectiveness.py`](../python/health_transformation_lab_nlp/cost_effectiveness.py);
   scripts 14–16; [`costs.yaml`](../costs.yaml) (illustrative); SQL judge [`02_llm_judge.sql`](../databricks/notebooks/02_llm_judge.sql).
 - Docs: [cost_effectiveness.md](cost_effectiveness.md), [financial_tradeoffs.md](financial_tradeoffs.md).
 
@@ -334,8 +334,8 @@ simulated flag). A rung can be registered in Unity Catalog as a pyfunc (alias
 challenger) and promoted to champion only if it passes the acceptance test and
 matches the current champion. The judge also runs as an MLflow GenAI judge.
 
-- Code: [`tracking.py`](../python/dental_omop_nlp/tracking.py), [`model_registry.py`](../python/dental_omop_nlp/model_registry.py),
-  [`mlflow_judge.py`](../python/dental_omop_nlp/mlflow_judge.py), [`scripts/24_promote_model.py`](../python/scripts/24_promote_model.py);
+- Code: [`tracking.py`](../python/health_transformation_lab_nlp/tracking.py), [`model_registry.py`](../python/health_transformation_lab_nlp/model_registry.py),
+  [`mlflow_judge.py`](../python/health_transformation_lab_nlp/mlflow_judge.py), [`scripts/24_promote_model.py`](../python/scripts/24_promote_model.py);
   bundle [`databricks/resources/mlops.yml`](../databricks/resources/mlops.yml). Docs: [mlops.md](mlops.md).
 
 ## R side and parity

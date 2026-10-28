@@ -2,10 +2,10 @@ import random
 
 import pytest
 
-from dental_omop_nlp.labels import PerioChart, Status, label_chart
-from dental_omop_nlp.notes import render_soap_note
-from dental_omop_nlp.rungs import rules_predict
-from dental_omop_nlp.synthetic import draw_chart
+from health_transformation_lab_nlp.labels import PerioChart, Status, label_chart
+from health_transformation_lab_nlp.notes import render_soap_note
+from health_transformation_lab_nlp.rungs import rules_predict
+from health_transformation_lab_nlp.synthetic import draw_chart
 
 
 @pytest.mark.parametrize("chart,expected", [
@@ -33,7 +33,7 @@ def test_note_is_deterministic():
 
 
 def test_no_leak_never_states_status():
-    from dental_omop_nlp.notes import _ASSESS
+    from health_transformation_lab_nlp.notes import _ASSESS
     stated = {p for phrases in _ASSESS.values() for p in phrases}
     rng = random.Random(0)
     for i in range(300):

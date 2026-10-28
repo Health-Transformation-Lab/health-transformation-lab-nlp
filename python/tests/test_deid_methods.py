@@ -3,9 +3,9 @@
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import deid, deid_eval
-from dental_omop_nlp.phi import FIRST, LAST
-from dental_omop_nlp.phi_challenge import CATEGORIES, CH_FIRST, CH_LAST, build_challenge
+from health_transformation_lab_nlp import deid, deid_eval
+from health_transformation_lab_nlp.phi import FIRST, LAST
+from health_transformation_lab_nlp.phi_challenge import CATEGORIES, CH_FIRST, CH_LAST, build_challenge
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +31,7 @@ def test_challenge_covers_the_hipaa_and_i2b2_categories(ch):
 
 
 def test_challenge_names_are_not_the_generator_names():
-    from dental_omop_nlp.phi_challenge import UNSEEN_FIRST, UNSEEN_LAST
+    from health_transformation_lab_nlp.phi_challenge import UNSEEN_FIRST, UNSEEN_LAST
     assert not set(CH_FIRST + UNSEEN_FIRST) & set(FIRST) and not set(CH_LAST + UNSEEN_LAST) & set(LAST)
 
 
@@ -197,7 +197,7 @@ def test_frontier_prefers_less_dental_damage_at_a_tie():
 def test_external_set_loads_spans_or_finds_listed_values(tmp_path):
     import json
 
-    from dental_omop_nlp.phi_challenge import load_external
+    from health_transformation_lab_nlp.phi_challenge import load_external
     f = tmp_path / "ext.jsonl"
     rows = [{"query": "find notes for Ana Ruiz seen 3/4/2024", "phi": [{"value": "Ana Ruiz", "type": "NAME"},
                                                                        {"value": "3/4/2024", "type": "DATE"}]},
@@ -281,7 +281,7 @@ def test_jsl_engine_reads_chunks_with_inclusive_ends():
 
 @pytest.mark.filterwarnings("error")
 def test_i2b2_2014_loader_reads_xml_tags(tmp_path):
-    from dental_omop_nlp.phi_challenge import load_i2b2_2014
+    from health_transformation_lab_nlp.phi_challenge import load_i2b2_2014
     note = "Record date: 2090-01-02\\nMr. Bo Li seen at Oak Clinic."
     text = note.replace("\\\\n", "\\n")
     s1, s2 = text.index("2090-01-02"), text.index("Bo Li")
@@ -297,7 +297,7 @@ def test_i2b2_2014_loader_reads_xml_tags(tmp_path):
 
 def test_external_set_reads_the_asq_phi_text_format(tmp_path):
     """ASQ-PHI ships as delimited text: ===QUERY=== line, ===PHI_TAGS===, one JSON tag per line."""
-    from dental_omop_nlp.phi_challenge import load_external
+    from health_transformation_lab_nlp.phi_challenge import load_external
     f = tmp_path / "queries.txt"
     f.write_text('===QUERY===\nDose advice for Ana Ruiz, seen at Oak Clinic 3/4/2024?\n===PHI_TAGS===\n'
                  '{"identifier_type": "NAME", "value": "Ana Ruiz"}\n'
@@ -420,7 +420,7 @@ def test_external_set_reads_the_jsl_benchmark_csv(tmp_path):
     """John Snow Labs' benchmark CSV: one row per labeled chunk, the full text repeated, end exclusive."""
     import pandas as pd
 
-    from dental_omop_nlp.phi_challenge import load_external
+    from health_transformation_lab_nlp.phi_challenge import load_external
     t1, t2 = "Pt Ana Ruiz seen 3/4/2024 .", "No identifiers here ."
     pd.DataFrame([{"doc_id": 1, "text": t1, "begin": 3, "end": 11, "chunk": "Ana Ruiz", "chunk_label": "NAME"},
                   {"doc_id": 1, "text": t1, "begin": 17, "end": 25, "chunk": "3/4/2024", "chunk_label": "DATE"},
@@ -465,6 +465,6 @@ def test_licensed_engine_reproduces_the_vendor_example():
 
 
 def test_redact_never_re_emits_text_inside_an_outer_span():
-    from dental_omop_nlp.deid import redact
+    from health_transformation_lab_nlp.deid import redact
     text = "abcdefghij"
     assert redact(text, [{"start": 2, "end": 8, "type": "A"}, {"start": 4, "end": 6, "type": "B"}]) == "ab[A]ij"

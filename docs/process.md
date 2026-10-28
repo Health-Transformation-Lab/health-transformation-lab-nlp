@@ -48,7 +48,7 @@ flowchart BT
 
 | Step | Repo | Output |
 |------|------|--------|
-| Evidence types per visit: chart notes, exam forms, procedure codes (completed, planned), procedure diagnosis codes (completed, planned), probing chart | `python/dental_omop_nlp/study.py` (generate), `sources.py` (codes, forms), `clinical_notes.py` (notes), `labels.py` (probing chart) | `data/datasets/answer_key/review_key.csv` |
+| Evidence types per visit: chart notes, exam forms, procedure codes (completed, planned), procedure diagnosis codes (completed, planned), probing chart | `python/health_transformation_lab_nlp/study.py` (generate), `sources.py` (codes, forms), `clinical_notes.py` (notes), `labels.py` (probing chart) | `data/datasets/answer_key/review_key.csv` |
 | Read each evidence type | `note_reader.py` (notes), `sources.READERS` (forms, codes, diagnoses), chart staging rules in `labels.py` | one status per evidence type per visit |
 | Compare each method against each other | `phenotype.agreement_matrix`, `phenotype.coverage` | `data/datasets/method_agreement.csv`, `method_coverage.csv` |
 | Qualitative review | People. Reviewers work from `method_agreement.csv` and the disagreeing charts; their findings go into `docs/labeling_protocol.md` and `RULES_V0` | rules, written down |

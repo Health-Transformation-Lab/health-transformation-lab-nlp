@@ -11,9 +11,9 @@ import uuid
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.db import conform, load_omop, perio_chart_from_db
-from dental_omop_nlp.labels import label_row
-from dental_omop_nlp.paths import LABELS_DIR, REPO_ROOT
+from health_transformation_lab_nlp.db import conform, load_omop, perio_chart_from_db
+from health_transformation_lab_nlp.labels import label_row
+from health_transformation_lab_nlp.paths import LABELS_DIR, REPO_ROOT
 
 URL = os.environ.get("DENTAL_TEST_DB_URL")
 

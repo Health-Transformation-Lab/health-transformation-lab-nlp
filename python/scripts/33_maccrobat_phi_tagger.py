@@ -20,8 +20,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from dental_omop_nlp import maccrobat, phi_tagger
-from dental_omop_nlp.paths import DEID_DIR, EXTERNAL_DIR, REPO_ROOT
+from health_transformation_lab_nlp import maccrobat, phi_tagger
+from health_transformation_lab_nlp.paths import DEID_DIR, EXTERNAL_DIR, REPO_ROOT
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--model", default="allenai/longformer-base-4096")

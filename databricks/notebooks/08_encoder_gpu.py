@@ -31,22 +31,22 @@ import sys
 import tempfile
 
 import pandas as pd
-from dental_omop_nlp import runlog
-from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
-from dental_omop_nlp.rungs import output_tag
+from health_transformation_lab_nlp import runlog
+from health_transformation_lab_nlp.paths import DATASETS_DIR, REPO_ROOT
+from health_transformation_lab_nlp.rungs import output_tag
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
-from dental_omop_nlp import tracking as _tracking
+from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("rungs", "modernbert-large,bioclinical-modernbert-large,longformer-base,clinical-longformer,gatortron-base")  # noqa: F821
 dbutils.widgets.text("lr_overrides", "gatortron-base=2e-5")             # noqa: F821  rung=rate, comma-separated
 dbutils.widgets.text("epochs", "3")                                     # noqa: F821
 dbutils.widgets.text("max_len", "256")                                  # noqa: F821
-dbutils.widgets.text("catalog", "dental_omop")                          # noqa: F821  set by databricks.yml
-dbutils.widgets.text("schema", "gold_dental_omop_perio")                # noqa: F821
-dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")     # noqa: F821
+dbutils.widgets.text("catalog", "health_transformation_lab")                          # noqa: F821  set by databricks.yml
+dbutils.widgets.text("schema", "gold_health_transformation_lab")                # noqa: F821
+dbutils.widgets.text("landing_schema", "landing_health_transformation_lab")     # noqa: F821
 dbutils.widgets.text("telemetry", "azure")                              # noqa: F821  spec 014
-from dental_omop_nlp import telemetry, tracking  # noqa: E402
+from health_transformation_lab_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"))  # noqa: F821  scripts inherit it
 tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
 w = {k: dbutils.widgets.get(k) for k in ("rungs", "lr_overrides", "epochs", "max_len", "catalog",  # noqa: F821

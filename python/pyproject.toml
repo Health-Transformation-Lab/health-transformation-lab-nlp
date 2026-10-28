@@ -1,5 +1,5 @@
 [project]
-name = "dental-omop-nlp"
+name = "health-transformation-lab-nlp"
 version = "0.1.0"
 description = "Synthetic dental notes -> OMOP -> periodontal status benchmark (Python side)"
 requires-python = ">=3.10"
@@ -26,7 +26,7 @@ models = [
 llm = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30"]
 # LoRA fine-tuning of an LLM reader (scripts/17_medgemma_lora.py). GPU strongly advised.
 lora = ["torch>=2.2", "transformers>=4.50", "accelerate>=0.30", "peft>=0.11", "trl>=0.12", "datasets>=2.19"]
-# Load OMOP into Postgres / Lakebase (dental_omop_nlp/db.py, scripts/05_load_omop_db.py)
+# Load OMOP into Postgres / Lakebase (health_transformation_lab_nlp/db.py, scripts/05_load_omop_db.py)
 db = ["sqlalchemy>=2", "psycopg[binary]>=3.1"]
 # Experiment tracking; on Databricks the workspace MLflow is used instead.
 track = ["mlflow>=3.4"]                 # tracking, UC registry, GenAI judges (make_judge)
@@ -44,11 +44,11 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
-dental_omop_nlp = ["*.yaml"]   # telemetry_levels.yaml
+health_transformation_lab_nlp = ["*.yaml"]   # telemetry_levels.yaml
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["dental_omop_nlp*"]
+include = ["health_transformation_lab_nlp*"]
 
 [tool.ruff]
 line-length = 100

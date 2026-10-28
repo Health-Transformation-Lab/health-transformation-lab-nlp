@@ -18,10 +18,10 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from dental_omop_nlp import databricks_ai as dbai
-from dental_omop_nlp import telemetry
-from dental_omop_nlp.labels import LABELS
-from dental_omop_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp import databricks_ai as dbai
+from health_transformation_lab_nlp import telemetry
+from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.paths import DATASETS_DIR
 
 ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
 ap.add_argument("--limit", type=int, default=None, help="only the first N review notes (a test)")

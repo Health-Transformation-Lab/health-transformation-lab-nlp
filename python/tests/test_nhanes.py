@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.nhanes import (
+from health_transformation_lab_nlp.nhanes import (
     nhanes_cdc_aap_published,
     sites_from_labels,
     to_site_tables,
@@ -62,7 +62,7 @@ def test_published_targets_are_cited():
 
 
 def test_classify_people_end_to_end_on_nhanes_shaped_tables():
-    from dental_omop_nlp.nhanes import classify_people
+    from health_transformation_lab_nlp.nhanes import classify_people
     letters = {"D": "distofacial", "M": "midfacial", "S": "mesiofacial", "P": "distolingual", "L": "midlingual",
                "A": "mesiolingual"}
     teeth = [t for t in range(2, 32) if t not in (16, 17)]

@@ -17,10 +17,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from dental_omop_nlp import judge as jg
-from dental_omop_nlp import judge_scorecard as js
-from dental_omop_nlp import readme_results as rr
-from dental_omop_nlp.paths import JUDGE_DIR
+from health_transformation_lab_nlp import judge as jg
+from health_transformation_lab_nlp import judge_scorecard as js
+from health_transformation_lab_nlp import readme_results as rr
+from health_transformation_lab_nlp.paths import JUDGE_DIR
 
 ap = argparse.ArgumentParser()
 mode = ap.add_mutually_exclusive_group(required=True)

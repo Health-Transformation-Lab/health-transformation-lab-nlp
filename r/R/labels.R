@@ -1,4 +1,4 @@
-# Periodontal status from a perio chart. R twin of python/dental_omop_nlp/labels.py.
+# Periodontal status from a perio chart. R twin of python/health_transformation_lab_nlp/labels.py.
 # Same rules, same thresholds; r/tests/test_parity.R checks the two agree.
 # Follows the AAP staging and grading worksheet (docs/staging_grading.md):
 # https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf

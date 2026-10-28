@@ -1,13 +1,13 @@
 import pandas as pd
 
-from dental_omop_nlp.cost_effectiveness import (
+from health_transformation_lab_nlp.cost_effectiveness import (
     calibrate_judge,
     frontier,
     judge_cost,
     method_cost,
     rogan_gladen,
 )
-from dental_omop_nlp.judge import gate
+from health_transformation_lab_nlp.judge import gate
 
 
 def test_quote_gate():
@@ -64,7 +64,7 @@ def test_corrected_accuracy_bootstrap_is_unchanged_by_the_array_speedup():
     DataFrames gave (reference copied from the earlier implementation)."""
     import numpy as np
 
-    from dental_omop_nlp import cost_effectiveness as ce
+    from health_transformation_lab_nlp import cost_effectiveness as ce
 
     def reference(sample, gold, n_boot, seed):
         rng = np.random.default_rng(seed)

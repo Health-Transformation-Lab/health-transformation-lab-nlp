@@ -9,16 +9,16 @@ temporal checks catch. Writes data/datasets/data_quality/.
 
 import pandas as pd
 
-from dental_omop_nlp import telemetry
-from dental_omop_nlp.completeness import (
+from health_transformation_lab_nlp import telemetry
+from health_transformation_lab_nlp.completeness import (
     CHART_INPUTS,
     column_completeness,
     prevalence_by_scale,
     row_completeness,
 )
-from dental_omop_nlp.dq import run_checks
-from dental_omop_nlp.paths import DATASETS_DIR
-from dental_omop_nlp.plausibility import check_history, transition_pairs, transition_summary
+from health_transformation_lab_nlp.dq import run_checks
+from health_transformation_lab_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp.plausibility import check_history, transition_pairs, transition_summary
 
 telemetry.setup()
 telemetry.start_script("20_data_quality", data_label="synthetic")

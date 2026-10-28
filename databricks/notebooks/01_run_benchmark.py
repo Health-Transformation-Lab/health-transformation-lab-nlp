@@ -47,11 +47,11 @@ import os
 run_encoder = dbutils.widgets.get("run_encoder") == "true"   # widget defined above the install
 
 dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was deployed from
-from dental_omop_nlp import tracking as _tracking
+from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
-dbutils.widgets.text("catalog", "dental_omop")
-dbutils.widgets.text("schema", "gold_dental_omop_perio")              # tables
-dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")   # data volume
+dbutils.widgets.text("catalog", "health_transformation_lab")
+dbutils.widgets.text("schema", "gold_health_transformation_lab")              # tables
+dbutils.widgets.text("landing_schema", "landing_health_transformation_lab")   # data volume
 dbutils.widgets.text("n_people", "300")
 dbutils.widgets.dropdown("leak_assessment", "false", ["true", "false"])
 dbutils.widgets.text("experiment_id", "")   # set per target by the bundle (resources/jobs.yml)
@@ -72,8 +72,8 @@ os.environ["DENTAL_DATA_ROOT"] = f"/Volumes/{catalog}/{landing}/data"
 
 import sys
 import pandas as pd
-from dental_omop_nlp import paths
-from dental_omop_nlp.build import build
+from health_transformation_lab_nlp import paths
+from health_transformation_lab_nlp.build import build
 
 # paths reads the env var at import time; reload after setting it.
 import importlib; importlib.reload(paths)
@@ -106,14 +106,14 @@ display(spark.table(f"{catalog}.{schema}.labeled_notes").limit(5))
 # COMMAND ----------
 
 import mlflow
-from dental_omop_nlp.registry import load_registry
-from dental_omop_nlp.rungs import make_rung
+from health_transformation_lab_nlp.registry import load_registry
+from health_transformation_lab_nlp.rungs import make_rung
 
 reg = load_registry()
 if dbutils.widgets.get("experiment_id"):
     mlflow.set_experiment(experiment_id=dbutils.widgets.get("experiment_id"))
 else:
-    mlflow.set_experiment(f"/Users/{spark.sql('select current_user()').first()[0]}/dental-omop-nlp")
+    mlflow.set_experiment(f"/Users/{spark.sql('select current_user()').first()[0]}/health-transformation-lab-nlp")
 
 def run(rung_id, **kw):
     with mlflow.start_run(run_name=rung_id):

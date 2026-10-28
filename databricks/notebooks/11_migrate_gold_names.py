@@ -3,7 +3,7 @@
 # MAGIC # Migrate gold names (spec 018)
 # MAGIC
 # MAGIC The gold tables were renamed to the SQL conventions (AGENTS.md, "SQL and data names"): `ai_predictions` is now
-# MAGIC `fact_prediction`, `gate_ok` is `is_gate_ok`, and so on (`dental_omop_nlp.gold_names`). This copies each old
+# MAGIC `fact_prediction`, `gate_ok` is `is_gate_ok`, and so on (`health_transformation_lab_nlp.gold_names`). This copies each old
 # MAGIC table that still exists to its new name, columns renamed, so the MedGemma reader's Databricks rows and the
 # MAGIC judge's earlier calls are kept. It runs before Load results. If a job already wrote the new table, the old rows
 # MAGIC it lacks are added (by batch key), so running it again adds nothing. An old `judgments` table goes to
@@ -21,13 +21,13 @@ dbutils.library.restartPython()  # noqa: F821
 
 # COMMAND ----------
 
-from dental_omop_nlp import gold_names, tracking
+from health_transformation_lab_nlp import gold_names, tracking
 from pyspark.sql import functions as F
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
 tracking.use_git_commit(dbutils)  # noqa: F821
-dbutils.widgets.text("catalog", "dental_omop")  # noqa: F821
-dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
+dbutils.widgets.text("catalog", "health_transformation_lab")  # noqa: F821
+dbutils.widgets.text("schema", "gold_health_transformation_lab")  # noqa: F821
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 
 
@@ -65,7 +65,7 @@ existing = {t.name: spark.table(table(t.name)).columns  # noqa: F821
 plan = gold_names.migration_plan(existing)
 failed = [f"{old}: no gold name for column(s) {cols}" for action, old, cols in plan if action == "fail"]
 if failed:
-    raise ValueError("add them to dental_omop_nlp/gold_names.py first: " + "; ".join(failed))
+    raise ValueError("add them to health_transformation_lab_nlp/gold_names.py first: " + "; ".join(failed))
 
 for action, old, new in plan:
     if action == "copy":

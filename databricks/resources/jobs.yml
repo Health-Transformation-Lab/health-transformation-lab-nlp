@@ -7,7 +7,7 @@ resources:
     study_benchmark:
       name: Benchmark
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
@@ -27,7 +27,7 @@ resources:
     load_lakebase:
       name: Load Lakebase
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
@@ -44,7 +44,7 @@ resources:
     judge_scorecard:
       name: Judge scorecard
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
@@ -64,7 +64,7 @@ resources:
     llm_judge:
       name: LLM judge
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
@@ -83,7 +83,7 @@ resources:
       name: MedGemma reader
       max_concurrent_runs: 2   # a new run starts even while an old one waits hours to retry
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       environments:          # required with task-level compute on serverless
@@ -117,7 +117,7 @@ resources:
       name: Encoders on GPU
       max_concurrent_runs: 2   # a new run starts even while an old one waits hours to retry
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       environments:          # required with task-level compute on serverless
@@ -148,7 +148,7 @@ resources:
     deid_ai:
       name: De-id AI methods
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
@@ -168,7 +168,7 @@ resources:
     nhanes_perio:
       name: NHANES perio
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: public
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
@@ -187,7 +187,7 @@ resources:
     load_results:
       name: Load results
       tags:
-        project: dental-omop-nlp
+        project: health-transformation-lab-nlp
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:

@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from dental_omop_nlp.labelstudio import import_export, simulate_export
-from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
+from health_transformation_lab_nlp.labelstudio import import_export, simulate_export
+from health_transformation_lab_nlp.paths import DATASETS_DIR, REVIEW_DIR
 
 ap = argparse.ArgumentParser()
 ap.add_argument("exports", nargs="*")

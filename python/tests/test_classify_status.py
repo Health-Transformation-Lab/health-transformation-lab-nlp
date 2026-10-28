@@ -6,9 +6,9 @@ import pytest
 
 pytest.importorskip("xgboost")
 
-from dental_omop_nlp import classify_status as cs
-from dental_omop_nlp.labels import LABELS
-from dental_omop_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp import classify_status as cs
+from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.paths import DATASETS_DIR
 
 SMALL = {"max_depth": [3], "learning_rate": [0.3], "reg_lambda": [1.0], "min_child_weight": [1],
          "class_weight": [None, "balanced"]}

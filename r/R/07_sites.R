@@ -1,4 +1,4 @@
-# Spec 006: R twin of python/dental_omop_nlp/sites.py derive() and cdc_aap().
+# Spec 006: R twin of python/health_transformation_lab_nlp/sites.py derive() and cdc_aap().
 # Base R. sites: visit_id, tooth, site, pd_mm, cal_mm, bop; teeth: visit_id, tooth,
 # present, missing_reason, furcation_class, mobility_degree.
 

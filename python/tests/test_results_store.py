@@ -6,8 +6,8 @@ import sys
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import results_store as rs
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp import results_store as rs
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 RECORD = REPO_ROOT / "kaggle" / "record_results.py"
 
@@ -136,7 +136,7 @@ def test_record_refuses_a_test_run_of_a_new_method(tmp_path, datasets):
 def test_record_defaults_to_the_full_review_set():
     import importlib.util
 
-    from dental_omop_nlp.paths import DATASETS_DIR
+    from health_transformation_lab_nlp.paths import DATASETS_DIR
     spec = importlib.util.spec_from_file_location("record_results", RECORD)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -210,7 +210,7 @@ def test_load_notebook_finds_the_deployed_files_and_says_when_there_are_none():
 
 def test_run_rows_label_one_runs_files_with_their_batch_key(tmp_path):
     # the MedGemma reader job writes its own run to ai_predictions and llm_reader_runs (spec 016)
-    from dental_omop_nlp.results_store import run_rows
+    from health_transformation_lab_nlp.results_store import run_rows
     _preds(tmp_path / "ai_predictions_medgemma-x+k2.csv", 3)
     pd.DataFrame({"visit_id": [1, 2, 3], "pred": "healthy", "gate_ok": True, "error": None}).to_csv(
         tmp_path / "llm_details_medgemma-x+k2.csv", index=False)

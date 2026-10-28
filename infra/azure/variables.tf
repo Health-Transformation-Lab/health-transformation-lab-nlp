@@ -7,13 +7,13 @@ variable "location" {
 variable "resource_group" {
   description = "Resource group that holds the telemetry resources"
   type        = string
-  default     = "rg-dental-omop-telemetry"
+  default     = "rg-health-transformation-lab-telemetry"
 }
 
 variable "name" {
   description = "Base name for the resources; no environment prefix or suffix (each environment is its own subscription)"
   type        = string
-  default     = "dental-omop-nlp"
+  default     = "health-transformation-lab-nlp"
 }
 
 variable "daily_cap_gb" {

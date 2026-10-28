@@ -13,9 +13,9 @@ import argparse
 
 import pandas as pd
 
-from dental_omop_nlp import telemetry
-from dental_omop_nlp.paths import DATASETS_DIR
-from dental_omop_nlp.reliability_cal import (
+from health_transformation_lab_nlp import telemetry
+from health_transformation_lab_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp.reliability_cal import (
     CalParams,
     draw_repeated_charts,
     icc_report,

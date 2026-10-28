@@ -3,8 +3,8 @@
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import llm_reader
-from dental_omop_nlp.rungs import output_tag
+from health_transformation_lab_nlp import llm_reader
+from health_transformation_lab_nlp.rungs import output_tag
 
 
 def test_output_tag_keeps_each_variant_in_its_own_file():
@@ -47,7 +47,7 @@ def test_gated_model_accepts_a_cached_cli_login(monkeypatch, tmp_path):
 
 
 def test_output_tag_marks_a_non_default_learning_rate():
-    from dental_omop_nlp.rungs import output_tag
+    from health_transformation_lab_nlp.rungs import output_tag
     assert output_tag(lr=5e-5) == ""
     assert output_tag(lr=2e-5) == "+lr2e-05"
     assert output_tag(class_weight="sqrt", seed=1, lr=1e-5) == "+cw+s1+lr1e-05"

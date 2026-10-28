@@ -1,10 +1,10 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Walkthrough: dental-omop-nlp step by step
+# MAGIC # Walkthrough: health-transformation-lab-nlp step by step
 # MAGIC
 # MAGIC Personal learning project; synthetic data and simulated reviewers only.
 # MAGIC
-# MAGIC One section per step of [`docs/code_walkthrough.md`](https://github.com/jcbowyer/dental-omop-nlp/blob/main/docs/code_walkthrough.md),
+# MAGIC One section per step of [`docs/code_walkthrough.md`](https://github.com/jcbowyer/health-transformation-lab-nlp/blob/main/docs/code_walkthrough.md),
 # MAGIC in run order. Each section links three levels: the **README** section (what the study does),
 # MAGIC the **walkthrough** step (how the code does it), and the **code**, then shows the step's output
 # MAGIC from the files in this Git folder. Rebuild the outputs with `python/scripts/make_parity_inputs.sh`.
@@ -39,7 +39,7 @@ import os
 import pandas as pd
 
 REPO = os.path.abspath("../..")                      # this Git folder
-GITHUB = "https://github.com/jcbowyer/dental-omop-nlp/blob/main/"
+GITHUB = "https://github.com/jcbowyer/health-transformation-lab-nlp/blob/main/"
 WALK = GITHUB + "docs/code_walkthrough.md"
 try:
     host = "https://" + spark.conf.get("spark.databricks.workspaceUrl")  # noqa: F821
@@ -86,37 +86,37 @@ def show_json(path):
 # COMMAND ----------
 
 # DBTITLE 1,1. Generate the synthetic study
-links("1", "generate-the-synthetic-study", "Generate the synthetic study", "dental-omop-nlp", ['python/dental_omop_nlp/study.py', 'python/dental_omop_nlp/synthetic.py', 'python/dental_omop_nlp/clinical_notes.py', 'python/dental_omop_nlp/labels.py'])
+links("1", "generate-the-synthetic-study", "Generate the synthetic study", "health-transformation-lab-nlp", ['python/health_transformation_lab_nlp/study.py', 'python/health_transformation_lab_nlp/synthetic.py', 'python/health_transformation_lab_nlp/clinical_notes.py', 'python/health_transformation_lab_nlp/labels.py'])
 show_json("data/datasets/build_summary.json")
 
 # COMMAND ----------
 
 # DBTITLE 1,2. De-identify and gate
-links("2", "de-identify-and-gate", "De-identify and gate", "ground-rules", ['python/dental_omop_nlp/deid.py', 'python/dental_omop_nlp/phi.py'])
+links("2", "de-identify-and-gate", "De-identify and gate", "ground-rules", ['python/health_transformation_lab_nlp/deid.py', 'python/health_transformation_lab_nlp/phi.py'])
 show("data/datasets/deid_report.csv", describe=True)
 
 # COMMAND ----------
 
 # DBTITLE 1,3. Read the diagnostic evidence
-links("3", "read-the-diagnostic-evidence", "Read the diagnostic evidence", "dental-omop-nlp", ['python/dental_omop_nlp/note_reader.py', 'python/dental_omop_nlp/sources.py', 'python/dental_omop_nlp/radiograph.py'])
+links("3", "read-the-diagnostic-evidence", "Read the diagnostic evidence", "health-transformation-lab-nlp", ['python/health_transformation_lab_nlp/note_reader.py', 'python/health_transformation_lab_nlp/sources.py', 'python/health_transformation_lab_nlp/radiograph.py'])
 show("data/datasets/method_coverage.csv")
 
 # COMMAND ----------
 
 # DBTITLE 1,4. Compare the evidence
-links("4", "compare-the-evidence", "Compare the evidence", "dental-omop-nlp", ['python/dental_omop_nlp/phenotype.py'])
+links("4", "compare-the-evidence", "Compare the evidence", "health-transformation-lab-nlp", ['python/health_transformation_lab_nlp/phenotype.py'])
 show("data/datasets/method_agreement.csv", query="level == 'status'")
 
 # COMMAND ----------
 
 # DBTITLE 1,5. Rule-based phenotype
-links("5", "rule-based-phenotype", "Rule-based phenotype", "dental-omop-nlp", ['python/dental_omop_nlp/phenotype.py'])
+links("5", "rule-based-phenotype", "Rule-based phenotype", "health-transformation-lab-nlp", ['python/health_transformation_lab_nlp/phenotype.py'])
 show("data/datasets/answer_key/review_key.csv", cols=["visit_id", "truth_status", "algorithm_design", "algorithm_design_decided_by", "algorithm_v0", "algorithm_v0_decided_by"])
 
 # COMMAND ----------
 
 # DBTITLE 1,6. AI models read the notes
-links("6", "ai-models-read-the-notes", "AI models read the notes", "models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml", ['python/dental_omop_nlp/rungs.py', 'models.yaml', 'python/dental_omop_nlp/llm_reader.py', 'python/scripts/11_ai_predict.py'])
+links("6", "ai-models-read-the-notes", "AI models read the notes", "models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml", ['python/health_transformation_lab_nlp/rungs.py', 'models.yaml', 'python/health_transformation_lab_nlp/llm_reader.py', 'python/scripts/11_ai_predict.py'])
 show("data/datasets/ai_predictions_tfidf_logreg.csv")
 
 # COMMAND ----------
@@ -128,61 +128,61 @@ show("data/review/simulated_reviewer_labels.csv")
 # COMMAND ----------
 
 # DBTITLE 1,8. Reliability and the acceptance test
-links("8", "reliability-and-the-acceptance-test", "Reliability and the acceptance test", "how-results-are-measured", ['python/dental_omop_nlp/reliability.py', 'python/scripts/13_reliability.py', 'r/R/04_reliability.R'])
+links("8", "reliability-and-the-acceptance-test", "Reliability and the acceptance test", "how-results-are-measured", ['python/health_transformation_lab_nlp/reliability.py', 'python/scripts/13_reliability.py', 'r/R/04_reliability.R'])
 show("data/review/simulated_reliability/agreement_vs_humans.csv")
 
 # COMMAND ----------
 
 # DBTITLE 1,9. Five categories and evidence order
-links("9", "five-categories-and-evidence-order", "Five categories and evidence order", "action-items", ['python/dental_omop_nlp/phenotype.py', 'python/scripts/18_phenotype_order.py'])
+links("9", "five-categories-and-evidence-order", "Five categories and evidence order", "action-items", ['python/health_transformation_lab_nlp/phenotype.py', 'python/scripts/18_phenotype_order.py'])
 show("data/review/simulated_reliability_5cat/phenotype_orders.csv", cols=["order", "is_design_order", "select_kappa", "holdout_kappa", "holdout_verdict", "selected"])
 
 # COMMAND ----------
 
 # DBTITLE 1,10. Over time: plausibility and data quality
-links("10", "over-time-plausibility-and-data-quality", "Over time: plausibility and data quality", "action-items", ['python/dental_omop_nlp/plausibility.py', 'python/dental_omop_nlp/dq.py', 'python/scripts/20_data_quality.py'])
+links("10", "over-time-plausibility-and-data-quality", "Over time: plausibility and data quality", "action-items", ['python/health_transformation_lab_nlp/plausibility.py', 'python/health_transformation_lab_nlp/dq.py', 'python/scripts/20_data_quality.py'])
 show("data/datasets/data_quality/dq_overall.csv"); show("data/datasets/data_quality/temporal_by_method.csv")
 
 # COMMAND ----------
 
 # DBTITLE 1,11. Clinic prevalence
-links("11", "clinic-prevalence", "Clinic prevalence", "action-items", ['python/dental_omop_nlp/prevalence.py', 'python/scripts/19_prevalence.py'])
+links("11", "clinic-prevalence", "Clinic prevalence", "action-items", ['python/health_transformation_lab_nlp/prevalence.py', 'python/scripts/19_prevalence.py'])
 show("data/datasets/prevalence/prevalence_by_clinic.csv", query="method in ['algorithm_design', 'truth_status']")
 
 # COMMAND ----------
 
 # DBTITLE 1,12. Predict progression
-links("12", "predict-progression", "Predict progression", "action-items", ['python/dental_omop_nlp/prediction.py', 'python/scripts/21_predict_progression.py'])
+links("12", "predict-progression", "Predict progression", "action-items", ['python/health_transformation_lab_nlp/prediction.py', 'python/scripts/21_predict_progression.py'])
 show("data/datasets/prediction/summary_algorithm_design.csv"); show("data/datasets/prediction/importance_algorithm_design.csv")
 
 # COMMAND ----------
 
 # DBTITLE 1,13. Site-level charts, both classifications
-links("13", "site-level-charts-both-classifications", "Site-level charts, both classifications", "drill-downs", ['python/dental_omop_nlp/sites.py', 'python/scripts/22_build_sites.py', 'r/R/07_sites.R'])
+links("13", "site-level-charts-both-classifications", "Site-level charts, both classifications", "drill-downs", ['python/health_transformation_lab_nlp/sites.py', 'python/scripts/22_build_sites.py', 'r/R/07_sites.R'])
 show("data/sites/aap_vs_cdc.csv")
 
 # COMMAND ----------
 
 # DBTITLE 1,14. OMOP storage designs on Postgres
-links("14", "omop-storage-designs-on-postgres", "OMOP storage designs on Postgres", "drill-downs", ['python/dental_omop_nlp/site_designs.py', 'omop/sql/site_designs/derived_tail.sql', 'python/scripts/23_site_designs.py'])
+links("14", "omop-storage-designs-on-postgres", "OMOP storage designs on Postgres", "drill-downs", ['python/health_transformation_lab_nlp/site_designs.py', 'omop/sql/site_designs/derived_tail.sql', 'python/scripts/23_site_designs.py'])
 show("data/sites/site_designs.csv")
 
 # COMMAND ----------
 
 # DBTITLE 1,15. OMOP into Lakebase
-links("15", "omop-into-lakebase", "OMOP into Lakebase", "drill-downs", ['python/dental_omop_nlp/db.py', 'python/scripts/05_load_omop_db.py', 'databricks/notebooks/04_load_lakebase.py', 'omop/ddl/dental_extension.sql'])
+links("15", "omop-into-lakebase", "OMOP into Lakebase", "drill-downs", ['python/health_transformation_lab_nlp/db.py', 'python/scripts/05_load_omop_db.py', 'databricks/notebooks/04_load_lakebase.py', 'omop/ddl/dental_extension.sql'])
 print(open(f"{REPO}/omop/ddl/dental_extension.sql").read()[:1500])
 
 # COMMAND ----------
 
 # DBTITLE 1,16. LLM judge and cost at 1M notes
-links("16", "llm-judge-and-cost-at-1m-notes", "LLM judge and cost at 1M notes", "drill-downs", ['python/dental_omop_nlp/judge.py', 'python/dental_omop_nlp/cost_effectiveness.py', 'costs.yaml'])
+links("16", "llm-judge-and-cost-at-1m-notes", "LLM judge and cost at 1M notes", "drill-downs", ['python/health_transformation_lab_nlp/judge.py', 'python/health_transformation_lab_nlp/cost_effectiveness.py', 'costs.yaml'])
 show("data/corpus/simulated_cost_effectiveness.csv")
 
 # COMMAND ----------
 
 # DBTITLE 1,17. MedGemma
-links("17", "medgemma", "MedGemma", "drill-downs", ['python/dental_omop_nlp/llm_reader.py', 'python/scripts/17_medgemma_lora.py', 'databricks/notebooks/03_medgemma_reader.py'])
+links("17", "medgemma", "MedGemma", "drill-downs", ['python/health_transformation_lab_nlp/llm_reader.py', 'python/scripts/17_medgemma_lora.py', 'databricks/notebooks/03_medgemma_reader.py'])
 show("data/datasets/simulated_llm_details_medgemma-1.5-4b-it.csv", cols=["visit_id", "status", "quote", "gate_ok", "fallback", "input_tokens"])
 
 # COMMAND ----------

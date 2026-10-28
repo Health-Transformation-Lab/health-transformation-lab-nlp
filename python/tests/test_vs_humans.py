@@ -6,8 +6,8 @@ import random
 import numpy as np
 import pandas as pd
 
-from dental_omop_nlp.labels import LABELS
-from dental_omop_nlp.reliability import _kappa_where_both, agreement_vs_humans
+from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.reliability import _kappa_where_both, agreement_vs_humans
 
 
 def _panel(n=200, n_rev=4, err=0.15, seed=0):
@@ -59,8 +59,8 @@ def _kappa_reference(a, b):
 
 
 def test_fast_kappa_matches_pandas_reference_exactly():
-    from dental_omop_nlp.reliability import VALID, _kappa_where_both
-    from dental_omop_nlp.phenotype import cohen_kappa
+    from health_transformation_lab_nlp.reliability import VALID, _kappa_where_both
+    from health_transformation_lab_nlp.phenotype import cohen_kappa
     rng = np.random.default_rng(3)
     for dtype, vals in ((object, np.array([*VALID, "unsure", None], dtype=object)),
                         ("str", np.array([*VALID, "unsure"], dtype=object))):
@@ -81,7 +81,7 @@ def test_fast_kappa_matches_pandas_reference_exactly():
 
 def test_kappa_on_label_codes_equals_kappa_on_labels_exactly():
     """The bootstrap runs kappa ~40,000 times on integer codes; it must give the very same floats."""
-    from dental_omop_nlp.reliability import _kappa_codes, _label_codes
+    from health_transformation_lab_nlp.reliability import _kappa_codes, _label_codes
     rng = random.Random(3)
     pool = [*LABELS, "healthy_gingivitis", "unknown", None, float("nan")]
     for _ in range(300):

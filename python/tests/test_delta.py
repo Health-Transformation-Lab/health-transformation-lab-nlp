@@ -5,7 +5,7 @@ import types
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.delta import replace_batch
+from health_transformation_lab_nlp.delta import replace_batch
 
 
 class _Col:

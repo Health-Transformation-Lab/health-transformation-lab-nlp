@@ -5,7 +5,7 @@ One switch, `DENTAL_TELEMETRY`, picks where traces, metrics and logs go:
     off      default: nothing leaves the process (tests, CI, laptops)
     console  print spans and metrics (debugging)
     azure    Azure Application Insights through the Azure Monitor OpenTelemetry distro;
-             needs APPLICATIONINSIGHTS_CONNECTION_STRING (Databricks: secret scope `dental`,
+             needs APPLICATIONINSIGHTS_CONNECTION_STRING (Databricks: secret scope `health_transformation_lab`,
              key `appinsights_connection_string`). Without it: a warning, then off.
     otlp     any OpenTelemetry backend over OTLP (self-hosted Grafana Tempo/Loki, Jaeger, SigNoz);
              OTEL_EXPORTER_OTLP_ENDPOINT as usual
@@ -17,7 +17,7 @@ spans, and a sampled-away failure is the one you needed), and only INFO and abov
 logger. Telemetry never carries note text or row-level data: step names, counts, durations, rates
 and error types only.
 
-    from dental_omop_nlp import telemetry
+    from health_transformation_lab_nlp import telemetry
     telemetry.setup()                                   # from the environment
     with telemetry.pipeline_step("build_sites", data_label="synthetic", rows=len(v)):
         ...
@@ -44,12 +44,12 @@ from typing import ClassVar
 from opentelemetry import context, metrics, trace
 from opentelemetry.trace import Status, StatusCode
 
-SERVICE = "dental-omop-nlp"                 # service.namespace: the code base
-DATA_PRODUCT = "dental_omop_perio"          # service.name: the data product, as in the Databricks schemas
+SERVICE = "health-transformation-lab-nlp"                 # service.namespace: the code base
+DATA_PRODUCT = "health_transformation_lab"          # service.name: the data product, as in the Databricks schemas
 MAX_SPANS_PER_CALLER = int(os.environ.get("DENTAL_TELEMETRY_MAX_CALLS", "3"))
 LEVELS = ("step", "call", "detail")         # DENTAL_TELEMETRY_LEVEL: how far down the call tree to trace
 LEVELS_FILE = Path(__file__).with_name("telemetry_levels.yaml")
-LOGGER = "dental_omop_nlp"
+LOGGER = "health_transformation_lab_nlp"
 EXPORTERS = ("off", "console", "azure", "otlp", "memory")
 log = logging.getLogger(LOGGER)
 
@@ -256,7 +256,7 @@ def end_script() -> None:
     context.detach(token)      # OpenTelemetry logs, never raises, if the context already moved on
 
 
-def use_databricks_secret(dbutils, exporter: str = "azure", scope: str = "dental",
+def use_databricks_secret(dbutils, exporter: str = "azure", scope: str = "health_transformation_lab",
                           key: str = "appinsights_connection_string") -> str:
     """In a Databricks notebook: put the telemetry settings in the environment, where the scripts the
     notebook starts pick them up. A missing secret turns telemetry off; it never fails the job."""

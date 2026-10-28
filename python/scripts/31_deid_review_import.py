@@ -23,8 +23,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from dental_omop_nlp import deid, deid_eval, deid_review
-from dental_omop_nlp.paths import DEID_DIR, RAW_DIR
+from health_transformation_lab_nlp import deid, deid_eval, deid_review
+from health_transformation_lab_nlp.paths import DEID_DIR, RAW_DIR
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--gold", nargs="*", default=[], help="Label Studio JSON exports of the gold project")

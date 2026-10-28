@@ -16,16 +16,16 @@ import argparse
 
 import pandas as pd
 
-from dental_omop_nlp.cost_effectiveness import calibrate_components
-from dental_omop_nlp.judge import (
+from health_transformation_lab_nlp.cost_effectiveness import calibrate_components
+from health_transformation_lab_nlp.judge import (
     COMPONENTS,
     OpenAIJudge,
     SimulatedComponentJudge,
     judge_components_openai,
 )
-from dental_omop_nlp.note_reader import read_extent, read_grade
-from dental_omop_nlp.paths import CORPUS_DIR, DATASETS_DIR, REVIEW_DIR
-from dental_omop_nlp.reliability import consensus
+from health_transformation_lab_nlp.note_reader import read_extent, read_grade
+from health_transformation_lab_nlp.paths import CORPUS_DIR, DATASETS_DIR, REVIEW_DIR
+from health_transformation_lab_nlp.reliability import consensus
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--simulated", action="store_true", help="simulated reviewers and simulated judge")

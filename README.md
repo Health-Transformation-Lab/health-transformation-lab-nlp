@@ -1,4 +1,4 @@
-# dental-omop-nlp
+# health-transformation-lab-nlp
 
 > **Personal learning project.** Built on my own time while waiting for internal
 > approvals. Not affiliated with or endorsed by any employer, institution or

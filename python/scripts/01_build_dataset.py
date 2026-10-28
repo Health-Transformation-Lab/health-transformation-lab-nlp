@@ -7,8 +7,8 @@
 
 import argparse
 
-from dental_omop_nlp.build import build
-from dental_omop_nlp.paths import LABELS_DIR, OMOP_DIR, SYNTHEA_CSV
+from health_transformation_lab_nlp.build import build
+from health_transformation_lab_nlp.paths import LABELS_DIR, OMOP_DIR, SYNTHEA_CSV
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--n-people", type=int, default=300)

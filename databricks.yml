@@ -12,21 +12,21 @@
 # real-data path is approved. See DISCLAIMER.md.
 
 bundle:
-  name: dental-omop-nlp
+  name: health-transformation-lab-nlp
 
 include:
   - databricks/resources/*.yml
 
 variables:
   # dev, uat and prod are separate workspaces, so the names are the same in every
-  # target: catalog dental_omop, schemas landing_/bronze_/silver_/gold_<domain>
+  # target: catalog health_transformation_lab, schemas landing_/bronze_/silver_/gold_<domain>
   # (databricks/resources/unity_catalog.yml).
   catalog:
     description: Unity Catalog catalog the bundle creates
-    default: dental_omop
+    default: health_transformation_lab
   domain:
     description: Suffix of the layer schemas (landing_, bronze_, silver_, gold_)
-    default: dental_omop_perio
+    default: health_transformation_lab
   n_people:
     description: Synthetic people to generate in the benchmark job
     default: "300"
@@ -72,9 +72,9 @@ variables:
     default: databricks-meta-llama-3-3-70b-instruct
   hf_secret_scope:
     description: Secret scope holding hf_token (Hugging Face read token; HAI-DEF terms accepted)
-    default: dental
+    default: health_transformation_lab
   telemetry_exporter:
-    description: "Pipeline telemetry (spec 014): azure (Application Insights; connection string from secret dental/appinsights_connection_string, off if missing), otlp, console or off"
+    description: "Pipeline telemetry (spec 014): azure (Application Insights; connection string from secret health_transformation_lab/appinsights_connection_string, off if missing), otlp, console or off"
     default: azure
   lakebase_instance:
     description: Lakebase (managed Postgres) instance or project for this environment
@@ -117,7 +117,7 @@ targets:
       judge_endpoint: databricks-meta-llama-3-3-70b-instruct   # pay-per-token; synthetic, de-identified notes only
     resources:
       catalogs:
-        dental_omop:
+        health_transformation_lab:
           # dev has Default Storage: the catalog was made with SQL and adopted (docs/deployment.md), which
           # gives it the workspace's default storage root. Stating it keeps the plan from recreating the catalog.
           storage_root: s3://dbstorage-prod-ast0p/uc/556de223-f832-4c59-8269-f8bebde9a978/71a2bfe2-25ec-4dde-ad73-b6f34409fcef
@@ -142,7 +142,7 @@ targets:
         judge_monitoring: &judge_monitoring_job
           name: Judge monitoring
           tags:
-            project: dental-omop-nlp
+            project: health-transformation-lab-nlp
             data: synthetic
             git_commit: ${bundle.git.commit}   # the commit this job was deployed from
           tasks:

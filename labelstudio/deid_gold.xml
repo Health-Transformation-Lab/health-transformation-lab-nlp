@@ -5,7 +5,7 @@
   inside the secure environment). Mark every identifier, whole value, no surrounding words.
   Pre-annotations come from one engine: accept, fix the boundaries or category, delete, add.
   PHI_UNSPECIFIED means the engine couldn't name the category: always re-label it.
-  Categories: docs/deid_review_protocol.md. Field names map to dental_omop_nlp/deid_review.py
+  Categories: docs/deid_review_protocol.md. Field names map to health_transformation_lab_nlp/deid_review.py
   (from_name "phi" on to_name "text"); change one, change the other.
 -->
 <View>

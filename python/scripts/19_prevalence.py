@@ -11,8 +11,8 @@ prevalence.py. Writes data/datasets/prevalence/.
 
 import pandas as pd
 
-from dental_omop_nlp.paths import DATASETS_DIR
-from dental_omop_nlp.prevalence import NHANES_2009_2014, prevalence_by
+from health_transformation_lab_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp.prevalence import NHANES_2009_2014, prevalence_by
 
 v = pd.read_csv(DATASETS_DIR / "visits_structured.csv")
 truth = pd.read_csv(DATASETS_DIR / "answer_key" / "visits_truth.csv")[["visit_id", "truth_status"]]

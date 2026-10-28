@@ -2,7 +2,7 @@
 -- MAGIC %md
 -- MAGIC # LLM judge at corpus scale (ai_query)
 -- MAGIC
--- MAGIC Same prompt as `python/dental_omop_nlp/judge.py` (prompt version `judge-v2`, AAP worksheet rules), run as batch SQL.
+-- MAGIC Same prompt as `python/health_transformation_lab_nlp/judge.py` (prompt version `judge-v2`, AAP worksheet rules), run as batch SQL.
 -- MAGIC
 -- MAGIC * Input: `${catalog}.${schema}.judge_queue` with columns `method_name, visit_id, note_text, predicted_status_code`.
 -- MAGIC   Build it from a **stratified sample** of each method's predictions (not all million notes:
@@ -15,8 +15,8 @@
 
 -- COMMAND ----------
 
-CREATE WIDGET TEXT catalog DEFAULT 'dental_omop';
-CREATE WIDGET TEXT schema DEFAULT 'gold_dental_omop_perio';
+CREATE WIDGET TEXT catalog DEFAULT 'health_transformation_lab';
+CREATE WIDGET TEXT schema DEFAULT 'gold_health_transformation_lab';
 CREATE WIDGET TEXT judge_endpoint DEFAULT '<your-judge-endpoint>';  -- a Model Serving endpoint approved for this data
 
 -- COMMAND ----------

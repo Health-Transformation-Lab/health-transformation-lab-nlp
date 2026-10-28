@@ -7,7 +7,7 @@ import uuid
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.site_designs import DESIGNS, derived_sql, sql_stats
+from health_transformation_lab_nlp.site_designs import DESIGNS, derived_sql, sql_stats
 
 URL = os.environ.get("DENTAL_TEST_DB_URL")
 
@@ -23,10 +23,10 @@ def test_sql_stats_rank_designs():
 def test_three_designs_match_python():
     from sqlalchemy import create_engine, text
 
-    from dental_omop_nlp.labels import PerioChart
-    from dental_omop_nlp.site_designs import load_design, run_derived, write_back_derived
-    from dental_omop_nlp.sites import cdc_aap, derive, draw_mouth
-    from dental_omop_nlp.synthetic import draw_chart
+    from health_transformation_lab_nlp.labels import PerioChart
+    from health_transformation_lab_nlp.site_designs import load_design, run_derived, write_back_derived
+    from health_transformation_lab_nlp.sites import cdc_aap, derive, draw_mouth
+    from health_transformation_lab_nlp.synthetic import draw_chart
 
     sp, tp, vis, ref = [], [], [], []
     for vid in range(1, 41):

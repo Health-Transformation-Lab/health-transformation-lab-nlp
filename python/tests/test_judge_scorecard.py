@@ -7,9 +7,9 @@ import math
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import judge_scorecard as js
-from dental_omop_nlp import readme_results as rr
-from dental_omop_nlp.labels import LABELS
+from health_transformation_lab_nlp import judge_scorecard as js
+from health_transformation_lab_nlp import readme_results as rr
+from health_transformation_lab_nlp.labels import LABELS
 
 
 @pytest.fixture(scope="module")
@@ -54,7 +54,7 @@ NOTE = "S: bleeding gums. O: max CAL 4 mm interproximal, PD 5 mm. A: Generalized
 
 
 def test_status_prompt_shows_no_answer_and_uses_the_aap_criteria():
-    from dental_omop_nlp import judge
+    from health_transformation_lab_nlp import judge
     assert judge.CRITERIA in judge.STATUS_SYSTEM
     prompt = judge.STATUS_USER.format(note=NOTE)
     assert NOTE in prompt and "Predicted" not in prompt and "{pred}" not in judge.STATUS_USER
@@ -69,12 +69,12 @@ def test_status_prompt_shows_no_answer_and_uses_the_aap_criteria():
     ({"supported_status": "periodontitis_stage_2"}, False, "quote not in note"),
 ])
 def test_status_gate(out, ok, why):
-    from dental_omop_nlp import judge
+    from health_transformation_lab_nlp import judge
     assert judge.gate_status(NOTE, out) == (ok, why)
 
 
 def test_simulated_judge_gives_a_status_and_a_verbatim_quote():
-    from dental_omop_nlp import judge
+    from health_transformation_lab_nlp import judge
     j = judge.SimulatedJudge({1: "periodontitis_stage_2"}, seed=0)
     v = j.status(NOTE, visit_id=1)
     assert v.supported_status in (None, *LABELS) and v.quote_ok
@@ -86,7 +86,7 @@ def test_openai_judge_status_call_sends_no_answer_and_gates_the_reply(monkeypatc
     import io
     import json
 
-    from dental_omop_nlp import judge
+    from health_transformation_lab_nlp import judge
     sent = {}
 
     def fake_urlopen(req, timeout):
@@ -114,7 +114,7 @@ def _small_queue(inp, answers, n=12):
 
 
 def test_run_judge_returns_one_judgment_per_queue_row(inp, answers):
-    from dental_omop_nlp import judge
+    from health_transformation_lab_nlp import judge
     q = _small_queue(inp, answers)
     sim = judge.SimulatedJudge(inp["key"]["truth_status"].to_dict(), seed=1)
     out = js.run_judge(q, sim, endpoint="sim:judge")
@@ -127,7 +127,7 @@ def test_run_judge_returns_one_judgment_per_queue_row(inp, answers):
 
 
 def test_a_failed_gate_counts_as_not_determinable_and_no_status(inp, answers):
-    from dental_omop_nlp.judge import Verdict
+    from health_transformation_lab_nlp.judge import Verdict
 
     class Liar:
         simulated = False
@@ -145,7 +145,7 @@ def test_a_failed_gate_counts_as_not_determinable_and_no_status(inp, answers):
 
 
 def test_run_judge_resumes_and_skips_rows_already_judged(inp, answers):
-    from dental_omop_nlp import judge
+    from health_transformation_lab_nlp import judge
     q = _small_queue(inp, answers)
     sim = judge.SimulatedJudge(inp["key"]["truth_status"].to_dict(), seed=1)
     first = js.run_judge(q.iloc[:5], sim, endpoint="sim:judge")
@@ -167,7 +167,7 @@ def test_run_judge_resumes_and_skips_rows_already_judged(inp, answers):
 
 def test_calls_that_failed_on_the_network_are_retried_on_resume(inp, answers):
     """An endpoint error isn't a judgment: it's recorded as such and asked again on the next run."""
-    from dental_omop_nlp import judge
+    from health_transformation_lab_nlp import judge
     q = _small_queue(inp, answers, 2)
 
     class Down:
@@ -252,7 +252,7 @@ def test_script_dry_run_writes_simulated_tables(tmp_path):
     import subprocess
     import sys
 
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     r = subprocess.run([sys.executable, str(REPO_ROOT / "python" / "scripts" / "36_judge_scorecard.py"),
                         "--simulated", "--out", str(tmp_path), "--n-boot", "20"],
                        capture_output=True, text=True, check=True)
@@ -265,7 +265,7 @@ def test_script_dry_run_writes_simulated_tables(tmp_path):
 
 def test_tables_use_the_readme_names(inp, answers):
     """Metric and group names are the README's own, so the dashboard reads like the README."""
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     m = js.judge_metrics(inp, answers, _perfect_judgments(inp, answers), n_boot=20)
     header = next(line for line in (REPO_ROOT / "docs" / "results.md").read_text().splitlines()
                   if line.startswith("| Rank | Method |"))
@@ -354,7 +354,7 @@ def test_tables_keep_their_column_types_when_no_judge_ran():
 
 def test_a_rerun_only_reuses_judgments_from_the_same_endpoint_and_prompt():
     """Resuming must not mix in judgments made with another endpoint or an older prompt."""
-    from dental_omop_nlp import judge as jg
+    from health_transformation_lab_nlp import judge as jg
     base = {"visit_id": 1, "answer": None, "verdict": None, "judge_status": "healthy", "quote": "q", "gate_ok": True,
             "gate_reason": "", "prompt_tokens": 1, "completion_tokens": 1, "latency_s": 0.1, "simulated": False}
     done = pd.DataFrame([

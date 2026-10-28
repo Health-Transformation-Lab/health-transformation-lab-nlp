@@ -27,19 +27,19 @@ def store(tmp_path, monkeypatch):
 def test_tracking_logs_params_metrics_tags(store, tmp_path):
     import mlflow
 
-    from dental_omop_nlp.tracking import track
+    from health_transformation_lab_nlp.tracking import track
     f = tmp_path / "preds.csv"
     pd.DataFrame({"visit_id": [1], "pred": ["healthy"]}).to_csv(f, index=False)
     with track("unit", "tfidf_logreg", params={"rung": "tfidf_logreg"}, simulated=True) as run:
         run.log_metrics({"kappa": 0.7})
         run.log_artifact(f)
-    r = mlflow.search_runs(experiment_names=["dental-omop-nlp"], output_format="list")[0]
+    r = mlflow.search_runs(experiment_names=["health-transformation-lab-nlp"], output_format="list")[0]
     assert r.data.params["rung"] == "tfidf_logreg" and r.data.metrics["kappa"] == 0.7
     assert r.data.tags["simulated"] == "true" and r.data.tags["step"] == "unit" and "git_commit" in r.data.tags
 
 
 def test_tracking_is_a_noop_when_disabled(monkeypatch):
-    from dental_omop_nlp.tracking import track
+    from health_transformation_lab_nlp.tracking import track
     monkeypatch.setenv("DENTAL_MLFLOW", "0")
     with track("unit", "x") as run:
         run.log_metrics({"a": 1})       # nothing raised, nothing logged
@@ -47,7 +47,7 @@ def test_tracking_is_a_noop_when_disabled(monkeypatch):
 
 
 def test_mlflow_judge_definition_and_quote_gate():
-    from dental_omop_nlp.mlflow_judge import JUDGE_NAME, make_perio_judge, verdict_from_feedback
+    from health_transformation_lab_nlp.mlflow_judge import JUDGE_NAME, make_perio_judge, verdict_from_feedback
     j = make_perio_judge("databricks:/my-endpoint")
     assert j.name == JUDGE_NAME and "{{ inputs }}" in j.instructions and "{{ outputs }}" in j.instructions
 
@@ -62,7 +62,7 @@ def test_mlflow_judge_definition_and_quote_gate():
 
 
 def test_mlflow_evaluate_with_simulated_judge(store):
-    from dental_omop_nlp.mlflow_judge import evaluate_predictions
+    from health_transformation_lab_nlp.mlflow_judge import evaluate_predictions
     rows = pd.DataFrame({"visit_id": [1, 2, 3], "note": [NOTE] * 3,
                          "pred": ["periodontitis_stage_3", "healthy", "periodontitis_stage_3"],
                          "truth": ["periodontitis_stage_3", "periodontitis_stage_3", "periodontitis_stage_3"]})
@@ -72,9 +72,9 @@ def test_mlflow_evaluate_with_simulated_judge(store):
 
 
 def test_register_load_and_promote_by_acceptance_test(store):
-    from dental_omop_nlp.model_registry import load_alias, log_and_register, promote_if_accepted
-    from dental_omop_nlp.registry import load_registry
-    from dental_omop_nlp.rungs import make_rung
+    from health_transformation_lab_nlp.model_registry import load_alias, log_and_register, promote_if_accepted
+    from health_transformation_lab_nlp.registry import load_registry
+    from health_transformation_lab_nlp.rungs import make_rung
     train = pd.DataFrame({"note_text": ["bop 40% no cal", "cal 6 mm stage iii", "healthy gums"] * 10,
                           "label": ["gingivitis", "periodontitis_stage_3", "healthy"] * 10})
     rung = make_rung("tfidf_logreg", load_registry()).fit(train)
@@ -90,9 +90,9 @@ def test_register_load_and_promote_by_acceptance_test(store):
 
 
 def test_challenger_must_beat_current_champion(store):
-    from dental_omop_nlp.model_registry import log_and_register, promote_if_accepted
-    from dental_omop_nlp.registry import load_registry
-    from dental_omop_nlp.rungs import make_rung
+    from health_transformation_lab_nlp.model_registry import log_and_register, promote_if_accepted
+    from health_transformation_lab_nlp.registry import load_registry
+    from health_transformation_lab_nlp.rungs import make_rung
     train = pd.DataFrame({"note_text": ["bop 40%", "cal 6 mm", "healthy"] * 10,
                           "label": ["gingivitis", "periodontitis_stage_3", "healthy"] * 10})
     rung = make_rung("tfidf_logreg", load_registry()).fit(train)
@@ -110,7 +110,7 @@ def test_challenger_must_beat_current_champion(store):
 def test_guidelines_judge_carries_the_aap_rules():
     from mlflow.genai.scorers import Guidelines
 
-    from dental_omop_nlp.mlflow_judge import GUIDELINES, make_guidelines_judge
+    from health_transformation_lab_nlp.mlflow_judge import GUIDELINES, make_guidelines_judge
     g = make_guidelines_judge("databricks:/my-endpoint")
     assert isinstance(g, Guidelines) and g.name == "aap_guidelines"
     text = " ".join(GUIDELINES)
@@ -119,14 +119,14 @@ def test_guidelines_judge_carries_the_aap_rules():
 
 
 def test_phi_scorer_flags_identifiers_in_the_note():
-    from dental_omop_nlp.mlflow_judge import no_phi_in_note
+    from health_transformation_lab_nlp.mlflow_judge import no_phi_in_note
     clean = no_phi_in_note(inputs={"note": NOTE})
     leaky = no_phi_in_note(inputs={"note": NOTE + "\nCall 404-555-0123 or jane.doe@example.com"})
     assert clean.value == "yes" and leaky.value == "no"
 
 
 def test_evaluate_runs_extra_scorers(store):
-    from dental_omop_nlp.mlflow_judge import evaluate_predictions, no_phi_in_note
+    from health_transformation_lab_nlp.mlflow_judge import evaluate_predictions, no_phi_in_note
     rows = pd.DataFrame({"visit_id": [1, 2], "note": [NOTE] * 2,
                          "pred": ["periodontitis_stage_3"] * 2, "truth": ["periodontitis_stage_3"] * 2})
     res = evaluate_predictions(rows, judge=None, method="sim:test", simulated=True, extra_scorers=[no_phi_in_note])
@@ -134,7 +134,7 @@ def test_evaluate_runs_extra_scorers(store):
 
 
 def test_monitoring_plan_samples_llm_judges_and_checks_every_trace():
-    from dental_omop_nlp.mlflow_judge import JUDGE_NAME, monitoring_plan
+    from health_transformation_lab_nlp.mlflow_judge import JUDGE_NAME, monitoring_plan
     plan = {name: rate for name, _, rate in monitoring_plan("databricks:/my-endpoint", sample_rate=0.1)}
     assert plan == {JUDGE_NAME: 0.1, "aap_guidelines": 0.1, "no_phi_in_note": 1.0}
     with pytest.raises(ValueError):

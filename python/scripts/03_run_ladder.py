@@ -12,9 +12,9 @@ import sys
 
 import pandas as pd
 
-from dental_omop_nlp.paths import LABELS_DIR, REPO_ROOT, RESULTS_DIR
-from dental_omop_nlp.registry import load_registry
-from dental_omop_nlp.rungs import make_rung
+from health_transformation_lab_nlp.paths import LABELS_DIR, REPO_ROOT, RESULTS_DIR
+from health_transformation_lab_nlp.registry import load_registry
+from health_transformation_lab_nlp.rungs import make_rung
 
 sys.path.insert(0, str(REPO_ROOT / "eval"))
 from score import score, write

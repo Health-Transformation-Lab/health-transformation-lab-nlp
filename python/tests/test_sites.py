@@ -5,8 +5,8 @@ import random
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.labels import PerioChart, label_chart
-from dental_omop_nlp.sites import (
+from health_transformation_lab_nlp.labels import PerioChart, label_chart
+from health_transformation_lab_nlp.sites import (
     INTERPROXIMAL,
     SITES,
     aap_from_derived,
@@ -15,7 +15,7 @@ from dental_omop_nlp.sites import (
     derive_all,
     draw_mouth,
 )
-from dental_omop_nlp.synthetic import draw_chart
+from health_transformation_lab_nlp.synthetic import draw_chart
 
 
 def _mouths(n=300):

@@ -50,12 +50,12 @@ def test_three_targets_with_expected_modes():
 
 def test_every_target_uses_the_same_catalog_and_domain():
     # dev, uat and prod are separate workspaces, so the Unity Catalog names are the
-    # same everywhere: catalog dental_omop, schemas <layer>_dental_omop_perio.
+    # same everywhere: catalog health_transformation_lab, schemas <layer>_health_transformation_lab.
     root, _ = _load()
     d = {k: v["default"] for k, v in root["variables"].items() if "default" in v}
     places = {env: (t.get("variables", {}).get("catalog", d["catalog"]),
                     t.get("variables", {}).get("domain", d["domain"])) for env, t in root["targets"].items()}
-    assert set(places.values()) == {("dental_omop", "dental_omop_perio")}, places
+    assert set(places.values()) == {("health_transformation_lab", "health_transformation_lab")}, places
 
 
 def test_every_variable_used_is_defined():
@@ -149,19 +149,19 @@ def test_judge_monitoring_job_only_in_uat_and_prod():
 
 
 def test_bundle_creates_the_catalog_layer_schemas_and_landing_volume():
-    """One catalog (dental_omop) with landing / bronze / silver / gold schemas, all
+    """One catalog (health_transformation_lab) with landing / bronze / silver / gold schemas, all
     bundle resources so a deploy creates them; the data volume lives in landing.
     prevent_destroy keeps `bundle destroy` from dropping data."""
     uc = yaml.safe_load((ROOT / "databricks/resources/unity_catalog.yml").read_text())["resources"]
-    assert {k: c["name"] for k, c in uc["catalogs"].items()} == {"dental_omop": "${var.catalog}"}
+    assert {k: c["name"] for k, c in uc["catalogs"].items()} == {"health_transformation_lab": "${var.catalog}"}
     layers = ("landing", "bronze", "silver", "gold")
     assert {k: sc["name"] for k, sc in uc["schemas"].items()} == {k: f"{k}_${{var.domain}}" for k in layers}
-    assert {sc["catalog_name"] for sc in uc["schemas"].values()} == {"${resources.catalogs.dental_omop.name}"}
+    assert {sc["catalog_name"] for sc in uc["schemas"].values()} == {"${resources.catalogs.health_transformation_lab.name}"}
     vol = uc["volumes"]["data"]
     assert vol["catalog_name"] == "${resources.schemas.landing.catalog_name}"
     assert vol["schema_name"] == "${resources.schemas.landing.name}" and vol["volume_type"] == "MANAGED"
     # the admin group create_service_principal.sh makes gets the catalog; the deployer owns it
-    assert uc["catalogs"]["dental_omop"]["grants"] == [
+    assert uc["catalogs"]["health_transformation_lab"]["grants"] == [
         {"principal": "dental_omop_nlp_${bundle.target}_admin", "privileges": ["ALL_PRIVILEGES"]}]
     for r in [*uc["catalogs"].values(), *uc["schemas"].values(), vol]:
         assert r["lifecycle"]["prevent_destroy"] is True
@@ -233,7 +233,7 @@ def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
     tables = {"fact_chart_answer", "fact_judge_call", "judge_metric", "judge_agreement", "judge_cost", "deid_score"}
     for ds in dash["datasets"]:
         sql = " ".join(ds["queryLines"])
-        used = set(re.findall(r"dental_omop\.gold_dental_omop_perio\.(\w+)", sql))
+        used = set(re.findall(r"health_transformation_lab\.gold_health_transformation_lab\.(\w+)", sql))
         assert used and used <= tables, ds["name"]
     for page in dash["pages"]:
         for item in page["layout"]:
@@ -242,10 +242,10 @@ def test_scorecard_dashboard_has_phenotyping_and_deidentification_pages():
 
 
 def test_dev_catalog_states_its_default_storage_root():
-    """dev's dental_omop was made with SQL on Default Storage (docs/deployment.md), which sets a storage
+    """dev's health_transformation_lab was made with SQL on Default Storage (docs/deployment.md), which sets a storage
     root; without it in the config the deploy plans to recreate the catalog (prevent_destroy stops it)."""
     root, _ = _load()
-    dev = root["targets"]["dev"]["resources"]["catalogs"]["dental_omop"]
+    dev = root["targets"]["dev"]["resources"]["catalogs"]["health_transformation_lab"]
     assert dev["storage_root"].startswith("s3://") and "/uc/" in dev["storage_root"]
     for env in ("uat", "prod"):
         assert "catalogs" not in root["targets"][env].get("resources", {})
@@ -276,7 +276,7 @@ def test_encoder_gpu_notebook_runs_the_script_and_keeps_the_predictions():
 
 def test_every_model_that_can_be_scored_has_a_plain_name():
     import yaml
-    from dental_omop_nlp import readme_results as rr
+    from health_transformation_lab_nlp import readme_results as rr
     reg = yaml.safe_load((ROOT / "models.yaml").read_text())
     for m in reg["models"]:
         if m["role"] in ("classifier", "long_context", "llm"):
@@ -293,7 +293,7 @@ def test_job_and_dashboard_names_are_short_and_the_same_in_every_target():
         names += [d["display_name"] for d in (yaml.safe_load(f.read_text())["resources"].get("dashboards") or {}).values()]
     assert len(names) >= 8
     for n in names:
-        assert len(n) <= 20 and "${bundle.target}" not in n and "dental-omop-nlp" not in n, n
+        assert len(n) <= 20 and "${bundle.target}" not in n and "health-transformation-lab-nlp" not in n, n
 
 
 def test_medgemma_reader_takes_shots_and_lora_as_settings():

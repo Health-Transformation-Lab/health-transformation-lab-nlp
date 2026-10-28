@@ -54,7 +54,7 @@ dbutils.library.restartPython()
 
 # Pay-per-token Foundation Model endpoint for the llm engine; pick any chat model listed under Serving.
 dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was deployed from
-from dental_omop_nlp import tracking as _tracking
+from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("llm_endpoint", "databricks-meta-llama-3-3-70b-instruct")
 # SQL warehouse for ai_mask; empty = the first warehouse the workspace has (Free Edition has one).
@@ -62,7 +62,7 @@ dbutils.widgets.text("sql_warehouse_id", "")
 # Empty = the script's default engine set (every engine; the ones without credentials are reported as not run).
 dbutils.widgets.text("engines", "")
 dbutils.widgets.text("n_notes", "400")
-# ASQ-PHI as downloaded (synthetic_clinical_queries.txt), e.g. /Volumes/dental_omop/landing_dental_omop_perio/data/synthetic_clinical_queries.txt
+# ASQ-PHI as downloaded (synthetic_clinical_queries.txt), e.g. /Volumes/health_transformation_lab/landing_health_transformation_lab/data/synthetic_clinical_queries.txt
 dbutils.widgets.text("external_path", "")
 # John Snow Labs' 48-note benchmark CSV, on a volume (tier jsl48); empty = skip that tier.
 dbutils.widgets.text("jsl48_path", "")

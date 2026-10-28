@@ -1,7 +1,7 @@
 """AGENTS.md holds the rules every coding agent follows; CLAUDE.md imports it and adds only Claude Code's
 own workflow, so the rules live in one place."""
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 AGENTS = REPO_ROOT / "AGENTS.md"
 CLAUDE = REPO_ROOT / "CLAUDE.md"

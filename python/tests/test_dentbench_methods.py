@@ -3,9 +3,9 @@
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.cost_effectiveness import bakeoff
-from dental_omop_nlp.harm import severity, unsafe_rates
-from dental_omop_nlp.study import difficulty
+from health_transformation_lab_nlp.cost_effectiveness import bakeoff
+from health_transformation_lab_nlp.harm import severity, unsafe_rates
+from health_transformation_lab_nlp.study import difficulty
 
 H, G = "healthy", "gingivitis"
 P1, P2, P3, P4 = (f"periodontitis_stage_{i}" for i in range(1, 5))

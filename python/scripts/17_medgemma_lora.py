@@ -19,9 +19,9 @@ import json
 
 import pandas as pd
 
-from dental_omop_nlp.llm_reader import sft_records
-from dental_omop_nlp.paths import DATASETS_DIR
-from dental_omop_nlp.registry import load_registry, model
+from health_transformation_lab_nlp.llm_reader import sft_records
+from health_transformation_lab_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp.registry import load_registry, model
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--rung", default="medgemma-1.5-4b-it")

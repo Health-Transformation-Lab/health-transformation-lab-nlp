@@ -1,7 +1,7 @@
 """Gold table and column names (spec 018; AGENTS.md "SQL and data names").
 
 pandas frames and the committed CSVs keep their analysis names; a job renames them with to_gold just
-before writing dental_omop.gold_dental_omop_perio. One entry per gold table: the analysis column names it
+before writing health_transformation_lab.gold_health_transformation_lab. One entry per gold table: the analysis column names it
 is written from, and the gold name of each.
 
     to_gold    rename for gold; an unknown column fails, naming it; _count columns become integers
@@ -100,7 +100,7 @@ def to_gold(df: pd.DataFrame, table: str) -> pd.DataFrame:
     gold = set(names.values())
     unknown = [c for c in df.columns if c not in names and c not in gold]
     if unknown:
-        raise ValueError(f"{table}: no gold name for column(s) {unknown}; add them to dental_omop_nlp/gold_names.py")
+        raise ValueError(f"{table}: no gold name for column(s) {unknown}; add them to health_transformation_lab_nlp/gold_names.py")
     out = df.rename(columns=names)
     for c in out.columns:
         if c.endswith("_count") and not c.startswith("avg_") and pd.api.types.is_float_dtype(out[c]):

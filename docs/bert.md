@@ -65,6 +65,6 @@ as names, which is why the dental guard exists.
 
 ## Where it is in the code
 
-- Classifier: [`rungs.py`](../python/dental_omop_nlp/rungs.py) `HFEncoder` (fine-tune, predict);
+- Classifier: [`rungs.py`](../python/health_transformation_lab_nlp/rungs.py) `HFEncoder` (fine-tune, predict);
   run with [`scripts/11_ai_predict.py`](../python/scripts/11_ai_predict.py).
-- De-identification: [`deid.py`](../python/dental_omop_nlp/deid.py) `detect_transformer`.
+- De-identification: [`deid.py`](../python/health_transformation_lab_nlp/deid.py) `detect_transformer`.

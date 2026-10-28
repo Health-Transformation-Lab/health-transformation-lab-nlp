@@ -2,8 +2,8 @@
 
 import pandas as pd
 
-from dental_omop_nlp import judge
-from dental_omop_nlp.cost_effectiveness import calibrate_components
+from health_transformation_lab_nlp import judge
+from health_transformation_lab_nlp.cost_effectiveness import calibrate_components
 
 NOTE = "Perio charting: CAL 6 mm #3.\nDx: generalized periodontitis stage III grade B."
 

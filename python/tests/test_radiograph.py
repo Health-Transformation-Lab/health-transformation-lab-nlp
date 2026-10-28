@@ -4,8 +4,8 @@ import random
 
 import pandas as pd
 
-from dental_omop_nlp.labels import PerioChart
-from dental_omop_nlp.radiograph import FEATURES, features, read_radiograph, simulate_radiograph, summary
+from health_transformation_lab_nlp.labels import PerioChart
+from health_transformation_lab_nlp.radiograph import FEATURES, features, read_radiograph, simulate_radiograph, summary
 
 
 def _rad(chart, pct=50, seed=1, **kw):
@@ -50,8 +50,8 @@ def test_features_and_summary_without_radiograph():
 
 
 def test_fusion_rung_handles_missing_radiographs():
-    from dental_omop_nlp.registry import load_registry
-    from dental_omop_nlp.rungs import make_rung
+    from health_transformation_lab_nlp.registry import load_registry
+    from health_transformation_lab_nlp.rungs import make_rung
     rng = random.Random(0)
     rows = []
     for i in range(240):

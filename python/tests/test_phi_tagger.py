@@ -1,6 +1,6 @@
 """Spec 010: a PHI tagger (Age, Sex, Date) on MACCROBAT's labels. Fixtures are invented sentences."""
 
-from dental_omop_nlp import phi_tagger
+from health_transformation_lab_nlp import phi_tagger
 
 TEXT = "An 8-year-old boy was seen on 12/18/2014. Fever began 3 days later."
 ENTS = [{"start": 3, "end": 13, "type": "Age"}, {"start": 14, "end": 17, "type": "Sex"},

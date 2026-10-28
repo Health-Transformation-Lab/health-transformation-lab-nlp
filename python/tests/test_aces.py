@@ -4,7 +4,7 @@ Tay et al. 2025 (PMC12176459), Holde et al. 2025 (PMC12003053) and Nafz et al. 2
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.aces import AcesRules, aces, occluding_pairs
+from health_transformation_lab_nlp.aces import AcesRules, aces, occluding_pairs
 
 ALL = [t for t in range(1, 33) if t not in (1, 16, 17, 32)]     # no third molars
 
@@ -102,7 +102,7 @@ def test_unknown_rule_is_an_error():
 def test_vectorized_matches_one_exam_at_a_time(rules):
     import random
 
-    from dental_omop_nlp.aces import aces_all
+    from health_transformation_lab_nlp.aces import aces_all
     sites, teeth = [], []
     for k in range(120):
         rng = random.Random(k)

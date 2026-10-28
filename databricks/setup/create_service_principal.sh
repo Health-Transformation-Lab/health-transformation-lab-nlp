@@ -71,10 +71,10 @@ next (docs/deployment.md):
   1. OAuth secret, 90 days; shown once, put it straight into GitHub:
        databricks service-principal-secrets-proxy create $sp_id --lifetime 7776000s
   2. GitHub environment $target:
-       gh api -X PUT repos/<owner>/dental-omop-nlp/environments/$target
-       gh variable set DATABRICKS_HOST      -R <owner>/dental-omop-nlp -e $target -b <workspace url>
-       gh variable set DATABRICKS_CLIENT_ID -R <owner>/dental-omop-nlp -e $target -b $sp_app
-       gh variable set SERVICE_PRINCIPAL    -R <owner>/dental-omop-nlp -e $target -b $sp_app
-       gh secret set   DATABRICKS_CLIENT_SECRET -R <owner>/dental-omop-nlp -e $target
+       gh api -X PUT repos/<owner>/health-transformation-lab-nlp/environments/$target
+       gh variable set DATABRICKS_HOST      -R <owner>/health-transformation-lab-nlp -e $target -b <workspace url>
+       gh variable set DATABRICKS_CLIENT_ID -R <owner>/health-transformation-lab-nlp -e $target -b $sp_app
+       gh variable set SERVICE_PRINCIPAL    -R <owner>/health-transformation-lab-nlp -e $target -b $sp_app
+       gh secret set   DATABRICKS_CLIENT_SECRET -R <owner>/health-transformation-lab-nlp -e $target
   3. Actions > auth_check > Run workflow (environment $target): it should print $sp_app.
 EOF

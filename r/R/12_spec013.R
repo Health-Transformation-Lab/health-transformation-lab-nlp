@@ -1,4 +1,4 @@
-# Spec 013 twins: CAL reliability (python/dental_omop_nlp/reliability_cal.py). Base R.
+# Spec 013 twins: CAL reliability (python/health_transformation_lab_nlp/reliability_cal.py). Base R.
 
 # Balanced nested ANOVA on CAL after an OLS time trend (d: patient_id, tooth, site, visit, years, cal_mm).
 cal_nested_components <- function(d) {
@@ -31,7 +31,7 @@ stage_band_flips <- function(d) {
   list(pairs = sum(ok), flip_rate = mean(w$band[ok] != prev[ok]), down_rate = mean(w$band[ok] < prev[ok]))
 }
 
-# ACES (python/dental_omop_nlp/aces.py), one exam at a time. s: tooth, site, cal_mm, pd_mm, bop;
+# ACES (python/health_transformation_lab_nlp/aces.py), one exam at a time. s: tooth, site, cal_mm, pd_mm, bop;
 # t: tooth, present, missing_reason.
 aces_non_adjacent <- function(teeth) {
   u <- sort(unique(teeth)); if (length(u) >= 3) return(TRUE); if (length(u) < 2) return(FALSE)

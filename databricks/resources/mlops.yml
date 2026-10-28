@@ -3,10 +3,10 @@
 resources:
   experiments:
     dental_experiment:
-      name: ${workspace.root_path}/dental-omop-nlp-experiment
+      name: ${workspace.root_path}/health-transformation-lab-nlp-experiment
       tags:
         - key: project
-          value: dental-omop-nlp
+          value: health-transformation-lab-nlp
         - key: data
           value: synthetic
 

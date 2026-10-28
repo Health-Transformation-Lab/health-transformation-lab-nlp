@@ -25,10 +25,10 @@ it is scored on the same 240 review charts with the same code, and its results a
 - **Synthetic only.** It reads the synthetic study tables in the gold schema and nothing else. Notes go
   to the model only after de-identification and the leak gate, as for the LLM judge.
 - **Every claim quotes the record.** Each piece of evidence it uses comes with a verbatim quote or the
-  exact field value; the quote gate in `dental_omop_nlp.judge` checks it. An answer whose quotes fail is
+  exact field value; the quote gate in `health_transformation_lab_nlp.judge` checks it. An answer whose quotes fail is
   scored as *no answer*, never repaired.
 - **Rules come from the code, not the prompt.** Tools return what the repo's readers say
-  (`dental_omop_nlp.sources`, `note_reader`, `labels`, `radiograph`); the agent decides only when they
+  (`health_transformation_lab_nlp.sources`, `note_reader`, `labels`, `radiograph`); the agent decides only when they
   disagree or say nothing. Don't restate the rules in the prompt, where they can drift from the code.
 - **It may abstain.** "No answer" is a valid output when the record can't support a status; it is
   counted as such, never coerced into a guess.
@@ -50,8 +50,8 @@ it is scored on the same 240 review charts with the same code, and its results a
 
 ## Tools
 
-Unity Catalog functions in `dental_omop.gold_dental_omop_perio`, so the agent, SQL and the Playground
-all call the same code. Each is a thin wrapper over a tested function in `python/dental_omop_nlp/`.
+Unity Catalog functions in `health_transformation_lab.gold_health_transformation_lab`, so the agent, SQL and the Playground
+all call the same code. Each is a thin wrapper over a tested function in `python/health_transformation_lab_nlp/`.
 
 | Tool | Returns | Wraps |
 |---|---|---|
@@ -86,7 +86,7 @@ One JSON object per visit, validated before it's kept:
 - A job in `databricks/resources/` deployed by the bundle like every other; runs on demand.
 - The model behind it is a pay-per-token serving endpoint set by a bundle variable (default `none`, which
   skips it), with AI Gateway usage tracking and rate limits on that endpoint.
-- Logged with MLflow and registered in Unity Catalog as `dental_omop.gold_dental_omop_perio.chart_review_agent`
+- Logged with MLflow and registered in Unity Catalog as `health_transformation_lab.gold_health_transformation_lab.chart_review_agent`
   only if it passes the same acceptance test as the other models.
 
 ## Layout
@@ -100,6 +100,6 @@ Planned; add each file with its tests, under the spec.
 | `databricks/agents/chart_review/agent.py` | The agent: prompt, tool calls, output validation (MLflow agent interface) |
 | `databricks/agents/chart_review/tools.sql` | `CREATE FUNCTION` statements for the Unity Catalog tools |
 | `databricks/notebooks/11_chart_review_agent.py` | Job notebook: cost check, run on the review charts, save, score |
-| `python/dental_omop_nlp/chart_review.py` | Testable logic: evidence gathering, output schema, quote checks, scoring hookup |
+| `python/health_transformation_lab_nlp/chart_review.py` | Testable logic: evidence gathering, output schema, quote checks, scoring hookup |
 | `python/tests/test_chart_review.py` | Tests, with a simulated agent so no endpoint is needed |
 | `r/R/` | R twin of anything added to scoring |
