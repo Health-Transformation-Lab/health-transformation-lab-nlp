@@ -1,0 +1,30 @@
+# Every pull request: the branch is named <type>/<issue>-<slug> and the description links its issue
+# ("Closes #71"). The rule is in AGENTS.md ("Branches and issues"); the check in .github/scripts/pr_conventions.py.
+name: Check the branch name and issue link
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+  workflow_dispatch:                           # try a name before creating the branch
+    inputs:
+      branch:
+        description: "Branch name to check, e.g. feat/71-016-results-loader"
+        required: true
+      body:
+        description: "PR description to check (needs 'Closes #<issue>')"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - name: Branch name and issue link
+        env:                                   # passed as data, never pasted into the shell
+          BRANCH: ${{ github.head_ref || inputs.branch }}
+          BODY: ${{ github.event.pull_request.body || inputs.body }}
+        run: python .github/scripts/pr_conventions.py

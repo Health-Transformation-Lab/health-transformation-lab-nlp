@@ -42,6 +42,10 @@ verified findings only, mandatory secrets scan), with this repo's rules from `AG
 | Prices | Service prices name their source and date; placeholders say ILLUSTRATIVE |
 | Commits | Imperative subject, body says why, co-author trailer when an agent wrote it |
 | Docs | README stays about 3 printed pages; plain-language docs updated when behaviour changes |
+| Configuration | New or changed settings are declared once (bundle variable or documented env var), checked before work starts, and the PR says which environments change |
+| Secrets register | A credential made, rotated or newly used is in `ops/secrets_register.yaml` with its expiry and owner; no values anywhere |
+| Idempotent writes | Every table write is overwrite, MERGE, or delete-then-append by batch key; rows carry their batch key; append only for event logs |
+| Alerts | New alerts have a severity (SEV1–4), an owner and an action; SEV3/4 go to the digest, not straight to people |
 
 ## Output
 

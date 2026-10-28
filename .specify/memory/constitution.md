@@ -75,7 +75,8 @@ No new dependency without a reason in the plan; base R where it's enough.
    `writing-plans`/`executing-plans` for the session, `test-driven-development`
    per task, `systematic-debugging` on failures, `verification-before-completion`
    before claiming done, `requesting-code-review` before merge.
-4. One feature branch per spec; small commits; PR into `main`.
+4. One GitHub issue per user story; one branch and PR per issue, named `<type>/<issue>-<slug>`
+   and closing it (`AGENTS.md`, "Branches and issues"); small commits; PR into `main`.
 
 ## Governance
 
@@ -83,4 +84,4 @@ This constitution overrides other practice in the repo. Amend it by PR that
 states the change and why, bumps the version, and updates any affected spec.
 Reviewers check principle I and II on every PR.
 
-**Version**: 1.2.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-26
+**Version**: 1.3.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-28
