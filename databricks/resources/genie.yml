@@ -1,0 +1,11 @@
+# Genie spaces for the two graders (spec 019 US5), built by python/scripts/42_build_dashboards.py from
+# dental_omop_nlp/dashboards.py, so each space defines its measures exactly as its dashboard does.
+# Needs Databricks CLI 1.3.0 or later (the genie_spaces resource) and the direct engine
+# (DATABRICKS_BUNDLE_ENGINE=direct, as CI deploys). Same names in every target.
+resources:
+  genie_spaces:
+    dq_grader_genie:
+      title: EHR DQ grader
+      description: Data quality of the synthetic dental record for periodontal phenotyping. Synthetic data only.
+      warehouse_id: ${var.warehouse_id}
+      file_path: ../genie/dq_grader.geniespace.json
