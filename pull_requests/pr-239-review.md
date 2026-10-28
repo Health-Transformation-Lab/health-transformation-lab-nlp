@@ -1,5 +1,5 @@
 ---
-pr: pending
+pr: 239
 branch: docs/237-recheck-deck-citations
 title: "Say \"with teeth\" where the decks cite Eke et al. 2018; mark it checked"
 author: jcbowyer
