@@ -230,8 +230,8 @@ class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
     name, simulated = "hf", False
 
     def __init__(self, hf_id: str, modality: str = "multimodal", adapter: str | None = None,
-                 max_new_tokens: int = 300, dtype: str = "auto", device_map: str = "auto"):
-        self.hf_id, self.modality, self.adapter = hf_id, modality, adapter
+                 max_new_tokens: int = 300, dtype: str = "auto", device_map: str = "auto", revision: str | None = None):
+        self.hf_id, self.modality, self.adapter, self.revision = hf_id, modality, adapter, revision
         self.max_new_tokens, self.dtype, self.device_map = max_new_tokens, dtype, device_map
         self.model = None
 
@@ -244,14 +244,14 @@ class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
             AutoTokenizer,
         )
         dtype = _hardware_dtype() if self.dtype == "auto" else self.dtype
-        print(f"loading {self.hf_id} as {dtype}", flush=True)
+        print(f"loading {self.hf_id} as {dtype}, revision {self.revision or 'latest (not pinned)'}", flush=True)
         kw = {"torch_dtype": getattr(torch, dtype), "device_map": self.device_map}
         if self.modality == "multimodal":
-            self.proc = AutoProcessor.from_pretrained(self.hf_id)
-            self.model = AutoModelForImageTextToText.from_pretrained(self.hf_id, **kw)
+            self.proc = AutoProcessor.from_pretrained(self.hf_id, revision=self.revision)
+            self.model = AutoModelForImageTextToText.from_pretrained(self.hf_id, revision=self.revision, **kw)
         else:
-            self.proc = AutoTokenizer.from_pretrained(self.hf_id)
-            self.model = AutoModelForCausalLM.from_pretrained(self.hf_id, **kw)
+            self.proc = AutoTokenizer.from_pretrained(self.hf_id, revision=self.revision)
+            self.model = AutoModelForCausalLM.from_pretrained(self.hf_id, revision=self.revision, **kw)
         if self.adapter:
             from peft import PeftModel
             self.model = PeftModel.from_pretrained(self.model, self.adapter)
@@ -318,7 +318,8 @@ def make_backend(entry: dict, kind: str, **kw):
         if entry.get("gated") and not _hf_token():
             raise RuntimeError(f"{entry['hf']} is gated ({entry.get('license', 'see its model card')}): accept "
                                "the terms on its Hugging Face page, then set HF_TOKEN to a read token from that account")
-        return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"))
+        return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"),
+                      revision=entry.get("revision"))
     if kind == "openai":
         return OpenAIChat(model=kw.get("endpoint") or entry.get("endpoint"))
     raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
@@ -354,6 +355,7 @@ class LLMReader:
         for _, r in test.iterrows():
             note, vid = r["note_text"], r.get("visit_id")
             row = {"visit_id": vid, "model": self.model_id, "backend": self.backend.name,
+                   "revision": getattr(self.backend, "revision", None) or "",
                    "prompt_version": self.variant, "shots": self.shots, "input_tokens": 0, "output_tokens": 0,
                    "latency_s": 0.0, "raw": "", "status": None, "grade": "NA", "extent": "NA", "quote": "",
                    "gate_ok": False, "error": ""}

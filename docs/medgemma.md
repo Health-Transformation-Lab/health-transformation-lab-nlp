@@ -104,7 +104,7 @@ placeholder error rates and say nothing about MedGemma.
   than as an endpoint
   ([limitations](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations),
   [announcement](https://www.databricks.com/blog/whats-coming-next-free-edition)).
-  The 27B model is unlikely to fit.
+  The 27B model doesn't fit (about 54 GB of weights; see "Next: MedGemma 27B").
 - **Kaggle (free GPU), when Databricks has none:** GPU access on Free Edition needs LinkedIn
   verification and free capacity, and some accounts get none, so the `medgemma_reader` job can wait and
   retry for hours without starting. [`kaggle/medgemma_reader.ipynb`](../kaggle/medgemma_reader.ipynb) runs
@@ -125,6 +125,56 @@ placeholder error rates and say nothing about MedGemma.
 - **Evaluation:** the same split, scorer, harm grading, difficulty levels and
   cost-effectiveness as every other method. Report prompt-sensitivity by running
   two or three prompt variants.
+
+## Versions, and which have been run
+
+Google publishes five MedGemma models on Hugging Face. They are different models, not updates of one, so
+every result names the model, and since 2026-10-28 also the exact revision: `models.yaml` pins a
+Hugging Face commit per model, the reader loads that commit, and each run's `llm_details_*.csv` records it in
+a `revision` column. Google updated the 1.5 weights on 2026-04-13. The committed 1.5 run (October 2026)
+used the pinned revision.
+
+| Model | Kind | Pinned revision | Status here |
+|---|---|---|---|
+| `medgemma-1.5-4b-it` | 4B, text and images, instruction-tuned (Jan 2026) | `91850547d9f0` | **run**: 75.8% correct on the 240 review notes |
+| `medgemma-4b-it` | 4B, text and images, instruction-tuned (MedGemma 1, 2025) | `290cda5eeccb` | not run; next (same hardware as 1.5) |
+| `medgemma-27b-text-it` | 27B, text only, instruction-tuned (2025) | `5b667cf2ddcf` | not run: needs a larger GPU (below) |
+| `medgemma-27b-it` | 27B, text and images (2025) | not in the registry | the text-only 27B suits notes better |
+| `medgemma-4b-pt` | 4B, pretrained only | not in the registry | not instruction-tuned, so unsuited to a zero-shot reader |
+
+**MedGemma 4B v1 against 1.5 (next).** This is the same hardware and code as the 1.5 run, so it isolates
+the effect of the version. On kaggle.com, open the notebook, set `RUNG = "medgemma-4b-it"` and
+`FULL_RUN = True` in the Settings cell, check that `HF_TOKEN` is attached, then **Save & Run All**. When it
+finishes, run the GitHub workflow with `collect_only` to open the results PR.
+
+## Next: MedGemma 27B
+
+**Why it matters.** The 27B is the version most likely to read notes better.
+- Google's [MedGemma Technical Report](https://arxiv.org/abs/2507.05201) (Table 3) gives **87.7%** on
+  MedQA for the 27B, with Google's test-time scaling, against **64.4%** for the 4B.
+- In this repo, the larger general-purpose Llama 3.3 70B (83.8%) already beats MedGemma 1.5 4B (75.8%) on
+  the 240 review notes.
+
+That's an expectation, not a result. MedQA is exam questions, not dental charts, and the 27B is
+**not run** here yet. Until it is, no number in this repo stands for it.
+
+**What it needs.** 27 billion parameters at 2 bytes each (bfloat16) is about **54 GB of GPU memory** for
+the weights, plus room for the prompt. The free GPUs fall short:
+- Kaggle's T4 x2 has 30 GB, and no bfloat16;
+- Databricks Free Edition's serverless A10 has 24 GB.
+
+Options, best first:
+
+| Option | Fits | Cost | What to record |
+|---|---|---|---|
+| One A100 80 GB or H100 (paid Databricks GPU compute, or a cloud VM) | yes, in bfloat16 | paid per GPU-hour; the 240 notes take well under an hour | `--rung medgemma-27b-text-it --backend hf`; revision, dtype, GPU |
+| Serve it on GPU Model Serving (paid Databricks) and call it with `--backend openai --endpoint <name>` or `ai_query` | yes | paid; scales to zero | endpoint, revision |
+| 4-bit quantization (about 15–17 GB) on Kaggle T4 x2 or an A10 | yes | free | label it `medgemma-27b-text-it+4bit`: compressed weights are a slightly different model, scored as their own row |
+| Gemma 3 12B, which Databricks hosts pay-per-token (`databricks-gemma-3-12b`) | yes | pennies | not MedGemma: the general model MedGemma is built from, so a size and medical-training comparison, not a substitute |
+
+The code already supports the first two. The 4-bit option needs a `--quantize 4bit` flag for the reader,
+using `bitsandbytes`; that's a small addition when it's wanted. Whichever option is used, record the
+revision, the dtype or quantization, and the hardware with the run.
 
 ## Cautions
 
