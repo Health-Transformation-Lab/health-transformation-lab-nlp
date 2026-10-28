@@ -255,5 +255,7 @@ def test_the_migration_notebook_carries_the_legacy_schemas_and_checks_every_key_
     nb = (ROOT / "databricks/notebooks/11_migrate_gold_names.py").read_text()
     assert "gold_names.legacy_plan(" in nb and "gold_names.legacy_schemas(" in nb
     assert "rows not carried" in nb                    # a legacy table with rows missing gets no DROP
+    stale = nb[nb.index('if action == "stale":'):]
+    assert stale.index("continue") < stale.index("drops.append")   # a stale table, never checked, gets no DROP
     jobs = (ROOT / "databricks/resources/jobs.yml").read_text()
     assert "legacy_gold_schemas: ${var.legacy_gold_schemas}" in jobs

@@ -13,7 +13,8 @@
 # MAGIC Then the old gold schemas in `legacy_gold_schemas` (issue #228): specs 021 and 022 rebuilt gold in a new
 # MAGIC catalog and schema from committed files, which can't bring back rows only Databricks wrote (the MedGemma
 # MAGIC reader's). Each batch-keyed table's rows the current one lacks are added (`gold_names.legacy_plan`), every
-# MAGIC old key is checked to have arrived, and `DROP TABLE` is printed only for the tables that pass.
+# MAGIC old key is checked to have arrived, and `DROP TABLE` is printed only for the tables that pass. A summary
+# MAGIC table its own job rebuilds is reported as stale, with no `DROP`: compare it by hand first.
 # MAGIC Synthetic data only. Serverless CPU.
 
 # COMMAND ----------
@@ -36,6 +37,8 @@ dbutils.widgets.text("schema", "gold_perio_bench")  # noqa: F821
 dbutils.widgets.text("legacy_gold_schemas", "")  # noqa: F821  set by the job: catalog.schema, comma-separated
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 legacy = gold_names.legacy_schemas(dbutils.widgets.get("legacy_gold_schemas"))  # noqa: F821  malformed: fails here
+if not legacy:
+    print("legacy_gold_schemas is empty: no old gold schemas are read (the job sets it; databricks.yml)")
 
 
 def table(name: str, where: str = "") -> str:
@@ -120,8 +123,9 @@ for cat, sch in legacy:
     if not spark.catalog.databaseExists(where):  # noqa: F821
         print(f"{where}: not found, skipped")
         continue
-    found = {t.name: spark.table(table(t.name, where)).columns  # noqa: F821
-             for t in spark.catalog.listTables(where)}  # noqa: F821
+    names = [t.name for t in spark.catalog.listTables(where)]  # noqa: F821
+    found = {n: spark.table(table(n, where)).columns  # noqa: F821  only the tables the migration knows are read
+             for n in names if n in gold_names.RENAMED or n in gold_names.TABLES}
     lplan = gold_names.legacy_plan(found, current)
     failed = [f"{where}.{old}: no gold name for column(s) {cols}" for action, old, cols in lplan if action == "fail"]
     if failed:
@@ -139,10 +143,13 @@ for cat, sch in legacy:
                 left = not_carried(renamed(old, new, where), new)
                 if left:
                     raise RuntimeError(f"{where}.{old} -> {new}: {left} rows not carried")
-            print(f"{action}: {where}.{old} ({n_old} rows) -> {new} ({rows(new)} rows)"
-                  + (" (rebuilt each run from committed files; old copy left)" if action == "stale" else ""))
+            if action == "stale":   # rebuilt by its own job; nothing carried, so no DROP until checked by hand
+                print(f"stale: {where}.{old} ({n_old} rows); {new} ({rows(new)} rows) is rebuilt by its job. "
+                      "Not checked: compare before dropping it")
+                continue
+            print(f"{action}: {where}.{old} ({n_old} rows) -> {new} ({rows(new)} rows), every key carried")
             drops.append(f"DROP TABLE {table(old, where)};")
-    others = sorted(set(found) - {old for _, old, _ in lplan})
+    others = sorted(set(names) - set(found))
     if others:
         print(f"{where}: not gold tables this migration knows, left as they are: {', '.join(others)}")
 

@@ -60,7 +60,8 @@ rebuilt gold in a new catalog and schema from committed files, which can't bring
 the MedGemma reader's runs were left in the old catalog's gold schema. For each table there, old-named or already
 renamed, the task adds the rows whose batch key the current table lacks (a key column the current table doesn't
 have yet counts as null), checks that every old key arrived, and only then adds its `DROP TABLE` to the list.
-Summary tables are rebuilt each run and are left as they are. A schema that doesn't exist is skipped (uat and prod
+A table without a batch key that its own job rebuilds (the scorecard's summaries, the de-id scores, the corpus
+judge's calls) is reported as stale and gets no `DROP`: compare it by hand before dropping it. A schema that doesn't exist is skipped (uat and prod
 never had one). The decisions are `gold_names.legacy_plan` (tested).
 
 Jobs that haven't run in the workspace yet write more tables to gold: `study_benchmark`
