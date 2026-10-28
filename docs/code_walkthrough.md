@@ -107,8 +107,10 @@ This is the input to the qualitative review.
 ## 5. Rule-based phenotype
 
 Two orders, both kept: the study design's starting order (exam form → diagnosis
-code → note NLP → periodontal chart) as `algorithm_design`, and the earlier
-placeholder (chart first, radiograph as a lower bound) as `algorithm_v0`.
+code → note NLP → periodontal chart), after Patel et al., *Methods Inf Med* 2022
+([references](references.md), item 4; not yet checked against the paper, action item A2), as
+`algorithm_design`, and this repo's earlier placeholder (chart first, radiograph as a lower bound)
+as `algorithm_v0`.
 
 - Code: `phenotype.RULES_DESIGN`, `RULES_V0`, `phenotype()`.
 - Output: `algorithm_design`, `algorithm_v0` columns. Differences: [action_items.md](action_items.md) A2–A6.
