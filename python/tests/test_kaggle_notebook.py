@@ -212,3 +212,29 @@ def test_workflow_defaults_to_the_branch_and_commit_it_was_started_from():
     text = path.read_text()
     assert "inputs.branch || github.ref_name" in text
     assert "github.sha" in text                          # pinned when it runs its own branch
+
+
+def test_an_older_keras_preset_is_read_with_its_renamed_tokenizer_setting(tmp_path):
+    # #185: MedGemma 4B v1's preset (Oct 2025) says "is_vision_model"; keras-hub 0.32 calls it "has_vision_tokens"
+    # and refuses the old name ("Unrecognized keyword arguments passed to Gemma3Tokenizer")
+    old = tmp_path / "preset"
+    (old / "assets" / "tokenizer").mkdir(parents=True)
+    (old / "assets" / "tokenizer" / "vocabulary.spm").write_bytes(b"spm")
+    (old / "model_00000.weights.h5").write_bytes(b"weights")
+    tok = {"module": "keras_hub.src.models.gemma3.gemma3_tokenizer", "config": {"is_vision_model": True}}
+    (old / "tokenizer.json").write_text(json.dumps(tok))
+    (old / "preprocessor.json").write_text(json.dumps({"config": {"tokenizer": tok}}))
+    (old / "metadata.json").write_text(json.dumps({"keras_version": "3.10.0"}))
+    new = _converter().compatible_preset(old, tmp_path / "work")
+    assert new != old
+    assert json.loads((new / "tokenizer.json").read_text())["config"] == {"has_vision_tokens": True}
+    assert json.loads((new / "preprocessor.json").read_text())["config"]["tokenizer"]["config"] == {"has_vision_tokens": True}
+    assert (new / "model_00000.weights.h5").is_symlink()             # 17 GB of weights linked, not copied
+    assert (new / "assets" / "tokenizer" / "vocabulary.spm").read_bytes() == b"spm"
+    assert "is_vision_model" in (old / "tokenizer.json").read_text()  # the attached input is never changed
+
+
+def test_a_current_preset_is_used_as_it_is(tmp_path):
+    (tmp_path / "tokenizer.json").write_text(json.dumps({"config": {"has_vision_tokens": True}}))
+    assert _converter().compatible_preset(tmp_path, tmp_path / "work") == tmp_path
+    assert not (tmp_path / "work").exists()

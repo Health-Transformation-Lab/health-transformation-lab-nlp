@@ -50,13 +50,42 @@ def finish(out: Path, rung: str) -> None:
     (out / "chat_template.json").write_text(json.dumps({"chat_template": template}, indent=2))
 
 
+RENAMED = {"is_vision_model": "has_vision_tokens"}   # keras-hub renamed it; MedGemma 4B v1's preset (Oct 2025) has the old one
+
+
+def _rename(v):
+    if isinstance(v, dict):
+        return {RENAMED.get(k, k): _rename(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_rename(x) for x in v]
+    return v
+
+
+def compatible_preset(preset: Path, work: Path) -> Path:
+    """The preset itself, or, for an older one with renamed config keys, a copy in `work` that keras-hub 0.32 reads:
+    its JSON configs rewritten, everything else (the weights) linked. The attached input is never changed."""
+    preset, work = Path(preset), Path(work)
+    configs = sorted(preset.glob("*.json"))
+    if not any(k in p.read_text() for p in configs for k in RENAMED):
+        return preset
+    work.mkdir(parents=True, exist_ok=True)
+    for item in preset.iterdir():
+        target = work / item.name
+        if item.suffix == ".json":
+            target.write_text(json.dumps(_rename(json.loads(item.read_text())), indent=2))
+        elif not target.exists():
+            target.symlink_to(item.resolve(), target_is_directory=item.is_dir())
+    print(f"preset uses older config names {sorted(RENAMED)}: reading a renamed copy in {work}", flush=True)
+    return work
+
+
 def convert(rung: str, out: Path, dtype: str = "bfloat16") -> None:  # pragma: no cover - needs the weights
     os.environ.setdefault("KERAS_BACKEND", "torch")   # before keras is imported; the torch writer streams to disk
     import kagglehub
     import keras_hub
 
     handle = kaggle_handle(rung)
-    preset = kagglehub.model_download(handle)
+    preset = compatible_preset(kagglehub.model_download(handle), Path(out).with_name(Path(out).name + "-preset"))
     print(f"converting {handle} ({preset}) to {out} as {dtype}", flush=True)
     model = keras_hub.models.Gemma3CausalLM.from_preset(preset, dtype=dtype)
     model.export_to_transformers(str(out))
