@@ -90,10 +90,14 @@ def _fit(params: dict, X, y, n_class: int, seed: int):
 @traced
 def tune(X: pd.DataFrame, y: np.ndarray, groups: np.ndarray, n_class: int, seed: int = 0,
          grid: dict | None = None, folds: int = 5) -> dict:
-    """Grid search by grouped k-fold (people never split across folds), scored by macro F1."""
+    """Grid search by grouped k-fold (people never split across folds), scored by macro F1. A fold whose
+    training part lacks a class is skipped (xgboost can't fit it); `cv_folds_used` says how many were left."""
     grid = grid or GRID
     keys = list(grid)
-    cv = list(GroupKFold(n_splits=folds).split(X, y, groups))
+    cv = [(tr, va) for tr, va in GroupKFold(n_splits=folds).split(X, y, groups)
+          if len(np.unique(y[tr])) == n_class]
+    if not cv:
+        raise ValueError(f"every training fold lacks a class: fewer people per class than folds ({folds})")
     best, best_score = None, -1.0
     for values in itertools.product(*(grid[k] for k in keys)):
         params = dict(zip(keys, values))
@@ -101,7 +105,7 @@ def tune(X: pd.DataFrame, y: np.ndarray, groups: np.ndarray, n_class: int, seed:
                            average="macro", labels=list(range(n_class)), zero_division=0) for tr, va in cv]
         if np.mean(scores) > best_score:
             best, best_score = params, float(np.mean(scores))
-    return best | {"cv_macro_f1": best_score}
+    return best | {"cv_macro_f1": best_score, "cv_folds_used": len(cv)}
 
 
 @traced
@@ -118,8 +122,12 @@ def train_eval(f: pd.DataFrame, scheme: str, seed: int = 0, grid: dict | None = 
     n_class = len(names)
     te = split_people(f, seed)
     X, y = f[FEATURES], f["y"].to_numpy()
+    missing = [names[k] for k in range(n_class) if not (y[~te] == k).any()]
+    if missing:
+        raise ValueError(f"no {', '.join(missing)} among the training people: the model can't learn it "
+                         "(a larger study, or a coarser scheme such as 3level)")
     best = tune(X[~te], y[~te], f.loc[~te, "person_id"].to_numpy(), n_class, seed, grid, folds)
-    params = {k: v for k, v in best.items() if k != "cv_macro_f1"}
+    params = {k: v for k, v in best.items() if k not in ("cv_macro_f1", "cv_folds_used")}
     model = _fit(params, X[~te], y[~te], n_class, seed)
     Xt, yt = X[te], y[te]
     proba = model.predict_proba(Xt)
@@ -148,7 +156,7 @@ def train_eval(f: pd.DataFrame, scheme: str, seed: int = 0, grid: dict | None = 
     summary = {"scheme": scheme, "n_train": int((~te).sum()), "n_test": int(te.sum()),
                "people_test": int(f.loc[te, "person_id"].nunique()), "accuracy": float(accuracy_score(yt, pred)),
                "macro_f1": float(f1_score(yt, pred, average="macro", labels=list(range(n_class)), zero_division=0)),
-               "cv_macro_f1": best["cv_macro_f1"], "params": params}
+               "cv_macro_f1": best["cv_macro_f1"], "cv_folds_used": best["cv_folds_used"], "params": params}
     return {"summary": summary, "metrics": metrics, "shap_importance": imp, "shap_test": per, "model": model,
             "X_test": Xt, "test_predictions": pd.DataFrame({"visit_id": f.loc[te, "visit_id"].to_numpy(),
                                                             "y": yt, "pred": pred})}

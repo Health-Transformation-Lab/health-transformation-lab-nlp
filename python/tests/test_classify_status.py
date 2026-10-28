@@ -91,3 +91,21 @@ def test_same_seed_same_result(visits):
     b = cs.train_eval(f, "3level", seed=4, grid=SMALL, folds=3)
     pd.testing.assert_frame_equal(a["shap_importance"], b["shap_importance"])
     assert a["summary"]["params"] == b["summary"]["params"]
+
+
+def test_a_class_missing_from_the_training_people_fails_with_a_clear_message(visits):
+    # xgboost infers the class count from the labels: without this check a missing stage 4 gives 4 probability
+    # columns and an IndexError later, and a missing middle class an "Invalid classes" error
+    f = cs.features(visits, "algorithm_design", "5level")
+    f = f[f["y"] != 4]                                 # no stage 4 at all, so none among the training people
+    with pytest.raises(ValueError, match="stage_4"):
+        cs.train_eval(f, "5level", seed=1, grid=SMALL, folds=3)
+
+
+def test_folds_missing_a_class_are_skipped_in_tuning(visits):
+    f = cs.features(visits, "algorithm_design", "5level").reset_index(drop=True)
+    tr = f[~cs.split_people(f, seed=1)].reset_index(drop=True)
+    stage4_people = tr.loc[tr["y"] == 4, "person_id"].unique()
+    keep = tr[(tr["y"] != 4) | tr["person_id"].isin(stage4_people[:2])].reset_index(drop=True)   # 2 people: some folds lack it
+    best = cs.tune(keep[cs.FEATURES], keep["y"].to_numpy(), keep["person_id"].to_numpy(), 5, seed=1, grid=SMALL, folds=5)
+    assert 0 < best["cv_macro_f1"] <= 1 and best["cv_folds_used"] < 5

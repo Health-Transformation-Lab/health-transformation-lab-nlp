@@ -265,8 +265,9 @@ macro F1 0.75 on 713 held-out visits (the label also uses notes and codes, so th
 it; on `truth_status` accuracy is 0.99). SHAP ranks attachment loss first, then % of teeth involved: it is 0
 when no tooth has attachment loss, so it separates healthy and gingivitis from periodontitis. Bone loss,
 teeth lost and probing depth follow; smoking and diabetes are near zero, as the rules say. On `truth_status`
-bone loss drops to zero, because the rules use it only when CAL is missing and every charted visit has CAL.
-One oddity it surfaces: older age pulls slightly *away* from stage IV (mean |SHAP| 0.05); unexplained so far.
+bone loss falls to 0.08 (5 levels) and to zero (3 levels), because the rules use it only when CAL is missing
+and every charted visit has CAL. One oddity it surfaces: older age pulls *away* from stage IV (mean |SHAP|
+0.135 for stage IV, 0.05 over all classes); unexplained so far.
 
 - Code: [`classify_status.py`](../python/dental_omop_nlp/classify_status.py);
   [`scripts/42_classify_status.py`](../python/scripts/42_classify_status.py). Needs the `ml` extra
