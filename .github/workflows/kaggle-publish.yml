@@ -1,16 +1,23 @@
-# Publish the synthetic notes and the benchmark results as public Kaggle datasets (spec 020, kaggle/publish.py).
-# Start it from the Actions tab: "Publish datasets to Kaggle" -> Run workflow. The first run creates each dataset
-# (public, CC BY 4.0); later runs add a version named after the commit; publish.py fails the run if Kaggle
-# refuses an upload. Same secrets as the notebook workflows:
-# KAGGLE_USERNAME and KAGGLE_API_TOKEN (or KAGGLE_KEY) in the GitHub environment `dev`.
-name: Publish datasets to Kaggle
-run-name: "Publish to Kaggle: ${{ inputs.dataset }}"
+# Publish the PerioBench datasets and the quickstart notebook on Kaggle and Hugging Face (specs 020 and 025).
+# Start it from the Actions tab: "Publish datasets (Kaggle and Hugging Face)" -> Run workflow. The first run
+# creates each item public (CC BY 4.0); later runs add a version, or a commit on Hugging Face, named after the
+# repository commit. A refused upload fails the run. Settings, in the GitHub environment `dev`:
+#   Kaggle: KAGGLE_USERNAME (variable) and KAGGLE_API_TOKEN (or KAGGLE_KEY) (secret).
+#   Hugging Face: HF_PUBLISH_TOKEN (secret), a fine-grained token with write access to the healthtransformationlab
+#   organisation's repositories (huggingface/README.md).
+name: Publish datasets (Kaggle and Hugging Face)
+run-name: "Publish: ${{ inputs.dataset }} to ${{ inputs.platform }}"
 
 on:
   workflow_dispatch:
     inputs:
+      platform:
+        description: "Where to publish"
+        type: choice
+        options: [both, kaggle, huggingface]
+        default: both
       dataset:
-        description: "Which dataset"
+        description: "Which dataset (the quickstart notebook and the Hugging Face organisation page go with both)"
         type: choice
         options: [both, notes, results]
         default: both
@@ -18,13 +25,14 @@ on:
         description: "Version note (the commit is added)"
         default: "Update from the repository"
 
-concurrency: kaggle-publish
+concurrency: publish-datasets
 
 jobs:
-  publish:
+  kaggle:
+    if: inputs.platform != 'huggingface'
     runs-on: ubuntu-latest
     environment: dev
-    timeout-minutes: 30
+    timeout-minutes: 40
     permissions:
       contents: read
     steps:
@@ -47,7 +55,7 @@ jobs:
           [ -n "$K" ] && echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"
           true
 
-      - name: Build and publish
+      - name: Build and publish the datasets
         env:
           WHICH: ${{ inputs.dataset }}
           MESSAGE: ${{ inputs.message }}
@@ -59,3 +67,71 @@ jobs:
             python kaggle/publish.py --dataset "$name" --out "build/$name" --username "$KAGGLE_USERNAME" \
               --commit "$SHA" --upload --message "$MESSAGE" | tee -a "$GITHUB_STEP_SUMMARY"
           done
+
+      # spec 025 US2: the quickstart reads both datasets, so it goes when both do; it runs once on Kaggle (CPU,
+      # a minute or two), which proves it works there, and its run is the published version.
+      - name: Publish the quickstart notebook and wait for its run
+        if: inputs.dataset == 'both'
+        run: |
+          python kaggle/prepare_kernel.py --job quickstart --out build/quickstart --username "$KAGGLE_USERNAME"
+          kaggle kernels push -p build/quickstart
+          k="$KAGGLE_USERNAME/perio-bench-quickstart"
+          for i in $(seq 1 30); do
+            s=$(kaggle kernels status "$k" 2>&1); echo "$(date -u +%H:%M) $s"
+            case "${s,,}" in
+              *complete*) echo "Quickstart: https://www.kaggle.com/code/$k" >> "$GITHUB_STEP_SUMMARY"; exit 0 ;;
+              *error*|*cancel*) echo "::error::The quickstart failed on Kaggle: $s"; exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "::error::The quickstart was still running after 15 minutes: $s"; exit 1
+
+  huggingface:
+    if: inputs.platform != 'kaggle'
+    runs-on: ubuntu-latest
+    environment: dev
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - run: pip install --quiet "huggingface_hub==0.34.4" -e ./python
+
+      # Check the setting before any work (AGENTS.md "Configuration and secrets"): missing, wrong shape, or
+      # unable to write to the organisation fails here, naming it.
+      - name: Check the Hugging Face token (value stays masked)
+        env:
+          HF_PUBLISH_TOKEN: ${{ secrets.HF_PUBLISH_TOKEN }}
+        run: |
+          python - <<'PY'
+          import importlib.util, os
+          from huggingface_hub import HfApi
+          spec = importlib.util.spec_from_file_location("hf_publish", "huggingface/publish.py")
+          hp = importlib.util.module_from_spec(spec); spec.loader.exec_module(hp)
+          token = os.environ.get("HF_PUBLISH_TOKEN", "")
+          try:
+              user = hp.check_token(token, whoami=lambda t: HfApi().whoami(token=t))
+          except SystemExit as e:
+              print(f"::error::{e}"); raise
+          print(f"Hugging Face token OK: {user}, can write to {hp.ORG}")
+          PY
+
+      - name: Build and publish the datasets and the organisation page
+        env:
+          HF_PUBLISH_TOKEN: ${{ secrets.HF_PUBLISH_TOKEN }}
+          WHICH: ${{ inputs.dataset }}
+          MESSAGE: ${{ inputs.message }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -o pipefail
+          [ "$WHICH" = both ] && names="notes results" || names="$WHICH"
+          for name in $names; do
+            python huggingface/publish.py --dataset "$name" --out "build/hf-$name" --commit "$SHA" --upload \
+              --message "$MESSAGE" | tee -a "$GITHUB_STEP_SUMMARY"
+          done
+          if [ "$WHICH" = both ]; then
+            python huggingface/publish.py --org-card --out build/hf-org --commit "$SHA" --upload \
+              --message "$MESSAGE" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
