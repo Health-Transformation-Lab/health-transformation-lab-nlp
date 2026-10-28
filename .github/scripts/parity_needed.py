@@ -2,7 +2,7 @@
 
 R parity reruns the Python pipeline in python/scripts/make_parity_inputs.sh and compares R with it. It is needed when
 a changed file is one that pipeline depends on:
-  - the scripts make_parity_inputs.sh runs, and the dental_omop_nlp modules they import, followed through every
+  - the scripts make_parity_inputs.sh runs, and the health_transformation_lab_nlp modules they import, followed through every
     module they import in turn;
   - r/, the inputs the scripts read (data/, eval/, synthea/, omop/, models.yaml, costs.yaml), the package's
     dependencies (python/pyproject.toml), and this check and the CI workflow themselves.
@@ -21,32 +21,32 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = "python/scripts/make_parity_inputs.sh"
-PACKAGE = "python/dental_omop_nlp"
+PACKAGE = "python/health_transformation_lab_nlp"
 ALWAYS = ("r/", "data/", "eval/", "synthea/", "omop/", "models.yaml", "costs.yaml", "python/pyproject.toml",
           SCRIPT, ".github/scripts/parity_needed.py", ".github/workflows/ci.yml")
 
 
 def _imported_modules(path: Path) -> set[str]:
-    """dental_omop_nlp modules a file imports (absolute, or relative inside the package)."""
+    """health_transformation_lab_nlp modules a file imports (absolute, or relative inside the package)."""
     tree = ast.parse(path.read_text(encoding="utf-8"))
-    inside = path.parent.name == "dental_omop_nlp"
+    inside = path.parent.name == "health_transformation_lab_nlp"
     out = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for a in node.names:
                 parts = a.name.split(".")
-                if parts[0] == "dental_omop_nlp" and len(parts) > 1:
+                if parts[0] == "health_transformation_lab_nlp" and len(parts) > 1:
                     out.add(parts[1])
         elif isinstance(node, ast.ImportFrom):
             base = node.module or ""
             if node.level and inside:                       # from .x import y, from . import x
-                base = "dental_omop_nlp" + ("." + base if base else "")
+                base = "health_transformation_lab_nlp" + ("." + base if base else "")
             parts = base.split(".")
-            if parts[0] != "dental_omop_nlp":
+            if parts[0] != "health_transformation_lab_nlp":
                 continue
             if len(parts) > 1:
                 out.add(parts[1])
-            else:                                          # from dental_omop_nlp import a, b
+            else:                                          # from health_transformation_lab_nlp import a, b
                 out |= {a.name for a in node.names}
     return out
 
