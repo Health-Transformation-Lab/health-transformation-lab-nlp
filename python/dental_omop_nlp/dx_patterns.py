@@ -29,6 +29,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from .labels import Status
+from .telemetry import traced
 
 ROMAN = {1: "i", 2: "ii", 3: "iii", 4: "iv"}
 GRADE_ROMAN = {"A": "i", "B": "ii", "C": "iii"}
@@ -120,6 +121,7 @@ PATTERNS: list[Pattern] = [
 BY_ID = {p.id: p for p in PATTERNS}
 
 
+@traced
 def render_dx(status: Status, grade: str, extent: str, rng: random.Random,
               none_rate: float = NONE_RATE) -> tuple[str, str]:
     """Returns (diagnosis line, pattern id). Pattern 'none' = no diagnosis line."""

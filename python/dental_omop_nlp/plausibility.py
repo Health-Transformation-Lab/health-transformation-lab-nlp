@@ -22,12 +22,14 @@ from __future__ import annotations
 import pandas as pd
 
 from .labels import LABELS
+from .telemetry import traced
 
 FLAGS = ["cal_drop", "rbl_drop", "teeth_regained", "perio_resolved", "stage_drop"]
 CAL_TOL_MM = 1.5
 RBL_TOL_PCT = 5.0
 
 
+@traced
 def check_history(visits: pd.DataFrame, status_col: str = "status") -> pd.DataFrame:
     """visits: visit_id, person_id, visit_date, charted, max_cal_mm, rbl_pct,
     teeth_lost_perio, <status_col>. Returns visit_id, person_id, the FLAGS and any_flag."""
@@ -57,6 +59,7 @@ def check_history(visits: pd.DataFrame, status_col: str = "status") -> pd.DataFr
     return out
 
 
+@traced
 def flag_rates(flags: pd.DataFrame, by: pd.Series | None = None) -> pd.DataFrame:
     """Share of visits with each flag (after a person's first visit), overall or by group."""
     f = flags.copy()
@@ -76,6 +79,7 @@ def _five(s: str) -> str:
     return "healthy_gingivitis" if s in ("healthy", "gingivitis") else s
 
 
+@traced
 def transition_pairs(visits: pd.DataFrame, status_col: str = "status",
                      min_days: int = MIN_DAYS, max_days: int = MAX_DAYS) -> pd.DataFrame:
     """visits: visit_id, person_id, visit_date, treated_before, <status_col>. Returns one row per
@@ -104,6 +108,7 @@ def transition_pairs(visits: pd.DataFrame, status_col: str = "status",
                                        "from_status", "to_status", "change"])
 
 
+@traced
 def transition_summary(pairs: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """Five-by-five counts (rows: earlier visit) and the share of pairs better / same / worse."""
     m = pd.crosstab(pd.Categorical(pairs["from_status"], FIVE), pd.Categorical(pairs["to_status"], FIVE),

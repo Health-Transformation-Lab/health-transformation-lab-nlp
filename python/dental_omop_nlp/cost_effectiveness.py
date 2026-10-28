@@ -25,10 +25,13 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .telemetry import traced
+
 CORRECT, INCORRECT, ND = "correct", "incorrect", "not_determinable"
 
 
 # ------------------------------------------------------------------ costs
+@traced
 def method_cost(cfg: dict, n_notes: int, avg_note_tokens: float, compute: dict,
                 measured_tput: float | None = None) -> dict:
     """Cost to run one method over n_notes. Returns cost and the inputs used."""
@@ -46,6 +49,7 @@ def method_cost(cfg: dict, n_notes: int, avg_note_tokens: float, compute: dict,
             "throughput_source": cfg.get("throughput_source", "assumed")}
 
 
+@traced
 def judge_cost(n_judged: int, avg_note_tokens: float, judge_cfg: dict) -> float:
     tok_in = n_judged * (avg_note_tokens + judge_cfg["prompt_overhead_tokens"])
     tok_out = n_judged * judge_cfg["output_tokens"]
@@ -53,6 +57,7 @@ def judge_cost(n_judged: int, avg_note_tokens: float, judge_cfg: dict) -> float:
 
 
 # ------------------------------------------------------------------ judge calibration
+@traced
 def calibrate_judge(gold: pd.DataFrame) -> dict:
     """gold: rows with columns truly_correct (bool) and verdict. Not-determinable excluded."""
     g = gold[gold["verdict"].isin([CORRECT, INCORRECT]) & gold["gate_ok"]]
@@ -64,6 +69,7 @@ def calibrate_judge(gold: pd.DataFrame) -> dict:
             "gate_fail_rate": float((~gold["gate_ok"]).mean())}
 
 
+@traced
 def calibrate_components(gold: pd.DataFrame) -> pd.DataFrame:
     """gold: component, verdict, truly_correct, gate_ok (one row per chart and component).
     One calibration row per component (spec 002 T011); not_applicable rows are dropped."""
@@ -73,6 +79,7 @@ def calibrate_components(gold: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+@traced
 def judge_kappa(gold: pd.DataFrame) -> float:
     """Cohen's kappa between the judge's verdict and the truth (reviewer consensus)."""
     from .phenotype import cohen_kappa
@@ -80,6 +87,7 @@ def judge_kappa(gold: pd.DataFrame) -> float:
     return cohen_kappa((g["verdict"] == CORRECT), g["truly_correct"].astype(bool))
 
 
+@traced
 def bakeoff(gold: pd.DataFrame, classifier_families: set[str] | None = None,
             judge_families: dict[str, str] | None = None, n_boot: int = 500, seed: int = 0) -> pd.DataFrame:
     """Compare candidate judges on the calibration set (spec 002; after GlobalDentBench's
@@ -105,6 +113,7 @@ def bakeoff(gold: pd.DataFrame, classifier_families: set[str] | None = None,
     return t
 
 
+@traced
 def rogan_gladen(p: float, sens: float, spec: float) -> float:
     denom = sens + spec - 1
     if not np.isfinite(denom) or denom <= 0:
@@ -117,6 +126,7 @@ def _p_judged_correct(s: pd.DataFrame) -> float:
     return float((d["verdict"] == CORRECT).mean()) if len(d) else float("nan")
 
 
+@traced
 def corrected_accuracy(sample: pd.DataFrame, gold: pd.DataFrame, n_boot: int = 1000,
                        seed: int = 0) -> dict:
     """sample: judged corpus predictions for ONE method. gold: judged calibration rows (all methods)."""
@@ -149,6 +159,7 @@ def corrected_accuracy(sample: pd.DataFrame, gold: pd.DataFrame, n_boot: int = 1
 
 
 # ------------------------------------------------------------------ frontier
+@traced
 def frontier(table: pd.DataFrame, n_notes: int) -> pd.DataFrame:
     """Adds dominated flag and ICER (USD per additional correct note) along the frontier."""
     t = table.sort_values(["cost_usd", "accuracy_est"], ascending=[True, False]).reset_index(drop=True)

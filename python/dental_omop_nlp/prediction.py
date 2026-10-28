@@ -26,6 +26,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from .labels import LABELS
+from .telemetry import traced
 
 RANK = {**{s: i for i, s in enumerate(LABELS)}, "healthy_gingivitis": 0}
 FEATURES = ["age", "smoker_1_9", "smoker_10plus", "diabetes", "treated_before", "charted", "current_rank",
@@ -34,6 +35,7 @@ _CHART = {"rec_max_probing_depth_mm": "max_probing_depth_mm", "rec_bop_pct": "bo
           "rec_max_cal_mm": "max_cal_mm", "rec_rbl_pct": "rbl_pct", "rec_teeth_lost_perio": "teeth_lost_perio"}
 
 
+@traced
 def make_pairs(visits: pd.DataFrame, status_col: str) -> pd.DataFrame:
     v = visits[visits[status_col].isin(RANK)].sort_values(["person_id", "visit_date"]).copy()
     v["next_rank"] = v.groupby("person_id")[status_col].shift(-1).map(RANK)
@@ -60,6 +62,7 @@ def _unpenalized_logit() -> LogisticRegression:
     return LogisticRegression(penalty=None, solver="newton-cholesky", tol=1e-10, max_iter=500)
 
 
+@traced
 def train_eval(pairs: pd.DataFrame, seed: int = 0, n_boot: int = 500, test_share: float = 0.3) -> dict:
     rng = np.random.default_rng(seed)
     people = pairs["person_id"].unique()

@@ -22,6 +22,8 @@ import time
 import numpy as np
 import pandas as pd
 
+from .telemetry import traced
+
 
 def _chars(spans) -> set[int]:
     return {i for s in spans for i in range(s["start"], s["end"])}
@@ -41,6 +43,7 @@ def _token_counts(text: str, gold: list[dict], found: list[dict]) -> tuple[int, 
     return len(g), len(f), len(g & f)
 
 
+@traced
 def score_records(records: list[dict], detect) -> dict:
     rows, cat_rows = [], []
     for r in records:
@@ -80,6 +83,7 @@ def score_records(records: list[dict], detect) -> dict:
     return {"summary": summary, "by_category": by_cat, "per_note": per}
 
 
+@traced
 def damage_by_type(records: list[dict], detect) -> pd.DataFrame:
     """Per entity type (records carrying `entities`, e.g. maccrobat.load_bio): share of entities with
     any character removed, and share of their characters removed."""
@@ -97,6 +101,7 @@ def damage_by_type(records: list[dict], detect) -> pd.DataFrame:
             .drop(columns=["chars", "removed"]).sort_values(["role", "n"], ascending=[True, False]))
 
 
+@traced
 def choose_routes(records: list[dict], engines: dict, min_precision: float = 0.8,
                   guard: bool = True) -> tuple[dict, pd.DataFrame]:
     """Route each identifier type to the engines that report it precisely. For every (engine, type
@@ -121,6 +126,7 @@ def choose_routes(records: list[dict], engines: dict, min_precision: float = 0.8
     return {e: t for e, t in routes.items() if t}, table.sort_values(["engine", "type"]).reset_index(drop=True)
 
 
+@traced
 def routes_from_table(table: pd.DataFrame) -> dict:
     """The routes choose_routes picked, read back from its table (data/deid/routes.csv), so another test
     set is scored with the routes chosen on the challenge set's training tiers."""
@@ -128,6 +134,7 @@ def routes_from_table(table: pd.DataFrame) -> dict:
     return {e: set(g["type"]) for e, g in kept.groupby("engine")}
 
 
+@traced
 def measure_throughput(records: list[dict], detect, min_seconds: float = 0.5) -> float:
     """Notes per second on this machine (local engines)."""
     n, t0 = 0, time.perf_counter()
@@ -138,6 +145,7 @@ def measure_throughput(records: list[dict], detect, min_seconds: float = 0.5) ->
     return n / (time.perf_counter() - t0)
 
 
+@traced
 def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> float:
     """USD to run one engine over n_notes."""
     if cfg["kind"] == "local":
@@ -177,11 +185,13 @@ def engine_cost(cfg: dict, n_notes: int, avg_chars: float, compute: dict) -> flo
     raise ValueError(f"unknown kind {cfg['kind']}")
 
 
+@traced
 def review_cost(n_notes: int, review: dict) -> float:
     """Human QA of a sample of de-identified notes (same for every engine)."""
     return review["qa_sample_share"] * n_notes * review["minutes_per_note"] / 60 * review["usd_per_hour"]
 
 
+@traced
 def deid_frontier(t: pd.DataFrame) -> pd.DataFrame:
     """t: method, cost_usd, leaked_per_1m_notes [, decoy_damage]. Adds dominated,
     icer_usd_per_leak_avoided, usd_per_1k_leaks_avoided, compared_to. At equal cost and leaks the
@@ -214,17 +224,20 @@ _LLM_KEYS = ("usd_per_1m_input_tokens", "usd_per_1m_output_tokens", "prompt_over
 _LICENSE_KEYS = ("chars_per_sec", "node_usd_per_hour", "license_usd_per_month", "hours_per_month", "prorate_license")
 
 
+@traced
 def format_tiers(tiers) -> str:
     """[[1e6, 0.0014], [None, 0.00025]] -> '1000000:0.0014;inf:0.00025' (cost_inputs.csv; R parses it)."""
     return ";".join(f"{'inf' if hi is None else int(hi)}:{usd!r}" for hi, usd in tiers or [])
 
 
+@traced
 def parse_tiers(s) -> list:
     if not isinstance(s, str) or not s:
         return []
     return [[None if hi == "inf" else int(hi), float(usd)] for hi, usd in (t.split(":") for t in s.split(";"))]
 
 
+@traced
 def cost_table(ci: pd.DataFrame) -> pd.DataFrame:
     """cost_inputs.csv rows (one per method x member engine) -> one row per method with the frontier."""
     if "tier" in ci and ci["tier"].nunique() > 1:

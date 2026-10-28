@@ -14,6 +14,7 @@ from __future__ import annotations
 import re
 
 from .labels import PerioChart, Status, label_chart
+from .telemetry import traced
 
 _ROMAN = {"I": 1, "II": 2, "III": 3, "IV": 4, "1": 1, "2": 2, "3": 3, "4": 4}
 _STAGE = re.compile(r"\b(?:stage|st\.?|perio)\s*(IV|III|II|I|[1-4])(?=[\s/.,ABCabc]|$)", re.IGNORECASE)
@@ -30,6 +31,7 @@ _NOT_PERIO_EXTENT = re.compile(r"^\s+(recession|gingival|inflammation|plaque|cal
                                re.IGNORECASE)
 
 
+@traced
 def current_text(text: str) -> str:
     """Drop copied-forward sections."""
     return re.split(r"--\s*copied from visit", text, flags=re.IGNORECASE)[0]
@@ -49,6 +51,7 @@ def _stage_status(stage: int, t: str) -> str:
     return f"periodontitis_stage_{stage}"
 
 
+@traced
 def read_stated_dx(text: str) -> str | None:
     t = current_text(text)
     if re.search(r"gingival health|periodontal health|perio(?:dontium)? WNL|perio health", t, re.IGNORECASE):
@@ -78,6 +81,7 @@ def _num(pattern: str, t: str) -> float | None:
     return float(next(g for g in m.groups() if g is not None))
 
 
+@traced
 def read_findings(text: str) -> str:
     t = current_text(text)
     # Probing depth is not read here: in notes it is usually a site list, not the max.
@@ -101,6 +105,7 @@ def read_findings(text: str) -> str:
                                   _teeth_lost(t))).value
 
 
+@traced
 def read_note(text: str) -> str:
     return read_stated_dx(text) or read_findings(text)
 
@@ -111,6 +116,7 @@ def _dx_region(t: str) -> str:
     return m.group(0) if m else t
 
 
+@traced
 def read_grade(text: str) -> str:
     """A/B/C for periodontitis, 'NA' otherwise, 'unknown' if not written."""
     t = current_text(text)
@@ -121,6 +127,7 @@ def read_grade(text: str) -> str:
     return _GRADE_MAP[m.group(1).lower()] if m else "unknown"
 
 
+@traced
 def read_extent(text: str) -> str:
     """localized/generalized for periodontitis, 'NA' otherwise, 'unknown' if not written.
     Skips extent words that describe another finding ('generalized recession')."""

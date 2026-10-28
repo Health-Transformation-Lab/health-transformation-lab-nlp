@@ -30,6 +30,7 @@ import pandas as pd
 
 from .deid import residual_scan
 from .phi_challenge import CATEGORIES
+from .telemetry import traced
 
 UNSPECIFIED = "PHI_UNSPECIFIED"
 GOLD_LABELS = [*CATEGORIES, UNSPECIFIED]
@@ -67,6 +68,7 @@ def _runs(chars: set[int]) -> list[tuple[int, int]]:
 
 
 # ------------------------------------------------------------------ gold flow
+@traced
 def gold_tasks(records: list[dict], detect, engine: str, unaided_share: float = 0.2, seed: int = 0) -> list[dict]:
     """One task per note; engine spans as predictions except on a seeded unaided share."""
     rng = random.Random(seed)
@@ -81,6 +83,7 @@ def gold_tasks(records: list[dict], detect, engine: str, unaided_share: float = 
     return tasks
 
 
+@traced
 def parse_gold_export(export: list[dict]) -> pd.DataFrame:
     """One row per marked span (note_id, annotator, aided, start, end, type, text). An annotation
     with no spans (the annotator found no PHI) is kept as one row with start = end = -1."""
@@ -101,6 +104,7 @@ def _marked(spans: pd.DataFrame) -> pd.DataFrame:
     return spans[spans["start"] >= 0]
 
 
+@traced
 def agreement(spans: pd.DataFrame) -> pd.DataFrame:
     """Pairwise entity F1 on the notes both annotated: exact (start, end), then also same category."""
     rows = []
@@ -119,6 +123,7 @@ def agreement(spans: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+@traced
 def consensus(spans: pd.DataFrame) -> dict:
     """{note_id: [span]}: characters marked by at least half the note's annotators (one vote per
     annotator, however many spans cover the character); each run takes
@@ -137,6 +142,7 @@ def consensus(spans: pd.DataFrame) -> dict:
     return out
 
 
+@traced
 def gold_records(spans: pd.DataFrame, records: list[dict]) -> list[dict]:
     """The annotated notes with the consensus as their PHI, ready for deid_eval.score_records."""
     gold = consensus(spans)
@@ -144,6 +150,7 @@ def gold_records(spans: pd.DataFrame, records: list[dict]) -> list[dict]:
             for r in records if r["note_id"] in gold]
 
 
+@traced
 def annotator_recall(spans: pd.DataFrame, records: list[dict]) -> pd.DataFrame:
     """Synthetic only: share of the generator's identifiers each annotator fully marked, aided vs unaided."""
     truth = {r["note_id"]: r["phi"] for r in records}
@@ -161,6 +168,7 @@ def annotator_recall(spans: pd.DataFrame, records: list[dict]) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------------ QA flow
+@traced
 def redact_map(text: str, spans: list[dict]) -> tuple[str, list[int]]:
     """Redacted text (deid.redact uses this) plus where each original character landed (-1 = redacted).
     A span inside an earlier one is already redacted; nothing inside an outer span is re-emitted."""
@@ -191,17 +199,20 @@ def _is_leak(frag: str) -> bool:
     return any(w not in _TITLES for w in words)
 
 
+@traced
 def format_spans(spans) -> str:
     """[(start, end), ...] as "s-e;s-e" for CSV (R reads the same)."""
     return ";".join(f"{a}-{b}" for a, b in spans)
 
 
+@traced
 def parse_spans(s) -> list[tuple[int, int]]:
     if not isinstance(s, str) or not s:
         return []
     return [tuple(int(x) for x in part.split("-")) for part in s.split(";")]
 
 
+@traced
 def qa_tasks(records: list[dict], detect, engine: str, n: int = 100, seed: int = 0) -> tuple[list[dict], pd.DataFrame]:
     """De-identify each note with the engine; sample residual-scan hits first, then seeded random notes.
     Returns (tasks, key); the key (true leaks, in redacted coordinates) never goes into a task."""
@@ -236,6 +247,7 @@ def qa_tasks(records: list[dict], detect, engine: str, n: int = 100, seed: int =
     return tasks, pd.DataFrame(key)
 
 
+@traced
 def parse_qa_export(export: list[dict]) -> pd.DataFrame:
     rows = []
     for task in export:
@@ -253,6 +265,7 @@ def parse_qa_export(export: list[dict]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+@traced
 def wilson(k: int, n: int, z: float = 1.959964) -> tuple[float, float, float]:
     """Share k/n with its Wilson score interval."""
     if n == 0:
@@ -263,6 +276,7 @@ def wilson(k: int, n: int, z: float = 1.959964) -> tuple[float, float, float]:
     return p, max(0.0, centre - half), min(1.0, centre + half)
 
 
+@traced
 def qa_summary(labels: pd.DataFrame, key: pd.DataFrame | None = None) -> pd.DataFrame:
     """Leak-note rate (Wilson CI) and over-redaction rate, pooled (any reviewer) and per reviewer;
     with the key, sensitivity (true-leak notes flagged), specificity (clean notes passed) and
@@ -300,6 +314,7 @@ def qa_summary(labels: pd.DataFrame, key: pd.DataFrame | None = None) -> pd.Data
 
 
 # ------------------------------------------------------------------ dry run
+@traced
 def simulate_gold_export(tasks: list[dict], records: list[dict], n_annotators: int = 3, seed: int = 11) -> list[dict]:
     """Simulated annotators: start from the truth, miss more where the pre-annotation missed (anchoring),
     sometimes keep an engine false positive, sometimes pick the wrong category. Dry runs only."""
@@ -335,6 +350,7 @@ def simulate_gold_export(tasks: list[dict], records: list[dict], n_annotators: i
     return out
 
 
+@traced
 def simulate_qa_export(tasks: list[dict], key: pd.DataFrame, n_reviewers: int = 2, seed: int = 13) -> list[dict]:
     """Simulated QA reviewers with their own sensitivity and false-alarm rate. Dry runs only."""
     rng = random.Random(seed)

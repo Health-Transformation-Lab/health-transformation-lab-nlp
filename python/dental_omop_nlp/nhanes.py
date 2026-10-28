@@ -26,6 +26,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from .telemetry import traced
+
 CYCLES = {"F": "2009", "G": "2011", "H": "2013"}
 FILES = ("OHXPER", "OHXDEN", "DEMO")
 URLS = ("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/{year}/DataFiles/{name}_{suffix}.xpt",
@@ -40,6 +42,7 @@ SITE_WORDS = [("distofacial", "DB"), ("distobuccal", "DB"), ("mesiofacial", "MB"
               ("midlingual", "L")]
 
 
+@traced
 def download(dest: Path) -> list[Path]:
     """Fetch the nine XPT files into dest (skips ones already there)."""
     dest.mkdir(parents=True, exist_ok=True)
@@ -61,6 +64,7 @@ def download(dest: Path) -> list[Path]:
     return got
 
 
+@traced
 def read_xpt(path: Path) -> tuple[pd.DataFrame, dict[str, str]]:
     """Data and {variable: SAS label}."""
     with pd.read_sas(path, format="xport", iterator=True) as r:
@@ -68,6 +72,7 @@ def read_xpt(path: Path) -> tuple[pd.DataFrame, dict[str, str]]:
         return r.read(), labels
 
 
+@traced
 def sites_from_labels(labels: dict[str, str]) -> dict[tuple[str, str, str], str]:
     """(tooth, measure, letter) -> site, from labels such as 'Pocket depth: ..., distofacial'."""
     out = {}
@@ -83,6 +88,7 @@ def sites_from_labels(labels: dict[str, str]) -> dict[tuple[str, str, str], str]
     return out
 
 
+@traced
 def to_site_tables(per: pd.DataFrame, den: pd.DataFrame, labels: dict[str, str]) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Wide NHANES exam -> sites (SEQN, tooth, site, pd_mm, cal_mm, bop) and teeth (SEQN, tooth, present,
     missing_reason, furcation_class, mobility_degree). Universal tooth numbers, as NHANES uses."""
@@ -110,6 +116,7 @@ def to_site_tables(per: pd.DataFrame, den: pd.DataFrame, labels: dict[str, str])
     return sites[["SEQN", "tooth", "site", "pd_mm", "cal_mm", "bop"]], teeth
 
 
+@traced
 def weighted_prevalence(d: pd.DataFrame, col: str, w: str = "w", strata: str = "strata", psu: str = "psu",
                         domain: str = "domain", z: float = 1.959963984540054) -> pd.DataFrame:
     """Share of each category of `col` within the domain, % with linearized SE and Wald 95% CI.
@@ -136,6 +143,7 @@ def weighted_prevalence(d: pd.DataFrame, col: str, w: str = "w", strata: str = "
     return pd.DataFrame(rows)
 
 
+@traced
 def nhanes_cdc_aap_published() -> pd.DataFrame:
     """Published NHANES 2009-2014 prevalence, adults 30+, % (95% CI where given). Checked against the papers."""
     eke = "Eke et al. 2018 (PMC8094373)"     # dentate adults; mild and moderate reported together
@@ -152,6 +160,7 @@ def nhanes_cdc_aap_published() -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["source", "classification", "category", "pct", "ci_low", "ci_high"])
 
 
+@traced
 def classify_people(per: pd.DataFrame, den: pd.DataFrame, demo: pd.DataFrame, labels: dict[str, str]) -> pd.DataFrame:
     """One cycle -> one row per person: age, design, exam status, edentulous, CDC/AAP and ACES categories."""
     from .aces import AcesRules, aces_all

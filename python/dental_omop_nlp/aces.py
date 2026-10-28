@@ -34,6 +34,8 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from .telemetry import traced
+
 THIRD_MOLARS = {1, 16, 17, 32}
 SECOND_MOLARS = {2, 15, 18, 31}
 INTERPROXIMAL = {"MB", "DB", "ML", "DL"}
@@ -71,12 +73,14 @@ def _non_adjacent(teeth) -> bool:
     return not (same_arch and b - a == 1)
 
 
+@traced
 def occluding_pairs(teeth: pd.DataFrame) -> int:
     """Opposing pairs of present natural teeth, third molars excluded: upper t opposes lower 33 - t."""
     present = set(teeth.loc[teeth["present"].astype(bool), "tooth"])
     return sum(1 for t in range(2, 16) if t in present and 33 - t in present)
 
 
+@traced
 def aces(sites: pd.DataFrame, teeth: pd.DataFrame, rules: AcesRules = DEFAULT) -> dict:
     """One exam. sites: tooth, site, cal_mm, pd_mm, bop. teeth: tooth, present, missing_reason."""
     r = rules
@@ -125,6 +129,7 @@ def _non_adjacent_by(df: pd.DataFrame, key: str, index) -> pd.Series:
     return ok.reindex(index, fill_value=False)
 
 
+@traced
 def aces_all(sites: pd.DataFrame, teeth: pd.DataFrame, rules: AcesRules = DEFAULT,
              key: str = "visit_id") -> pd.DataFrame:
     """aces() for every exam at once (same rules, vectorized); one row per `key`."""

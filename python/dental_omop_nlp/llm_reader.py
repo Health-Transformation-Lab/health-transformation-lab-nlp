@@ -38,6 +38,7 @@ import pandas as pd
 from .deid import residual_scan
 from .judge import CRITERIA
 from .labels import LABELS
+from .telemetry import traced
 
 GRADES = {"A", "B", "C"}
 EXTENTS = {"localized", "generalized", "molar_incisor"}
@@ -64,6 +65,7 @@ _FINDING_WORDS = ("CAL", "attachment", "bone loss", "RBL", "PD ", "probing", "BO
 
 
 # ---------------------------------------------------------------- prompt
+@traced
 def build_messages(note: str, examples: list[tuple[str, str]] | None = None,
                    variant: str = DEFAULT_VARIANT) -> list[dict]:
     msgs = [{"role": "system", "content": PROMPTS[variant]}]
@@ -86,6 +88,7 @@ def _decisive_line(note: str) -> str:
     return lines[0] if lines else ""
 
 
+@traced
 def target_answer(note: str, status: str, grade: str = "NA", extent: str = "NA") -> str:
     perio = status.startswith("periodontitis")
     g = grade if perio and grade in GRADES else None
@@ -94,6 +97,7 @@ def target_answer(note: str, status: str, grade: str = "NA", extent: str = "NA")
                        "rationale": "From the charted findings and diagnosis in the note."})
 
 
+@traced
 def pick_examples(train: pd.DataFrame, k: int, seed: int = 0) -> list[tuple[str, str]]:
     """k synthetic training notes per status, chosen by seed."""
     rng = random.Random(seed)
@@ -107,6 +111,7 @@ def pick_examples(train: pd.DataFrame, k: int, seed: int = 0) -> list[tuple[str,
     return out
 
 
+@traced
 def sft_records(train: pd.DataFrame, variant: str = DEFAULT_VARIANT) -> list[dict]:
     """Chat-format fine-tuning records in exactly the reader's prompt/answer format."""
     recs = []
@@ -122,6 +127,7 @@ def sft_records(train: pd.DataFrame, variant: str = DEFAULT_VARIANT) -> list[dic
 THOUGHT_START, THOUGHT_END = "<unused94>", "<unused95>"  # MedGemma 1.5 thinking markers
 
 
+@traced
 def parse_answer(raw: str, note: str) -> dict:
     out = {"status": None, "grade": "NA", "extent": "NA", "quote": "", "gate_ok": False, "error": ""}
     if THOUGHT_START in raw:
@@ -269,6 +275,7 @@ def _hf_token() -> str | None:
         return f.read().strip() or None
 
 
+@traced
 def make_backend(entry: dict, kind: str, **kw):
     if kind == "hf":
         if entry.get("gated") and not _hf_token():
@@ -280,6 +287,7 @@ def make_backend(entry: dict, kind: str, **kw):
     raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
 
 
+@traced
 def summarize_details(d: pd.DataFrame) -> dict:
     """One run's reliability and cost inputs from its llm_details file."""
     return {"gate_pass": d["gate_ok"].mean(), "fallback": d["fallback"].mean(),
@@ -297,10 +305,12 @@ class LLMReader:
         self.examples: list[tuple[str, str]] = []
         self.details = pd.DataFrame()
 
+    @traced
     def fit(self, train: pd.DataFrame):
         self.examples = pick_examples(train, self.shots, self.seed) if self.shots and len(train) else []
         return self
 
+    @traced
     def predict(self, test: pd.DataFrame):
         from .note_reader import read_note
         preds, rows = [], []

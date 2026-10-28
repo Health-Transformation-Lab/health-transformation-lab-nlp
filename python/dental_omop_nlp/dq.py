@@ -19,6 +19,7 @@ import pandas as pd
 
 from .plausibility import check_history
 from .sources import UNKNOWN
+from .telemetry import traced
 
 THRESHOLD_FAIL = 0.05
 RANGES = {"probing_depth_range": ("rec_max_probing_depth_mm", 0, 15),
@@ -59,6 +60,7 @@ def _checks(v: pd.DataFrame, today: str) -> list[dict]:
     return out
 
 
+@traced
 def run_checks(visits: pd.DataFrame, today: str, by: str | None = None) -> pd.DataFrame:
     """visits: visits_structured.csv rows. Returns one row per check (and group)."""
     if by is None:

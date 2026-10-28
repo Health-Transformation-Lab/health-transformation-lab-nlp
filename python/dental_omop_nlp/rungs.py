@@ -25,6 +25,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 
 from .labels import LABELS, PerioChart, label_chart
+from .telemetry import traced
 
 CHART_COLS = ["max_probing_depth_mm", "bop_pct", "max_cal_mm", "rbl_pct", "teeth_lost_perio"]
 
@@ -49,6 +50,7 @@ def _find(text: str, key: str) -> float | None:
     return None
 
 
+@traced
 def rules_predict(text: str) -> str:
     bop = 0.0 if _NEG_BOP.search(text) else (_find(text, "bop") or 0.0)
     cal, rbl = _find(text, "cal"), _find(text, "rbl")
@@ -63,18 +65,22 @@ def rules_predict(text: str) -> str:
 class NoteRules:
     """Rules for clinical notes: stated diagnosis in any scheme, else findings (note_reader.py)."""
 
+    @traced
     def fit(self, train: pd.DataFrame):
         return self
 
+    @traced
     def predict(self, test: pd.DataFrame):
         from .note_reader import read_note
         return [read_note(t) for t in test["note_text"]], None
 
 
 class RulesBaseline:
+    @traced
     def fit(self, train: pd.DataFrame):
         return self
 
+    @traced
     def predict(self, test: pd.DataFrame):
         return [rules_predict(t) for t in test["note_text"]], None
 
@@ -84,10 +90,12 @@ class _SkWrap:
     def __init__(self, est, cols: str | list[str]):
         self.est, self.cols = est, cols
 
+    @traced
     def fit(self, train):
         self.est.fit(train[self.cols], train["label"])
         return self
 
+    @traced
     def predict(self, test):
         proba = self.est.predict_proba(test[self.cols])
         cls = list(self.est.classes_)
@@ -97,10 +105,12 @@ class _SkWrap:
         return [LABELS[i] for i in full.argmax(axis=1)], full
 
 
+@traced
 def structured_baseline():
     return _SkWrap(LogisticRegression(max_iter=2000), CHART_COLS)
 
 
+@traced
 def fusion_tfidf_rad():
     """Note text + structured radiograph features (spec 003). Visits without a
     radiograph get zeros plus rad_present = 0, so the model falls back to text."""
@@ -113,6 +123,7 @@ def fusion_tfidf_rad():
     return _SkWrap(make_pipeline(pre, LogisticRegression(max_iter=3000)), ["note_text", *FEATURES])
 
 
+@traced
 def tfidf_logreg():
     return _SkWrap(make_pipeline(TfidfVectorizer(ngram_range=(1, 2), min_df=2),
                                  LogisticRegression(max_iter=2000)), "note_text")
@@ -136,6 +147,7 @@ def _clear_checkpoints(out_dir) -> None:
         shutil.rmtree(c, ignore_errors=True)
 
 
+@traced
 def class_weights(labels, classes, power: float = 0.5) -> list[float]:
     """Inverse-frequency loss weights raised to `power` (0.5 = square root, gentler than fully
     balanced), scaled so the average weight over the training notes is 1. Absent classes get 0."""
@@ -165,6 +177,7 @@ class HFEncoder:
         return d.map(lambda b: self.tok(b["note_text"], truncation=True, max_length=self.max_len,
                                         padding="max_length"), batched=True)
 
+    @traced
     def fit(self, train):
         from transformers import (
             AutoModelForSequenceClassification,
@@ -200,6 +213,7 @@ class HFEncoder:
         _clear_checkpoints(args.output_dir)
         return self
 
+    @traced
     def predict(self, test):
         import torch
         logits = self.trainer.predict(self._ds(test)).predictions
@@ -207,6 +221,7 @@ class HFEncoder:
         return [LABELS[i] for i in proba.argmax(axis=1)], proba
 
 
+@traced
 def output_tag(class_weight: str | None = None, seed: int = 42, adapter: str | None = None,
                shots: int = 0, variant: str = "reader-v2", lr: float = 5e-5) -> str:
     """Suffix for a run's prediction file, so variants of one rung don't overwrite each other:
@@ -219,6 +234,7 @@ def output_tag(class_weight: str | None = None, seed: int = 42, adapter: str | N
     return tag
 
 
+@traced
 def make_rung(rung_id: str, registry: dict, **hf_kwargs):
     if rung_id == "rules_baseline":
         return RulesBaseline()

@@ -19,6 +19,8 @@ import json
 import re
 from pathlib import Path
 
+from .telemetry import traced
+
 # The original release (brat standoff, exact text) on figshare: MACCROBAT2020.zip, file 21489405.
 FIGSHARE_URL = "https://ndownloader.figshare.com/files/21489405"
 FIGSHARE_MD5 = "9d090f3e0719e77e7a33c38750548bb8"   # figshare's published checksum
@@ -41,6 +43,7 @@ _NO_SPACE_BEFORE = {",", ".", ";", ":", ")", "]", "%", "!", "?", "-", "/"}
 _NO_SPACE_AFTER = {"(", "[", "-", "/"}
 
 
+@traced
 def bio_spans(tokens: list[str], tags: list[str]) -> tuple[str, list[dict]]:
     """BIO tokens -> (text, [{start, end, type, text}]). An I- tag that doesn't continue an entity of
     its type starts a new one. Spacing is approximate: BIO files drop the original whitespace."""
@@ -67,6 +70,7 @@ def bio_spans(tokens: list[str], tags: list[str]) -> tuple[str, list[dict]]:
     return text, [s | {"text": text[s["start"]:s["end"]]} for s in spans]
 
 
+@traced
 def role(kind: str, text: str) -> str:
     """phi, clinical or other (see the module docstring)."""
     if kind == "Date" and (_MONTH.search(text) or _NUMERIC_DATE.search(text)):
@@ -91,6 +95,7 @@ def _record(note_id, tier: str, text: str, spans: list[dict]) -> dict:
             "decoys": [s for s in ents if s["role"] == "clinical"]}
 
 
+@traced
 def load_bio(path, tier: str = "maccrobat") -> list[dict]:
     """JSONL rows {"tokens", "tags"} -> challenge records (spec 007 format) plus `entities` with a role.
     Rows with the same tokens are copies (the mirror holds the 2018 and 2020 releases): the last one wins."""
@@ -117,6 +122,7 @@ def _brat_spans(text: str, ann: str) -> list[dict]:
     return spans
 
 
+@traced
 def load_brat(path, tier: str = "maccrobat") -> list[dict]:
     """The original release (figshare zip, or the folder it unpacks to): NNN.txt with NNN.ann.
     Exact text and offsets, unlike the BIO mirror."""

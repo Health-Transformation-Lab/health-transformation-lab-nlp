@@ -37,6 +37,7 @@ from typing import Literal
 import pandas as pd
 
 from .judge import CRITERIA, Verdict
+from .telemetry import traced
 
 JUDGE_NAME = "perio_status_supported"
 VERDICTS = ("correct", "incorrect", "not_determinable")
@@ -67,6 +68,7 @@ GUIDELINES = [
 ]
 
 
+@traced
 def make_guidelines_judge(model: str | None = None, name: str = "aap_guidelines"):
     """Databricks/MLflow built-in Guidelines judge over the AAP rules a note can show."""
     from mlflow.genai.scorers import Guidelines
@@ -108,6 +110,7 @@ class _LazyPhiScorer:
 no_phi_in_note = _LazyPhiScorer()
 
 
+@traced
 def monitoring_plan(model: str, sample_rate: float = 0.1) -> list[tuple[str, object, float]]:
     """(name, scorer, sample rate) for production monitoring. LLM judges score a sample of live
     traces (they cost tokens); the PHI scan is free and runs on every trace."""
@@ -118,6 +121,7 @@ def monitoring_plan(model: str, sample_rate: float = 0.1) -> list[tuple[str, obj
             ("no_phi_in_note", no_phi_in_note._get(), 1.0)]
 
 
+@traced
 def start_monitoring(model: str, experiment_id: str, sample_rate: float = 0.1) -> list[str]:  # pragma: no cover
     """Register each scorer on the experiment and start it on live traces (Databricks tracking)."""
     from mlflow.genai.scorers import ScorerSamplingConfig
@@ -129,6 +133,7 @@ def start_monitoring(model: str, experiment_id: str, sample_rate: float = 0.1) -
     return started
 
 
+@traced
 def stop_monitoring(experiment_id: str) -> list[str]:  # pragma: no cover - needs Databricks tracking
     from mlflow.genai.scorers import list_scorers
     stopped = []
@@ -138,12 +143,14 @@ def stop_monitoring(experiment_id: str) -> list[str]:  # pragma: no cover - need
     return stopped
 
 
+@traced
 def make_perio_judge(model: str):
     from mlflow.genai.judges import make_judge
     return make_judge(name=JUDGE_NAME, instructions=INSTRUCTIONS, model=model,
                       feedback_value_type=Literal["correct", "incorrect", "not_determinable"])
 
 
+@traced
 def verdict_from_feedback(fb, note: str) -> Verdict:
     """MLflow Feedback -> judge.Verdict, with the quote gate."""
     value = str(getattr(fb, "value", "") or "")
@@ -169,6 +176,7 @@ class MLflowJudgeAdapter:
         return verdict_from_feedback(fb, note)
 
 
+@traced
 def evaluate_predictions(rows: pd.DataFrame, judge=None, method: str = "", simulated: bool = False,
                          sim_sensitivity: float = 0.93, sim_specificity: float = 0.88, seed: int = 11,
                          extra_scorers: list | None = None) -> dict:
@@ -211,6 +219,7 @@ def evaluate_predictions(rows: pd.DataFrame, judge=None, method: str = "", simul
     return {"n": len(data), "metrics": dict(res.metrics), "run_id": run.info.run_id, "table": res.result_df}
 
 
+@traced
 def align_to_reviewers(judge, experiment_id: str, traces_and_labels: list[tuple[str, str]],
                        optimizer=None):  # pragma: no cover - needs Databricks + MLflow >= 3.14 + an LLM
     """Log each reviewer label as HUMAN feedback under the judge's name, then align the judge.

@@ -38,6 +38,7 @@ from dataclasses import dataclass, replace
 from typing import ClassVar
 
 from .labels import LABELS
+from .telemetry import traced
 
 PROMPT_VERSION = "judge-v2"   # v2: AAP worksheet rules (CAL first, complexity, grade)
 
@@ -137,6 +138,7 @@ Judge each part."""
 _ALLOWED = {"status": (None, *LABELS), "grade": (None, *GRADES), "extent": (None, *EXTENTS)}
 
 
+@traced
 def gate_components(note: str, out: dict, pred_status: str) -> dict[str, tuple[bool, str]]:
     """Quote gate and schema check per component: {component: (ok, reason)}."""
     perio = str(pred_status).startswith("periodontitis")
@@ -214,6 +216,7 @@ def _parse(raw: str) -> dict:
     return json.loads(s[start:end + 1])
 
 
+@traced
 def gate(note: str, out: dict) -> tuple[bool, str]:
     """Quote gate plus schema check. Returns (ok, reason)."""
     if out.get("verdict") not in {"correct", "incorrect", "not_determinable"}:
@@ -226,6 +229,7 @@ def gate(note: str, out: dict) -> tuple[bool, str]:
     return True, ""
 
 
+@traced
 def gate_status(note: str, out: dict) -> tuple[bool, str]:
     """Quote gate for a status call: a status (or null) from the six, and a verbatim quote for a status."""
     st = out.get("supported_status")
@@ -248,6 +252,7 @@ class OpenAIJudge:
     def __call__(self, note: str, pred: str) -> Verdict:
         return self._ask(SYSTEM, USER.format(note=note, pred=pred), lambda out: gate(note, out))
 
+    @traced
     def status(self, note: str) -> Verdict:
         """The status the note supports, with no answer shown (spec 012); verdict is 'status'."""
         v = self._ask(STATUS_SYSTEM, STATUS_USER.format(note=note), lambda out: gate_status(note, out))
@@ -278,6 +283,7 @@ class OpenAIJudge:
         return Verdict("", None, "", "", False, 0, 0, 0.0, err)
 
 
+@traced
 def judge_components_openai(j: OpenAIJudge, note: str, pred: dict) -> dict[str, ComponentVerdict]:
     """One call, three verdicts, through the same OpenAI-compatible endpoint as OpenAIJudge."""
     body = json.dumps({"model": j.model, "temperature": j.temperature, "max_tokens": 500,
@@ -320,6 +326,7 @@ class SimulatedJudge:
         return Verdict(v, t if v == "incorrect" else (pred if v == "correct" else None), quote,
                        "simulated", True, tok_in, 60, 0.0)
 
+    @traced
     def status(self, note: str, visit_id: int | None = None) -> Verdict:
         """Simulated own status: the truth at rate `sensitivity`, else another status, or none at nd_rate."""
         t = self.truth[visit_id]

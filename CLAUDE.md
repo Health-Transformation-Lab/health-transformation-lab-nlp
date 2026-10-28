@@ -74,6 +74,8 @@ needed to use them. To refresh them to a newer Spec Kit:
 - Commits: imperative subject, body says why. Co-author trailer when an agent wrote it.
 - Seeds: every generator and sampler takes one; defaults are fixed.
 - Paths: use `dental_omop_nlp.paths`, never hard-code `data/`.
+- Telemetry: every public function or method in `python/dental_omop_nlp/` gets `@traced` (from
+  `.telemetry`); a test fails without it. Never put note text or row-level data in span attributes or logs.
 - Names: simulated files `simulated_*`, simulated methods `sim:<name>`, calibration-only methods `calib:<name>`.
 - Databricks names: identical in every target (catalog `dental_omop`, schemas
   `landing_`/`bronze_`/`silver_`/`gold_dental_omop_perio`). Never add `dev_`,

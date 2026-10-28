@@ -25,6 +25,7 @@ import json
 import random
 
 from .labels import PerioChart
+from .telemetry import traced
 
 POSTERIOR = [2, 3, 4, 5, 12, 13, 14, 15, 18, 19, 20, 21, 28, 29, 30, 31]
 MOLARS = {2, 3, 14, 15, 18, 19, 30, 31}
@@ -37,6 +38,7 @@ FEATURES = ["rad_present", "rad_max_rbl_pct", "rad_mean_rbl_pct", "rad_share_tee
             "rad_vertical_defects", "rad_furcations", "rad_calculus_teeth", "rad_missing_teeth", "rad_is_bwx"]
 
 
+@traced
 def simulate_radiograph(chart: PerioChart, pct_teeth_involved: float, rng: random.Random,
                         availability: float = 0.85, failure_rate: float = 0.04, image: str | None = None,
                         noise_sd_mm: float = 0.6) -> dict:
@@ -79,10 +81,12 @@ def simulate_radiograph(chart: PerioChart, pct_teeth_involved: float, rng: rando
             "n_teeth_rbl15": sum(r >= 15 for r in rbls)}
 
 
+@traced
 def ok(r: dict) -> bool:
     return bool(r.get("present")) and r.get("quality") == "ok"
 
 
+@traced
 def features(r: dict) -> dict:
     if not ok(r):
         return {f: 0.0 for f in FEATURES}
@@ -97,6 +101,7 @@ def features(r: dict) -> dict:
             "rad_is_bwx": 1.0 if "BWX" in r["image"] else 0.0}
 
 
+@traced
 def read_radiograph(r: dict) -> str:
     """Stage from % RBL alone, as a LOWER BOUND: the stage is set by the worst of
     CAL, RBL and tooth loss, so bone loss on the image says "at least this stage".
@@ -114,6 +119,7 @@ def read_radiograph(r: dict) -> str:
     return "periodontitis_stage_2" if r["max_rbl_pct"] <= 33 else "periodontitis_stage_3"
 
 
+@traced
 def summary(r: dict) -> str:
     """One line for reviewers (Label Studio)."""
     if not r.get("present"):
@@ -136,5 +142,6 @@ def summary(r: dict) -> str:
     return "; ".join(parts)
 
 
+@traced
 def to_json(r: dict) -> str:
     return json.dumps(r, separators=(",", ":"))

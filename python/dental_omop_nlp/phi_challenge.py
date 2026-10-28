@@ -31,6 +31,8 @@ from __future__ import annotations
 import datetime as dt
 import random
 
+from .telemetry import traced
+
 CATEGORIES = ["PATIENT", "DOCTOR", "RELATIVE", "AGE", "DATE", "PHONE", "EMAIL", "URL", "SSN",
               "MEDICAL_RECORD", "HEALTH_PLAN", "STREET", "CITY", "ZIP", "ORGANIZATION", "ID_OTHER"]
 
@@ -51,6 +53,7 @@ class _Note:
     def __init__(self):
         self.parts, self.phi, self.decoys, self.n = [], [], [], 0
 
+    @traced
     def t(self, s):
         self.parts.append(s)
         self.n += len(s)
@@ -60,12 +63,15 @@ class _Note:
         lst.append({"start": self.n, "end": self.n + len(s), "text": s, "type": kind})
         return self.t(s)
 
+    @traced
     def p(self, s, kind):
         return self._mark(self.phi, s, kind)
 
+    @traced
     def d(self, s, kind):
         return self._mark(self.decoys, s, kind)
 
+    @traced
     def build(self, note_id, tier):
         return {"note_id": note_id, "tier": tier, "text": "".join(self.parts), "phi": self.phi, "decoys": self.decoys}
 
@@ -190,6 +196,7 @@ def _unseen(rng, i):
     return n.build(i, "unseen")
 
 
+@traced
 def build_challenge(n_notes: int = 400, seed: int = 7, hard_share: float = 0.35,
                     unseen_share: float = 0.3) -> list[dict]:
     """n_notes labeled notes in three tiers (the rest easy), in seeded random order."""
@@ -201,6 +208,7 @@ def build_challenge(n_notes: int = 400, seed: int = 7, hard_share: float = 0.35,
     return [make[t](rng, i) for i, t in enumerate(tiers)]
 
 
+@traced
 def load_external(path, text_keys=("text", "query", "note"), tier: str = "external") -> list[dict]:
     """Load another labeled PHI set (e.g. ASQ-PHI, MIT) into the challenge format.
 
@@ -270,6 +278,7 @@ def _parse_asq_phi(raw: str) -> list[dict]:
     return out
 
 
+@traced
 def load_i2b2_2014(folder, tier: str = "i2b2_2014") -> list[dict]:
     """The 2014 i2b2/UTHealth (n2c2) de-identification corpus: one XML per note, text in <TEXT>,
     PHI as <TAGS> children with start, end, text and TYPE. Needs the n2c2 data use agreement;

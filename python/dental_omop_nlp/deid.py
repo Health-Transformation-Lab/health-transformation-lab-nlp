@@ -51,6 +51,8 @@ from __future__ import annotations
 
 import re
 
+from .telemetry import traced
+
 DENTAL_ALLOWLIST = {
     "BOP", "CAL", "RBL", "PD", "SRP", "FMX", "BWX", "PAN", "PSR", "WNL", "MB", "DB", "ML", "DL", "B", "L",
     "M", "D", "OHI", "RTC", "FM", "UR", "LR", "UL", "LL", "HTN", "NKDA", "T2DM", "A1c", "AAP", "EFP",
@@ -92,6 +94,7 @@ def _merge(spans: list[dict]) -> list[dict]:
     return out
 
 
+@traced
 def detect_regex(text: str) -> list[dict]:
     spans = []
     for kind, pat in _PATTERNS:
@@ -103,6 +106,7 @@ def detect_regex(text: str) -> list[dict]:
     return _merge(spans)
 
 
+@traced
 def detect_presidio(text: str) -> list[dict]:  # pragma: no cover - optional dependency
     from presidio_analyzer import AnalyzerEngine
     global _PRESIDIO
@@ -149,6 +153,7 @@ _PT_NAME = re.compile(rf"\b(?:Pt|Patient|pt)\.?:? ({_NAME_WORD}(?: {_NAME_WORD})
 _CAP_PAIR_OVERLAP = re.compile(rf"(?=\b({_NAME_WORD}) ({_NAME_WORD})\b)")
 
 
+@traced
 def detect_regex_v2(text: str) -> list[dict]:
     spans = detect_regex(text)
     for kind, pat in [*_PATTERNS_V2, ("NAME", _PT_NAME)]:
@@ -173,6 +178,7 @@ _DENTAL_PROTECT = re.compile(
 )
 
 
+@traced
 def dental_guard(text: str, spans: list[dict]) -> list[dict]:
     """Drop spans that lie entirely inside a dental term."""
     protected = [(m.start(), m.end()) for m in _DENTAL_PROTECT.finditer(text)]
@@ -208,6 +214,7 @@ def _azure_deid_client():  # pragma: no cover - needs an Azure resource
     return _CLIENTS["deid"]
 
 
+@traced
 def detect_azure_deid(text: str, client=None) -> list[dict]:
     """Azure Health Data Services de-identification, TAG operation (spans only, nothing replaced)."""
     client = client or _azure_deid_client()
@@ -226,6 +233,7 @@ def _azure_language_client():  # pragma: no cover - needs an Azure resource
     return _CLIENTS["lang"]
 
 
+@traced
 def detect_azure_language(text: str, client=None) -> list[dict]:
     """Azure AI Language PII detection with the healthcare (PHI) domain filter."""
     client = client or _azure_language_client()
@@ -248,6 +256,7 @@ def _aws_comprehend_client():  # pragma: no cover - needs an AWS account
     return _CLIENTS["aws"]
 
 
+@traced
 def detect_aws_comprehend(text: str, client=None, min_score: float = 0.5) -> list[dict]:
     """Amazon Comprehend Medical DetectPHI. min_score 0.5 is the middle threshold the ASQ-PHI paper
     reports. Its AGE and PROFESSION types are kept: that's what the service returns."""
@@ -297,6 +306,7 @@ def _windows(text: str, size: int) -> list[tuple[int, str]]:
     return out
 
 
+@traced
 def detect_transformer(text: str, model: str = _HF_MODELS["hf_stanford"], pipe=None, min_score: float = 0.5,
                        window_chars: int = 1200) -> list[dict]:
     """Clinical de-identification transformer (token classification). Labels may carry BIO/BILOU prefixes.
@@ -338,6 +348,7 @@ def _llm_complete(system: str, user: str) -> str:  # pragma: no cover - needs an
         return json.loads(r.read())["choices"][0]["message"]["content"]
 
 
+@traced
 def detect_llm(text: str, complete=None) -> list[dict]:
     """LLM lists identifiers verbatim; each is located in the note (every occurrence). Values not
     found in the note are dropped, so the model can't add identifiers that aren't there."""
@@ -374,6 +385,7 @@ def _jsl_light():  # pragma: no cover - needs a John Snow Labs licence and Spark
     return _JSL["light"]
 
 
+@traced
 def detect_jsl(text: str, light=None) -> list[dict]:
     """John Snow Labs Healthcare NLP de-identification pipeline ('clinical_deidentification').
     Licensed; runs on Spark (e.g. Databricks). Spark NLP chunk ends are inclusive."""
@@ -415,6 +427,7 @@ def _ai_mask_sql(text: str, labels: list[str]) -> str:  # pragma: no cover - nee
     return out["result"]["data_array"][0][0]
 
 
+@traced
 def detect_ai_mask(text: str, mask=None, labels: list[str] | None = None) -> list[dict]:
     """Databricks ai_mask returns the note with entities replaced by [MASKED], not offsets. The spans
     are recovered by locating the unmasked pieces in order; if the model changed other text too, a
@@ -461,6 +474,7 @@ ENGINES = {"regex": detect_regex, "regex_v2": detect_regex_v2, "presidio": detec
 CLOUD_ENGINES = {"azure_deid", "azure_language", "llm", "jsl", "ai_mask", "aws_comprehend"}
 
 
+@traced
 def get_engine(spec: str):
     """'regex', 'regex_v2+guard', 'azure_deid+regex_v2+guard': union of engines, then optional dental guard."""
     parts = spec.split("+")
@@ -478,6 +492,7 @@ def get_engine(spec: str):
     return detect
 
 
+@traced
 def routed_engine(routes: dict, engines: dict | None = None, guard: bool = True):
     """Union of each engine's spans of only its routed types (deid_eval.choose_routes), then the
     dental guard. Types are filtered per engine before spans merge, since merging keeps one type."""
@@ -490,28 +505,33 @@ def routed_engine(routes: dict, engines: dict | None = None, guard: bool = True)
     return detect
 
 
+@traced
 def redact(text: str, spans: list[dict]) -> str:
     """Replace each span with [TYPE]; a span nested in an earlier one adds nothing."""
     from .deid_review import redact_map
     return redact_map(text, spans)[0]
 
 
+@traced
 def deidentify(text: str, engine: str = "regex") -> tuple[str, list[dict]]:
     spans = get_engine(engine)(text)
     return redact(text, spans), spans
 
 
 # ------------------------------------------------------------ gates & scoring
+@traced
 def leak_check(deid_text: str, known_phi: list[dict]) -> list[str]:
     """Synthetic data only: every injected PHI value that survived (should be [])."""
     return [p["text"] for p in known_phi if p["text"] in deid_text]
 
 
+@traced
 def residual_scan(deid_text: str) -> list[dict]:
     """Real data: detectors re-run on the output. Non-empty = hold for human review."""
     return detect_regex(deid_text)
 
 
+@traced
 def score_deid(text: str, known_phi: list[dict], found: list[dict]) -> dict:
     """Character-level recall (PHI removed) and over-redaction (non-PHI removed)."""
     phi = set()

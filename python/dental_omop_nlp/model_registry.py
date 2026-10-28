@@ -24,6 +24,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from .telemetry import traced
+
 
 def _pyfunc_class():
     import mlflow
@@ -50,6 +52,7 @@ def _uc():
     return mlflow
 
 
+@traced
 def log_and_register(rung, rung_id: str, model_name: str, input_example: pd.DataFrame,
                      simulated: bool = False) -> str:
     """Log the fitted rung as a pyfunc in the active (or a new) run and register a version.
@@ -87,6 +90,7 @@ class _null:
         return False
 
 
+@traced
 def promote_if_accepted(model_name: str, version: str, rater: str, agreement_vs_humans: pd.DataFrame) -> bool:
     """Champion only if the acceptance test is non-inferior for this model's predictions."""
     mlflow = _uc()
@@ -111,6 +115,7 @@ def promote_if_accepted(model_name: str, version: str, rater: str, agreement_vs_
     return True
 
 
+@traced
 def load_alias(model_name: str, alias: str):
     mlflow = _uc()
     try:

@@ -27,10 +27,11 @@ from __future__ import annotations
 import datetime as dt
 import random
 
+from .dx_patterns import render_dx
 from .labels import PerioChart, Status
 from .phi import Builder, Person, Provider, fmt_date
-from .dx_patterns import render_dx
 from .synthetic import RiskFactors
+from .telemetry import traced
 
 # Share of each note style. "ehr" follows published real-note patterns (spec 001)
 # and is the majority; the older styles stay for variety.
@@ -162,6 +163,7 @@ _PLAN = {
 }
 
 
+@traced
 def render_clinical_note(chart: PerioChart, status: Status, grade: str, extent: str, risk: RiskFactors,
                          patient: Person, provider: Provider, visit_date: dt.date,
                          rng: random.Random, prev_date: dt.date | None = None,

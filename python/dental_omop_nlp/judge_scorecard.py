@@ -26,6 +26,7 @@ from .cost_effectiveness import corrected_accuracy
 from .harm import unsafe_rates
 from .ladder_eval import STAGE4
 from .phenotype import cohen_kappa
+from .telemetry import traced
 
 # Rough token counts for the cost estimate printed before a run (judge.SYSTEM is ~1,000 tokens).
 SYSTEM_TOKENS = 1000
@@ -38,6 +39,7 @@ LIST_USD_PER_1M_IN = 0.50
 LIST_USD_PER_1M_OUT = 1.50
 
 
+@traced
 def chart_answers(inp: dict) -> pd.DataFrame:
     """One row per (visit_id, system): the system's status on that review chart (NaN = none), the
     note's difficulty (L1/L2/L3) and the generator's truth (for the dashboard's drill-down). Same systems and answers as the README leaderboard."""
@@ -48,6 +50,7 @@ def chart_answers(inp: dict) -> pd.DataFrame:
     return pd.concat(parts, ignore_index=True)
 
 
+@traced
 def judge_queue(answers: pd.DataFrame, key: pd.DataFrame) -> pd.DataFrame:
     """kind='status': one per chart, no answer shown. kind='verdict': one per distinct (chart, answer),
     since a verdict depends only on the note and the answer, not on which system gave it."""
@@ -60,6 +63,7 @@ def judge_queue(answers: pd.DataFrame, key: pd.DataFrame) -> pd.DataFrame:
     return q.sort_values(["visit_id", "kind", "answer"], na_position="first").reset_index(drop=True)
 
 
+@traced
 def estimate_cost(queue: pd.DataFrame, usd_per_1m_in: float, usd_per_1m_out: float,
                   system_tokens: int = SYSTEM_TOKENS, out_tokens: int = OUT_TOKENS) -> dict:
     """Tokens and US$ for judging the queue, printed (and checked against SC-005) before calling."""
@@ -78,6 +82,7 @@ _JUDGMENT_DTYPES = {"visit_id": "int64", "gate_ok": "bool", "prompt_tokens": "in
                     "latency_s": "float64", "simulated": "bool", "api_error": "bool"}
 
 
+@traced
 def empty_judgments() -> pd.DataFrame:
     """A judgments table with no rows but typed columns (judge_endpoint=none)."""
     return pd.DataFrame({c: pd.Series(dtype=_JUDGMENT_DTYPES.get(c, "object")) for c in JUDGMENT_COLS})
@@ -98,17 +103,20 @@ def _spark_type(col: pd.Series) -> str:
     return "STRING"
 
 
+@traced
 def spark_ddl(pdf: pd.DataFrame) -> str:
     """Spark schema for a table, from pandas dtypes, so all-empty columns (no judge run) keep their type."""
     return ", ".join(f"`{c}` {_spark_type(pdf[c])}" for c in pdf.columns)
 
 
+@traced
 def spark_rows(pdf: pd.DataFrame) -> list[tuple]:
     """Rows as plain Python values, NaN as null."""
     return [tuple(None if pd.isna(v) else (v.item() if hasattr(v, "item") else v) for v in r)
             for r in pdf.itertuples(index=False, name=None)]
 
 
+@traced
 def reusable(done: pd.DataFrame | None, endpoint: str) -> pd.DataFrame | None:
     """Earlier judgments a rerun can keep: same endpoint, the current prompt for their kind, no endpoint error."""
     if done is None:
@@ -122,6 +130,7 @@ def _key(r) -> tuple:
     return (int(r.visit_id), r.kind, "" if pd.isna(r.answer) else r.answer)
 
 
+@traced
 def run_judge(queue: pd.DataFrame, judge, endpoint: str, done: pd.DataFrame | None = None,
               trace=None) -> pd.DataFrame:
     """One judgment per queue row, in queue order. Rows already in `done` are kept, not re-asked, so a
@@ -191,6 +200,7 @@ def _judge_status(judgments: pd.DataFrame) -> pd.Series:
     return st.set_index("visit_id")["judge_status"].dropna()
 
 
+@traced
 def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_boot: int = 1000,
                   seed: int = 0) -> pd.DataFrame:
     """One row per (system, metric): vs_truth (the README number, all 240 charts), vs_truth_judged and
@@ -239,6 +249,7 @@ def judge_metrics(inp: dict, answers: pd.DataFrame, judgments: pd.DataFrame, n_b
     return out
 
 
+@traced
 def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed: int = 0) -> pd.DataFrame:
     """The judge's own status against the truth, overall and per truth status and note difficulty: n
     charts, coverage (share it gave a status for), agreement where it did (95% bootstrap range), kappa."""
@@ -264,6 +275,7 @@ def judge_agreement(inp: dict, judgments: pd.DataFrame, n_boot: int = 1000, seed
     return pd.DataFrame(rows)
 
 
+@traced
 def judge_run_summary(judgments: pd.DataFrame, usd_per_1m_in: float, usd_per_1m_out: float) -> pd.DataFrame:
     """What a judge run cost and how fast it was, per call type (status, verdict) and overall: calls,
     endpoint errors, quote-gate failures, tokens, US$ at the endpoint's list price (also per chart), and

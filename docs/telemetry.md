@@ -38,6 +38,37 @@ Instrumented so far: `11_ai_predict.py` (every model, including the GPU encoders
 `38_nhanes_perio.py`. Databricks jobs `medgemma_reader`, `encoder_gpu` and `nhanes_perio` pass the
 switch (`telemetry_exporter`, default `azure`) and read the connection string from the secret scope.
 
+## Every call, with a common header
+
+Every public function and method in `python/dental_omop_nlp/` (282 of them) carries `@traced`, which
+runs its body inside a `with` statement, the pattern cdh-lava-core uses in every method:
+
+```python
+from .telemetry import trace_call, traced
+
+@traced                                   # the usual form: one line above the def
+def label_chart(chart): ...
+
+def build_study(seed=7):
+    with trace_call("study.build_study") as log:      # the explicit form, same thing
+        log.info("built %d visits", n)                 # the log line carries the header too
+```
+
+**Common header.** Every span and every log line carries `data_product_id` (default
+`dental_omop_perio`, `DENTAL_DATA_PRODUCT_ID`), `environment` (`DENTAL_ENVIRONMENT`) and
+`service.namespace` (`dental-omop-nlp`); spans add `code.namespace` (module) and `code.function`. The
+resource names the data product as the service, so in a shared Application Insights resource one
+data product and one environment are a filter away (`customDimensions.data_product_id`,
+`cloud_RoleName`).
+
+**Budget.** A function called many times under the same parent (staging every chart, reading every
+note) makes a span for its first 3 calls only (`DENTAL_TELEMETRY_MAX_CALLS`); the rest are counted
+in the `function.calls` metric and failures still count. The whole site build (thousands of calls)
+sends 28 spans. With telemetry off, `@traced` is a plain function call: the test suite runs as fast
+as before.
+
+A test (`tests/test_telemetry_calls.py`) fails if a new public function lacks `@traced`.
+
 ## Set up Azure (once, from your laptop)
 
 The Azure resources are Terraform in `infra/azure/` (the azurerm provider). You need an Azure
@@ -103,6 +134,17 @@ Usage
 Spans the scripts send are internal spans, so in the workspace they are rows of `AppDependencies`
 (`Name` = step, `Success`, `DurationMs`, attributes in `Properties`). Exceptions are in
 `AppExceptions`, metrics in `AppMetrics`, log lines in `AppTraces`.
+
+Every call of one data product in one environment (the common header):
+
+```kusto
+AppDependencies
+| where TimeGenerated > ago(1d)
+| where tostring(Properties["data_product_id"]) == "dental_omop_perio" and tostring(Properties["environment"]) == "dev"
+| summarize calls = count(), failures = countif(Success == false), p95_ms = percentile(DurationMs, 95)
+    by function = Name
+| order by calls desc
+```
 
 What failed this week, and how:
 

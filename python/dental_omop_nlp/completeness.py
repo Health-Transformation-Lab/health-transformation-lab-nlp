@@ -18,6 +18,7 @@ from __future__ import annotations
 import pandas as pd
 
 from .sources import UNKNOWN
+from .telemetry import traced
 
 CHART_INPUTS = ["rec_max_cal_mm", "rec_bop_pct", "rec_max_probing_depth_mm", "rec_teeth_lost_perio"]
 SCALES = ["all_visits", "complete_cases", "reference_set"]
@@ -28,6 +29,7 @@ def _missing(s: pd.Series) -> pd.Series:
     return s.isna() | s.astype(str).isin([UNKNOWN, ""])
 
 
+@traced
 def element_completeness(expected: dict[str, list[str]], actual: dict[str, list[str]]) -> pd.DataFrame:
     """expected / actual: table -> columns. One row per expected column, present True/False."""
     rows = [{"table": t, "column": c, "present": c in actual.get(t, [])}
@@ -35,12 +37,14 @@ def element_completeness(expected: dict[str, list[str]], actual: dict[str, list[
     return pd.DataFrame(rows, columns=["table", "column", "present"])
 
 
+@traced
 def column_completeness(v: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return pd.DataFrame([{"column": c, "n_rows": len(v), "n_missing": int(_missing(v[c]).sum()),
                           "pct_missing": 100.0 * float(_missing(v[c]).mean()) if len(v) else float("nan")}
                          for c in columns])
 
 
+@traced
 def row_completeness(v: pd.DataFrame, inputs: list[str], where: str = "charted") -> dict:
     """Among rows where `where` is true (visits with a chart), the share with every input present."""
     rows = v[v[where].astype(bool)] if where else v
@@ -49,6 +53,7 @@ def row_completeness(v: pd.DataFrame, inputs: list[str], where: str = "charted")
     return {"n_rows": n, "n_complete": int(ok.sum()), "pct_complete": 100.0 * ok.sum() / n if n else float("nan")}
 
 
+@traced
 def complete_cases(v: pd.DataFrame) -> pd.DataFrame:
     """Visits where every evidence type can be compared: an exam-form status, a treatment plan
     (planned procedure codes, with or without a diagnosis), a complete probing chart and a note."""
@@ -57,6 +62,7 @@ def complete_cases(v: pd.DataFrame) -> pd.DataFrame:
     return v[keep]
 
 
+@traced
 def prevalence_by_scale(v: pd.DataFrame, status_col: str) -> pd.DataFrame:
     """Visit-level share with periodontitis and with stage III-IV on each scale (known calls only)."""
     scales = {"all_visits": v, "complete_cases": complete_cases(v), "reference_set": v[v["in_review"].astype(bool)]}
