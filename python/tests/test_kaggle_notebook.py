@@ -158,3 +158,18 @@ def test_show_log_prints_the_notebook_output_without_warnings(tmp_path):
     assert "SyntaxWarning" not in out and "re.sub" not in out and "NbConvertApp" not in out
     wf = (REPO_ROOT / ".github" / "workflows" / "kaggle-medgemma.yml").read_text()
     assert "kaggle/show_log.py" in wf
+
+
+def test_a_test_run_can_use_its_own_notebook(tmp_path):
+    # two runs pushed to one kernel replace each other: a side test gets its own slug (title derived from it)
+    _, meta, _ = _prepare(tmp_path, "--slug", "dental-omop-medgemma-keras-test")
+    assert meta["id"] == "someone/dental-omop-medgemma-keras-test"
+    assert meta["title"] == "dental omop medgemma keras test"
+
+
+def test_only_files_this_run_wrote_are_kept_as_outputs():
+    # the clone holds the committed hf results, which match *_{RUNG}*.csv too
+    code = _code()
+    assert "STARTED = time.time()" in code and code.index("STARTED = time.time()") < code.index("11_ai_predict.py")
+    keep = code[code.index("glob.glob"):]
+    assert "os.path.getmtime(f) >= STARTED" in keep

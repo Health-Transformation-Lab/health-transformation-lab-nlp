@@ -3,12 +3,14 @@ kernel-metadata.json (GPU and internet on; public, since it holds synthetic note
 .github/workflows/kaggle-medgemma.yml.
 
     python kaggle/prepare_kernel.py --out build/kernel --username <kaggle user> [--rung ...] [--limit 10]
-        [--shots 0] [--branch main] [--backend keras|hf]
+        [--shots 0] [--branch main] [--backend keras|hf] [--slug dental-omop-medgemma-reader]
 
 --limit 0 reads all 240 review notes (FULL_RUN); any other number reads that many as a test.
 --backend keras (the default) attaches the rung's Kaggle model (kaggle_model in models.yaml) through
 model_sources, so the notebook needs no Hugging Face token: a notebook pushed from GitHub can't read Kaggle
 secrets. --backend hf needs the HF_TOKEN Kaggle secret, attached to the notebook on kaggle.com.
+--slug pushes to another notebook, so a side test doesn't replace the workflow's run (Kaggle keeps one
+run per notebook).
 """
 
 import argparse
@@ -54,6 +56,7 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=10)
     ap.add_argument("--branch", default="main")
     ap.add_argument("--backend", choices=["keras", "hf"], default="keras")
+    ap.add_argument("--slug", default=SLUG)
     a = ap.parse_args()
     models = model_sources(a.rung, a.backend)
 
@@ -62,7 +65,8 @@ def main() -> None:
     cell["source"] = settings("".join(cell["source"]), a.rung, a.shots, a.limit, a.branch, a.backend).splitlines(keepends=True)
     a.out.mkdir(parents=True, exist_ok=True)
     (a.out / "medgemma_reader.ipynb").write_text(json.dumps(nb, indent=1) + "\n")
-    meta = {"id": f"{a.username}/{SLUG}", "title": TITLE, "code_file": "medgemma_reader.ipynb",
+    title = TITLE if a.slug == SLUG else a.slug.replace("-", " ")
+    meta = {"id": f"{a.username}/{a.slug}", "title": title, "code_file": "medgemma_reader.ipynb",
             "language": "python", "kernel_type": "notebook", "is_private": False, "enable_gpu": True,
             "enable_tpu": False, "enable_internet": True, "dataset_sources": [], "competition_sources": [],
             "kernel_sources": [], "model_sources": models}
