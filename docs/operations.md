@@ -134,11 +134,11 @@ once:
 
 - Use overwrite, or `MERGE` on a key.
 - Or **delete-then-append by batch key**. Load results (spec 016) does this: it deletes the rows of the
-  same file versions (SHA-256), then appends, and records each loaded file in `result_files` last.
+  same file versions (SHA-256), then appends, and records each loaded file in `dim_result_file` last.
 - Every written row carries its batch key (file SHA, run id, `git_commit`, load time), so a bad batch can
   be found and removed.
 - Plain `append` is allowed only for a log, where every row is a distinct event. The MedGemma reader job
-  writes `ai_predictions` and `llm_reader_runs` by batch key instead (`delta.replace_batch`, keyed by
+  writes `fact_prediction` and `fact_llm_call` by batch key instead (`delta.replace_batch`, keyed by
   source, job run id and method), so one of its retries replaces the run's rows.
 
 ## 5. Ingestion with Auto Loader, and schema drift
@@ -178,7 +178,7 @@ The repo doesn't ingest files with Auto Loader yet; these are the rules for when
 - With `DELETE`, turn on bucket versioning so a deletion can be undone.
 - Use it only when one stream reads the directory. Together with the `cloud_files_state` function, it's
   the only record Auto Loader keeps of which files it took. Write your own file ledger (file, size,
-  checksum, batch, rows) if you need to prove what was loaded, as `result_files` does for results.
+  checksum, batch, rows) if you need to prove what was loaded, as `dim_result_file` does for results.
 
 ## 6. FHIR on Databricks: partners, not platform
 

@@ -1,0 +1,13 @@
+feature,role,mean_abs_shap,mean_abs_shap_healthy_gingivitis,mean_abs_shap_stage_1,mean_abs_shap_stage_2,mean_abs_shap_stage_3,mean_abs_shap_stage_4
+max_cal_mm,stage,1.5153193,0.0,1.9272058,2.365919,3.283458,0.0
+pct_teeth_involved,extent,1.2807618,4.788871,1.2231432,0.3911083,0.0006769365,0.0
+teeth_lost_perio,stage,0.6921483,0.0,0.0,0.055568535,0.47914916,2.9260457
+max_probing_depth_mm,stage,0.29854655,0.0,0.53573173,0.87020135,0.08680415,0.0
+bop_pct,gingivitis,0.13738838,0.0,0.43479392,0.1277875,0.12436132,0.0
+treated_before,none,0.081914574,0.0,0.042017274,0.3675549,0.0,0.0
+rbl_pct,stage,0.078721605,0.0,0.2701217,0.075011835,0.039135873,0.009334635
+age,grade,0.046725143,0.0,0.06929221,0.16323358,0.0010996904,0.0
+hba1c,grade,0.002161932,0.0,0.0,0.01080966,0.0,0.0
+smoker_10plus,grade,0.0007792269,0.0,0.0,0.0,0.0038961344,0.0
+smoker_1_9,grade,0.0,0.0,0.0,0.0,0.0,0.0
+diabetes,grade,0.0,0.0,0.0,0.0,0.0,0.0

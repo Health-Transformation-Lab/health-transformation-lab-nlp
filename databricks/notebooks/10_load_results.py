@@ -7,10 +7,12 @@
 # MAGIC workflow) and laptops. Whatever is committed under `data/datasets/` is deployed with the bundle;
 # MAGIC this job, run after every deploy, appends each file version it hasn't seen yet:
 # MAGIC
-# MAGIC - `result_files`: one row per file version (SHA-256), with its source (`kaggle`, `repo`) and run URL
-# MAGIC - `ai_predictions`: method, visit_id, predicted status
-# MAGIC - `llm_reader_runs`: the LLM reader details, next to the rows the MedGemma reader job writes
-# MAGIC   (`source = databricks`)
+# MAGIC - `dim_result_file`: one row per file version (SHA-256), with its source (`kaggle`, `repo`) and run URL
+# MAGIC - `fact_prediction`: method, visit_id, predicted status
+# MAGIC - `fact_llm_call`: the LLM reader details, next to the rows the MedGemma reader job writes
+# MAGIC   (`source_code = databricks`)
+# MAGIC
+# MAGIC Columns take their gold names (spec 018, `dental_omop_nlp.gold_names`) as they are written.
 # MAGIC
 # MAGIC and logs one MLflow run per new LLM file. Running it again adds nothing. `simulated_*` files are
 # MAGIC never loaded. Serverless CPU.
@@ -30,7 +32,7 @@ import re
 from pathlib import Path
 
 import pandas as pd
-from dental_omop_nlp import grader_tables, results_store, tracking
+from dental_omop_nlp import gold_names, grader_tables, results_store, tracking
 from pyspark.sql import functions as F
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
@@ -57,14 +59,13 @@ if not data_dir.is_dir() or not (files := results_store.result_files(data_dir)).
                        "deployed with the bundle (data/datasets/). Check the deploy synced data/.")
 print("reading", data_dir)
 loaded = set()
-if spark.catalog.tableExists(table("result_files")):  # noqa: F821
-    loaded = {r.sha256 for r in spark.table(table("result_files")).select("sha256").collect()}  # noqa: F821
+if spark.catalog.tableExists(table("dim_result_file")):  # noqa: F821
+    loaded = {r.file_sha256 for r in spark.table(table("dim_result_file")).select("file_sha256").collect()}  # noqa: F821
 # The reader job (03) writes its CSVs into this folder and loads them itself, source 'databricks': those
 # versions are already in the tables, so loading them again would duplicate its rows as source 'repo'.
-if spark.catalog.tableExists(table("ai_predictions")):  # noqa: F821
-    reader = spark.table(table("ai_predictions"))  # noqa: F821
-    if {"source", "sha256"} <= set(reader.columns):
-        loaded |= {r.sha256 for r in reader.where("source = 'databricks'").select("sha256").distinct().collect()}
+if spark.catalog.tableExists(table("fact_prediction")):  # noqa: F821
+    reader = spark.table(table("fact_prediction"))  # noqa: F821
+    loaded |= {r.file_sha256 for r in reader.where("source_code = 'databricks'").select("file_sha256").distinct().collect()}
 new = results_store.new_files(files, loaded)
 print(f"{len(files)} result files deployed, {len(new)} new or changed")
 if len(new):
@@ -76,20 +77,21 @@ now = pd.Timestamp.now(tz="UTC")
 
 
 def append(df: pd.DataFrame, name: str):
-    """Append these file versions. Rows of the same versions are deleted first, so a load that failed partway
-    (no result_files row yet) is redone, not duplicated. An empty column takes the type the table already has
-    (an all-null `error` reads as a number in one file, text in another); other columns keep their own type,
+    """Append these file versions under their gold names. Rows of the same versions are deleted first, so a load
+    that failed partway (no dim_result_file row yet) is redone, not duplicated. An empty column takes the type the
+    table already has (an all-null `error_text` reads as a number in one file, text in another); other columns keep their own type,
     so a real mismatch fails loudly instead of turning values to null. New columns are added (mergeSchema)."""
     if not len(df):
         return
+    df = gold_names.to_gold(df.assign(git_commit=commit, loaded_at=now), name)
     empty = [c for c in df.columns if df[c].isna().all()]
-    sdf = spark.createDataFrame(df.astype({c: "string" for c in empty}).assign(git_commit=commit, loaded_at=now))  # noqa: F821
+    sdf = spark.createDataFrame(df.astype({c: "string" for c in empty}))  # noqa: F821
     if spark.catalog.tableExists(table(name)):  # noqa: F821
         schema = spark.table(table(name)).schema  # noqa: F821
-        hashes = ", ".join(f"'{h}'" for h in sorted(set(df.sha256)) if re.fullmatch(r"[0-9a-f]{64}", h))
-        if hashes and "sha256" in schema.fieldNames():
+        hashes = ", ".join(f"'{h}'" for h in sorted(set(df.file_sha256)) if re.fullmatch(r"[0-9a-f]{64}", h))
+        if hashes:
             # the reader job's own rows carry their CSV's sha256 too, keyed by run: never touch them here
-            spark.sql(f"DELETE FROM {table(name)} WHERE sha256 IN ({hashes}) AND source <> 'databricks'")  # noqa: F821
+            spark.sql(f"DELETE FROM {table(name)} WHERE file_sha256 IN ({hashes}) AND source_code <> 'databricks'")  # noqa: F821
         for field in schema:
             if field.name in empty:
                 sdf = sdf.withColumn(field.name, F.col(field.name).cast(field.dataType))
@@ -98,9 +100,9 @@ def append(df: pd.DataFrame, name: str):
 
 preds = new[new.kind == "predictions"]
 details = new[new.kind == "llm_details"]
-append(results_store.prediction_rows(preds, data_dir), "ai_predictions")
-append(results_store.detail_rows(details, data_dir).assign(run_ts=now), "llm_reader_runs")
-append(new, "result_files")              # last: a failure above leaves these versions to load next time
+append(results_store.prediction_rows(preds, data_dir), "fact_prediction")
+append(results_store.detail_rows(details, data_dir).assign(run_ts=now), "fact_llm_call")
+append(new, "dim_result_file")           # last: a failure above leaves these versions to load next time
 
 # COMMAND ----------
 

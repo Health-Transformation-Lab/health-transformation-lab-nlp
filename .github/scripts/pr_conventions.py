@@ -5,9 +5,10 @@
     ticket   a GitHub issue number, or a Jira key (DENT-123)
     slug     lowercase words joined by '-', at most 40 characters; spec work starts with the spec number
 
-Branches a tool names are allowed as they are: claude/* (agent sessions), dependabot/*, kaggle-results/*
-(the Kaggle workflow's results PRs). Every PR except dependabot's and kaggle-results' links its issue in the
-body: "Closes #71" (or Fixes, Resolves, Refs; or a Jira key).
+Branches a tool names are allowed as they are: dependabot/*, kaggle-results/* (the Kaggle workflow's results
+PRs). An agent session's assigned claude/* branch is not: the session moves its work to <type>/<issue>-<slug>
+(AGENTS.md rule 4, issue #116). Every PR except dependabot's and kaggle-results' links its issue in the body:
+"Closes #71" (or Fixes, Resolves, Refs; or a Jira key).
 
 Usage in CI: BRANCH=... BODY=... python .github/scripts/pr_conventions.py
 """
@@ -17,7 +18,7 @@ import re
 import sys
 
 TYPES = ("feat", "fix", "docs", "data", "ci", "chore", "spec")
-TOOL_BRANCHES = ("claude/", "dependabot/", "kaggle-results/")
+TOOL_BRANCHES = ("dependabot/", "kaggle-results/")
 NO_ISSUE_NEEDED = ("dependabot/", "kaggle-results/")
 TICKET = r"(?:\d+|[A-Z][A-Z0-9]+-\d+)"
 LINK = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?|refs?)\s+(?:#\d+|[A-Z][A-Z0-9]+-\d+)\b", re.IGNORECASE)
@@ -27,6 +28,9 @@ MAX_SLUG = 40
 def branch_problems(branch: str) -> list[str]:
     if branch.startswith(TOOL_BRANCHES):
         return []
+    if branch.startswith("claude/"):
+        return [(f"'{branch}' is an agent session's assigned branch: open or find the issue, then push the work to "
+                 "<type>/<issue>-<slug> and open the PR from there (AGENTS.md, Branches and issues, rule 4)")]
     kind, _, rest = branch.partition("/")
     if kind not in TYPES or not rest:
         return [f"start with a type and '/': one of {', '.join(TYPES)} (got '{branch}')"]

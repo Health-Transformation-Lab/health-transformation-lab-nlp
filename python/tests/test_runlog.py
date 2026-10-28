@@ -57,3 +57,17 @@ def test_an_existing_log_is_never_appended_to(tmp_path, capsys):
     assert "third run" in others[0].read_text() + others[1].read_text()
     out = capsys.readouterr().out
     assert f"log: {others[0]}" in out or f"log: {others[1]}" in out
+
+
+def test_scripts_dont_attach_to_the_notebooks_spark_gateway(monkeypatch, capsys):
+    # MedGemma reader, 2026-10-28: the script inherited the notebook's Py4J gateway, MLflow attached to it
+    # ("Connection to spark using Py4J from PID ..."), and when the script exited the notebook's next cell
+    # failed with "Py4JException: Error while obtaining a new communication channel". Scripts don't use Spark.
+    monkeypatch.setenv("PYSPARK_GATEWAY_PORT", "37723")
+    monkeypatch.setenv("PYSPARK_GATEWAY_SECRET", "x")
+    monkeypatch.setenv("DATABRICKS_HOST", "https://example")       # the login for MLflow still goes through
+    code = "import os; print(sorted(k for k in ('PYSPARK_GATEWAY_PORT', 'PYSPARK_GATEWAY_SECRET', 'DATABRICKS_HOST') if k in os.environ))"
+    assert runlog.run([sys.executable, "-c", code]) == 0
+    assert "['DATABRICKS_HOST']" in capsys.readouterr().out
+    import os
+    assert os.environ["PYSPARK_GATEWAY_PORT"] == "37723"            # the notebook keeps its own
