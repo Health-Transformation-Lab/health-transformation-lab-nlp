@@ -46,14 +46,23 @@ td,th{{padding:12px 16px;border-bottom:1px solid #D9D3C4}}ul{{padding-left:1.2em
 .topnav select{{max-width:280px;min-width:0;font:600 14px 'Public Sans',Arial,sans-serif;color:#F7F5EF;background:#15303A;border:1px solid rgba(213,227,225,.3);border-radius:8px;padding:6px 8px}}
 .disclaimer{{position:fixed;top:56px;left:0;right:0;z-index:40;padding:6px 16px;background:#15303A;color:#D5E3E1;font:13px/1.45 'Public Sans',Arial,sans-serif}}
 .reveal-viewport,.reveal{{background:#2b2b2b}}.reveal{{position:fixed;top:84px;left:0;right:0;bottom:0;width:auto;height:auto}}
-.reveal .slides{{text-align:left}}.reveal .slides>section{{height:1080px}}.reveal .controls{{color:#F2A070}}.reveal .progress{{color:#F2A070}}
+.reveal .slides{{text-align:left}}.reveal .slides>section{{height:1080px}}.reveal .progress{{color:#F2A070}}
+.topnav .pager{{display:flex;align-items:center;gap:4px}}
+.topnav .pager button{{color:#0F2A33;background:#F2A070;padding:7px 12px}}.topnav .pager button:hover{{color:#0F2A33;background:#F7F5EF}}
+.topnav .pager button:disabled{{opacity:.35;cursor:default;background:#F2A070}}
+.topnav button:focus-visible,.topnav select:focus-visible{{outline:2px solid #F7F5EF;outline-offset:2px}}
+/* reveal's own arrows: at the slide's left and right edges (controlsLayout 'edges'), larger, on a solid disc */
+.reveal .controls{{color:#F2A070;font-size:14px}}
+.reveal .controls .navigate-left,.reveal .controls .navigate-right{{background:rgba(15,42,51,.85);border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,.35)}}
 .reveal .slide-number{{font:600 14px 'Public Sans',Arial,sans-serif;background:rgba(15,42,51,.8);color:#F7F5EF}}
 .notes-panel{{position:fixed;left:0;right:0;bottom:0;z-index:45;max-height:35vh;overflow:auto;background:#f4f1ea;color:#222;padding:16px 20px 28px;font-size:15px;line-height:1.5;box-shadow:0 -8px 24px rgba(0,0,0,.3)}}
 .notes-panel[hidden]{{display:none}}
 @media (max-width:820px){{.home .name,.topnav .links a.deck{{display:none}}.topnav select{{max-width:40vw}}}}</style></head><body>
 <nav class="topnav" aria-label="Main"><div class="bar">
 <a class="home" href="{site}/" title="Back to the Health Transformation Lab home page"><span class="mark" aria-hidden="true">←</span><span class="name">Health Transformation Lab</span></a>
-<div class="links">{decks}<select id="deck-jump" aria-label="Go to slide">{options}</select>
+<div class="links">{decks}<span class="pager"><button id="deck-prev" aria-label="Previous slide" title="Previous slide (←)">‹ Previous</button>
+<select id="deck-jump" aria-label="Go to slide">{options}</select>
+<button id="deck-next" aria-label="Next slide" title="Next slide (→)">Next ›</button></span>
 <button id="deck-notes-btn" aria-pressed="false" title="Speaker notes (N)">Notes</button>
 <a class="cta" href="{repo}" target="_blank" rel="noopener">GitHub ↗</a></div></div></nav>
 <p class="disclaimer" id="deck-disclaimer">{note}</p>
@@ -64,18 +73,21 @@ TAIL = """</div></div>
 <script src="{reveal}/dist/reveal.js" integrity="{sri[js]}" crossorigin="anonymous"></script><script src="{reveal}/plugin/notes/notes.js" integrity="{sri[notes]}" crossorigin="anonymous"></script>
 <script>
 document.querySelectorAll('.slides a[href^="http"]').forEach(a=>{{a.target='_blank';a.rel='noopener'}})
-var jump=document.getElementById('deck-jump'),panel=document.getElementById('deck-notes'),btn=document.getElementById('deck-notes-btn'),
+var jump=document.getElementById('deck-jump'),prev=document.getElementById('deck-prev'),next=document.getElementById('deck-next'),panel=document.getElementById('deck-notes'),btn=document.getElementById('deck-notes-btn'),
   bar=document.getElementById('deck-disclaimer'),deck=document.querySelector('.reveal')
-function sync(){{var s=Reveal.getCurrentSlide();if(!s)return;var i=Reveal.getIndices().h;jump.selectedIndex=i;var n=s.querySelector('aside.notes');panel.innerHTML='<b>Slide '+(i+1)+' notes:</b> '+(n?n.innerHTML:'');if(!panel.hidden)fit()}}
+function sync(){{var s=Reveal.getCurrentSlide();if(!s)return;var i=Reveal.getIndices().h;jump.selectedIndex=i;prev.disabled=Reveal.isFirstSlide();next.disabled=Reveal.isLastSlide();var n=s.querySelector('aside.notes');panel.innerHTML='<b>Slide '+(i+1)+' notes:</b> '+(n?n.innerHTML:'');if(!panel.hidden)fit()}}
 // the slide area sits between the disclaimer (it wraps on narrow screens) and the notes panel, when open
 function fit(){{deck.style.top=(56+bar.offsetHeight)+'px';deck.style.bottom=(panel.hidden?0:panel.offsetHeight)+'px';if(Reveal.isReady())Reveal.layout()}}
 function toggleNotes(){{var on=panel.hidden;panel.hidden=!on;btn.setAttribute('aria-pressed',on);fit()}}
 jump.addEventListener('change',()=>{{Reveal.slide(jump.selectedIndex);jump.blur()}})
 btn.addEventListener('click',toggleNotes)
+// blur after a click so the arrow keys page again (the keyboard is off while focus is in the nav)
+prev.addEventListener('click',()=>{{Reveal.prev();prev.blur()}})
+next.addEventListener('click',()=>{{Reveal.next();next.blur()}})
 fit()
 Reveal.initialize({{width:1920,height:1080,margin:0.03,center:false,display:'flex',hash:true,history:false,
   // scrollActivationWidth:null: phones page by swipe too, not reveal's scroll view below 435 px
-  slideNumber:'c/t',scrollActivationWidth:null,controls:true,controlsTutorial:false,progress:true,transition:'fade',transitionSpeed:'fast',
+  slideNumber:'c/t',scrollActivationWidth:null,controls:true,controlsLayout:'edges',controlsTutorial:false,progress:true,transition:'fade',transitionSpeed:'fast',
   keyboard:{{78:toggleNotes}},keyboardCondition:e=>!e.target.closest('.topnav'),plugins:[RevealNotes]}}).then(sync)
 Reveal.on('slidechanged',sync)
 addEventListener('resize',fit)

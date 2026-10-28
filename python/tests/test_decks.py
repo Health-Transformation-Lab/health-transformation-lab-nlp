@@ -63,3 +63,18 @@ def test_deck_disclaimer_is_never_cut_off():
     # the synthetic-data line wraps on a narrow screen instead of ending in an ellipsis (PR #179 review)
     rule = re.search(r"\.disclaimer\{[^}]*\}", build_decks.HEAD).group(0)
     assert "nowrap" not in rule and "ellipsis" not in rule and "height" not in rule
+
+
+@pytest.mark.parametrize("deck", sorted(build_decks.DECKS))
+def test_deck_has_labelled_previous_and_next_buttons(deck):
+    # issue #206: reveal's small bottom-right arrows were hard to see and hit; the nav bar has labelled buttons
+    # beside the slide picker, and reveal's arrows sit large at the slide's edges
+    html, _ = build_decks.render(deck)
+    prev = re.search(r'<button id="deck-prev"[^>]*>([^<]*)</button>', html)
+    nxt = re.search(r'<button id="deck-next"[^>]*>([^<]*)</button>', html)
+    assert prev and "Previous" in prev.group(0) and nxt and "Next" in nxt.group(0)
+    assert html.index('id="deck-prev"') < html.index('id="deck-jump"') < html.index('id="deck-next"')
+    assert "Reveal.prev()" in html and "Reveal.next()" in html
+    assert "isFirstSlide()" in html and "isLastSlide()" in html     # disabled at either end
+    assert "controlsLayout:'edges'" in html
+    assert re.search(r"\.reveal \.controls[^{]*\{[^}]*font-size", html) or ".reveal .controls .navigate" in html
