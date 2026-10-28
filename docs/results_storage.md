@@ -87,7 +87,9 @@ All of them end in the same gold tables:
    start CI: push a commit to it to run the checks. The repo setting *Allow GitHub Actions to create and approve
    pull requests* must be on; if it's off, the branch is pushed and the log links to open the PR by hand.
 2. **Laptop**: commit the CSVs as before; they load with `source = repo`.
-3. **Databricks**: the MedGemma reader job writes `llm_reader_runs` itself, with `source = databricks`.
+3. **Databricks**: the MedGemma reader job writes `ai_predictions` and `llm_reader_runs` itself, with
+   `source = databricks`, its job `run_id` and `run_ts`; a retry of the run replaces its rows. Its CSVs in the
+   Git folder are scratch.
 
 After every deploy, `deploy.yml` starts **Load results** (`databricks/notebooks/10_load_results.py`). It appends
 each file version (SHA-256) it hasn't loaded yet to `result_files`, `ai_predictions` (method, visit_id, pred) and
