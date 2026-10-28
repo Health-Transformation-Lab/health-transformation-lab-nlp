@@ -116,7 +116,7 @@ databricks bundle validate -t dev
 databricks bundle run      -t dev study_benchmark
 ```
 
-To deploy dev before a merge, run the deploy workflow by hand (Actions → *Deploy to Databricks* → Run workflow → dev).
+To deploy dev before a merge, run the deploy workflow by hand (Actions → *Deploy to Databricks dev* → Run workflow; the target is dev by default).
 
 ## Deploy with CI (dev, uat, prod)
 
@@ -170,7 +170,7 @@ its own workspace: names are the same in all three, so they can't share one.
    Optional variables: `JUDGE_ENDPOINT`, `WAREHOUSE_NAME` (default
    `Serverless Starter Warehouse`), `USERS_GROUP` (default `users`).
    Give `prod` required reviewers (Settings → Environments → prod).
-4. **Check the sign-in:** Actions → *Check Databricks sign-in for an environment* → Run workflow, environment `uat`. It
+4. **Check the sign-in:** Actions → *Test that GitHub can log in to Databricks* → Run workflow, environment `uat`. It
    should print a `userName` equal to `DATABRICKS_CLIENT_ID`. Before the secret
    expires, repeat step 2 and `gh secret set`.
 5. **Secrets the jobs read**, in the `dental` scope: `hf_token` (MedGemma job) and

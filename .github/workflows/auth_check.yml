@@ -1,6 +1,7 @@
-# Can GitHub sign in as the environment's service principal? Run by hand before the first deploy;
-# it prints the principal's application id (docs/deployment.md).
-name: Check Databricks sign-in for an environment
+# Test that GitHub can log in to Databricks as the CI robot account (service principal dental-omop-ci)
+# with the secret stored in a GitHub environment (dev, uat or prod). Deploys nothing; prints which
+# account it logged in as. Run it by hand after creating or replacing that secret (docs/deployment.md).
+name: Test that GitHub can log in to Databricks (before a first deploy)
 on:
   workflow_dispatch:
     inputs:
@@ -8,7 +9,7 @@ on:
         description: GitHub environment
         type: choice
         options: [dev, uat, prod]
-        default: uat
+        default: dev
 
 permissions:
   contents: read
