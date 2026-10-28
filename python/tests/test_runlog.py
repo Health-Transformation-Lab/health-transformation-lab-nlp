@@ -40,3 +40,20 @@ def test_gpu_notebooks_run_their_scripts_through_runlog():
         text = (REPO_ROOT / "databricks" / "notebooks" / nb).read_text()
         assert "capture_output" not in text, nb                            # output lost if Python dies
         assert "runlog.run(" in text, nb
+
+
+def test_an_existing_log_is_never_appended_to(tmp_path, capsys):
+    # Unity Catalog volumes can't append to a file ("OSError: [Errno 29] Illegal seek" on the second
+    # MedGemma run): a run whose log already exists writes a new file next to it and says where
+    log = tmp_path / "medgemma.log"
+    runlog.run([sys.executable, "-c", "print('first run')"], log_path=log)
+    first = log.read_text()
+    runlog.run([sys.executable, "-c", "print('second run')"], log_path=log)
+    runlog.run([sys.executable, "-c", "print('third run')"], log_path=log)
+    assert log.read_text() == first                                     # untouched
+    others = sorted(p for p in tmp_path.glob("medgemma_*.log"))
+    assert len(others) == 2
+    assert "second run" in others[0].read_text() + others[1].read_text()
+    assert "third run" in others[0].read_text() + others[1].read_text()
+    out = capsys.readouterr().out
+    assert f"log: {others[0]}" in out or f"log: {others[1]}" in out

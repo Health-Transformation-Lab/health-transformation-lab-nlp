@@ -5,6 +5,10 @@ notebook's Python dies mid-run (seen on serverless GPU: "Py4JException: Error wh
 communication channel") everything the script printed is lost. `run` instead prints each line as it
 comes, appends it to a log file (on Databricks, the landing volume, which outlives the notebook), and says
 how the script ended: an exit code, or the signal that killed it, with the machine's free memory.
+
+A log file is written once and never appended to: Unity Catalog volumes can't append to an existing file
+("OSError: [Errno 29] Illegal seek"). When `log_path` already exists, the run writes `<name>_<UTC time>.log`
+next to it and prints which file it used.
 """
 
 from __future__ import annotations
@@ -28,6 +32,18 @@ def _free_memory() -> str:
         return "memory unknown"
 
 
+def _new_log(path: Path) -> Path:
+    """`path` if it doesn't exist yet, else a new sibling named after the current UTC time."""
+    if not path.exists():
+        return path
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d-%H%M%S")
+    candidate, n = path.with_name(f"{path.stem}_{stamp}{path.suffix}"), 1
+    while candidate.exists():
+        n += 1
+        candidate = path.with_name(f"{path.stem}_{stamp}-{n}{path.suffix}")
+    return candidate
+
+
 def _ending(code: int) -> str:
     if code < 0:
         sig = signal.Signals(-code)
@@ -39,12 +55,15 @@ def _ending(code: int) -> str:
 @traced
 def run(cmd: list[str], log_path: str | Path | None = None, cwd: str | Path | None = None,
         check: bool = False) -> int:
-    """Run `cmd`, printing stdout and stderr line by line and appending them to `log_path`.
-    Returns the exit code (negative: killed by that signal); with check=True, raises unless it's 0."""
+    """Run `cmd`, printing stdout and stderr line by line and writing them to a new log file (`log_path`, or
+    a time-stamped file next to it if that exists). Returns the exit code (negative: killed by that signal);
+    with check=True, raises unless it's 0."""
     log = None
     if log_path:
         Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-        log = open(log_path, "a", buffering=1)  # noqa: SIM115 - line-buffered, closed below
+        path = _new_log(Path(log_path))
+        print(f"log: {path}", flush=True)
+        log = open(path, "w", buffering=1)  # noqa: SIM115 - line-buffered, closed below; never "a" (see above)
         log.write(f"--- {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M:%S} UTC: {' '.join(map(str, cmd))}\n")
     try:
         with subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
