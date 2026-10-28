@@ -75,33 +75,32 @@ jobs:
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle deployment bind health_transformation_lab health_transformation_lab -t "$TARGET" --auto-approve || echo "bind did not run (see above); the deploy below decides"
-      # A Genie space can't be created before its tables, and Load results writes them after a deploy (issue #154).
-      # So when the only failure is a Genie space whose tables don't exist yet, the rest has deployed: run Load
-      # results, wait for it, and deploy again. Any other failure fails here.
+      # The Genie spaces are their own bundle (databricks/genie, #157). A main-bundle deploy from before that move
+      # still holds them in its state, so the main bundle plans to delete them, and a deploy without a console stops
+      # (issue #164). Approve that plan only when every destructive action is a Genie space; the Genie step below
+      # recreates them. Any other destructive plan, or any other failure, fails here.
       - name: Deploy
-        id: deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: |
           set -o pipefail
           log="$RUNNER_TEMP/deploy.log"
           databricks bundle deploy -t "$TARGET" 2>&1 | tee "$log" && exit 0
-          errors=$(grep '^Error:' "$log" || true)
-          if [ -z "$errors" ] || grep -v 'genie_spaces' <<<"$errors" | grep -q . \
-             || ! grep -q 'does not exist' "$log"; then
-            echo "::error::Deploy failed (see above)."; exit 1
+          planned=$(grep -E '^ +(delete|recreate) resources\.' "$log" || true)
+          if grep -q 'requires destructive actions' "$log" && [ -n "$planned" ] \
+             && ! grep -v ' resources\.genie_spaces\.' <<<"$planned" | grep -q .; then
+            echo "::notice::Removing the Genie spaces from the main bundle; the Genie step deploys them (issue #164)."
+            databricks bundle deploy -t "$TARGET" --auto-approve
+            exit 0
           fi
-          echo "::notice::The Genie spaces' tables don't exist yet: running Load results, then deploying again."
-          databricks bundle run -t "$TARGET" load_results
-          echo "loaded=true" >> "$GITHUB_OUTPUT"
-          databricks bundle deploy -t "$TARGET"
+          echo "::error::Deploy failed (see above)."; exit 1
       - name: Run benchmark job
         if: env.DATABRICKS_CLIENT_SECRET != '' && github.event.inputs.run_benchmark == 'true'
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Returns once Databricks has started the run; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait study_benchmark
       - name: Load committed results into the gold tables (spec 016)
-        if: env.DATABRICKS_CLIENT_SECRET != '' && steps.deploy.outputs.loaded != 'true'
+        if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Only file versions it hasn't loaded yet; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait load_results

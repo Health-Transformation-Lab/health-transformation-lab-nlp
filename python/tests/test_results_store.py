@@ -266,12 +266,45 @@ def test_load_results_job_migrates_the_old_gold_names_before_loading():
     assert "spark.sql(f\"DROP" not in nb                     # prints the drops, never runs them
 
 
-def test_deploy_breaks_the_genie_deadlock_by_loading_results_first():
-    # issue #154: a Genie space can't be created before its tables, which Load results writes after the deploy
-    text = _text(".github/workflows/deploy.yml")
-    deploy = text[text.index("- name: Deploy"):text.index("- name: Run benchmark job")]
-    assert "genie_spaces" in deploy and "does not exist" in deploy      # only that failure is retried
-    assert "bundle run -t \"$TARGET\" load_results" in deploy           # waits for the tables
-    assert deploy.count("bundle deploy -t \"$TARGET\"") >= 2           # then deploys again
-    assert "exit 1" in deploy                                           # any other failure still fails
-    assert "loaded=true" in deploy and "steps.deploy.outputs.loaded" in text   # no second, no-wait load
+def _deploy_step(tmp_path, plan, rc_first=1):
+    """Run the workflow's Deploy script with a fake databricks CLI that prints `plan` and fails once."""
+    import os
+    import stat
+    import subprocess
+
+    import yaml
+    steps = next(iter(yaml.safe_load(_text(".github/workflows/deploy.yml"))["jobs"].values()))["steps"]
+    script = next(s for s in steps if s.get("name") == "Deploy")["run"]
+    calls, fake = tmp_path / "calls", tmp_path / "bin" / "databricks"
+    fake.parent.mkdir()
+    fake.write_text(f"""#!/bin/bash
+echo "$*" >> {calls}
+if [ "$(wc -l < {calls})" = 1 ]; then printf '%s\\n' "$PLAN"; exit {rc_first}; fi
+""")
+    fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+    env = {**os.environ, "PATH": f"{fake.parent}:{os.environ['PATH']}", "PLAN": plan, "TARGET": "dev",
+           "RUNNER_TEMP": str(tmp_path), "GITHUB_OUTPUT": str(tmp_path / "out")}
+    r = subprocess.run(["bash", "-e", "-c", script], env=env, capture_output=True, text=True, check=False)
+    return r.returncode, calls.read_text().splitlines()
+
+
+DESTRUCTIVE = "Error: the deployment requires destructive actions, but the current console does not support prompting."
+
+
+def test_deploy_approves_only_the_genie_spaces_moved_to_their_own_bundle(tmp_path):
+    # issue #164: #157 moved the spaces to databricks/genie, so the main bundle plans to delete its copies
+    plan = ("  delete resources.genie_spaces.dq_grader_genie\n  delete resources.genie_spaces.lab_grader_genie\n"
+            + DESTRUCTIVE)
+    rc, calls = _deploy_step(tmp_path, plan)
+    assert rc == 0 and calls == ['bundle deploy -t dev', 'bundle deploy -t dev --auto-approve']
+
+
+def test_deploy_still_stops_on_any_other_destructive_plan(tmp_path):
+    plan = "  delete resources.genie_spaces.dq_grader_genie\n  delete resources.schemas.gold\n" + DESTRUCTIVE
+    rc, calls = _deploy_step(tmp_path, plan)
+    assert rc == 1 and calls == ['bundle deploy -t dev']
+
+
+def test_deploy_still_stops_on_an_ordinary_failure(tmp_path):
+    rc, calls = _deploy_step(tmp_path, "Error: cannot create job: permission denied")
+    assert rc == 1 and calls == ['bundle deploy -t dev']
