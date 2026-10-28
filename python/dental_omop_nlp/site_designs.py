@@ -28,6 +28,7 @@ import pandas as pd
 from .db import EHR, create_schema, local_concepts
 from .paths import REPO_ROOT
 from .sites import SITES
+from .telemetry import traced
 
 SQL_DIR = REPO_ROOT / "omop" / "sql" / "site_designs"
 DESIGNS = {"a_post_coordinated": "rows_a_post_coordinated.sql", "b_pre_coordinated": "rows_b_pre_coordinated.sql",
@@ -44,12 +45,14 @@ DERIVED_CONCEPTS = {"n_teeth_present": 2000000030, "pct_teeth_ip_cal1": 20000000
                     "teeth_lost_perio": 2000000005}
 
 
+@traced
 def derived_sql(design: str, schema: str) -> str:
     rows = (SQL_DIR / DESIGNS[design]).read_text()
     tail = (SQL_DIR / "derived_tail.sql").read_text()
     return "WITH\n" + (rows + tail).replace("{schema}", schema)
 
 
+@traced
 def sql_stats(design: str) -> dict:
     """Size of the design-specific SQL (the shared tail is identical for all)."""
     body = "\n".join(ln for ln in (SQL_DIR / DESIGNS[design]).read_text().splitlines()
@@ -59,6 +62,7 @@ def sql_stats(design: str) -> dict:
             "decode_calls": len(re.findall(r"split_part", body, re.IGNORECASE))}
 
 
+@traced
 def precoordinated_concepts() -> pd.DataFrame:
     rows = []
     for mi, (code, _) in enumerate([*SITE_MEASURES.values(), *TOOTH_MEASURES.values()]):
@@ -116,6 +120,7 @@ def _measurement(df: pd.DataFrame, concept_ids, start_id: int, source: pd.Series
                          "measurement_source_value": source.to_numpy()})
 
 
+@traced
 def load_design(engine, design: str, schema: str, sites, teeth, visits) -> dict:
     from sqlalchemy import text
     create_schema(engine, schema)
@@ -177,12 +182,14 @@ def load_design(engine, design: str, schema: str, sites, teeth, visits) -> dict:
     return {"measurement_rows": len(ms) + len(mt), "concept_rows": len(concepts), **extra}
 
 
+@traced
 def storage_bytes(engine, schema: str) -> int:
     q = ("SELECT COALESCE(SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))), 0) "
          f"FROM pg_tables WHERE schemaname = '{schema}' AND tablename IN ('measurement', 'site', 'site_event', 'concept')")
     return int(pd.read_sql(q, engine).iloc[0, 0])
 
 
+@traced
 def run_derived(engine, design: str, schema: str, repeats: int = 3) -> tuple[pd.DataFrame, float]:
     sql = derived_sql(design, schema)
     times, out = [], None
@@ -193,6 +200,7 @@ def run_derived(engine, design: str, schema: str, repeats: int = 3) -> tuple[pd.
     return out, statistics.median(times)
 
 
+@traced
 def write_back_derived(engine, schema: str, derived: pd.DataFrame, visits: pd.DataFrame, start_id: int) -> int:
     """Store derived measures as MEASUREMENT rows (local concepts), so cohort tools can use them."""
     d = derived.merge(visits[["visit_id", "person_id", "visit_date"]], on="visit_id")

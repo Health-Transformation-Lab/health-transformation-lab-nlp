@@ -43,6 +43,8 @@ import math
 from dataclasses import dataclass
 from enum import Enum
 
+from .telemetry import traced
+
 
 class Status(str, Enum):
     HEALTHY = "healthy"
@@ -53,6 +55,7 @@ class Status(str, Enum):
     P4 = "periodontitis_stage_4"
 
     @property
+    @traced
     def is_periodontitis(self) -> bool:
         return self.value.startswith("periodontitis")
 
@@ -85,14 +88,17 @@ class PerioChart:
             raise ValueError("negative chart value")
 
 
+@traced
 def stage_by_cal(cal: float) -> int:
     return 1 if cal <= 2.0 else 2 if cal <= 4.0 else 3
 
 
+@traced
 def stage_by_rbl(rbl: float) -> int:
     return 1 if rbl < 15.0 else 2 if rbl <= 33.0 else 3
 
 
+@traced
 def label_chart(chart: PerioChart) -> Status:
     """Map one perio chart to a status following the AAP worksheet (module docstring)."""
     cal, rbl, lost = chart.max_cal_mm, chart.rbl_pct, chart.teeth_lost_perio
@@ -119,6 +125,7 @@ def label_chart(chart: PerioChart) -> Status:
     return {1: Status.P1, 2: Status.P2, 3: Status.P3, 4: Status.P4}[stage]
 
 
+@traced
 def grade_of(status: Status, rbl_pct: float | None, age: int, cigarettes_per_day: int = 0,
              hba1c: float | None = None, diabetes: bool | None = None,
              loss_5yr_mm: float | None = None) -> str:
@@ -144,6 +151,7 @@ def grade_of(status: Status, rbl_pct: float | None, age: int, cigarettes_per_day
     return grade
 
 
+@traced
 def extent_of(status: Status, pct_teeth_involved: float, molar_incisor: bool = False) -> str:
     """Localized < 30% of teeth, generalized >= 30%, or molar/incisor pattern. 'NA' if not periodontitis."""
     if not status.is_periodontitis:
@@ -153,6 +161,7 @@ def extent_of(status: Status, pct_teeth_involved: float, molar_incisor: bool = F
     return "generalized" if pct_teeth_involved >= 30 else "localized"
 
 
+@traced
 def label_row(row) -> str:
     """pandas apply helper: row with the perio_chart view's column names."""
     def opt(x):

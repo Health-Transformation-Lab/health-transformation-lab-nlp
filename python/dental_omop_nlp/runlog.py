@@ -14,6 +14,8 @@ import signal
 import subprocess
 from pathlib import Path
 
+from .telemetry import traced
+
 _SIGNAL_HINT = {signal.SIGKILL: "usually out of memory", signal.SIGTERM: "stopped from outside"}
 
 
@@ -34,6 +36,7 @@ def _ending(code: int) -> str:
     return f"exit code {code}"
 
 
+@traced
 def run(cmd: list[str], log_path: str | Path | None = None, cwd: str | Path | None = None,
         check: bool = False) -> int:
     """Run `cmd`, printing stdout and stderr line by line and appending them to `log_path`.
@@ -63,6 +66,7 @@ def run(cmd: list[str], log_path: str | Path | None = None, cwd: str | Path | No
     return code
 
 
+@traced
 def log_dir(catalog: str) -> str:
     """Where notebooks keep script logs on Databricks: the landing volume (same name in every target)."""
     return f"/Volumes/{catalog}/landing_dental_omop_perio/data/logs"

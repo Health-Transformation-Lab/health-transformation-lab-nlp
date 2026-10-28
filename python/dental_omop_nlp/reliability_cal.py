@@ -25,6 +25,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from .telemetry import traced
+
 SITES = ["MB", "B", "DB", "ML", "L", "DL"]
 COMPONENTS = ["var_patient", "var_tooth", "var_site", "var_error"]
 
@@ -41,6 +43,7 @@ class CalParams:
     round_mm: bool = True           # charts record whole millimetres, never below 0
 
 
+@traced
 def draw_repeated_charts(n_patients: int, n_teeth: int, n_visits: int, params: CalParams,
                          seed: int = 0) -> pd.DataFrame:
     """Balanced: every patient has n_teeth charted teeth, six sites each, at n_visits visits."""
@@ -62,6 +65,7 @@ def draw_repeated_charts(n_patients: int, n_teeth: int, n_visits: int, params: C
                          "years": years[v.ravel()], "cal_mm": cal.ravel()})
 
 
+@traced
 def nested_components(d: pd.DataFrame) -> dict:
     """Balanced nested ANOVA on CAL after an OLS time trend. Negative estimates are set to 0."""
     x, y = d["years"].to_numpy(float), d["cal_mm"].to_numpy(float)
@@ -85,6 +89,7 @@ def nested_components(d: pd.DataFrame) -> dict:
             "n_patients": a, "n_teeth": int(b), "n_sites": int(c), "n_visits": int(n)}
 
 
+@traced
 def reml_components(d: pd.DataFrame) -> dict:
     """Mixed model by REML (statsmodels): random patient intercept, tooth and site variance components,
     years as fixed effect. For unbalanced real charts."""
@@ -97,6 +102,16 @@ def reml_components(d: pd.DataFrame) -> dict:
             "var_tooth": float(vc["tooth"]), "var_site": float(vc["site"]), "var_error": float(m.scale)}
 
 
+@traced
+def write_charts(d: pd.DataFrame, path) -> None:
+    """CSV, gzipped without a timestamp or file name in the header: the same charts give the same bytes, so
+    rerunning the script doesn't show up as a change in git."""
+    import gzip
+    from pathlib import Path
+    Path(path).write_bytes(gzip.compress(d.to_csv(index=False).encode(), mtime=0))
+
+
+@traced
 def icc_report(c: dict) -> dict:
     vp, vt, vs, ve = (c[k] for k in COMPONENTS)
     total = vp + vt + vs + ve
@@ -104,12 +119,14 @@ def icc_report(c: dict) -> dict:
             "sem_mm": ve ** 0.5, "total_var": total}
 
 
+@traced
 def cal_band(max_cal_mm: float) -> str:
     """2017 AAP/EFP severity band from the worst interdental CAL: <1 (no periodontitis by CAL),
     1-2 (stage I), 3-4 (stage II), >=5 (stage III or IV)."""
     return "<1" if max_cal_mm < 1 else "1-2" if max_cal_mm < 3 else "3-4" if max_cal_mm < 5 else ">=5"
 
 
+@traced
 def stage_band_flips(d: pd.DataFrame) -> dict:
     """What the error does to staging: the worst interproximal CAL per patient and visit, banded; the
     share of consecutive visit pairs whose band changes, and the share where it goes down (implausible

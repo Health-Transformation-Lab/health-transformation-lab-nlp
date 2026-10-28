@@ -7,8 +7,10 @@ from pathlib import Path
 import yaml
 
 from .paths import MODELS_YAML
+from .telemetry import traced
 
 
+@traced
 def load_registry(path: Path | str = MODELS_YAML) -> dict:
     with open(path) as f:
         reg = yaml.safe_load(f)
@@ -22,6 +24,7 @@ def load_registry(path: Path | str = MODELS_YAML) -> dict:
     return reg
 
 
+@traced
 def families_of(reg: dict, methods) -> set[str]:
     """Model families of the evaluated methods (ids may carry sim:/ai: prefixes).
     Used so an LLM judge never grades its own family."""
@@ -34,6 +37,7 @@ def families_of(reg: dict, methods) -> set[str]:
     return out
 
 
+@traced
 def model(reg: dict, model_id: str) -> dict:
     for m in reg["models"]:
         if m["id"] == model_id:

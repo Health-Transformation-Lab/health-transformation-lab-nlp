@@ -21,6 +21,7 @@ import math
 import pandas as pd
 
 from .labels import LABELS
+from .telemetry import traced
 
 Z95 = 1.959963984540054
 _PERIO = {"periodontitis_stage_1", "periodontitis_stage_2", "periodontitis_stage_3", "periodontitis_stage_4"}
@@ -38,6 +39,7 @@ NHANES_2009_2014 = pd.DataFrame([
 ])
 
 
+@traced
 def wilson_ci(k: int, n: int, z: float = Z95) -> tuple[float, float]:
     if n == 0:
         return float("nan"), float("nan")
@@ -48,12 +50,14 @@ def wilson_ci(k: int, n: int, z: float = Z95) -> tuple[float, float]:
     return max(0.0, c - h), min(1.0, c + h)
 
 
+@traced
 def latest_known(visits: pd.DataFrame, status_col: str) -> pd.DataFrame:
     v = visits.sort_values(["person_id", "visit_date"])
     known = v[v[status_col].isin(_KNOWN)]
     return known.groupby("person_id").tail(1)
 
 
+@traced
 def prevalence_by(visits: pd.DataFrame, status_col: str, by: str | None = None) -> pd.DataFrame:
     """visits: person_id, visit_date, <status_col>, and <by> if given."""
     people = visits.drop_duplicates("person_id")

@@ -51,3 +51,21 @@ The infrastructure moved from Bicep (Azure-only) to Terraform with the azurerm p
 resources and limits, one tool that also manages Databricks (the Databricks Terraform provider) and
 other clouds. Terraform also creates the resource group. Its state file holds the connection string,
 so it is git-ignored.
+
+## Revision 2026-10-28: every call, with a common header
+As cdh-lava-core does (`with tracer.start_as_current_span(...)` in every method, service and cloud-role
+names built from data product and environment): every public function and method in the package
+carries `@traced`, the decorator form of `with trace_call(...)`, which yields a logger with the same
+header. Header on every span and log line: `data_product_id`, `environment`, `service.namespace`;
+resource `service.name` is the data product. A per-parent budget (3 spans per function, the rest
+counted) keeps hot loops from flooding the free allowance; with telemetry off the decorator is a direct
+call. A test fails if a public function is missing `@traced`.
+
+## Revision 2026-10-28: verbosity levels
+`DENTAL_TELEMETRY_LEVEL` = `step` (scripts and pipeline steps), `call` (default: also pipeline-level
+functions) or `detail` (also per-item helpers). Each function's level is measured by
+`scripts/39_telemetry_levels.py` (each pipeline in its own process under `DENTAL_TELEMETRY_PROFILE`:
+calls per parent call and time per call) and kept in `telemetry_levels.yaml`; hand edits marked
+`manual: true` survive reruns. Below the chosen level `@traced` is a direct call. Site build: 1 / 6 /
+20,691 spans at step / call / detail. `37_cal_reliability.py` now writes its gzip without a timestamp,
+so reruns don't change the committed file.

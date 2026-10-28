@@ -1,0 +1,97 @@
+# Run the MedGemma reader on a free Kaggle GPU (kaggle/medgemma_reader.ipynb), for when Databricks
+# Free Edition has no GPU. Start it from the Actions tab: "kaggle-medgemma" -> Run workflow.
+#
+# Needs, in the GitHub environment `dev`: KAGGLE_USERNAME (variable or secret) and either KAGGLE_API_TOKEN
+# or KAGGLE_KEY (secret). The Hugging Face token is NOT passed from here: attach it once on kaggle.com
+# (open the notebook, Add-ons -> Secrets -> HF_TOKEN); the first run without it stops with that message.
+name: kaggle-medgemma
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Review notes to read: 10 for a test, 0 for all 240 (a few hours: set wait off)"
+        default: "10"
+      shots:
+        description: "Few-shot examples per status (0 = zero-shot)"
+        default: "0"
+      rung:
+        description: "MedGemma version (models.yaml)"
+        default: medgemma-1.5-4b-it
+      branch:
+        description: "Branch the notebook clones"
+        default: main
+      wait:
+        description: "Wait for Kaggle to finish and keep the outputs as an artifact"
+        type: boolean
+        default: true
+      collect_only:
+        description: "Don't run: only download the outputs of the last Kaggle run"
+        type: boolean
+        default: false
+
+concurrency: kaggle-medgemma
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment: dev
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - run: pip install --quiet "kaggle==2.2.5"
+
+      - name: Kaggle credentials (values stay masked)
+        env:
+          U: ${{ vars.KAGGLE_USERNAME || secrets.KAGGLE_USERNAME }}
+          T: ${{ secrets.KAGGLE_API_TOKEN }}
+          K: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          [ -n "$U" ] || { echo "::error::KAGGLE_USERNAME is not set in the GitHub environment 'dev' (variable or secret)"; exit 1; }
+          echo "KAGGLE_USERNAME=$U" >> "$GITHUB_ENV"
+          if [ -n "$T" ]; then echo "KAGGLE_API_TOKEN=$T" >> "$GITHUB_ENV"; echo "using KAGGLE_API_TOKEN"
+          elif [ -n "$K" ]; then echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"; echo "using KAGGLE_USERNAME + KAGGLE_KEY"
+          else echo "::error::Neither KAGGLE_API_TOKEN nor KAGGLE_KEY is set in the GitHub environment 'dev'"; exit 1; fi
+          echo "KERNEL=$U/dental-omop-medgemma-reader" >> "$GITHUB_ENV"
+
+      - name: Prepare the notebook
+        if: ${{ !inputs.collect_only }}
+        run: >
+          python kaggle/prepare_kernel.py --out build/kernel --username "$KAGGLE_USERNAME"
+          --rung "${{ inputs.rung }}" --shots "${{ inputs.shots }}" --limit "${{ inputs.limit }}"
+          --branch "${{ inputs.branch }}"
+
+      - name: Push and run it on Kaggle (GPU T4 x2)
+        if: ${{ !inputs.collect_only }}
+        run: kaggle kernels push -p build/kernel --accelerator NvidiaTeslaT4
+
+      - name: Wait for Kaggle to finish
+        if: ${{ inputs.wait || inputs.collect_only }}
+        run: |
+          for i in $(seq 1 330); do
+            s=$(kaggle kernels status "$KERNEL" 2>&1); echo "$(date -u +%H:%M) $s"
+            case "${s,,}" in
+              *complete*) exit 0 ;;
+              *error*|*cancel*) echo "::error::Kaggle run did not finish: $s"; exit 1 ;;
+            esac
+            sleep 60
+          done
+          echo "::error::still running after 330 minutes; run again later with collect_only"; exit 1
+
+      - name: Download the outputs and the log
+        if: ${{ always() && (inputs.wait || inputs.collect_only) }}
+        run: |
+          mkdir -p build/output
+          kaggle kernels output "$KERNEL" -p build/output || true
+          ls -la build/output
+          log=$(ls build/output/*.log 2>/dev/null | head -1)
+          if [ -n "$log" ]; then echo "---- last lines of the Kaggle log ----"; tail -c 6000 "$log"; fi
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && (inputs.wait || inputs.collect_only) }}
+        with:
+          name: medgemma-${{ inputs.rung }}-kaggle
+          path: build/output
+          if-no-files-found: warn

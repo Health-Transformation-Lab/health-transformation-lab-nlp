@@ -28,6 +28,7 @@ import random
 import pandas as pd
 
 from .labels import PerioChart, label_chart
+from .telemetry import traced
 
 TEETH = list(range(1, 33))
 THIRD_MOLARS = {1, 16, 17, 32}
@@ -40,6 +41,7 @@ DERIVED = ["n_teeth_present", "teeth_lost_perio", "max_probing_depth_mm", "max_c
            "n_teeth_ip_pd4", "n_teeth_ip_pd5", "n_sites_ip_pd5", "max_furcation_class", "max_mobility_degree"]
 
 
+@traced
 def draw_mouth(chart: PerioChart, pct_teeth_involved: float, rng: random.Random) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (sites, teeth). sites: tooth, site, pd_mm, cal_mm, bop. teeth: tooth, present,
     missing_reason ('perio' / 'other' / ''), furcation_class, mobility_degree."""
@@ -47,6 +49,7 @@ def draw_mouth(chart: PerioChart, pct_teeth_involved: float, rng: random.Random)
     return pd.DataFrame(site_cols), pd.DataFrame(tooth_cols)
 
 
+@traced
 def draw_mouth_columns(chart: PerioChart, pct_teeth_involved: float, rng: random.Random) -> tuple[dict, dict]:
     """draw_mouth as column lists, for building one table over many visits (scripts/22_build_sites.py)."""
     stage = label_chart(chart).value
@@ -121,6 +124,7 @@ def draw_mouth_columns(chart: PerioChart, pct_teeth_involved: float, rng: random
     return cols, teeth
 
 
+@traced
 def derive(sites: pd.DataFrame, teeth: pd.DataFrame) -> dict:
     """Person-visit measures from site and tooth rows."""
     ip = sites[sites["site"].isin(INTERPROXIMAL)]
@@ -145,6 +149,7 @@ def derive(sites: pd.DataFrame, teeth: pd.DataFrame) -> dict:
     }
 
 
+@traced
 def derive_all(sites: pd.DataFrame, teeth: pd.DataFrame, key: str = "visit_id") -> pd.DataFrame:
     """derive() for every visit at once (sites and teeth carry `key`); one row per visit, indexed by `key`."""
     ip = sites[sites["site"].isin(INTERPROXIMAL)]
@@ -175,6 +180,7 @@ def derive_all(sites: pd.DataFrame, teeth: pd.DataFrame, key: str = "visit_id") 
     return out[DERIVED]
 
 
+@traced
 def aap_from_derived(d: dict, rbl_pct: float | None = None) -> str:
     """2017 AAP/EFP status from derived measures (labels.py rules); RBL comes from radiographs."""
     return label_chart(PerioChart(d["max_probing_depth_mm"], d["bop_pct"], d["max_cal_mm"],
@@ -184,6 +190,7 @@ def aap_from_derived(d: dict, rbl_pct: float | None = None) -> str:
                                   remaining_teeth=d["n_teeth_present"])).value
 
 
+@traced
 def cdc_aap(d: dict) -> str:
     """2012 CDC/AAP surveillance case definition (Eke et al.). Interproximal sites;
     'different teeth' counts teeth, not sites. Returns severe / moderate / mild / none."""

@@ -24,14 +24,17 @@ import numpy as np
 import pandas as pd
 
 from .harm import unsafe_rates
+from .telemetry import traced
 
 STAGE4 = "periodontitis_stage_4"
 
 
+@traced
 def rules_override(pred: pd.Series, rules_pred: pd.Series, labels=(STAGE4,)) -> pd.Series:
     return rules_pred.where(rules_pred.isin(labels), pred)
 
 
+@traced
 def expected_calibration_error(truth: pd.Series, proba: pd.DataFrame, n_bins: int = 10) -> float:
     conf = proba.max(axis=1).to_numpy()
     correct = (proba.idxmax(axis=1).to_numpy() == truth.to_numpy())
@@ -40,6 +43,7 @@ def expected_calibration_error(truth: pd.Series, proba: pd.DataFrame, n_bins: in
                      for b in range(n_bins) if (bins == b).any()))
 
 
+@traced
 def ladder_table(truth: pd.Series, preds: dict, proba: dict | None = None, n_boot: int = 1000,
                  seed: int = 0, reference: str = "note_rules") -> pd.DataFrame:
     """One row per method. All series share truth's index (one row per chart)."""
@@ -67,11 +71,13 @@ def ladder_table(truth: pd.Series, preds: dict, proba: dict | None = None, n_boo
     return pd.DataFrame(rows)
 
 
+@traced
 def missing_charts(pred: pd.Series, truth: pd.Series) -> int:
     """Review charts a run did not score (e.g. a --limit smoke test); such a run isn't comparable."""
     return int(pred.reindex(truth.index).isna().sum())
 
 
+@traced
 def by_difficulty(truth: pd.Series, preds: dict, level: pd.Series) -> pd.DataFrame:
     """Accuracy per method and difficulty level (long: method, difficulty, n, accuracy)."""
     t, lv = truth.to_numpy(), level.reindex(truth.index).to_numpy()

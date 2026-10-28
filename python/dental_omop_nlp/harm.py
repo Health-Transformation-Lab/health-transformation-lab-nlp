@@ -29,10 +29,12 @@ from __future__ import annotations
 import pandas as pd
 
 from .labels import LABELS
+from .telemetry import traced
 
 ORDER = LABELS  # healthy, gingivitis, stage 1..4
 
 
+@traced
 def severity(truth: str, pred: str) -> str:
     # five-category reports: the collapsed label grades like "healthy"
     truth, pred = ("healthy" if x == "healthy_gingivitis" else x for x in (truth, pred))
@@ -51,6 +53,7 @@ def severity(truth: str, pred: str) -> str:
     return "S0" if p - t == 1 else "S1"
 
 
+@traced
 def unsafe_rates(truth: pd.Series, pred: pd.Series) -> dict:
     ok = truth.isin([*ORDER, "healthy_gingivitis"]) & pred.isin([*ORDER, "healthy_gingivitis"])
     if not ok.any():

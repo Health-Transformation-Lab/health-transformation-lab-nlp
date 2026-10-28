@@ -14,6 +14,7 @@ import random
 from dataclasses import dataclass
 
 from .labels import LABELS, PerioChart, Status, label_chart
+from .telemetry import traced
 
 # Latent severity mix for US adults, roughly shaped on NHANES 2009-2014
 # (about 4 in 10 adults 30+ with some periodontitis, most mild/moderate).
@@ -28,6 +29,7 @@ class RiskFactors:
     hba1c: float | None          # None = not measured; >= 6.5 diabetes, 5.8-6.4 pre-diabetes
 
 
+@traced
 def draw_risk(rng: random.Random) -> RiskFactors:
     smoke = rng.choices([0, rng.randint(1, 9), rng.randint(10, 30)], weights=[0.82, 0.10, 0.08])[0]
     hba1c = rng.choice([round(rng.uniform(5.8, 6.9), 1), round(rng.uniform(7.0, 10.5), 1)]) \
@@ -35,6 +37,7 @@ def draw_risk(rng: random.Random) -> RiskFactors:
     return RiskFactors(smoke, hba1c)
 
 
+@traced
 def draw_chart(age: int, rng: random.Random, case_mix: float = 0.0) -> PerioChart:
     """case_mix > 0 moves weight from healthy toward moderate/severe disease
     (a clinic with sicker patients); < 0 the other way. Range about -0.1..0.1."""
@@ -62,6 +65,7 @@ def draw_chart(age: int, rng: random.Random, case_mix: float = 0.0) -> PerioChar
     return PerioChart(u(6, 10), u(30, 80), u(5, 10), u(40, 80), rng.randint(5, 10))
 
 
+@traced
 def draw_pct_teeth_involved(chart: PerioChart, rng: random.Random) -> float:
     """Share of teeth with attachment loss; drives extent (localized < 30%)."""
     if chart.max_cal_mm < 1:
@@ -87,6 +91,7 @@ class HistoryVisit:
     treated_before: bool    # periodontal therapy at an earlier visit
 
 
+@traced
 def cal_rate_per_year(risk: RiskFactors, rng: random.Random) -> float:
     r = rng.uniform(*BASE_CAL_MM_PER_YEAR)
     if risk.cigarettes_per_day >= 10:
@@ -98,6 +103,7 @@ def cal_rate_per_year(risk: RiskFactors, rng: random.Random) -> float:
     return r
 
 
+@traced
 def draw_history(age: int, n_visits: int, risk: RiskFactors, rng: random.Random,
                  case_mix: float = 0.0, months_between: float = 6.0) -> list[HistoryVisit]:
     """One patient's charts over recall visits.

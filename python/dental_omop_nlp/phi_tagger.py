@@ -15,17 +15,21 @@ from collections import Counter
 
 import pandas as pd
 
+from .telemetry import traced
+
 TYPES = ("Age", "Date", "Sex")
 LABELS = ["O"] + [f"{p}-{t}" for t in TYPES for p in ("B", "I")]
 _WORD = re.compile(r"\w+|[^\w\s]")
 
 
 # ------------------------------------------------------------------ data
+@traced
 def words(text: str) -> list[tuple[str, int, int]]:
     """Words with character offsets: runs of letters/digits, or one punctuation mark."""
     return [(m.group(), m.start(), m.end()) for m in _WORD.finditer(text)]
 
 
+@traced
 def bio_docs(records: list[dict], types=TYPES) -> list[dict]:
     """Records with text and entities (maccrobat.load_brat) -> words, BIO tags and sentence ranges.
     An entity's first word is B-, the rest I-; a word already tagged keeps its first tag."""
@@ -52,6 +56,7 @@ def bio_docs(records: list[dict], types=TYPES) -> list[dict]:
     return out
 
 
+@traced
 def read_conll(path, prefix: str | None = None) -> list[dict]:
     """A CoNLL file as the course distributes it ("word POS tag" per line, "-DOCSTART- -X- -X- O"
     before each note, blank lines between some sentences) -> docs like bio_docs gives. The text is the
@@ -88,6 +93,7 @@ def read_conll(path, prefix: str | None = None) -> list[dict]:
     return out
 
 
+@traced
 def split_docs(ids: list[str], test_share: float = 0.2, seed: int = 42) -> tuple[list[str], list[str]]:
     ids = sorted(ids)
     random.Random(seed).shuffle(ids)
@@ -95,6 +101,7 @@ def split_docs(ids: list[str], test_share: float = 0.2, seed: int = 42) -> tuple
     return sorted(ids[n_test:]), sorted(ids[:n_test])
 
 
+@traced
 def three_way_split(ids: list[str], test_share: float = 0.2, n_val: int = 20,
                     seed: int = 42) -> tuple[list[str], list[str], list[str]]:
     """(train, val, test): the 80:20 test split, then n_val of the training notes held out for
@@ -104,6 +111,7 @@ def three_way_split(ids: list[str], test_share: float = 0.2, n_val: int = 20,
     return [i for i in train if i not in set(val)], val, test
 
 
+@traced
 def write_conll(docs: list[dict], path) -> None:
     """One "word tag" per line, a blank line between sentences, -DOCSTART- before each note."""
     lines = []
@@ -117,6 +125,7 @@ def write_conll(docs: list[dict], path) -> None:
     Path(path).write_text("\n".join(lines) + "\n")
 
 
+@traced
 def chunks(doc: dict, max_words: int) -> list[tuple[int, int]]:
     """Consecutive whole sentences packed up to max_words words; a longer sentence is cut."""
     out, cur = [], None
@@ -134,6 +143,7 @@ def chunks(doc: dict, max_words: int) -> list[tuple[int, int]]:
     return out
 
 
+@traced
 def align(word_ids: list, tags: list[str], label2id: dict) -> list[int]:
     """Sub-token labels: the word's tag on its first sub-token, -100 (ignored) elsewhere."""
     out, prev = [], None
@@ -143,6 +153,7 @@ def align(word_ids: list, tags: list[str], label2id: dict) -> list[int]:
     return out
 
 
+@traced
 def word_tags(word_ids: list, best: list[int], n_words: int, labels: list[str] = LABELS) -> list[str]:
     """Sub-token predictions (argmax label ids) back to one tag per word, from each word's first
     sub-token. A word with no sub-token means the chunk was truncated: raise rather than tag it O."""
@@ -158,6 +169,7 @@ def word_tags(word_ids: list, best: list[int], n_words: int, labels: list[str] =
 
 
 # ------------------------------------------------------------------ scores
+@traced
 def entities(tags: list[str]) -> list[tuple[str, int, int]]:
     """(type, start, end) word ranges; an I- that doesn't continue its type starts an entity."""
     out, cur = [], None
@@ -173,6 +185,7 @@ def entities(tags: list[str]) -> list[tuple[str, int, int]]:
     return [tuple(e) for e in out]
 
 
+@traced
 def score(gold: list[list[str]], pred: list[list[str]], types=TYPES, overlap: bool = False) -> pd.DataFrame:
     """Entity precision, recall, F1 per type, and the support-weighted average. Exact span and type
     (the usual seqeval rule); with overlap=True any same-type overlap counts, which shows how much of
@@ -203,6 +216,7 @@ def score(gold: list[list[str]], pred: list[list[str]], types=TYPES, overlap: bo
     return pd.concat([d, pd.DataFrame([avg])], ignore_index=True)
 
 
+@traced
 def error_kinds(gold: list[list[str]], pred: list[list[str]]) -> Counter:
     """(type, kind) counts. A gold entity not found exactly is `boundary` (overlapped by the same type),
     `wrong_type` (by another type) or `missed`; a predicted entity overlapping no gold one is `spurious`."""
@@ -237,6 +251,7 @@ DATE_PATTERNS = {
 }
 
 
+@traced
 def regex_dates(text: str, spans: list[tuple[str, int, int]], tags: list[str], patterns) -> list[str]:
     """Words the model left O inside a match of the named date patterns are tagged Date."""
     out = list(tags)
@@ -253,6 +268,7 @@ def regex_dates(text: str, spans: list[tuple[str, int, int]], tags: list[str], p
 _FUNCTION_WORDS = {"the", "a", "an", "of", "this", "that", "these", "within", "in", "on", "at", "and", "to", ","}
 
 
+@traced
 def fix_dates(words_: list[str], tags: list[str], rules) -> list[str]:
     """Boundary rules on predicted Date entities. `trim_function_words`: drop leading and trailing
     function words (the, of, within ...); a Date left empty is removed. Other types are untouched."""

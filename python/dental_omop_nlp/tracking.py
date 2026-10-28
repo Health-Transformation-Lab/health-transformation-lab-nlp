@@ -23,11 +23,13 @@ import subprocess
 from pathlib import Path
 
 from .paths import DATASETS_DIR, REPO_ROOT
+from .telemetry import traced
 
 EXPERIMENT = "dental-omop-nlp"
 log = logging.getLogger(__name__)
 
 
+@traced
 def enabled() -> bool:
     if os.environ.get("DENTAL_MLFLOW", "1") == "0":
         return False
@@ -38,6 +40,7 @@ def enabled() -> bool:
     return True
 
 
+@traced
 def git_commit() -> str:
     """Short commit of the code that's running: the deployed commit on Databricks (DENTAL_GIT_COMMIT, set by
     use_git_commit from the job), else asked of git, else "unknown"."""
@@ -51,6 +54,7 @@ def git_commit() -> str:
         return "unknown"
 
 
+@traced
 def dataset_fingerprint(files: tuple[str, ...] = ("train.csv", "answer_key/review_key.csv")) -> str:
     h = hashlib.sha256()
     for f in files:
@@ -64,27 +68,32 @@ class _Run:
     def __init__(self, run_id=None):
         self.run_id = run_id
 
+    @traced
     def log_metrics(self, m: dict):
         if self.run_id:
             import mlflow
             mlflow.log_metrics({k: float(v) for k, v in m.items() if v is not None and not math.isnan(float(v))})
 
+    @traced
     def log_params(self, p: dict):
         if self.run_id:
             import mlflow
             mlflow.log_params({k: str(v)[:500] for k, v in p.items()})
 
+    @traced
     def set_tags(self, t: dict):
         if self.run_id:
             import mlflow
             mlflow.set_tags({k: str(v) for k, v in t.items()})
 
+    @traced
     def log_artifact(self, path):
         if self.run_id and Path(path).exists():
             import mlflow
             mlflow.log_artifact(str(path))
 
 
+@traced
 def use_git_commit(dbutils) -> str:
     """In a Databricks notebook: read the `git_commit` job parameter (the commit the bundle was deployed from)
     and hand it to this code and the scripts it starts. Returns it ("" when run by hand)."""
@@ -95,6 +104,7 @@ def use_git_commit(dbutils) -> str:
     return commit
 
 
+@traced
 def pass_databricks_login() -> bool:
     """In a Databricks notebook: put its host and token in the environment so the scripts it starts (separate
     processes, without the notebook's login) can log to MLflow. Never raises; False if it couldn't."""

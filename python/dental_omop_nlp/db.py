@@ -23,6 +23,7 @@ from pathlib import Path
 import pandas as pd
 
 from .paths import REPO_ROOT
+from .telemetry import traced
 
 DDL_DIR = REPO_ROOT / "omop" / "ddl"
 PG_DDL = ["OMOPCDM_postgresql_5.4_ddl.sql", "OMOPCDM_postgresql_5.4_primary_keys.sql",
@@ -40,6 +41,7 @@ _DEFAULTS = {
 }
 
 
+@traced
 def conform(tables: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     """Add the required CDM columns that are missing."""
     out = {}
@@ -60,6 +62,7 @@ def _statements(sql: str, schema: str) -> list[str]:
     return [s.strip() for s in body.split(";") if s.strip()]
 
 
+@traced
 def create_schema(engine, schema: str) -> None:
     from sqlalchemy import text
     with engine.begin() as c:
@@ -72,6 +75,7 @@ def create_schema(engine, schema: str) -> None:
             c.execute(text(s))
 
 
+@traced
 def local_concepts() -> pd.DataFrame:
     c = pd.read_csv(REPO_ROOT / "omop" / "vocab" / "local_concepts.csv", dtype={"standard_concept": "object"})
     for d in ("valid_start_date", "valid_end_date"):
@@ -79,6 +83,7 @@ def local_concepts() -> pd.DataFrame:
     return c
 
 
+@traced
 def load_omop(engine, omop_dir: Path, schema: str) -> dict[str, int]:
     """Create the CDM + dental extension in `schema` and load the synthetic tables."""
     create_schema(engine, schema)
@@ -93,5 +98,6 @@ def load_omop(engine, omop_dir: Path, schema: str) -> dict[str, int]:
     return counts
 
 
+@traced
 def perio_chart_from_db(engine, schema: str) -> pd.DataFrame:
     return pd.read_sql(f"SELECT * FROM {schema}.perio_chart", engine)

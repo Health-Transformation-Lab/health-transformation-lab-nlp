@@ -20,6 +20,7 @@ import pandas as pd
 from .labels import label_chart
 from .notes import render_soap_note
 from .synthetic import draw_chart
+from .telemetry import traced
 
 LOCAL = {"PERIO_MAX_PD": 2000000001, "PERIO_BOP_PCT": 2000000002, "PERIO_MAX_CAL": 2000000003,
          "PERIO_RBL_PCT": 2000000004, "PERIO_TEETH_LOST": 2000000005}
@@ -63,6 +64,7 @@ def _visits_generated(n_people: int, rng: random.Random) -> pd.DataFrame:
     return df
 
 
+@traced
 def build(out_omop: Path, out_labels: Path, synthea_csv: Path | None = None,
           n_people: int = 300, seed: int = 42, leak_assessment: bool = True) -> pd.DataFrame:
     rng = random.Random(seed)

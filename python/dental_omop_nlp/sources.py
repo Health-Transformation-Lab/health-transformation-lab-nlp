@@ -33,6 +33,7 @@ from __future__ import annotations
 import random
 
 from .labels import Status
+from .telemetry import traced
 
 STATUSES = [s.value for s in Status]
 UNKNOWN = "unknown"   # evidence that is missing or says nothing about status
@@ -76,6 +77,7 @@ def _drift(status: Status, rng: random.Random, p: float) -> Status:
     return order[i + (1 if target > i else -1 if target < i else rng.choice([-1, 1]))]
 
 
+@traced
 def generate_sources(status: Status, extent: str, rng: random.Random) -> dict:
     """Evidence types 2-6 for one visit. Values are strings; '' means missing."""
     s = {}
@@ -103,6 +105,7 @@ def generate_sources(status: Status, extent: str, rng: random.Random) -> dict:
 
 
 # ------------------------------------------------------------------ read
+@traced
 def read_exam_form(v: str) -> str:
     if not v:
         return UNKNOWN
@@ -117,6 +120,7 @@ def read_exam_form(v: str) -> str:
     return [Status.HEALTHY, Status.GINGIVITIS, Status.GINGIVITIS, Status.P2, Status.P3][psr].value
 
 
+@traced
 def read_proc_codes(v: str) -> str:
     """CDT codes say perio or not, and roughly how severe; they cannot stage."""
     if not v:
@@ -135,6 +139,7 @@ def read_proc_codes(v: str) -> str:
     return UNKNOWN                      # D0180 + D1110: evaluated, treatment not done
 
 
+@traced
 def read_proc_dx(v: str) -> str:
     if not v:
         return UNKNOWN

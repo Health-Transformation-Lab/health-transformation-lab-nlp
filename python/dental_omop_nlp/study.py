@@ -36,6 +36,7 @@ from .radiograph import read_radiograph, simulate_radiograph, to_json
 from .radiograph import summary as rad_summary
 from .sources import READERS, UNKNOWN, generate_sources
 from .synthetic import draw_chart, draw_history, draw_pct_teeth_involved, draw_risk
+from .telemetry import traced
 
 REVIEW_STRATA = {  # target share of the review set; rare classes oversampled
     "healthy": 0.15, "gingivitis": 0.20, "periodontitis_stage_1": 0.17,
@@ -43,6 +44,7 @@ REVIEW_STRATA = {  # target share of the review set; rare classes oversampled
 }
 
 
+@traced
 def probing_chart_text(c: PerioChart) -> str:
     return (f"Max PD {c.max_probing_depth_mm:.0f} mm | BOP {c.bop_pct:.0f}% | "
             f"Max interproximal CAL {c.max_cal_mm:.0f} mm | RBL {c.rbl_pct:.0f}% | "
@@ -72,6 +74,7 @@ STRUCTURED_COLS = ["visit_id", "person_id", "clinic_id", "visit_seq", "visit_dat
                    "algorithm_v0", "algorithm_design", "in_review"]
 
 
+@traced
 def clinic_profiles(seed: int) -> pd.DataFrame:
     """Synthetic clinics: case mix (sicker or healthier patients) and charting habits."""
     rng = random.Random(seed * 31 + 7)
@@ -101,6 +104,7 @@ def _record_error(chart: PerioChart, age: int, rng: random.Random) -> tuple[Peri
                       round(chart.rbl_pct / 10, 1), chart.teeth_lost_perio), "decimal_slip"
 
 
+@traced
 def generate_visits(n_people: int, seed: int) -> pd.DataFrame:
     rng = random.Random(seed)
     clinics = clinic_profiles(seed).set_index("clinic_id")
@@ -152,6 +156,7 @@ def generate_visits(n_people: int, seed: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+@traced
 def apply_deid(df: pd.DataFrame, engine: str = "regex") -> tuple[pd.DataFrame, pd.DataFrame]:
     out, report = [], []
     for r in df.itertuples():
@@ -165,6 +170,7 @@ def apply_deid(df: pd.DataFrame, engine: str = "regex") -> tuple[pd.DataFrame, p
     return df.merge(pd.DataFrame(out), on="visit_id"), pd.DataFrame(report)
 
 
+@traced
 def read_methods(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["notes"] = [read_note(t) for t in df["note_text"]]
@@ -185,6 +191,7 @@ def read_methods(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+@traced
 def pick_review(df: pd.DataFrame, n: int, seed: int) -> pd.DataFrame:
     """One visit per person (latest), stratified by truth status."""
     last = df.sort_values("visit_date").groupby("person_id").tail(1)
@@ -195,6 +202,7 @@ def pick_review(df: pd.DataFrame, n: int, seed: int) -> pd.DataFrame:
     return pd.concat(picks).sample(frac=1, random_state=seed)
 
 
+@traced
 def label_studio_tasks(review: pd.DataFrame) -> list[dict]:
     return [{"data": {
         "visit_id": int(r.visit_id),
@@ -210,6 +218,7 @@ def label_studio_tasks(review: pd.DataFrame) -> list[dict]:
     }} for r in review.itertuples()]
 
 
+@traced
 def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: int = 240,
                 seed: int = 42, engine: str = "regex") -> dict:
     df = generate_visits(n_people, seed)
@@ -264,6 +273,7 @@ def build_study(out_dir: Path, raw_dir: Path, n_people: int = 1200, review_n: in
             "review_status_mix": review["truth_status"].value_counts().to_dict()}
 
 
+@traced
 def build_corpus_sample(n_people: int, seed: int, engine: str = "regex") -> pd.DataFrame:
     """A de-identified stand-in for the full corpus, for timing and judging.
 
@@ -282,6 +292,7 @@ def build_corpus_sample(n_people: int, seed: int, engine: str = "regex") -> pd.D
 TRANSLATE_PATTERNS = {"pre2017_severity", "legacy_old"}
 
 
+@traced
 def difficulty(dx_pattern: str, stated_status: str, chart_status: str, copy_forward: bool) -> str:
     """Difficulty level per chart (spec 002), adapted from GlobalDentBench's
     L1 recall / L2 routine reasoning / L3 individualized reasoning:

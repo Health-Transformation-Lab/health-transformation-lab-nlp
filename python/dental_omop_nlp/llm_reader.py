@@ -27,6 +27,7 @@ Backends
 from __future__ import annotations
 
 import json
+import logging
 import os
 import random
 import time
@@ -38,7 +39,9 @@ import pandas as pd
 from .deid import residual_scan
 from .judge import CRITERIA
 from .labels import LABELS
+from .telemetry import traced
 
+log = logging.getLogger("dental_omop_nlp")
 GRADES = {"A", "B", "C"}
 EXTENTS = {"localized", "generalized", "molar_incisor"}
 
@@ -64,6 +67,7 @@ _FINDING_WORDS = ("CAL", "attachment", "bone loss", "RBL", "PD ", "probing", "BO
 
 
 # ---------------------------------------------------------------- prompt
+@traced
 def build_messages(note: str, examples: list[tuple[str, str]] | None = None,
                    variant: str = DEFAULT_VARIANT) -> list[dict]:
     msgs = [{"role": "system", "content": PROMPTS[variant]}]
@@ -86,6 +90,7 @@ def _decisive_line(note: str) -> str:
     return lines[0] if lines else ""
 
 
+@traced
 def target_answer(note: str, status: str, grade: str = "NA", extent: str = "NA") -> str:
     perio = status.startswith("periodontitis")
     g = grade if perio and grade in GRADES else None
@@ -94,6 +99,7 @@ def target_answer(note: str, status: str, grade: str = "NA", extent: str = "NA")
                        "rationale": "From the charted findings and diagnosis in the note."})
 
 
+@traced
 def pick_examples(train: pd.DataFrame, k: int, seed: int = 0) -> list[tuple[str, str]]:
     """k synthetic training notes per status, chosen by seed."""
     rng = random.Random(seed)
@@ -107,6 +113,7 @@ def pick_examples(train: pd.DataFrame, k: int, seed: int = 0) -> list[tuple[str,
     return out
 
 
+@traced
 def sft_records(train: pd.DataFrame, variant: str = DEFAULT_VARIANT) -> list[dict]:
     """Chat-format fine-tuning records in exactly the reader's prompt/answer format."""
     recs = []
@@ -122,6 +129,7 @@ def sft_records(train: pd.DataFrame, variant: str = DEFAULT_VARIANT) -> list[dic
 THOUGHT_START, THOUGHT_END = "<unused94>", "<unused95>"  # MedGemma 1.5 thinking markers
 
 
+@traced
 def parse_answer(raw: str, note: str) -> dict:
     out = {"status": None, "grade": "NA", "extent": "NA", "quote": "", "gate_ok": False, "error": ""}
     if THOUGHT_START in raw:
@@ -183,13 +191,41 @@ class OpenAIChat:
         return {"raw": "", "input_tokens": 0, "output_tokens": 0, "latency_s": 0.0, "error": err}
 
 
+@traced
+def pick_dtype(cuda: bool, capability: tuple | None, total_gb: float) -> str:
+    """Weights dtype for the hardware: bfloat16 where the GPU has it natively (compute capability 8.0+:
+    A10, A100, H100); float32 where the GPUs together have 20 GB or more (Kaggle's T4 x2: Gemma models
+    can overflow in float16); float16 only as a last resort; float32 on CPU. DENTAL_LLM_DTYPE overrides."""
+    import os
+    forced = os.environ.get("DENTAL_LLM_DTYPE", "").strip()
+    if forced:
+        return forced
+    if not cuda:
+        return "float32"
+    if capability and tuple(capability) >= (8, 0):
+        return "bfloat16"
+    return "float32" if total_gb >= 20 else "float16"
+
+
+def _hardware_dtype() -> str:  # pragma: no cover - needs torch
+    import torch
+    if not torch.cuda.is_available():
+        return pick_dtype(False, None, 0)
+    n = torch.cuda.device_count()
+    total = sum(torch.cuda.get_device_properties(i).total_memory for i in range(n)) / 1e9
+    dtype = pick_dtype(True, torch.cuda.get_device_capability(0), total)
+    if dtype == "float16":
+        log.warning("float16 on this GPU: Gemma models can overflow; choose 'GPU T4 x2' on Kaggle for float32")
+    return dtype
+
+
 class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
     """Local transformers generation, greedy. Loads lazily on first call."""
 
     name, simulated = "hf", False
 
     def __init__(self, hf_id: str, modality: str = "multimodal", adapter: str | None = None,
-                 max_new_tokens: int = 300, dtype: str = "bfloat16", device_map: str = "auto"):
+                 max_new_tokens: int = 300, dtype: str = "auto", device_map: str = "auto"):
         self.hf_id, self.modality, self.adapter = hf_id, modality, adapter
         self.max_new_tokens, self.dtype, self.device_map = max_new_tokens, dtype, device_map
         self.model = None
@@ -202,7 +238,9 @@ class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
             AutoProcessor,
             AutoTokenizer,
         )
-        kw = {"torch_dtype": getattr(torch, self.dtype), "device_map": self.device_map}
+        dtype = _hardware_dtype() if self.dtype == "auto" else self.dtype
+        print(f"loading {self.hf_id} as {dtype}", flush=True)
+        kw = {"torch_dtype": getattr(torch, dtype), "device_map": self.device_map}
         if self.modality == "multimodal":
             self.proc = AutoProcessor.from_pretrained(self.hf_id)
             self.model = AutoModelForImageTextToText.from_pretrained(self.hf_id, **kw)
@@ -269,6 +307,7 @@ def _hf_token() -> str | None:
         return f.read().strip() or None
 
 
+@traced
 def make_backend(entry: dict, kind: str, **kw):
     if kind == "hf":
         if entry.get("gated") and not _hf_token():
@@ -280,6 +319,7 @@ def make_backend(entry: dict, kind: str, **kw):
     raise ValueError(f"backend {kind!r} needs to be constructed directly (simulated needs the truth)")
 
 
+@traced
 def summarize_details(d: pd.DataFrame) -> dict:
     """One run's reliability and cost inputs from its llm_details file."""
     return {"gate_pass": d["gate_ok"].mean(), "fallback": d["fallback"].mean(),
@@ -297,10 +337,12 @@ class LLMReader:
         self.examples: list[tuple[str, str]] = []
         self.details = pd.DataFrame()
 
+    @traced
     def fit(self, train: pd.DataFrame):
         self.examples = pick_examples(train, self.shots, self.seed) if self.shots and len(train) else []
         return self
 
+    @traced
     def predict(self, test: pd.DataFrame):
         from .note_reader import read_note
         preds, rows = [], []

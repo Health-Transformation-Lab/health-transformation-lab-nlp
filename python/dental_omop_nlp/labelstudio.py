@@ -19,6 +19,7 @@ from pathlib import Path
 import pandas as pd
 
 from .labels import Status
+from .telemetry import traced
 
 STATUS_CHOICES = [s.value for s in Status] + ["cannot_determine"]
 
@@ -30,6 +31,7 @@ def _choice(results: list[dict], name: str) -> str | None:
     return None
 
 
+@traced
 def parse_export(export: list[dict]) -> tuple[pd.DataFrame, pd.DataFrame]:
     labels, spans = [], []
     for task in export:
@@ -55,6 +57,7 @@ def parse_export(export: list[dict]) -> tuple[pd.DataFrame, pd.DataFrame]:
     return pd.DataFrame(labels), pd.DataFrame(spans)
 
 
+@traced
 def import_export(path: Path, out_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     labels, spans = parse_export(json.loads(Path(path).read_text()))
     prefix = "simulated_" if "simulated" in Path(path).name else ""
@@ -65,6 +68,7 @@ def import_export(path: Path, out_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame
 
 
 # ------------------------------------------------------------------ dry run
+@traced
 def simulate_export(tasks: list[dict], key: pd.DataFrame, n_reviewers: int = 4,
                     seed: int = 7) -> list[dict]:
     """Each simulated reviewer reads the chart truth with their own error rate,

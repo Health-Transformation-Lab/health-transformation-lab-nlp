@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 
 from .sources import UNKNOWN
+from .telemetry import traced
 
 METHODS = ["notes", "exam_form", "proc_codes_completed", "proc_codes_planned",
            "proc_dx_completed", "proc_dx_planned", "probing_chart", "radiograph_ai"]
@@ -49,6 +50,7 @@ DESIGN_GROUPS = {
 DESIGN_ORDER = ["exam_form", "dx_code", "notes", "probing_chart"]
 
 
+@traced
 def rules_for_order(order: list[str], version: str | None = None, radiograph_lower_bound: bool = False) -> dict:
     return {"version": version or "order:" + ">".join(order),
             "priority": [m for g in order for m in DESIGN_GROUPS[g]],
@@ -63,16 +65,19 @@ _ORDER = ["healthy", "gingivitis", "periodontitis_stage_1", "periodontitis_stage
 FIVE = ["healthy_gingivitis", *_ORDER[2:]]
 
 
+@traced
 def collapse5(s: pd.Series) -> pd.Series:
     """Map six statuses to five (healthy + gingivitis -> healthy_gingivitis); other values unchanged."""
     return s.replace({"healthy": "healthy_gingivitis", "gingivitis": "healthy_gingivitis"})
 
 
+@traced
 def phenotype(row: pd.Series, rules: dict) -> tuple[str, str]:
     """Integrated phenotype: (status, method that decided) under the given rules."""
     return phenotype_v0(row, rules)
 
 
+@traced
 def phenotype_v0(row: pd.Series, rules: dict = RULES_V0) -> tuple[str, str]:
     """Returns (status, method that decided)."""
     status, by = UNKNOWN, "none"
@@ -88,6 +93,7 @@ def phenotype_v0(row: pd.Series, rules: dict = RULES_V0) -> tuple[str, str]:
     return status, by
 
 
+@traced
 def cohen_kappa(a: pd.Series, b: pd.Series) -> float:
     # Plain object arrays, not pandas ops: the reliability bootstrap calls this ~10^5 times.
     a, b = np.asarray(a, dtype=object), np.asarray(b, dtype=object)
@@ -100,6 +106,7 @@ def cohen_kappa(a: pd.Series, b: pd.Series) -> float:
     return float("nan") if pe == 1 else (po - pe) / (1 - pe)
 
 
+@traced
 def agreement_matrix(df: pd.DataFrame, methods: list[str] = METHODS, level: str = "status") -> pd.DataFrame:
     """Pairwise agreement over visits where BOTH methods give an answer.
 
@@ -118,11 +125,13 @@ def agreement_matrix(df: pd.DataFrame, methods: list[str] = METHODS, level: str 
     return pd.DataFrame(rows)
 
 
+@traced
 def coverage(df: pd.DataFrame, methods: list[str] = METHODS) -> pd.Series:
     """Share of visits where each method says anything at all."""
     return pd.Series({m: float((df[m] != UNKNOWN).mean()) for m in methods})
 
 
+@traced
 def split_halves(ids, seed: int) -> tuple[set, set]:
     """Seeded random halves of the review charts: (select, holdout). Written to
     phenotype_orders_split.csv so the R twin scores the same halves."""
@@ -131,6 +140,7 @@ def split_halves(ids, seed: int) -> tuple[set, set]:
     return {int(i) for i in ids[: len(ids) // 2]}, {int(i) for i in ids[len(ids) // 2:]}
 
 
+@traced
 def score_orders(key: pd.DataFrame, reviewer_wide: pd.DataFrame, n_boot: int = 200, seed: int = 0,
                  five: bool = True, margin: float = 0.05) -> pd.DataFrame:
     """Score every ordering of the four evidence groups (spec 005).

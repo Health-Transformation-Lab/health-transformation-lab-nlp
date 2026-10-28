@@ -15,6 +15,7 @@ from __future__ import annotations
 import random
 
 from .labels import PerioChart, Status, label_chart
+from .telemetry import traced
 
 _SUBJECTIVE = [
     "Pt presents for {visit}. {complaint}",
@@ -69,6 +70,7 @@ def _objective(chart: PerioChart, rng: random.Random) -> str:
     return "; ".join(parts) + "."
 
 
+@traced
 def render_soap_note(chart: PerioChart, seed: int, leak_assessment: bool = True) -> str:
     """Deterministic for a given (chart, seed)."""
     rng = random.Random(seed)

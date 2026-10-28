@@ -31,6 +31,7 @@ import pandas as pd
 from .harm import unsafe_rates
 from .labels import Status
 from .phenotype import cohen_kappa
+from .telemetry import traced
 
 ORDER = [s.value for s in Status]
 # Five-category reports (spec 005) collapse healthy + gingivitis into one label.
@@ -42,6 +43,7 @@ def _ordinal_for(*series: pd.Series) -> list[str]:
     return FIVE if any((s == "healthy_gingivitis").any() for s in series) else ORDER
 
 
+@traced
 def fleiss_kappa(wide: pd.DataFrame) -> float:
     """wide: rows = visits, cols = reviewers, values = category. Rows with any NA dropped."""
     w = wide.dropna()
@@ -54,6 +56,7 @@ def fleiss_kappa(wide: pd.DataFrame) -> float:
     return float((P_bar - P_e) / (1 - P_e))
 
 
+@traced
 def weighted_kappa(a: pd.Series, b: pd.Series, order: list[str] | None = None) -> float:
     """Quadratic-weighted Cohen's kappa over ordinal statuses; other values dropped.
     Uses the five-level order when the collapsed label is present."""
@@ -72,6 +75,7 @@ def weighted_kappa(a: pd.Series, b: pd.Series, order: list[str] | None = None) -
     return float(1 - (W * O).sum() / (W * E).sum())
 
 
+@traced
 def consensus(wide: pd.DataFrame) -> pd.Series:
     def vote(row):
         vc = row.dropna().value_counts()
@@ -111,6 +115,7 @@ def _kappa_codes(a: np.ndarray, b: np.ndarray) -> float:
     return float("nan") if pe == 1 else float((po - pe) / (1 - pe))
 
 
+@traced
 def reliability_report(labels: pd.DataFrame, key: pd.DataFrame, compare: dict[str, pd.Series]) -> dict:
     """labels: reviewer_labels.csv; key: review_key.csv indexed by visit_id;
     compare: name -> Series(status) indexed by visit_id (methods, algorithm, AI)."""
@@ -138,6 +143,7 @@ def reliability_report(labels: pd.DataFrame, key: pd.DataFrame, compare: dict[st
             "pairwise": pd.DataFrame(pair), "methods": pd.DataFrame(rows), "consensus": cons}
 
 
+@traced
 def by_level(key: pd.DataFrame, cons: pd.Series, compare: dict[str, pd.Series]) -> pd.DataFrame:
     """Agreement with consensus per difficulty level (spec 002), plus the macro
     average over levels (as GlobalDentBench macro-averages over reasoning levels)."""
@@ -155,6 +161,7 @@ def by_level(key: pd.DataFrame, cons: pd.Series, compare: dict[str, pd.Series]) 
     return pd.DataFrame(rows)
 
 
+@traced
 def agreement_vs_humans(wide: pd.DataFrame, compare: dict[str, pd.Series], n_boot: int = 500,
                         seed: int = 0, margin: float = 0.05) -> pd.DataFrame:
     """Is each method as reliable as a human reviewer?

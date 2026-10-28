@@ -21,6 +21,7 @@ from dental_omop_nlp.reliability_cal import (
     icc_report,
     nested_components,
     stage_band_flips,
+    write_charts,
 )
 
 ap = argparse.ArgumentParser()
@@ -40,7 +41,7 @@ for sd_error in (0.0, 0.4, 0.8, 1.2):
     c = nested_components(d)
     rows.append({"sd_error_true": sd_error, **c, **icc_report(c), **stage_band_flips(d)})
     if sd_error == 0.8:
-        d.to_csv(out / "simulated_cal_charts.csv.gz", index=False)   # read by the R parity test
+        write_charts(d, out / "simulated_cal_charts.csv.gz")   # read by the R parity test
 res = pd.DataFrame(rows)
 res.to_csv(out / "simulated_cal_reliability.csv", index=False)
 print("SIMULATED charts (placeholder variance components; whole-mm rounding):")
