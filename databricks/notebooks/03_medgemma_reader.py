@@ -107,5 +107,6 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")  # noqa: F821
 # source and git_commit match the rows the Load results job adds from Kaggle and the repo (spec 016)
 rows = d.assign(run_ts=pd.Timestamp.now(tz="UTC"), source="databricks",
                 git_commit=dbutils.widgets.get("git_commit"))  # noqa: F821
+rows = rows.astype({c: "string" for c in rows.columns if rows[c].isna().all()})  # empty `error`: text, not a number
 spark.createDataFrame(rows).write.mode("append").option("mergeSchema", "true").saveAsTable(  # noqa: F821
     f"{catalog}.{schema}.llm_reader_runs")

@@ -20,3 +20,4 @@
 
 ## Polish
 - [x] T011 Update `docs/results_storage.md`; run the full Python suite
+- [x] T012 Review fixes: full-run row minimum (`--min-rows`, default the answer key), `!cancelled()` guard, delete-then-append per file version, cast only empty columns, `show_log.py` keeps a one-line warning's next line

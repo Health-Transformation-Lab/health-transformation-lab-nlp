@@ -109,6 +109,7 @@ def test_show_log_prints_the_notebook_output_without_warnings(tmp_path):
     log.write_text(json.dumps([
         {"stream_name": "stdout", "time": 1.0, "data": "ready\n"},
         {"stream_name": "stderr", "time": 2.0, "data": "/x/mistune.py:435: SyntaxWarning: invalid escape\n  cells = re.sub(a, b)\n"},
+        {"stream_name": "stderr", "time": 2.5, "data": "FutureWarning: one line, no source\n"},
         {"stream_name": "stdout", "time": 3.0, "data": "No HF_TOKEN secret on this notebook.\n"},
         {"stream_name": "stderr", "time": 4.0, "data": "[NbConvertApp] Writing 1 bytes\n"},
     ]))

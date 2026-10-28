@@ -63,3 +63,11 @@ loader never fails on tracking: no MLflow means no run, as elsewhere (`tracking.
 - After a Kaggle full run and its PR are merged, `select source, count(*) from ai_predictions group by 1`
   in dev shows `kaggle` rows for the MedGemma rung.
 - Running Load results twice adds no rows the second time.
+
+## Revision 2026-10-28: after review
+- A run is committed only if every file has at least as many rows as a full run (every note in the answer
+  key, 240) and as the file it replaces: a 10-note test under a new name (`+k2` for shots) was otherwise
+  committed. A cancelled workflow commits nothing.
+- Each load first deletes rows of the same file versions, so a load that failed partway is redone without
+  duplicates. Only all-empty columns take the table's existing type; a real type clash fails the job rather
+  than turning values to null. The reader job writes empty columns as text.

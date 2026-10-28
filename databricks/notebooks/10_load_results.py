@@ -26,6 +26,7 @@ dbutils.library.restartPython()  # noqa: F821
 # COMMAND ----------
 
 import os
+import re
 
 import pandas as pd
 from dental_omop_nlp import results_store, tracking
@@ -61,15 +62,21 @@ now = pd.Timestamp.now(tz="UTC")
 
 
 def append(df: pd.DataFrame, name: str):
-    """Append, with each column cast to the type the table already has (an empty `error` column is text in one
-    file and a number in another); new columns are added (mergeSchema)."""
+    """Append these file versions. Rows of the same versions are deleted first, so a load that failed partway
+    (no result_files row yet) is redone, not duplicated. An empty column takes the type the table already has
+    (an all-null `error` reads as a number in one file, text in another); other columns keep their own type,
+    so a real mismatch fails loudly instead of turning values to null. New columns are added (mergeSchema)."""
     if not len(df):
         return
-    df = df.astype({c: "string" for c in df.columns if df[c].isna().all()})   # an empty column is text, not void
-    sdf = spark.createDataFrame(df.assign(git_commit=commit, loaded_at=now))  # noqa: F821
+    empty = [c for c in df.columns if df[c].isna().all()]
+    sdf = spark.createDataFrame(df.astype({c: "string" for c in empty}).assign(git_commit=commit, loaded_at=now))  # noqa: F821
     if spark.catalog.tableExists(table(name)):  # noqa: F821
-        for field in spark.table(table(name)).schema:  # noqa: F821
-            if field.name in sdf.columns:
+        schema = spark.table(table(name)).schema  # noqa: F821
+        hashes = ", ".join(f"'{h}'" for h in sorted(set(df.sha256)) if re.fullmatch(r"[0-9a-f]{64}", h))
+        if hashes and "sha256" in schema.fieldNames():   # the reader job's own rows have no sha256
+            spark.sql(f"DELETE FROM {table(name)} WHERE sha256 IN ({hashes})")  # noqa: F821
+        for field in schema:
+            if field.name in empty:
                 sdf = sdf.withColumn(field.name, F.col(field.name).cast(field.dataType))
     sdf.write.mode("append").option("mergeSchema", "true").saveAsTable(table(name))
 

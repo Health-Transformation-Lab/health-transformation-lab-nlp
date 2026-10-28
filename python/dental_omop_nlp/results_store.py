@@ -85,18 +85,20 @@ def detail_rows(files: pd.DataFrame, folder: Path) -> pd.DataFrame:
 
 
 @traced
-def record(src: Path, dest: Path, run_url: str, source: str = "kaggle") -> list[str]:
+def record(src: Path, dest: Path, run_url: str, source: str = "kaggle", min_rows: int = 0) -> list[str]:
     """Copy src's result files into dest and list them in dest's manifest. Raises ValueError, changing
-    nothing, if there are none or one has fewer rows than the file it would replace (a test run)."""
+    nothing, if there are none, or one has fewer rows than min_rows (a full run) or than the file it would
+    replace: a test run is never committed, even under a new name (shots or adapter tags the method)."""
     src, dest = Path(src), Path(dest)
     found = result_files(src)
     if found.empty:
         raise ValueError(f"no result files (ai_predictions_*.csv, llm_details_*.csv) in {src}")
     for f in found.itertuples():
         old = dest / f.file
-        if old.exists() and f.rows < (n := len(pd.read_csv(old, usecols=["visit_id"]))):
-            raise ValueError(f"{f.file} has fewer rows ({f.rows}) than the committed file ({n}): "
-                             "a test run doesn't replace a full one")
+        n = max(min_rows, len(pd.read_csv(old, usecols=["visit_id"])) if old.exists() else 0)
+        if f.rows < n:
+            raise ValueError(f"{f.file} has fewer rows ({f.rows}) than a full run ({n}): "
+                             "a test run is not committed")
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     manifest = read_manifest(dest)
     manifest = manifest[~manifest.file.isin(found.file)]

@@ -17,9 +17,10 @@ def main(path, chars=6000):
         return
     kept, skip_next = [], False
     for line in "".join(c.get("data", "") for c in chunks).splitlines():
-        if skip_next:
+        if skip_next and line.startswith(" "):   # the warning's source line
             skip_next = False
             continue
+        skip_next = False
         if not line.strip() or line.startswith("[NbConvertApp]"):
             continue
         if "Warning: " in line:             # a Python warning is two lines: the message, then the source line

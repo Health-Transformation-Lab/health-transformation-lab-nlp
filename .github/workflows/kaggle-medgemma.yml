@@ -111,7 +111,7 @@ jobs:
       # Spec 016: commit the results so they're versioned and the Load results job puts them in Delta.
       # The branch starts from main, so the PR holds the results only.
       - name: Open a pull request with the results
-        if: ${{ always() && inputs.open_pr && (inputs.wait || inputs.collect_only) }}
+        if: ${{ !cancelled() && inputs.open_pr && (inputs.wait || inputs.collect_only) }}
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

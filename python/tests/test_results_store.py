@@ -101,14 +101,14 @@ def test_record_copies_real_results_and_writes_the_manifest(tmp_path, datasets):
     _preds(out / "ai_predictions_medgemma-x.csv", 6)
     _details(out / "llm_details_medgemma-x.csv", 6)
     _preds(out / "simulated_ai_predictions_medgemma-x.csv", 6)
-    r = _record(out, datasets)
+    r = _record(out, datasets, "--min-rows", "6")
     assert r.returncode == 0, r.stdout + r.stderr
     assert len(pd.read_csv(datasets / "ai_predictions_medgemma-x.csv")) == 6
     assert len(pd.read_csv(datasets / "simulated_ai_predictions_medgemma-x.csv")) == 4    # untouched
     m = pd.read_csv(datasets / rs.MANIFEST)
     assert set(m.file) == {"ai_predictions_medgemma-x.csv", "llm_details_medgemma-x.csv"}
     assert set(m.source) == {"kaggle"} and set(m.run_url) == {"https://github.com/o/r/actions/runs/9"}
-    r = _record(out, datasets)                                                # recording again: one row per file
+    r = _record(out, datasets, "--min-rows", "6")                             # recording again: one row per file
     assert len(pd.read_csv(datasets / rs.MANIFEST)) == 2
 
 
@@ -121,6 +121,26 @@ def test_record_refuses_a_smaller_run_and_changes_nothing(tmp_path, datasets):
     assert r.returncode == 3 and "fewer rows" in r.stdout
     assert (datasets / "ai_predictions_medgemma-x.csv").read_bytes() == before
     assert not (datasets / rs.MANIFEST).exists()
+
+
+def test_record_refuses_a_test_run_of_a_new_method(tmp_path, datasets):
+    # a 10-note run with shots=2 is named ...+k2: no committed file to compare with, so the full-run size decides
+    out = tmp_path / "kaggle_out"
+    out.mkdir()
+    _preds(out / "ai_predictions_medgemma-x+k2.csv", 3)
+    r = _record(out, datasets, "--min-rows", "4")
+    assert r.returncode == 3 and "fewer rows" in r.stdout
+    assert not (datasets / "ai_predictions_medgemma-x+k2.csv").exists()
+
+
+def test_record_defaults_to_the_full_review_set():
+    import importlib.util
+
+    from dental_omop_nlp.paths import DATASETS_DIR
+    spec = importlib.util.spec_from_file_location("record_results", RECORD)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert mod.full_run_rows() == len(pd.read_csv(DATASETS_DIR / "answer_key" / "review_key.csv")) == 240
 
 
 def test_record_with_no_results_says_so(tmp_path, datasets):
@@ -145,6 +165,7 @@ def test_kaggle_workflow_opens_a_pr_with_the_results():
     assert perms["contents"] == "write" and perms["pull-requests"] == "write"
     text = _text(".github/workflows/kaggle-medgemma.yml")
     assert "kaggle/record_results.py" in text and "gh pr create" in text
+    assert "!cancelled()" in text and "always() && inputs.open_pr" not in text   # a cancelled run commits nothing
 
 
 def test_load_results_job_runs_the_notebook_with_the_bundle_schema():
@@ -167,6 +188,7 @@ def test_load_notebook_appends_new_versions_to_the_three_tables():
     for t in ("result_files", "ai_predictions", "llm_reader_runs"):
         assert f'"{t}"' in nb, t
     assert "new_files(" in nb and 'mode("append")' in nb and "mergeSchema" in nb
+    assert "DELETE FROM" in nb            # a load that failed partway is redone, not duplicated
     assert "tracking.track(" in nb and "llm_run_metrics(" in nb
 
 
