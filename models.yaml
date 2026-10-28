@@ -182,6 +182,7 @@ models:
   # by the judge bake-off: a judge of the same family is not selected.
   - id: medgemma-1.5-4b-it
     hf: google/medgemma-1.5-4b-it
+    kaggle_model: keras/medgemma/keras/medgemma_1.5_instruct_4b/1   # --backend keras: no HF token; accept the licence on kaggle.com/models/keras/medgemma
     license: Health AI Developer Foundations (HAI-DEF) terms of use, https://developers.google.com/health-ai-developer-foundations/terms
     gated: true   # requires: accept the HAI-DEF terms on the model's Hugging Face page, then a read token in HF_TOKEN
     org: Google (Health AI Developer Foundations)
@@ -197,6 +198,7 @@ models:
 
   - id: medgemma-4b-it
     hf: google/medgemma-4b-it
+    kaggle_model: keras/medgemma/keras/medgemma_instruct_4b/1
     license: Health AI Developer Foundations (HAI-DEF) terms of use, https://developers.google.com/health-ai-developer-foundations/terms
     gated: true   # requires: accept the HAI-DEF terms on the model's Hugging Face page, then a read token in HF_TOKEN
     org: Google (Health AI Developer Foundations)

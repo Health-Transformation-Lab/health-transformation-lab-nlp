@@ -35,9 +35,17 @@ writes predictions; the reader's parsing, gate and fallback are unit-tested.
 
 ### User Story 2 - Several ways to run it (P1)
 
-`hf` (local transformers, GPU or CPU), `openai` (any OpenAI-compatible endpoint:
+`hf` (local transformers, GPU or CPU), `keras` (KerasHub on JAX with weights from
+Kaggle Models, so a Kaggle notebook pushed from GitHub, which can't read a Hugging
+Face token secret, can still run it), `openai` (any OpenAI-compatible endpoint:
 Databricks Model Serving, vLLM, Ollama), `simulated` (dry run, no model, files
 prefixed `simulated_`).
+
+1. **Given** `--backend keras`, **Then** no Hugging Face token is needed, the prompt is
+   the one the hf backend builds (Gemma 3 chat template), and the output files are
+   tagged `+keras` so they never replace the hf results.
+2. **Given** a 10-note keras run, **Then** it is compared with the hf run on the same
+   notes (prediction agreement, gate pass, accuracy) before a full keras run is trusted.
 
 ### User Story 3 - Judge family rule (P2)
 
@@ -58,7 +66,7 @@ format, saving an adapter that the `hf` backend can load.
 ## Requirements
 
 - **FR-001**: `llm_reader.py`: prompt (shared status criteria with the judge), parser, gate, fallback, PHI pre-check.
-- **FR-002**: Backends hf / openai / simulated behind one interface; per-note details (raw output, quote, tokens, latency, fallback, error) written alongside predictions.
+- **FR-002**: Backends hf / keras / openai / simulated behind one interface; non-default backends tag their files (`+keras`); per-note details (raw output, quote, tokens, latency, fallback, error) written alongside predictions.
 - **FR-003**: `make_rung` builds an `LLMReader` for any `role: llm` model in `models.yaml`.
 - **FR-004**: Costs: MedGemma entries in `costs.yaml` (assumed GPU throughput, ILLUSTRATIVE) and simulated predictions in `14_benchmark_cost.py --simulate-missing`.
 - **FR-005**: `15_judge.py` adds families of evaluated LLM rungs to the excluded judge families automatically.

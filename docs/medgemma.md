@@ -69,7 +69,8 @@ suppresses it (it otherwise used up the 300 new tokens before the JSON) and
 | Piece | Where |
 |---|---|
 | Note reader rung: prompt shares the judge's AAP/EFP criteria; JSON status/grade/extent + verbatim quote; falls back to `note_rules` and flags the row on any failure; never sends a note the residual PHI scan flags | `python/dental_omop_nlp/llm_reader.py` |
-| Backends: `hf` (local transformers, optional LoRA adapter), `openai` (Databricks serving, vLLM, Ollama), `simulated` (dry run) | same |
+| Backends: `hf` (local transformers, optional LoRA adapter), `keras` (KerasHub on JAX, weights from Kaggle Models, no Hugging Face token; files tagged `+keras`), `openai` (Databricks serving, vLLM, Ollama), `simulated` (dry run) | same |
+| Compare backends | `python scripts/40_compare_backends.py --rung medgemma-1.5-4b-it` (the `+keras` run against the hf run, on the notes both read) |
 | Run it | `python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf [--shots 1] [--limit 40]` |
 | Fine-tune | `python scripts/17_medgemma_lora.py` then `--adapter runs/medgemma-lora` |
 | Judge rule | `15_judge.py` excludes judges of any evaluated LLM's family (`family: gemma` in `models.yaml`) |
@@ -114,12 +115,18 @@ placeholder error rates and say nothing about MedGemma.
   `DENTAL_LLM_DTYPE` to force one). Download the prediction CSVs from the Output tab into
   `data/datasets/`, then run `28_ladder_vs_truth.py` and `35_readme_results.py`.
   **From GitHub:** Actions → *Run MedGemma on a free Kaggle GPU* → Run workflow pushes the notebook to Kaggle
-  (`kaggle kernels push --accelerator NvidiaTeslaT4`, public: synthetic notes only, and the Hugging Face token stays a private Kaggle secret), waits, and keeps the predictions and
+  (`kaggle kernels push --accelerator NvidiaTeslaT4`, public: synthetic notes only), waits, and keeps the predictions and
   the Kaggle log as a workflow artifact. Needs `KAGGLE_USERNAME` and `KAGGLE_API_TOKEN` (or
   `KAGGLE_KEY`) in the GitHub environment `dev` (Kaggle → Settings → API → Generate New Token; delete it
-  there when done). The Hugging Face token stays a Kaggle secret: after the first push, open the
-  notebook on kaggle.com, Add-ons → Secrets → attach `HF_TOKEN`, and run the workflow again. `limit` 10
-  is a test; `limit` 0 reads all 240 notes (hours: turn `wait` off, then rerun with `collect_only`).
+  there when done). A notebook pushed by the API can't read Kaggle secrets, so the workflow's default
+  `backend` is `keras`: KerasHub loads `keras/medgemma/keras/medgemma_1.5_instruct_4b/1` (`kaggle_model` in
+  `models.yaml`), attached to the notebook through `model_sources`, so no Hugging Face token is needed
+  (accept the licence once on [kaggle.com/models/keras/medgemma](https://www.kaggle.com/models/keras/medgemma)).
+  It runs bfloat16 on one T4 (float32 4B doesn't fit 15 GB, and KerasHub has no Gemma 3 layout map to split
+  it), so its answers can differ from the float32 hf run: its files end in `+keras`, and the 10-note test is
+  compared with the committed hf results (`40_compare_backends.py`, printed in the log) before a full run
+  is worth trusting. `backend` `hf` still works by hand with the `HF_TOKEN` secret attached on kaggle.com.
+  `limit` 10 is a test; `limit` 0 reads all 240 notes (hours: turn `wait` off, then rerun with `collect_only`).
 - **Paid Databricks:** register through MLflow, serve on GPU Model Serving, and
   batch-score with `ai_query`. Costs go in `costs.yaml` as a self-hosted GPU method.
 - **Evaluation:** the same split, scorer, harm grading, difficulty levels and

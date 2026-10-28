@@ -12,11 +12,13 @@ LLM note readers (MedGemma, spec 004):
 
     python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf          # local GPU/CPU
     python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf --adapter runs/medgemma-lora
+    python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend keras       # Kaggle Models, no HF token
     READER_BASE_URL=... READER_API_KEY=... python scripts/11_ai_predict.py \
         --rung medgemma-27b-text-it --backend openai --endpoint <serving endpoint name>
     python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend simulated   # dry run, no model
 
-LLM variants get their own files: +lora (adapter), +k<shots> (few-shot), +terse (prompt variant).
+LLM variants get their own files: +lora (adapter), +k<shots> (few-shot), +terse (prompt variant),
++keras (KerasHub backend; compare with the hf run: scripts/40_compare_backends.py).
 Compare with the BERT encoders: scripts/29_medgemma_vs_bert.py.
 
 Writes data/datasets/ai_predictions_<rung>.csv (visit_id, pred, p_<status>...), plus
@@ -45,7 +47,7 @@ ap.add_argument("--class-weight", choices=["sqrt"], default=None,
 ap.add_argument("--seed", type=int, default=42, help="encoders: training seed; a non-default seed tags the output +s<seed>")
 ap.add_argument("--lr", type=float, default=5e-5, help="encoders: learning rate; a non-default rate tags the output +lr<rate>")
 llm = ap.add_argument_group("LLM readers")
-llm.add_argument("--backend", choices=["hf", "openai", "simulated"], default="hf")
+llm.add_argument("--backend", choices=["hf", "keras", "openai", "simulated"], default="hf")
 llm.add_argument("--shots", type=int, default=0, help="few-shot examples per status from train.csv")
 llm.add_argument("--variant", default="reader-v2", help="prompt variant (reader-v2, reader-v2-terse)")
 llm.add_argument("--adapter", default=None, help="LoRA adapter dir from scripts/17_medgemma_lora.py")
@@ -88,7 +90,7 @@ out = review[["visit_id"]].assign(pred=pred)
 if proba is not None:
     for i, lab in enumerate(LABELS):
         out[f"p_{lab}"] = proba[:, i]
-tag = (output_tag(adapter=a.adapter, shots=a.shots, variant=a.variant) if is_llm
+tag = (output_tag(adapter=a.adapter, shots=a.shots, variant=a.variant, backend=a.backend) if is_llm
        else output_tag(class_weight=a.class_weight, seed=a.seed, lr=a.lr))
 path = DATASETS_DIR / f"{prefix}ai_predictions_{a.rung}{tag}.csv"
 out.to_csv(path, index=False)
@@ -104,7 +106,7 @@ if is_llm:
         print(f"*** SIMULATED READER: dry run, not a MedGemma result (agreement with truth {acc:.1%}) ***")
 
 # ---- MLflow (docs/mlops.md): params, prediction file, optional Unity Catalog registration
-from dental_omop_nlp.tracking import track  # noqa: E402
+from dental_omop_nlp.tracking import track
 
 with track("11_ai_predict", a.rung, simulated=bool(prefix),
            params={"rung": a.rung, "label": a.label, "n_train": len(train), "n_review": len(review), **{

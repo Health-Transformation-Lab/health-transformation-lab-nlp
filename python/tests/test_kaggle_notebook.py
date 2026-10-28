@@ -29,6 +29,22 @@ def test_notebook_reads_the_token_from_kaggle_secrets_and_holds_none():
     assert not re.search(r"hf_[A-Za-z0-9]{20,}", NB.read_text())
 
 
+def test_hf_token_is_only_asked_for_on_the_hf_backend():
+    # a notebook pushed from GitHub can't read Kaggle secrets: the keras backend must not need one
+    code = _code()
+    guard = code.index('if BACKEND == "hf":')
+    assert guard < code.index('get_secret("HF_TOKEN")') < code.index("raise SystemExit")
+    assert 'BACKEND = "keras"' in code
+
+
+def test_keras_backend_runs_on_jax_and_is_compared_with_the_hf_results():
+    code = _code()
+    assert 'os.environ["KERAS_BACKEND"] = "jax"' in code
+    assert code.index('os.environ["KERAS_BACKEND"]') < code.index("11_ai_predict.py")
+    assert "--backend {BACKEND}" in code
+    assert "40_compare_backends.py" in code and code.index("--limit {TEST_NOTES}") < code.index("40_compare_backends.py")
+
+
 # ---- pushing it to Kaggle from GitHub Actions (kaggle/prepare_kernel.py, .github/workflows/kaggle-medgemma.yml)
 
 def _prepare(tmp_path, *extra):
@@ -54,6 +70,26 @@ def test_prepared_kernel_runs_on_a_gpu_with_internet_and_the_chosen_settings(tmp
     s = _settings(nb)
     assert 'RUNG = "medgemma-4b-it"' in s and "TEST_NOTES = 5" in s and "SHOTS = 2" in s
     assert 'BRANCH = "dev-x"' in s and "FULL_RUN = False" in s
+
+
+def test_keras_backend_attaches_the_kaggle_model_and_is_the_default(tmp_path):
+    _, meta, nb = _prepare(tmp_path)
+    assert 'BACKEND = "keras"' in _settings(nb)
+    assert meta["model_sources"] == ["keras/medgemma/keras/medgemma_1.5_instruct_4b/1"]   # from models.yaml
+
+
+def test_hf_backend_attaches_no_model(tmp_path):
+    _, meta, nb = _prepare(tmp_path, "--backend", "hf")
+    assert 'BACKEND = "hf"' in _settings(nb) and meta["model_sources"] == []
+
+
+def test_keras_backend_needs_a_kaggle_model_for_the_rung(tmp_path):
+    import subprocess
+    import sys
+    r = subprocess.run([sys.executable, str(REPO_ROOT / "kaggle" / "prepare_kernel.py"), "--out", str(tmp_path / "k"),
+                        "--username", "someone", "--rung", "medgemma-27b-text-it", "--backend", "keras"],
+                       capture_output=True, text=True, check=False)
+    assert r.returncode != 0 and "kaggle_model" in r.stderr
 
 
 def test_limit_zero_means_the_full_run(tmp_path):
@@ -85,6 +121,8 @@ def test_workflow_pushes_waits_and_keeps_the_outputs():
     assert "--accelerator" in text
     assert "kaggle kernels list --mine" in text          # fails early, with instructions, on bad credentials
     assert 'tok="${T:-$K}"' in text                      # a new-style token saved as KAGGLE_KEY still works
+    assert on["workflow_dispatch"]["inputs"]["backend"]["default"] == "keras"
+    assert '--backend "${{ inputs.backend }}"' in text
 
 
 def test_hf_secret_is_checked_first_and_its_message_printed():
