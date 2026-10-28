@@ -75,17 +75,33 @@ jobs:
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         run: databricks bundle deployment bind health_transformation_lab health_transformation_lab -t "$TARGET" --auto-approve || echo "bind did not run (see above); the deploy below decides"
+      # A Genie space can't be created before its tables, and Load results writes them after a deploy (issue #154).
+      # So when the only failure is a Genie space whose tables don't exist yet, the rest has deployed: run Load
+      # results, wait for it, and deploy again. Any other failure fails here.
       - name: Deploy
+        id: deploy
         if: env.DATABRICKS_CLIENT_SECRET != ''
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
-        run: databricks bundle deploy -t "$TARGET"
+        run: |
+          set -o pipefail
+          log="$RUNNER_TEMP/deploy.log"
+          databricks bundle deploy -t "$TARGET" 2>&1 | tee "$log" && exit 0
+          errors=$(grep '^Error:' "$log" || true)
+          if [ -z "$errors" ] || grep -v 'genie_spaces' <<<"$errors" | grep -q . \
+             || ! grep -q 'does not exist' "$log"; then
+            echo "::error::Deploy failed (see above)."; exit 1
+          fi
+          echo "::notice::The Genie spaces' tables don't exist yet: running Load results, then deploying again."
+          databricks bundle run -t "$TARGET" load_results
+          echo "loaded=true" >> "$GITHUB_OUTPUT"
+          databricks bundle deploy -t "$TARGET"
       - name: Run benchmark job
         if: env.DATABRICKS_CLIENT_SECRET != '' && github.event.inputs.run_benchmark == 'true'
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Returns once Databricks has started the run; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait study_benchmark
       - name: Load committed results into the gold tables (spec 016)
-        if: env.DATABRICKS_CLIENT_SECRET != ''
+        if: env.DATABRICKS_CLIENT_SECRET != '' && steps.deploy.outputs.loaded != 'true'
         env: {DATABRICKS_BUNDLE_ENGINE: direct}
         # Only file versions it hasn't loaded yet; follow it from the Run URL in the log.
         run: databricks bundle run -t "$TARGET" --no-wait load_results
