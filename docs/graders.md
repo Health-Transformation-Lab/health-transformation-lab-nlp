@@ -1,4 +1,4 @@
-# The graders on Databricks (spec 018)
+# The graders on Databricks (spec 019)
 
 Two graders, each an AI/BI dashboard plus a Genie space you can ask questions in plain words. Both are light
 versions of designs: the EHR DQ grader follows the React *Perio DQ Monitor*; the lab grader follows the pitch's

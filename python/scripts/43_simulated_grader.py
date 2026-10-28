@@ -1,4 +1,4 @@
-"""Write a SIMULATED lab grader run (spec 018 US3): every number is made up, so the Lab grader dashboard and Genie
+"""Write a SIMULATED lab grader run (spec 019 US3): every number is made up, so the Lab grader dashboard and Genie
 space have rows before any real run. Real runs commit data/datasets/grader/grader_*.csv, which Load results then
 uses instead.
 

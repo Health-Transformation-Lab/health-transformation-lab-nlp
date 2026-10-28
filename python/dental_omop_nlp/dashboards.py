@@ -1,4 +1,4 @@
-"""The grader dashboards (spec 018), built as Databricks AI/BI `.lvdash.json` from Python, so widgets and their
+"""The grader dashboards (spec 019), built as Databricks AI/BI `.lvdash.json` from Python, so widgets and their
 datasets are wired in one place instead of hand-edited JSON.
 
     python scripts/42_build_dashboards.py           # write databricks/dashboards/<name>.lvdash.json
@@ -108,7 +108,7 @@ def _filter(name, field, datasets, title, pos) -> dict:
         "frame": _frame(title)}}, "position": _at(*pos)}
 
 
-# ---------------------------------------------------------------- EHR DQ grader (spec 018 US2)
+# ---------------------------------------------------------------- EHR DQ grader (spec 019 US2)
 
 # each evidence source as the study names it, and its plain name (evidence_rules.md)
 SOURCES = [("exam_form", "Exam form"), ("proc_dx_completed", "Diagnosis codes, done"),
@@ -256,7 +256,7 @@ def dq_grader() -> dict:
                        "layout": layout}]}
 
 
-# ---------------------------------------------------------------- Lab grader (spec 018 US4)
+# ---------------------------------------------------------------- Lab grader (spec 019 US4)
 
 MODE = "CASE WHEN ans.with_agent THEN 'With the agent' ELSE 'On its own' END"
 ANSWERS = "{gold}.grader_answers ans JOIN {gold}.grader_questions q ON ans.question_id = q.question_id"
@@ -384,7 +384,7 @@ def lab_grader() -> dict:
 DASHBOARDS = {"dq_grader": dq_grader, "lab_grader": lab_grader}
 
 
-# ---------------------------------------------------------------- Genie spaces (spec 018 US5)
+# ---------------------------------------------------------------- Genie spaces (spec 019 US5)
 
 def _id(text: str) -> str:
     """A stable 32-hex id, so rebuilding the space changes nothing unless its text does."""

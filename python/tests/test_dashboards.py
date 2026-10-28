@@ -1,4 +1,4 @@
-"""Spec 018: the grader dashboards are built by dental_omop_nlp.dashboards, and every dataset's SQL runs, here in
+"""Spec 019: the grader dashboards are built by dental_omop_nlp.dashboards, and every dataset's SQL runs, here in
 DuckDB, on the tables grader_tables builds from the committed CSVs, under the same three-part names as in Databricks."""
 
 import json

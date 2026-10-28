@@ -121,7 +121,7 @@ print("loaded:", list(new.file) or "nothing new")
 
 # COMMAND ----------
 
-# The graders' tables (spec 018): data quality, and the lab grader (a SIMULATED sample until real runs exist). Each is small and built whole from the
+# The graders' tables (spec 019): data quality, and the lab grader (a SIMULATED sample until real runs exist). Each is small and built whole from the
 # deployed CSVs, so it is overwritten on every run: a rerun leaves the same rows. sha256 says which files it holds.
 for name, df in {**grader_tables.dq_tables(data_dir), **grader_tables.lab_tables(data_dir)}.items():
     empty = [c for c in df.columns if df[c].isna().all()]
