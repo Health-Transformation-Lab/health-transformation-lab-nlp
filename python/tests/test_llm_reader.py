@@ -253,15 +253,6 @@ def test_keras_backend_refuses_a_model_without_a_kaggle_handle():
         make_backend({"id": "x", "hf": "google/x"}, "keras")
 
 
-def test_keras_preset_uses_the_attached_copy_when_there_is_one(tmp_path):
-    from dental_omop_nlp.llm_reader import keras_preset
-    h = "keras/medgemma/keras/medgemma_1.5_instruct_4b/1"
-    assert keras_preset(h, input_root=tmp_path) == "kaggle://" + h            # not attached: kagglehub downloads it
-    local = tmp_path / "medgemma" / "keras" / "medgemma_1.5_instruct_4b" / "1"
-    local.mkdir(parents=True)
-    assert keras_preset(h, input_root=tmp_path) == str(local)                 # model_sources mounts it here
-
-
 def test_keras_dtype_defaults_to_bfloat16_and_can_be_overridden(monkeypatch):
     # float32 4B doesn't fit one 15 GB T4, and KerasHub has no Gemma 3 layout map to split it over two
     from dental_omop_nlp.llm_reader import keras_dtype

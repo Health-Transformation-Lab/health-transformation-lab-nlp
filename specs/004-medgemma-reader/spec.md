@@ -35,7 +35,7 @@ writes predictions; the reader's parsing, gate and fallback are unit-tested.
 
 ### User Story 2 - Several ways to run it (P1)
 
-`hf` (local transformers, GPU or CPU), `keras` (KerasHub on JAX with weights from
+`hf` (local transformers, GPU or CPU), `keras` (KerasHub on PyTorch with weights from
 Kaggle Models, so a Kaggle notebook pushed from GitHub, which can't read a Hugging
 Face token secret, can still run it), `openai` (any OpenAI-compatible endpoint:
 Databricks Model Serving, vLLM, Ollama), `simulated` (dry run, no model, files

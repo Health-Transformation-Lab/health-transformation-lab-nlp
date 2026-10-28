@@ -69,7 +69,7 @@ suppresses it (it otherwise used up the 300 new tokens before the JSON) and
 | Piece | Where |
 |---|---|
 | Note reader rung: prompt shares the judge's AAP/EFP criteria; JSON status/grade/extent + verbatim quote; falls back to `note_rules` and flags the row on any failure; never sends a note the residual PHI scan flags | `python/dental_omop_nlp/llm_reader.py` |
-| Backends: `hf` (local transformers, optional LoRA adapter), `keras` (KerasHub on JAX, weights from Kaggle Models, no Hugging Face token; files tagged `+keras`), `openai` (Databricks serving, vLLM, Ollama), `simulated` (dry run) | same |
+| Backends: `hf` (local transformers, optional LoRA adapter), `keras` (KerasHub on PyTorch, weights from Kaggle Models, no Hugging Face token; files tagged `+keras`), `openai` (Databricks serving, vLLM, Ollama), `simulated` (dry run) | same |
 | Compare backends | `python scripts/40_compare_backends.py --rung medgemma-1.5-4b-it` (the `+keras` run against the hf run, on the notes both read) |
 | Run it | `python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf [--shots 1] [--limit 40]` |
 | Fine-tune | `python scripts/17_medgemma_lora.py` then `--adapter runs/medgemma-lora` |

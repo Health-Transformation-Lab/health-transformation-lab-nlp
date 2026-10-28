@@ -37,9 +37,11 @@ def test_hf_token_is_only_asked_for_on_the_hf_backend():
     assert 'BACKEND = "keras"' in code
 
 
-def test_keras_backend_runs_on_jax_and_is_compared_with_the_hf_results():
+def test_keras_backend_runs_on_torch_and_is_compared_with_the_hf_results():
+    # first Kaggle run: on JAX the preset's token embedding didn't load; it loads on torch (keras-hub 0.32)
     code = _code()
-    assert 'os.environ["KERAS_BACKEND"] = "jax"' in code
+    assert 'os.environ["KERAS_BACKEND"] = "torch"' in code
+    assert 'os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"' in code     # TensorFlow took GPU memory at import
     assert code.index('os.environ["KERAS_BACKEND"]') < code.index("11_ai_predict.py")
     assert "--backend {BACKEND}" in code
     assert "40_compare_backends.py" in code and code.index("--limit {TEST_NOTES}") < code.index("40_compare_backends.py")

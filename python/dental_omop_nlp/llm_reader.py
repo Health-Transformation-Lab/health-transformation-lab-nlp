@@ -17,7 +17,7 @@ Backends
              text-only 27B via AutoModelForCausalLM; optional LoRA adapter. Needs
              `pip install -e ".[llm]"`, a Hugging Face login that has accepted the
              HAI-DEF terms, and ideally a GPU.
-  keras      KerasHub Gemma3CausalLM from Kaggle Models (`kaggle_model` in models.yaml), on JAX.
+  keras      KerasHub Gemma3CausalLM from Kaggle Models (`kaggle_model` in models.yaml), on PyTorch.
              No Hugging Face token: attached to a Kaggle notebook via model_sources, or downloaded
              by kagglehub with Kaggle credentials (the account must have accepted the licence on
              the model's Kaggle page). Needs `pip install -e ".[keras]"`. Output files are
@@ -296,35 +296,30 @@ def gemma_prompt(messages: list[dict]) -> str:
 
 
 @traced
-def keras_preset(handle: str, input_root: str | os.PathLike = "/kaggle/input") -> str:
-    """Where KerasHub loads a Kaggle model from: the copy a notebook's model_sources mounts under
-    /kaggle/input/<model>/<framework>/<variation>/<version>, else kaggle://<handle> (kagglehub downloads it)."""
-    local = os.path.join(input_root, *handle.split("/")[1:])
-    return local if os.path.isdir(local) else "kaggle://" + handle
-
-
-@traced
 def keras_dtype() -> str:
     """bfloat16 unless DENTAL_LLM_DTYPE says otherwise: float32 4B doesn't fit one 15 GB T4, and KerasHub
     has no Gemma 3 layout map to split it over two (the hf backend runs float32 on T4 x2)."""
     return os.environ.get("DENTAL_LLM_DTYPE", "").strip() or "bfloat16"
 
 
-class KerasChat:  # pragma: no cover - needs keras-hub, JAX and the model weights
+class KerasChat:  # pragma: no cover - needs keras-hub, torch and the model weights
     """KerasHub generation, greedy, with MedGemma's thought token suppressed as in HFChat. Loads lazily."""
 
     name, simulated = "keras", False
 
-    def __init__(self, handle: str, max_new_tokens: int = 300, dtype: str | None = None, bucket: int = 512):
-        self.handle, self.max_new_tokens, self.dtype, self.bucket = handle, max_new_tokens, dtype, bucket
+    def __init__(self, handle: str, max_new_tokens: int = 300, dtype: str | None = None):
+        self.handle, self.max_new_tokens, self.dtype = handle, max_new_tokens, dtype
         self.model = None
 
     def _load(self):
-        os.environ.setdefault("KERAS_BACKEND", "jax")     # set before keras is first imported
+        # before keras is first imported: on JAX the MedGemma preset's token embedding didn't load (keras-hub 0.32)
+        os.environ.setdefault("KERAS_BACKEND", "torch")
+        os.environ.setdefault("TF_FORCE_GPU_ALLOW_GROWTH", "true")   # keras-hub imports TensorFlow
+        import kagglehub
         import keras_hub
         from keras import ops
         dtype = self.dtype or keras_dtype()
-        preset = keras_preset(self.handle)
+        preset = kagglehub.model_download(self.handle)   # on Kaggle: the copy model_sources attached
         print(f"loading {preset} as {dtype} (Keras backend {os.environ['KERAS_BACKEND']})", flush=True)
         self.model = keras_hub.models.Gemma3CausalLM.from_preset(preset, dtype=dtype)
         self.tokenizer = self.model.preprocessor.tokenizer
@@ -343,10 +338,9 @@ class KerasChat:  # pragma: no cover - needs keras-hub, JAX and the model weight
             self._load()
         prompt = gemma_prompt(messages)
         n = np.asarray(self.tokenizer.tokenize(prompt)).size + 1        # + <bos>
-        # max_length counts prompt and answer; round it up so XLA compiles a few shapes, not one per note
-        max_length = -(-(n + self.max_new_tokens) // self.bucket) * self.bucket
         t0 = time.time()
-        raw = self.model.generate(prompt, max_length=max_length, strip_prompt=True)
+        # max_length counts prompt and answer (hf's max_new_tokens counts the answer only)
+        raw = self.model.generate(prompt, max_length=n + self.max_new_tokens, strip_prompt=True)
         out_tokens = np.asarray(self.tokenizer.tokenize(raw)).size if raw else 0
         return {"raw": raw, "input_tokens": n, "output_tokens": out_tokens, "latency_s": time.time() - t0}
 
