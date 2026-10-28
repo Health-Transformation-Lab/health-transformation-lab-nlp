@@ -82,3 +82,40 @@ def test_workflow_pushes_waits_and_keeps_the_outputs():
                  "upload-artifact"):
         assert step in text, step
     assert "--accelerator" in text
+    assert "kaggle kernels list --mine" in text          # fails early, with instructions, on bad credentials
+    assert 'tok="${T:-$K}"' in text                      # a new-style token saved as KAGGLE_KEY still works
+
+
+def test_hf_secret_is_checked_first_and_its_message_printed():
+    # Kaggle's IPython crashes formatting the SystemExit traceback (TypeError in ultratb), which hid the message
+    # in the first run: print it before raising, and check the secret before the slow clone and install.
+    code = _code()
+    assert code.index('get_secret("HF_TOKEN")') < code.index("git clone")
+    stop = code[code.index("except Exception"):code.index("raise SystemExit")]
+    assert "print(" in stop and "flush=True" in stop
+
+
+def test_repo_is_cloned_outside_the_output_folder():
+    # /kaggle/working is what Kaggle keeps as output: a clone there came back as 464 files
+    code = _code()
+    assert 'REPO = "/kaggle/temp/dental-omop-nlp"' in code
+    assert "dental-omop-nlp/python" not in code.replace("{REPO}/python", "")
+
+
+def test_show_log_prints_the_notebook_output_without_warnings(tmp_path):
+    import subprocess
+    import sys
+    log = tmp_path / "k.log"
+    log.write_text(json.dumps([
+        {"stream_name": "stdout", "time": 1.0, "data": "ready\n"},
+        {"stream_name": "stderr", "time": 2.0, "data": "/x/mistune.py:435: SyntaxWarning: invalid escape\n  cells = re.sub(a, b)\n"},
+        {"stream_name": "stderr", "time": 2.5, "data": "FutureWarning: one line, no source\n"},
+        {"stream_name": "stdout", "time": 3.0, "data": "No HF_TOKEN secret on this notebook.\n"},
+        {"stream_name": "stderr", "time": 4.0, "data": "[NbConvertApp] Writing 1 bytes\n"},
+    ]))
+    out = subprocess.run([sys.executable, str(REPO_ROOT / "kaggle" / "show_log.py"), str(log)],
+                         check=True, capture_output=True, text=True).stdout
+    assert "ready" in out and "No HF_TOKEN secret" in out
+    assert "SyntaxWarning" not in out and "re.sub" not in out and "NbConvertApp" not in out
+    wf = (REPO_ROOT / ".github" / "workflows" / "kaggle-medgemma.yml").read_text()
+    assert "kaggle/show_log.py" in wf

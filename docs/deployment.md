@@ -30,7 +30,7 @@ schema names are the same everywhere. One catalog, one schema per layer:
 | `landing_dental_omop_perio` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
 | `bronze_dental_omop_perio` | raw tables (empty for now) |
 | `silver_dental_omop_perio` | cleaned tables (empty for now) |
-| `gold_dental_omop_perio` | OMOP and study tables, `benchmark_results`, `judgments`, `llm_reader_runs`, `perio_note_classifier` |
+| `gold_dental_omop_perio` | OMOP and study tables, `benchmark_results`, `judgments`, `llm_reader_runs`, `ai_predictions`, `result_files` (spec 016), `perio_note_classifier` |
 
 The bundle creates the catalog, all four schemas and the volume on deploy
 (`databricks/resources/unity_catalog.yml`), each with `prevent_destroy` so

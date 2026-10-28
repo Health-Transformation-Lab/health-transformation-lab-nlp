@@ -14,6 +14,7 @@
 | Judge verdicts, cost-effectiveness | `data/corpus/` | CSV / Parquet / PNG |
 | Model runs (optional) | MLflow (`pip install -e ".[track]"`; workspace MLflow on Databricks) | MLflow runs |
 | On Databricks | `dental_omop.gold_dental_omop_perio.*` Delta tables (notebook 01); `llm_reader_runs` (notebook 03) | Delta |
+| Every committed result, wherever it ran (spec 016) | `result_files`, `ai_predictions`, `llm_reader_runs` in `gold_dental_omop_perio`, loaded by the **Load results** job after each deploy; source in `data/datasets/results_manifest.csv` | Delta |
 | OMOP target for model output | `NOTE_NLP` (a flag for review, never `CONDITION_OCCURRENCE`) | OMOP table |
 
 Files in git are fine for a synthetic learning repo: every result is
@@ -71,6 +72,30 @@ in between.
   `lakebase_instance` / `lakebase_schema` set per environment (dev, uat, prod).
 - R: `r/R/01_etl_synthea.R` defaults to Postgres / Lakebase (`DENTAL_DBMS=postgresql`);
   Databricks SQL (`spark`) is the other option. DuckDB has been removed.
+
+## Results from anywhere, in one place (spec 016)
+
+MedGemma runs where a GPU is free: a Databricks job, Kaggle (the `kaggle-medgemma` workflow) or a laptop.
+All three end in the same gold tables:
+
+1. **Kaggle**: when the workflow collects a run (`wait` or `collect_only`, with `open_pr` on), it opens a pull
+   request that adds `ai_predictions_<rung>.csv` and `llm_details_<rung>.csv` to `data/datasets/` and a row per
+   file in `results_manifest.csv` (`source = kaggle`, the workflow run URL). A run with fewer rows than the
+   committed file (a 10-note test) is never committed. The PR is opened with the workflow's token, which doesn't
+   start CI: push a commit to it to run the checks. The repo setting *Allow GitHub Actions to create and approve
+   pull requests* must be on; if it's off, the branch is pushed and the log links to open the PR by hand.
+2. **Laptop**: commit the CSVs as before; they load with `source = repo`.
+3. **Databricks**: the MedGemma reader job writes `llm_reader_runs` itself, with `source = databricks`.
+
+After every deploy, `deploy.yml` starts **Load results** (`databricks/notebooks/10_load_results.py`). It appends
+each file version (SHA-256) it hasn't loaded yet to `result_files`, `ai_predictions` (method, visit_id, pred) and
+`llm_reader_runs`, and logs one MLflow run per new LLM file (gate-failure and fallback rates, agreement with the
+answer key). Loading again adds nothing; a changed file is a new version and the old rows stay. `simulated_*`
+files are never loaded.
+
+```sql
+select source, method, count(*) from dental_omop.gold_dental_omop_perio.ai_predictions group by all;
+```
 
 ## Cautions
 
