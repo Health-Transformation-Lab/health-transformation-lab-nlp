@@ -314,6 +314,32 @@ def _hf_token() -> str | None:
         return f.read().strip() or None
 
 
+_HF_TOKEN_FIX = ("make a new read token at huggingface.co -> Settings -> Access tokens (short lifetime), put it in "
+                 "the Databricks secret scope health_transformation_lab, key hf_token, and record its expiry in "
+                 "ops/secrets_register.yaml")
+
+
+@traced
+def check_hf_access(repo: str, api=None) -> None:
+    """One cheap authenticated call before any work (AGENTS.md, #230): fails at once, naming HF_TOKEN, when the
+    token is missing, refused (expired or revoked) or has no access to the gated repo. The token never appears
+    in the message."""
+    token = _hf_token()
+    if not token:
+        raise RuntimeError(f"HF_TOKEN is not set, so {repo} (gated) can't be read: {_HF_TOKEN_FIX}")
+    if api is None:
+        from huggingface_hub import HfApi
+        api = HfApi()
+    try:
+        api.auth_check(repo, token=token)
+    except Exception as e:  # noqa: BLE001 - any refusal or network error stops the run here, with the reason
+        status = getattr(getattr(e, "response", None), "status_code", None)
+        why = {401: "was refused by Hugging Face (expired or revoked)",
+               403: f"has no access to {repo} (accept its terms on Hugging Face with the token's account)"}.get(
+            status, f"could not be checked ({type(e).__name__}, status {status})")
+        raise RuntimeError(f"HF_TOKEN {why}. To fix: {_HF_TOKEN_FIX}") from None
+
+
 @traced
 def make_backend(entry: dict, kind: str, **kw):
     if kind == "hf":
