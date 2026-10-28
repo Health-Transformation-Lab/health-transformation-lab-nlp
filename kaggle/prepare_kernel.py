@@ -1,18 +1,21 @@
 """Build the folder `kaggle kernels push` sends: the MedGemma notebook with its settings filled in, and
-kernel-metadata.json (GPU and internet on; public, since it holds synthetic notes only and the Hugging Face
-token stays a private Kaggle secret). Used by .github/workflows/kaggle-medgemma.yml.
+kernel-metadata.json (GPU and internet on; public, since it holds synthetic notes only and no token; MedGemma
+attached from Kaggle Models via model_sources). Used by .github/workflows/kaggle-medgemma.yml.
 
     python kaggle/prepare_kernel.py --out build/kernel --username <kaggle user> [--rung ...] [--limit 10]
         [--shots 0] [--branch main]
 
---limit 0 reads all 240 review notes (FULL_RUN); any other number reads that many as a test. The Hugging
-Face token is not handled here: it is a Kaggle secret attached to the notebook on kaggle.com.
+--limit 0 reads all 240 review notes (FULL_RUN); any other number reads that many as a test. No Hugging Face
+token: a pushed notebook can't read Kaggle Secrets, so the rung's `kaggle:` model (models.yaml) is attached
+instead and kaggle/keras_to_hf.py converts it on Kaggle.
 """
 
 import argparse
 import json
 import re
 from pathlib import Path
+
+from keras_to_hf import kaggle_handle
 
 HERE = Path(__file__).resolve().parent
 SLUG = "dental-omop-medgemma-reader"
@@ -39,6 +42,7 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=10)
     ap.add_argument("--branch", default="main")
     a = ap.parse_args()
+    model = kaggle_handle(a.rung)
 
     nb = json.loads((HERE / "medgemma_reader.ipynb").read_text())
     cell = next(c for c in nb["cells"] if c["cell_type"] == "code" and "RUNG =" in "".join(c["source"]))
@@ -48,9 +52,9 @@ def main() -> None:
     meta = {"id": f"{a.username}/{SLUG}", "title": TITLE, "code_file": "medgemma_reader.ipynb",
             "language": "python", "kernel_type": "notebook", "is_private": False, "enable_gpu": True,
             "enable_tpu": False, "enable_internet": True, "dataset_sources": [], "competition_sources": [],
-            "kernel_sources": [], "model_sources": []}
+            "kernel_sources": [], "model_sources": [model]}
     (a.out / "kernel-metadata.json").write_text(json.dumps(meta, indent=1) + "\n")
-    print(f"prepared {meta['id']}: rung={a.rung} shots={a.shots} "
+    print(f"prepared {meta['id']}: rung={a.rung} ({model}) shots={a.shots} "
           f"{'all 240 notes' if a.limit == 0 else f'{a.limit} notes'} from branch {a.branch}")
 
 
