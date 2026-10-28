@@ -2,7 +2,7 @@
 
 > Personal learning project; synthetic data only. See [DISCLAIMER](../DISCLAIMER.md).
 
-Three levels, the same way throughout: the **[README](../README.md)** says what
+Three levels, the same way throughout: the **[study page](edr/README.md)** says what
 the study does, this page explains **how the code does it, step by step in
 run order**, and each step links the **code**. The Databricks notebook
 [`databricks/notebooks/00_walkthrough.py`](../databricks/notebooks/00_walkthrough.py)
@@ -18,26 +18,26 @@ Pictures of the same: [medallion architecture](../diagrams/d0_medallion_architec
 
 | # | Step | Command | README section |
 |---|---|---|---|
-| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Evidence types](../README.md#dental-omop-nlp) |
-| 2 | [De-identify and gate](#2-de-identify-and-gate) | (inside step 1) | [Ground rules](../README.md#ground-rules) |
-| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Evidence types](../README.md#dental-omop-nlp) |
+| 1 | [Generate the synthetic study](#1-generate-the-synthetic-study) | `python scripts/10_build_study.py` | [Evidence types](edr/README.md) |
+| 2 | [De-identify and gate](#2-de-identify-and-gate) | (inside step 1) | [Ground rules](edr/README.md#ground-rules) |
+| 3 | [Read the diagnostic evidence](#3-read-the-diagnostic-evidence) | (inside step 1) | [Evidence types](edr/README.md) |
 | 4 | [Compare the evidence](#4-compare-the-evidence) | (inside step 1) | [Study process](process.md) |
-| 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](../README.md#dental-omop-nlp) |
-| 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](../README.md#models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml) |
-| 7 | [Reviewers stage charts](#7-reviewers-stage-charts) | Label Studio, then `12_import_review.py` | [How results are measured](../README.md#how-results-are-measured) |
-| 8 | [Reliability and the acceptance test](#8-reliability-and-the-acceptance-test) | `python scripts/13_reliability.py` | [How results are measured](../README.md#how-results-are-measured) |
-| 9 | [Five categories and evidence order](#9-five-categories-and-evidence-order) | `python scripts/18_phenotype_order.py` | [Action items](../README.md#action-items) |
-| 10 | [Over time: plausibility and data quality](#10-over-time-plausibility-and-data-quality) | `python scripts/20_data_quality.py` | [Action items](../README.md#action-items) |
-| 11 | [Clinic prevalence](#11-clinic-prevalence) | `python scripts/19_prevalence.py` | [Action items](../README.md#action-items) |
-| 12 | [Predict progression](#12-predict-progression) | `python scripts/21_predict_progression.py` | [Action items](../README.md#action-items) |
-| 13 | [Site-level charts, both classifications](#13-site-level-charts-both-classifications) | `python scripts/22_build_sites.py` | [Drill-downs](../README.md#drill-downs) |
-| 14 | [OMOP storage designs on Postgres](#14-omop-storage-designs-on-postgres) | `python scripts/23_site_designs.py --url ...` | [Drill-downs](../README.md#drill-downs) |
-| 15 | [OMOP into Lakebase](#15-omop-into-lakebase) | `python scripts/05_load_omop_db.py --url ...` | [Drill-downs](../README.md#drill-downs) |
-| 16 | [LLM judge and cost at 1M notes](#16-llm-judge-and-cost-at-1m-notes) | `14_benchmark_cost.py`, `15_judge.py`, `16_cost_effectiveness.py` | [Drill-downs](../README.md#drill-downs) |
-| 17 | [MedGemma](#17-medgemma) | `11_ai_predict.py --rung medgemma-1.5-4b-it`, `17_medgemma_lora.py` | [Drill-downs](../README.md#drill-downs) |
-| 18 | [Deploy: dev, UAT, prod](#18-deploy-dev-uat-prod) | `databricks bundle deploy -t <target>` | [Drill-downs](../README.md#drill-downs) |
-| 19 | [MLflow: track, register, judge, promote](#19-mlflow-track-register-judge-promote) | `11_ai_predict.py --register`, `24_promote_model.py`, `15_judge.py --backend mlflow` | [Drill-downs](../README.md#drill-downs) |
-| — | [R side and parity](#r-side-and-parity) | `python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R` | [Ground rules](../README.md#ground-rules) |
+| 5 | [Rule-based phenotype](#5-rule-based-phenotype) | (inside step 1) | [Staging and grading](edr/README.md) |
+| 6 | [AI models read the notes](#6-ai-models-read-the-notes) | `python scripts/11_ai_predict.py --rung <id>` | [Models evaluated](edr/README.md#models-evaluated-the-12-from-the-evaluation-sheet-modelsyaml) |
+| 7 | [Reviewers stage charts](#7-reviewers-stage-charts) | Label Studio, then `12_import_review.py` | [How results are measured](edr/README.md#how-results-are-measured) |
+| 8 | [Reliability and the acceptance test](#8-reliability-and-the-acceptance-test) | `python scripts/13_reliability.py` | [How results are measured](edr/README.md#how-results-are-measured) |
+| 9 | [Five categories and evidence order](#9-five-categories-and-evidence-order) | `python scripts/18_phenotype_order.py` | [Action items](edr/README.md#action-items) |
+| 10 | [Over time: plausibility and data quality](#10-over-time-plausibility-and-data-quality) | `python scripts/20_data_quality.py` | [Action items](edr/README.md#action-items) |
+| 11 | [Clinic prevalence](#11-clinic-prevalence) | `python scripts/19_prevalence.py` | [Action items](edr/README.md#action-items) |
+| 12 | [Predict progression](#12-predict-progression) | `python scripts/21_predict_progression.py` | [Action items](edr/README.md#action-items) |
+| 13 | [Site-level charts, both classifications](#13-site-level-charts-both-classifications) | `python scripts/22_build_sites.py` | [Drill-downs](edr/README.md#drill-downs) |
+| 14 | [OMOP storage designs on Postgres](#14-omop-storage-designs-on-postgres) | `python scripts/23_site_designs.py --url ...` | [Drill-downs](edr/README.md#drill-downs) |
+| 15 | [OMOP into Lakebase](#15-omop-into-lakebase) | `python scripts/05_load_omop_db.py --url ...` | [Drill-downs](edr/README.md#drill-downs) |
+| 16 | [LLM judge and cost at 1M notes](#16-llm-judge-and-cost-at-1m-notes) | `14_benchmark_cost.py`, `15_judge.py`, `16_cost_effectiveness.py` | [Drill-downs](edr/README.md#drill-downs) |
+| 17 | [MedGemma](#17-medgemma) | `11_ai_predict.py --rung medgemma-1.5-4b-it`, `17_medgemma_lora.py` | [Drill-downs](edr/README.md#drill-downs) |
+| 18 | [Deploy: dev, UAT, prod](#18-deploy-dev-uat-prod) | `databricks bundle deploy -t <target>` | [Drill-downs](edr/README.md#drill-downs) |
+| 19 | [MLflow: track, register, judge, promote](#19-mlflow-track-register-judge-promote) | `11_ai_predict.py --register`, `24_promote_model.py`, `15_judge.py --backend mlflow` | [Drill-downs](edr/README.md#drill-downs) |
+| — | [R side and parity](#r-side-and-parity) | `python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R` | [Ground rules](edr/README.md#ground-rules) |
 
 Commands run from `python/` unless they start with `python/` or `r/`.
 

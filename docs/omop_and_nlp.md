@@ -60,7 +60,7 @@ truth and against reviewers who read the same charts: [code_walkthrough.md steps
 
 ## Where to go next
 
-- The study end to end: [README](../README.md#what-it-does-step-by-step)
+- The study end to end: [README](edr/README.md#what-it-does-step-by-step)
 - OMOP for dental data: [omop_dental_vs_medical.md](omop_dental_vs_medical.md),
   [site_level_omop.md](site_level_omop.md)
 - NLP models: [bert.md](bert.md), [medgemma.md](medgemma.md), [deidentification.md](deidentification.md)

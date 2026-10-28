@@ -42,7 +42,7 @@ def _cell(row, i):
 
 
 def test_readme_and_results_page_match_the_committed_results(summary, md):
-    readme = (REPO_ROOT / "README.md").read_text()
+    readme = rr.SUMMARY_DOC.read_text()
     assert readme.count(rr.START) == 1 and readme.count(rr.END) == 1
     stale = "results are stale: run python scripts/35_readme_results.py"
     assert rr.update_readme(readme, summary) == readme, stale
@@ -79,7 +79,7 @@ def test_summary_shows_the_best_system_of_each_group_and_links_the_full_table(su
     for r in rows:
         assert _cell(r, 2) == plain(best[_cell(r, 1)]), r
         assert not any(c in _cell(r, i) for c in "`_" for i in (1, 2)), r     # no code names in the README
-    link = f"docs/results.md#{rr.anchor(title)}"
+    link = f"../results.md#{rr.anchor(title)}"
     assert link in _section(summary, title)
     assert f"\n{title}\n" in "\n" + md
 
@@ -207,11 +207,11 @@ def test_readme_has_one_row_per_other_note_set_linking_to_its_table(inp, summary
     for key in ("jsl48", "external", "maccrobat"):
         t = mac if key == "maccrobat" else d[d.tier == key].set_index("method")
         best = t.sort_values("entity_recall", ascending=False, kind="stable").index[0]
-        row = next(r for r in rows if f"docs/results.md#{rr.anchor(rr.DEID_SETS[key])}" in r)
+        row = next(r for r in rows if f"../results.md#{rr.anchor(rr.DEID_SETS[key])}" in r)
         assert _cell(row, 2) == rr.plain_tool(best), key
         assert _cell(row, 3) == of(t.loc[best, "n_phi"] * (1 - t.loc[best, "entity_recall"]), t.loc[best, "n_phi"])
     for r in rows:                                         # every row drills down
-        assert "docs/results.md#" in _cell(r, 5), r
+        assert "../results.md#" in _cell(r, 5), r
     course = next(r for r in rows if "Michigan" in _cell(r, 1))
     c = inp["course"]
     assert f"{c['missed']} of {c['total']}" in _cell(course, 3)
@@ -404,7 +404,7 @@ def test_readme_points_to_the_judge_scorecard_and_dashboard():
     """Spec 012 US4: one line in the README, a judge section in docs/results.md (real runs only)."""
     inp = rr.load_inputs()
     md = rr.results_markdown(inp)
-    assert f"*{rr.DASHBOARD}*" in md or rr.DASHBOARD in md and f"docs/results.md#{rr.anchor(rr.JUDGE_TITLE)}" in md
+    assert f"*{rr.DASHBOARD}*" in md or rr.DASHBOARD in md and f"../results.md#{rr.anchor(rr.JUDGE_TITLE)}" in md
     assert "LLM judgment" in md
     details = rr.details_markdown(inp)
     assert rr.JUDGE_TITLE in details
@@ -493,3 +493,11 @@ def test_readme_judge_and_ranges_are_in_plain_words(summary):
     para = next(x for x in ph.split("\n\n") if x.startswith("**Can an AI check the answers?**"))
     assert "answer key" in para and "hard notes" in para and "near-miss" in para
     assert "LLM judgment;" not in para and "flags most" not in para
+
+
+def test_summary_and_results_page_links_resolve_from_where_they_live(summary, md):
+    # issue #100: the summary lives on the EDR study page (docs/edr/README.md), not the landing README
+    assert rr.SUMMARY_DOC == REPO_ROOT / "docs" / "edr" / "README.md"
+    for text, home in ((summary, rr.SUMMARY_DOC), (md, rr.RESULTS_DOC)):
+        for link in re.findall(r"\]\(([^)#:]+)(?:#[^)]*)?\)", text):
+            assert (home.parent / link).exists(), (home.name, link)
