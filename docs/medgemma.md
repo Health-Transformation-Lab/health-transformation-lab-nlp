@@ -58,9 +58,16 @@ L1 100% (141), L2 97% (31), L3 16% (68). Gate pass 97.9%, fallback 2.1%, ~850 to
 in and ~75 out per note, ~27 s per note on 4 CPU cores. So it reads a written
 diagnosis well and does not yet stage from the chart findings when none is
 written; L3 is where few-shot, prompt variants or the LoRA fine-tune would have to
-help. Against the best encoder alone (`modernbert-base+cw`, 0.838) the difference is
--0.079 (-0.154 to -0.013); on L3 the encoder gets 81%. Full tables:
-`data/datasets/ladder/ladder_vs_truth.csv` and `medgemma_vs_bert*.csv`.
+help. Against the best encoder alone (`modernbert-base+cw`, 0.825) the difference is
+-0.067 (-0.138 to 0.000), so on 240 charts the two can't be told apart; on L3 the encoder gets 81%. Full
+tables: `data/datasets/ladder/ladder_vs_truth.csv` and `medgemma_vs_bert*.csv`.
+
+**MedGemma 4B v1 (Kaggle, same 240 notes, #210).** Accuracy 0.779 (0.725-0.833); with the note rules
+deciding stage IV, 0.817. Against `modernbert-base+cw` the difference is -0.046 (-0.104 to 0.012), so again
+not distinguishable. By difficulty: L1 97%, L2 68%, L3 43%. Against 1.5 it stages more charts from their
+findings when no diagnosis is written (L3 43% vs 16%) but does worse when old terms or copied-forward text
+must be translated (L2 68% vs 97%). Gate pass 94.2%, fallback 5.8%. Both are measurements on synthetic
+notes, not evidence about either model on real records.
 
 MedGemma 1.5 opens with a `<unused94>thought ... <unused95>` block; the hf backend
 suppresses it (it otherwise used up the 300 new tokens before the JSON) and
@@ -140,20 +147,20 @@ used the pinned revision.
 | Model | Kind | Pinned revision | Status here |
 |---|---|---|---|
 | `medgemma-1.5-4b-it` | 4B, text and images, instruction-tuned (Jan 2026) | `91850547d9f0` | **run**: 75.8% correct on the 240 review notes |
-| `medgemma-4b-it` | 4B, text and images, instruction-tuned (MedGemma 1, 2025) | `290cda5eeccb` | not run; next (same hardware as 1.5) |
+| `medgemma-4b-it` | 4B, text and images, instruction-tuned (MedGemma 1, 2025) | `290cda5eeccb` | **run** on Kaggle: 77.9% correct on the 240 review notes |
 | `medgemma-27b-text-it` | 27B, text only, instruction-tuned (2025) | `5b667cf2ddcf` | not run: needs a larger GPU (below) |
 | `medgemma-27b-it` | 27B, text and images (2025) | not in the registry | the text-only 27B suits notes better |
 | `medgemma-4b-pt` | 4B, pretrained only | not in the registry | not instruction-tuned, so unsuited to a zero-shot reader |
 
-**MedGemma 4B v1 against 1.5 (next).** This is the same hardware and code as the 1.5 run, so it isolates
-the effect of the version. The Kaggle notebook loads MedGemma from Kaggle Models (`kaggle/keras_to_hf.py`),
-which needs two things per model, and only 1.5 has them so far:
+**MedGemma 4B v1 against 1.5 (done, #185 and #210).** Same reader code as the 1.5 run, so the
+comparison isolates the version; results are under "Implemented" above. The Kaggle notebook loads MedGemma
+from Kaggle Models (`kaggle/keras_to_hf.py`), which needs two things per model, both now in place for 1.5
+and 4B v1:
 - the model's `kaggle:` handle in `models.yaml`, from kaggle.com/models/keras/medgemma;
 - Google's `config.json` and `generation_config.json` for it in `kaggle/hf_config/`, from
-  `google/medgemma-4b-it` on Hugging Face (terms accepted).
+  the model's Hugging Face repository (terms accepted).
 
-Add both, check that the converter reproduces the Hugging Face weights as it does for 1.5, then run the
-workflow with rung `medgemma-4b-it`. Runs on Hugging Face weights instead load the pinned revision.
+Runs on Hugging Face weights instead load the pinned revision.
 
 ## Next: MedGemma 27B
 

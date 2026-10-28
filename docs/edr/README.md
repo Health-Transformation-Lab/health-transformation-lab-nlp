@@ -123,7 +123,7 @@ step, with links to the code; the Databricks notebook
 | 1 | Generate synthetic patients over time (8 clinics): notes, exam forms, procedure codes and diagnoses, probing chart; fake PHI in notes | [1](../code_walkthrough.md#1-generate-the-synthetic-study) |
 | 2 | Remove names, dates and other identifiers; a final check holds back any note with one left | [2](../code_walkthrough.md#2-de-identify-and-gate) |
 | 3 | Read and compare the diagnostic evidence; build the rule-based phenotype | [3–5](../code_walkthrough.md#3-read-the-diagnostic-evidence) |
-| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma 1.5 4B | [6](../code_walkthrough.md#6-ai-models-read-the-notes) |
+| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma 1.5 4B and 4B v1 | [6](../code_walkthrough.md#6-ai-models-read-the-notes) |
 | 5 | Periodontists label the same 240 charts, each on their own, in a labeling tool (Label Studio) | [7](../code_walkthrough.md#7-reviewers-stage-charts) |
 | 6 | Does the AI agree with the periodontists as often as they agree with each other? Also: which order of checking the evidence agrees best | [8–9](../code_walkthrough.md#8-reliability-and-the-acceptance-test) |
 | 7 | Over time: catch impossible changes and bad data; compare clinics; predict who gets worse | [10–12](../code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
@@ -168,26 +168,29 @@ All 12 are BERT-type models: AI that reads text and picks a label. [What is a BE
 
 Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it),
 [27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
-**Status:** six encoders have run on CPU (3 epochs, 2026-10-26). On the 240 synthetic review charts
+**Status:** eleven encoders have results (3 epochs): the base-size models on CPU (2026-10-26), and the large
+ModernBERTs and the Longformers on Kaggle GPUs (#225). On the 240 synthetic review charts
 (against the generator's truth, with 95% bootstrap CIs; `28_ladder_vs_truth.py`):
-- alone they score 77-82% (ModernBERT base best), **not distinguishable** from the note rules (79%), and
+- alone they score 77-83% (ModernBERT base and large best), **not distinguishable** from the note rules (79%), and
   miss nearly every stage IV chart (7 in 3,484 training notes);
 - letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
   clearly better than the rules (difference CI excludes 0);
-- they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
+- they're overconfident (calibration error 0.14-0.18 vs 0.06 for TF-IDF).
 - class-weighted training (`--class-weight sqrt`) gives **no reliable gain**: over three seeds ModernBERT base
   averages 82% (80-84%) with stage IV recall 21%, 0%, 0%; BERT base stays at 0%. The seed alone moves accuracy
   ~4 points, as much as the spread between encoders. The `+rules4` hybrid holds at 90-91% on every seed;
 - Bio_ClinicalBERT (trained on hospital notes) scores 80%, like the others.
 
-The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
+Agreement with *simulated* reviewers is a dry run, not a result.
 
 **MedGemma vs BERT:** `29_medgemma_vs_bert.py` scores each MedGemma run (zero-shot, few-shot, LoRA)
 against the best encoder on the same charts (paired CI, stage IV recall, by note difficulty, fallback
-rate, assumed cost). First real run, `medgemma-1.5-4b-it` zero-shot on CPU: **0.758** (0.700-0.808)
-vs 0.838 for `modernbert-base+cw`, difference -0.079 (-0.154 to -0.013); 100% / 97% / 16% on
-L1 / L2 / L3, so it reads a written diagnosis but doesn't yet stage from the chart
-([details](../medgemma.md)). Few-shot and LoRA not run yet (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; LoRA needs a GPU:
+rate, assumed cost). Two real zero-shot runs: `medgemma-1.5-4b-it` on CPU scores **0.758** (0.700-0.808)
+and `medgemma-4b-it` (MedGemma 4B v1, on Kaggle) **0.779** (0.725-0.833), against 0.825 for
+`modernbert-base+cw`: differences -0.067 (-0.138 to 0.000) and -0.046 (-0.104 to 0.012), so on 240 charts
+neither can be told apart from the encoder. On L1 / L2 / L3, 1.5 gets 100% / 97% / 16% and 4B v1
+97% / 68% / 43%: 1.5 reads a written diagnosis but rarely stages from the chart, while 4B v1 stages more
+charts from their findings and handles old terms and copied-forward text worse ([details](../medgemma.md)). Few-shot and LoRA not run yet (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; LoRA needs a GPU:
 [notebook 03](../../databricks/notebooks/03_medgemma_reader.py)); `--simulated` is a dry run, not a result.
 
 ## Action items
