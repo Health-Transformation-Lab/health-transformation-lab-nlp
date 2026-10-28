@@ -218,3 +218,25 @@ def test_pick_dtype_can_be_overridden(monkeypatch):
     from dental_omop_nlp.llm_reader import pick_dtype
     monkeypatch.setenv("DENTAL_LLM_DTYPE", "float16")
     assert pick_dtype(cuda=True, capability=(8, 0), total_gb=80) == "float16"
+
+
+def test_local_weights_need_no_hugging_face_token(monkeypatch, tmp_path):
+    # Kaggle: MedGemma comes from Kaggle Models and is converted to a local transformers folder (no HF_TOKEN)
+    from dental_omop_nlp.llm_reader import HFChat, make_backend
+    for v in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"):
+        monkeypatch.delenv(v, raising=False)
+    monkeypatch.setenv("HF_HOME", str(tmp_path))
+    entry = {"hf": "google/medgemma-1.5-4b-it", "gated": True, "modality": "multimodal"}
+    with pytest.raises(RuntimeError, match="gated"):
+        make_backend(entry, "hf")
+    b = make_backend(entry, "hf", weights=str(tmp_path / "medgemma-hf"))
+    assert isinstance(b, HFChat) and b.hf_id == str(tmp_path / "medgemma-hf") and b.modality == "multimodal"
+
+
+def test_weights_reach_the_reader_from_make_rung(monkeypatch, tmp_path):
+    from dental_omop_nlp.registry import load_registry
+    from dental_omop_nlp.rungs import make_rung
+    monkeypatch.delenv("HF_TOKEN", raising=False)
+    monkeypatch.setenv("HF_HOME", str(tmp_path))
+    r = make_rung("medgemma-1.5-4b-it", load_registry(), backend_kind="hf", weights="/kaggle/temp/x")
+    assert r.backend.hf_id == "/kaggle/temp/x"

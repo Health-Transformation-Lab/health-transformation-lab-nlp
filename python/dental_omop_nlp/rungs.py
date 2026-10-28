@@ -253,7 +253,7 @@ def make_rung(rung_id: str, registry: dict, **hf_kwargs):
         raise KeyError(f"unknown rung {rung_id!r}")
     if m["role"] == "llm":
         from .llm_reader import LLMReader
-        allowed = {"backend", "backend_kind", "shots", "variant", "seed", "adapter", "endpoint"}
+        allowed = {"backend", "backend_kind", "shots", "variant", "seed", "adapter", "endpoint", "weights"}
         return LLMReader(rung_id, entry=m, **{k: v for k, v in hf_kwargs.items() if k in allowed})
     if m["role"] not in ("classifier", "long_context"):
         raise ValueError(f"{rung_id} has role {m['role']!r}; it is not a classifier rung")
