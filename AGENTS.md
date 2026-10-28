@@ -179,6 +179,7 @@ cd .. && python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R  
 cd python && python scripts/10_build_study.py     # rebuild study datasets (seeded)
 cd python && python scripts/35_readme_results.py  # refresh the README results leaderboards after new results
 cd python && python scripts/42_build_dashboards.py  # rebuild the grader dashboards and Genie spaces (spec 019)
+cd python && python scripts/43_simulated_grader.py  # the lab grader's SIMULATED sample (seeded), until real runs exist
 ```
 
 Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.

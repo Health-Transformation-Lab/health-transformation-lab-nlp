@@ -43,6 +43,11 @@ PROV = [C("file_sha256", "string", "SHA-256 of the source file: its version (in 
         C("git_commit_sha", "string", "commit the job was deployed from"),
         C("loaded_ts", "timestamp", "when Load results wrote it (Load results rows)")]
 
+DQ_PROV = [C("source_files_text", "string", "the committed CSVs the table is built from"),
+           C("file_sha256", "string", "SHA-256 of those files together: the version"),
+           C("git_commit_sha", "string", "commit the job was deployed from"),
+           C("loaded_ts", "timestamp", "when Load results wrote it")]
+
 TABLES = {
     "review_key": Table(
         "file", "One per synthetic review chart (answer_key/review_key.csv, not a table)", "10_build_study.py (seeded)", [
@@ -207,6 +212,113 @@ TABLES = {
             C("prompt_version_code", "string", "judge-v2"),
             C("judge_model_name", "string", "serving endpoint"),
         ]),
+    # spec 019: the EHR DQ grader (Load results overwrites each from committed CSVs on every run)
+    "dq_check": Table(
+        "dq", "One per (data-quality check, clinic); clinic_code All = every clinic", "Load results: overwrite", [
+            C("check_name", "string", "e.g. plausibility:temporal_stage_drop"),
+            C("check_category_code", "string", "conformance · completeness · plausibility"),
+            C("checked_count", "bigint", "rows the check looked at"),
+            C("failed_count", "bigint", "rows that failed it"),
+            C("pass_ratio", "double", "1 - failed / checked"),
+            C("check_status_code", "string", "PASS (none allowed, none found) · REPORT (a rate to read)"),
+            C("clinic_code", "string", "1-8, or All"),
+            *DQ_PROV]),
+    "dq_column_missing": Table(
+        "dq", "One per evidence column", "Load results: overwrite", [
+            C("evidence_column_name", "string", "column of the structured record"),
+            C("row_count", "bigint", "visits"),
+            C("missing_count", "bigint", "visits where it is empty"),
+            C("missing_pct", "double", "missing / visits, 0-100"),
+            *DQ_PROV]),
+    "dq_prevalence": Table(
+        "dq", "One per (method, clinic or scale)", "Load results: overwrite", [
+            C("method_name", "string", "status source: algorithm_design, notes, truth_status, ..."),
+            C("level_code", "string", "clinic · scale"),
+            C("group_name", "string", "clinic 1-8, or all_visits · complete_cases · reference_set"),
+            C("subject_count", "bigint", "people (clinic) or visits with a status (scale)"),
+            C("periodontitis_ratio", "double", "share with periodontitis"),
+            C("periodontitis_ci_low_ratio", "double", "95% interval, low (clinic rows)"),
+            C("periodontitis_ci_high_ratio", "double", "95% interval, high (clinic rows)"),
+            C("stage3_4_ratio", "double", "share with stage III-IV"),
+            *DQ_PROV]),
+    "dq_temporal_change": Table(
+        "dq", "One per method", "Load results: overwrite", [
+            C("method_name", "string", "status source"),
+            C("later_visit_count", "bigint", "visits after a patient's first"),
+            C("perio_resolved_ratio", "double", "later visits where periodontitis disappeared"),
+            C("stage_drop_ratio", "double", "later visits where the stage dropped"),
+            C("visit_pair_count", "bigint", "pairs 1-2 years apart, no treatment between"),
+            C("better_ratio", "double", "pairs whose stage improved: implausible"),
+            C("same_ratio", "double", "pairs with the same stage"),
+            C("worse_ratio", "double", "pairs whose stage worsened"),
+            *DQ_PROV]),
+    "dq_stage_transition": Table(
+        "dq", "One per (method, stage at a visit, stage at the next)", "Load results: overwrite", [
+            C("method_name", "string", "algorithm_design"),
+            C("from_status_code", "string", "stage at the earlier visit"),
+            C("to_status_code", "string", "stage at the next"),
+            C("visit_pair_count", "bigint", "visit pairs"),
+            C("row_pct", "double", "share of the earlier stage's pairs, 0-100"),
+            C("direction_code", "string", "better · same · worse"),
+            *DQ_PROV]),
+    "dq_source_concordance": Table(
+        "dq", "One per (pair of evidence sources, level)", "Load results: overwrite", [
+            C("method_a_name", "string", "first source"),
+            C("method_b_name", "string", "second source"),
+            C("visit_count", "bigint", "visits where both give a value"),
+            C("agreement_ratio", "double", "share that agree"),
+            C("kappa_coef", "double", "Cohen's kappa"),
+            C("level_code", "string", "status · stage · ..."),
+            *DQ_PROV]),
+    "fact_visit_evidence": Table(
+        "dq", "One per synthetic visit: each evidence source's status and the truth (statuses only, never note text)",
+        "Load results: overwrite", [
+            C("visit_id", "bigint", "visit", "PK"),
+            C("person_id", "bigint", "patient"),
+            C("visit_date", "date", "date of the visit (synthetic)"),
+            C("visit_seq_num", "bigint", "0 = the patient's first visit"),
+            C("is_in_review", "boolean", "one of the 240 review charts"),
+            C("note_status_code", "string", "status read from the chart note"),
+            C("exam_form_status_code", "string", "from the exam form; unknown when missing"),
+            C("dx_completed_status_code", "string", "from diagnosis codes on completed procedures"),
+            C("dx_planned_status_code", "string", "from diagnosis codes on planned procedures"),
+            C("probing_chart_status_code", "string", "from gum measurements; unknown when not charted"),
+            C("rules_v0_status_code", "string", "rules, gum measurements first"),
+            C("rules_design_status_code", "string", "rules in the study design's order"),
+            C("truth_status_code", "string", "the generator's truth"),
+            C("clinic_code", "string", "clinic 1-8"),
+            *DQ_PROV]),
+    "dq_injected_error": Table(
+        "dq", "One row: charting errors injected into the synthetic data and how many the checks catch",
+        "Load results: overwrite", [
+            C("injected_error_count", "bigint", "errors injected"),
+            C("caught_ratio", "double", "share the temporal checks flag"),
+            C("false_flag_ratio", "double", "visits flagged with no error injected"),
+            *DQ_PROV]),
+    # spec 019: the lab grader (a SIMULATED sample until real runs exist)
+    "dim_grader_question": Table(
+        "lab", "One per grader question", "Load results: overwrite", [
+            C("question_id", "string", "q001 ...", "PK"),
+            C("category_name", "string", "Access to care · Clinical cases · Medical-dental integration · ..."),
+            C("category_order_num", "bigint", "1 = access to care, shown first"),
+            C("level_code", "string", "L1 recall · L2 routine reasoning · L3 individualized reasoning"),
+            C("key_point_count", "bigint", "key points a full answer covers"),
+            C("source_text", "string", "the published evidence behind the question"),
+            C("is_simulated", "boolean", "true for the simulated sample"),
+            *DQ_PROV]),
+    "fact_grader_answer": Table(
+        "lab", "One per (question, model, with or without the agent, run)", "Load results: overwrite", [
+            C("question_id", "string", "question", "FK"),
+            C("model_name", "string", "model answering; sim: names in the sample"),
+            C("is_with_agent", "boolean", "answered with the open agent"),
+            C("covered_key_point_count", "bigint", "key points the answer covered"),
+            C("score_ratio", "double", "covered / key points"),
+            C("harm_code", "string", "S0 safe · S1 reversible harm · S2 irreversible harm"),
+            C("cost_usd", "double", "cost of the answer"),
+            C("judge_model_name", "string", "judge; never a family under test"),
+            C("run_id", "string", "the grading run"),
+            C("is_simulated", "boolean", "true for the simulated sample"),
+            *DQ_PROV]),
 }
 
 R = Relationship
@@ -230,6 +342,7 @@ RELATIONSHIPS = [
       "sampled from", "||..o|", derived=True),
     R("judge_queue", "fact_corpus_judge_call", ("method_name", "visit_id"), ("method_name", "visit_id"),
       "method_name, visit_id", "||--o|"),
+    R("dim_grader_question", "fact_grader_answer", ("question_id",), ("question_id",), "question_id"),
 ]
 
 AREAS = {   # fill, legend label
@@ -237,5 +350,7 @@ AREAS = {   # fill, legend label
     "judge": ("#EFE9FB", "gold · judge scorecard (spec 012)"),
     "deid": ("#E3F1E4", "gold · de-identification benchmark"),
     "corpus": ("#FDE7F1", "gold · corpus judge (ai_query, notebook 02)"),
+    "dq": ("#E1EEF6", "gold · EHR DQ grader (spec 019)"),
+    "lab": ("#F6E7DE", "gold · lab grader, simulated sample (spec 019)"),
     "file": ("#E4E7EA", "file in git, not a table"),
 }
