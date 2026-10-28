@@ -95,7 +95,8 @@ After every deploy, `deploy.yml` starts **Load results** (`databricks/notebooks/
 each file version (SHA-256) it hasn't loaded yet to `dim_result_file`, `fact_prediction` (method, visit, predicted status) and
 `fact_llm_call`, and logs one MLflow run per new LLM file (gate-failure and fallback rates, agreement with the
 answer key). Loading again adds nothing; a changed file is a new version and the old rows stay. `simulated_*`
-files are never loaded.
+files are never loaded. If Databricks is down at the deploy, or Load results fails, *Catch up Databricks after
+an outage* runs it later by itself ([operations.md](operations.md#when-databricks-is-down-catch-up-without-anyone-remembering-issue-189)).
 
 Every gold table, column by column, with ERDs: [gold_tables.md](gold_tables.md).
 

@@ -1,0 +1,64 @@
+# Catch Databricks up after an outage (issue #189, .github/scripts/catch_up.py). Every 3 hours, per target: if the
+# last deploy of main failed and Databricks answers again, re-run it; if the deployed Load results job has no
+# successful run for its commit, run it and wait. While Databricks is down it waits (a warning, SEV3); still behind
+# after 24 hours, or a refused credential, fails the run, so GitHub emails the owner (SEV2).
+#
+# Same GitHub environments and sign-in as deploy.yml. Its own concurrency group: sharing the deploy's would cancel a
+# deploy waiting in it; instead it does nothing while a deploy of the target is queued or running. When Databricks
+# last answered is kept in the Actions cache, so a long outage escalates even after a good deploy. A target without
+# DATABRICKS_CLIENT_SECRET (uat until it exists) is skipped.
+name: Catch up Databricks after an outage
+on:
+  schedule:
+    - cron: "41 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write          # re-run the failed deploy's jobs
+
+jobs:
+  catch-up:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75   # Load results waits up to 60 minutes
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [dev, uat]
+    concurrency:
+      group: catch-up-${{ matrix.target }}
+      cancel-in-progress: false
+    environment: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/databricks-signin
+        with:
+          host: ${{ vars.DATABRICKS_HOST || secrets.DATABRICKS_HOST }}
+          client_id: ${{ vars.DATABRICKS_CLIENT_ID || secrets.DATABRICKS_CLIENT_ID }}
+          client_secret: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+      - name: Stop if this environment isn't configured
+        if: env.DATABRICKS_CLIENT_SECRET == ''
+        run: echo "No service principal sign-in (DATABRICKS_CLIENT_SECRET) for ${{ matrix.target }}; skipping."
+      - uses: databricks/setup-cli@v1.3.0
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+      - name: When Databricks last answered (earlier checks)
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+        uses: actions/cache/restore@v4
+        with:
+          path: .catch-up
+          key: catch-up-${{ matrix.target }}-${{ github.run_id }}
+          restore-keys: catch-up-${{ matrix.target }}-
+      - name: Check and catch up
+        if: env.DATABRICKS_CLIENT_SECRET != ''
+        env:
+          TARGET: ${{ matrix.target }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          CATCH_UP_STATE: .catch-up/${{ matrix.target }}.json
+        run: python .github/scripts/catch_up.py
+      - name: Keep when Databricks last answered
+        if: always() && env.DATABRICKS_CLIENT_SECRET != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .catch-up
+          key: catch-up-${{ matrix.target }}-${{ github.run_id }}
