@@ -51,10 +51,22 @@ jobs:
         run: |
           [ -n "$U" ] || { echo "::error::KAGGLE_USERNAME is not set in the GitHub environment 'dev' (variable or secret)"; exit 1; }
           echo "KAGGLE_USERNAME=$U" >> "$GITHUB_ENV"
-          if [ -n "$T" ]; then echo "KAGGLE_API_TOKEN=$T" >> "$GITHUB_ENV"; echo "using KAGGLE_API_TOKEN"
-          elif [ -n "$K" ]; then echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"; echo "using KAGGLE_USERNAME + KAGGLE_KEY"
-          else echo "::error::Neither KAGGLE_API_TOKEN nor KAGGLE_KEY is set in the GitHub environment 'dev'"; exit 1; fi
+          # Kaggle's "Generate New Token" makes an API token (KAGGLE_API_TOKEN); older accounts have a legacy key
+          # (KAGGLE_KEY). A token saved under KAGGLE_KEY works too: the CLI tries it as a token first and falls
+          # back to username + key if Kaggle doesn't recognise it.
+          tok="${T:-$K}"
+          [ -n "$tok" ] || { echo "::error::Set KAGGLE_API_TOKEN (or KAGGLE_KEY) in the GitHub environment 'dev'"; exit 1; }
+          echo "KAGGLE_API_TOKEN=$tok" >> "$GITHUB_ENV"
+          [ -n "$K" ] && echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"
           echo "KERNEL=$U/dental-omop-medgemma-reader" >> "$GITHUB_ENV"
+
+      - name: Check Kaggle accepts the credentials
+        run: |
+          kaggle kernels list --mine --page-size 1 >/dev/null 2>err.txt || {
+            cat err.txt | head -5
+            echo "::error::Kaggle rejected the credentials. Kaggle -> Settings -> API -> Generate New Token, save it as the secret KAGGLE_API_TOKEN in the GitHub environment 'dev', and check KAGGLE_USERNAME is your Kaggle username (the name in kaggle.com/<username>), not your email."
+            exit 1; }
+          echo "Kaggle accepted the credentials"
 
       - name: Prepare the notebook
         if: ${{ !inputs.collect_only }}

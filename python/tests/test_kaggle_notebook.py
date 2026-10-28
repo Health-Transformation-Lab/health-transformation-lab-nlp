@@ -82,3 +82,5 @@ def test_workflow_pushes_waits_and_keeps_the_outputs():
                  "upload-artifact"):
         assert step in text, step
     assert "--accelerator" in text
+    assert "kaggle kernels list --mine" in text          # fails early, with instructions, on bad credentials
+    assert 'tok="${T:-$K}"' in text                      # a new-style token saved as KAGGLE_KEY still works
