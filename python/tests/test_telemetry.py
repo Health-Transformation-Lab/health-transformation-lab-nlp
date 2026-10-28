@@ -145,3 +145,16 @@ def test_missing_databricks_secret_turns_telemetry_off_not_the_job(monkeypatch, 
         assert tm.use_databricks_secret(_FakeDbutils({}), "azure") == "off"
     import os
     assert os.environ["DENTAL_TELEMETRY"] == "off" and "appinsights_connection_string" in caplog.text
+
+
+def test_connection_string_from_env_loses_stray_quotes_and_line_endings(monkeypatch):
+    monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", '"InstrumentationKey=abc;IngestionEndpoint=https://x/"\r\n')
+    assert tm.config_from_env().connection_string == "InstrumentationKey=abc;IngestionEndpoint=https://x/"
+
+
+@pytest.mark.parametrize("bad", ["Warning: No outputs found", "abc;def", "╷\n│ Error: Output not found"])
+def test_malformed_connection_string_warns_and_turns_off_instead_of_crashing(bad, caplog):
+    with caplog.at_level(logging.WARNING):
+        assert tm.setup(tm.TelemetryConfig(exporter="azure", connection_string=bad)) is None
+    assert tm.active_exporter() == "off"
+    assert "not a valid" in caplog.text and bad not in caplog.text      # the value is never logged

@@ -58,9 +58,20 @@ class TelemetryConfig:
             raise ValueError("DENTAL_TELEMETRY_SAMPLING must be between 0 and 1")
 
 
+def _clean(value: str) -> str:
+    """Strip what shells and copy-paste add: whitespace, Windows line endings, surrounding quotes."""
+    return value.strip().strip("\"'").strip()
+
+
+def _looks_valid(connection_string: str) -> bool:
+    """key=value pairs separated by ';', one of them InstrumentationKey (the Azure Monitor format)."""
+    pairs = [p.split("=", 1) for p in connection_string.split(";") if p.strip()]
+    return all(len(p) == 2 for p in pairs) and any(k.strip().lower() == "instrumentationkey" for k, _ in pairs)
+
+
 def config_from_env() -> TelemetryConfig:
     return TelemetryConfig(exporter=os.environ.get("DENTAL_TELEMETRY", "off").strip().lower() or "off",
-                           connection_string=os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING", ""),
+                           connection_string=_clean(os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING", "")),
                            sampling_ratio=float(os.environ.get("DENTAL_TELEMETRY_SAMPLING", "1.0")),
                            environment=os.environ.get("DENTAL_ENVIRONMENT", "dev"))
 
@@ -100,6 +111,10 @@ def setup(config: TelemetryConfig | None = None):
     out = None
     if c.exporter == "azure" and not c.connection_string:
         log.warning("DENTAL_TELEMETRY=azure but APPLICATIONINSIGHTS_CONNECTION_STRING is not set: telemetry off")
+        c = TelemetryConfig(exporter="off")
+    elif c.exporter == "azure" and not _looks_valid(c.connection_string):   # never log the value itself
+        log.warning("APPLICATIONINSIGHTS_CONNECTION_STRING is not a valid Application Insights connection "
+                    "string (expected InstrumentationKey=...;IngestionEndpoint=...): telemetry off")
         c = TelemetryConfig(exporter="off")
     if c.exporter == "off":
         _State.tracer, _State.meter = trace.NoOpTracer(), metrics.NoOpMeter(SERVICE)
@@ -206,7 +221,7 @@ def use_databricks_secret(dbutils, exporter: str = "azure", scope: str = "dental
     notebook starts pick them up. A missing secret turns telemetry off; it never fails the job."""
     if exporter == "azure":
         try:
-            os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"] = dbutils.secrets.get(scope, key)
+            os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"] = _clean(dbutils.secrets.get(scope, key))
         except Exception as e:  # noqa: BLE001  dbutils raises its own exception types
             log.warning("no secret %s/%s (%s): telemetry off", scope, key, type(e).__name__)
             exporter = "off"
