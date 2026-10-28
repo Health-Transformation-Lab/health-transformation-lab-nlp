@@ -1,4 +1,4 @@
-# De-identification cost-effectiveness (spec 007): R twin of python/dental_omop_nlp/deid_eval.py
+# De-identification cost-effectiveness (spec 007): R twin of python/health_transformation_lab_nlp/deid_eval.py
 # (engine_cost, review_cost, cost_table, deid_frontier). Reads data/deid/cost_inputs.csv,
 # written by python/scripts/26_deid_benchmark.py; must reproduce cost_effectiveness.csv.
 # Base R only.

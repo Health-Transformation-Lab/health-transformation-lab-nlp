@@ -4,13 +4,13 @@
 # MAGIC
 # MAGIC Every README phenotyping metric for every system, against the generator's truth and against an
 # MAGIC LLM judge's own reading of the same 240 synthetic review charts, plus how often the judge agrees
-# MAGIC with the truth. Metrics are computed in code (`dental_omop_nlp.judge_scorecard`), never by the LLM.
+# MAGIC with the truth. Metrics are computed in code (`health_transformation_lab_nlp.judge_scorecard`), never by the LLM.
 # MAGIC
 # MAGIC * Notes: `data/datasets/answer_key/review_key.csv`: synthetic, de-identified, through the leak gate.
 # MAGIC * Judge: `judge_endpoint` (a pay-per-token serving endpoint; `none` skips the judge and publishes
 # MAGIC   the truth-based metrics only). The job prints the token cost first and stops above `max_usd`.
 # MAGIC * Resumes: calls already in the `fact_judge_call` table aren't asked again (endpoint errors are).
-# MAGIC * Writes to the gold schema, under the gold names (spec 018, `dental_omop_nlp.gold_names`): `fact_chart_answer`,
+# MAGIC * Writes to the gold schema, under the gold names (spec 018, `health_transformation_lab_nlp.gold_names`): `fact_chart_answer`,
 # MAGIC   `fact_judge_call`, `judge_metric`, `judge_agreement`, `judge_cost`, `deid_score` (for the dashboard's
 # MAGIC   de-identification page). One MLflow trace per judge call.
 
@@ -27,9 +27,9 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was deployed from
-from dental_omop_nlp import tracking as _tracking
+from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
-dbutils.widgets.text("catalog", "dental_omop")
+dbutils.widgets.text("catalog", "health_transformation_lab")
 dbutils.widgets.text("schema", "gold_dental_omop_perio")
 dbutils.widgets.text("judge_endpoint", "none")
 dbutils.widgets.text("experiment_id", "")
@@ -45,11 +45,11 @@ experiment_id = dbutils.widgets.get("experiment_id")
 import mlflow
 import pandas as pd
 
-from dental_omop_nlp import gold_names
-from dental_omop_nlp import judge as jg
-from dental_omop_nlp import judge_scorecard as js
-from dental_omop_nlp import readme_results as rr
-from dental_omop_nlp.paths import DEID_DIR
+from health_transformation_lab_nlp import gold_names
+from health_transformation_lab_nlp import judge as jg
+from health_transformation_lab_nlp import judge_scorecard as js
+from health_transformation_lab_nlp import readme_results as rr
+from health_transformation_lab_nlp.paths import DEID_DIR
 
 inp = rr.load_inputs()
 answers = js.chart_answers(inp)

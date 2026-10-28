@@ -5,7 +5,7 @@ load it from the OHDSI package of their language:
 
 - Python: `omop/ddl/postgresql/` holds the OHDSI CommonDataModel **v5.4.2 Postgres DDL**
   (https://github.com/OHDSI/CommonDataModel, Apache-2.0), used by
-  `dental_omop_nlp/db.py` to create the CDM in Postgres / **Lakebase**
+  `health_transformation_lab_nlp/db.py` to create the CDM in Postgres / **Lakebase**
   (`scripts/05_load_omop_db.py`). Primary keys and indices are applied;
   foreign keys need the Athena vocabulary first.
 - R: `r/R/01_etl_synthea.R` loads the full CDM with ETL-Synthea into Postgres /

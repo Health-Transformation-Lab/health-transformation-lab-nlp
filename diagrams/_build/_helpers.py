@@ -105,7 +105,7 @@ def edge(src, dst, label="", dashed=False, exit=None, entry=None, via=()):
 
 
 def save(name, page_w=1600, page_h=900):
-    xml = (f'<mxfile host="app.diagrams.net" agent="dental-omop-nlp build_drawio.py"><diagram name="{name}"><mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" '
+    xml = (f'<mxfile host="app.diagrams.net" agent="health-transformation-lab-nlp build_drawio.py"><diagram name="{name}"><mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" '
            f'guides="1" page="1" pageScale="1" pageWidth="{page_w}" pageHeight="{page_h}" background="#ffffff"><root>' + "".join(cells) + '</root></mxGraphModel></diagram></mxfile>')
     out = Path(__file__).parent.parent / f"{name}.drawio"
     out.write_text(xml)

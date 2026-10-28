@@ -12,7 +12,7 @@ import pytest
 
 pytest.importorskip("opentelemetry.sdk")
 
-from dental_omop_nlp import telemetry as tm
+from health_transformation_lab_nlp import telemetry as tm
 
 PKG = Path(tm.__file__).parent
 NOT_TRACED_MODULES = {"__init__", "paths", "telemetry"}       # telemetry can't trace itself
@@ -20,7 +20,7 @@ NOT_TRACED_MODULES = {"__init__", "paths", "telemetry"}       # telemetry can't 
 
 @pytest.fixture
 def mem(monkeypatch):
-    monkeypatch.setenv("DENTAL_DATA_PRODUCT_ID", "dental_omop_perio")
+    monkeypatch.setenv("DENTAL_DATA_PRODUCT_ID", "health_transformation_lab")
     exporter = tm.setup(tm.TelemetryConfig(exporter="memory", environment="dev"))
     yield exporter
     tm.setup(tm.TelemetryConfig(exporter="off"))
@@ -31,17 +31,17 @@ def test_every_span_carries_the_common_header(mem):
         pass
     (span,) = mem.get_finished_spans()
     a = span.attributes
-    assert a["data_product_id"] == "dental_omop_perio" and a["environment"] == "dev"
-    assert a["service.namespace"] == "dental-omop-nlp"
-    assert span.resource.attributes["service.name"] == "dental_omop_perio"
-    assert span.resource.attributes["service.namespace"] == "dental-omop-nlp"
+    assert a["data_product_id"] == "health_transformation_lab" and a["environment"] == "dev"
+    assert a["service.namespace"] == "health-transformation-lab-nlp"
+    assert span.resource.attributes["service.name"] == "health_transformation_lab"
+    assert span.resource.attributes["service.namespace"] == "health-transformation-lab-nlp"
 
 
 def test_with_statement_gives_a_logger_that_carries_the_header(mem, caplog):
-    with caplog.at_level(logging.INFO, logger="dental_omop_nlp"), tm.trace_call("study.build_study") as log:
+    with caplog.at_level(logging.INFO, logger="health_transformation_lab_nlp"), tm.trace_call("study.build_study") as log:
         log.info("built %d visits", 3)
     rec = next(r for r in caplog.records if r.getMessage() == "built 3 visits")
-    assert rec.data_product_id == "dental_omop_perio" and rec.environment == "dev"
+    assert rec.data_product_id == "health_transformation_lab" and rec.environment == "dev"
     assert rec.function == "study.build_study"
 
 
@@ -122,7 +122,7 @@ def test_traced_functions_still_import_and_keep_their_signatures():
         if f.stem in NOT_TRACED_MODULES:
             continue
         try:
-            mod = importlib.import_module(f"dental_omop_nlp.{f.stem}")
+            mod = importlib.import_module(f"health_transformation_lab_nlp.{f.stem}")
         except ImportError:                            # optional extras (torch, mlflow, sqlalchemy) not installed
             continue
         for name, obj in vars(mod).items():

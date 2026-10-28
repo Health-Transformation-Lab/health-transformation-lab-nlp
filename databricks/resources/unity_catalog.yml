@@ -1,7 +1,7 @@
 # Unity Catalog objects the bundle owns (docs/deployment.md): one catalog, one
 # schema per layer, and the landing volume the jobs write files to.
 #
-#   dental_omop                       catalog
+#   health_transformation_lab                       catalog
 #     landing_dental_omop_perio       volumes (data: generated CSV/parquet, run files)
 #     bronze_dental_omop_perio        raw tables       (empty for now)
 #     silver_dental_omop_perio        cleaned tables   (empty for now)
@@ -19,7 +19,7 @@
 
 resources:
   catalogs:
-    dental_omop:
+    health_transformation_lab:
       name: ${var.catalog}
       comment: Dental OMOP. Synthetic data only.
       grants:   # the group databricks/setup/create_service_principal.sh makes (you and the principal)
@@ -30,25 +30,25 @@ resources:
 
   schemas:
     landing:
-      catalog_name: ${resources.catalogs.dental_omop.name}
+      catalog_name: ${resources.catalogs.health_transformation_lab.name}
       name: landing_${var.domain}
       comment: Landing zone (volumes) for ${var.domain}. Synthetic data only.
       lifecycle:
         prevent_destroy: true
     bronze:
-      catalog_name: ${resources.catalogs.dental_omop.name}
+      catalog_name: ${resources.catalogs.health_transformation_lab.name}
       name: bronze_${var.domain}
       comment: Raw tables for ${var.domain}. Synthetic data only.
       lifecycle:
         prevent_destroy: true
     silver:
-      catalog_name: ${resources.catalogs.dental_omop.name}
+      catalog_name: ${resources.catalogs.health_transformation_lab.name}
       name: silver_${var.domain}
       comment: Cleaned tables for ${var.domain}. Synthetic data only.
       lifecycle:
         prevent_destroy: true
     gold:
-      catalog_name: ${resources.catalogs.dental_omop.name}
+      catalog_name: ${resources.catalogs.health_transformation_lab.name}
       name: gold_${var.domain}
       comment: Study tables, results and perio_note_classifier for ${var.domain}. Synthetic data only.
       lifecycle:

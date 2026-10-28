@@ -1,4 +1,4 @@
-"""Spec 019: the grader dashboards are built by dental_omop_nlp.dashboards, and every dataset's SQL runs, here in
+"""Spec 019: the grader dashboards are built by health_transformation_lab_nlp.dashboards, and every dataset's SQL runs, here in
 DuckDB, on the tables grader_tables builds from the committed CSVs, under the same three-part names as in Databricks."""
 
 import json
@@ -7,10 +7,10 @@ import re
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import dashboards as dash
-from dental_omop_nlp import gold_names
-from dental_omop_nlp import grader_tables as gt
-from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
+from health_transformation_lab_nlp import dashboards as dash
+from health_transformation_lab_nlp import gold_names
+from health_transformation_lab_nlp import grader_tables as gt
+from health_transformation_lab_nlp.paths import DATASETS_DIR, REPO_ROOT
 
 duckdb = pytest.importorskip("duckdb")
 DASH_DIR = REPO_ROOT / "databricks" / "dashboards"
@@ -19,13 +19,13 @@ DASH_DIR = REPO_ROOT / "databricks" / "dashboards"
 @pytest.fixture(scope="module")
 def con():
     c = duckdb.connect()
-    c.execute("ATTACH ':memory:' AS dental_omop")
-    c.execute("CREATE SCHEMA dental_omop.gold_dental_omop_perio")
+    c.execute("ATTACH ':memory:' AS health_transformation_lab")
+    c.execute("CREATE SCHEMA health_transformation_lab.gold_dental_omop_perio")
     now = pd.Timestamp("2026-10-28", tz="UTC")
     for name, df in {**gt.dq_tables(DATASETS_DIR), **gt.lab_tables(DATASETS_DIR)}.items():   # under their gold names
         df = gold_names.to_gold(df.assign(git_commit="abc1234", loaded_at=now), name)
         c.register(f"src_{name}", df)
-        c.execute(f"CREATE TABLE dental_omop.gold_dental_omop_perio.{name} AS SELECT * FROM src_{name}")
+        c.execute(f"CREATE TABLE health_transformation_lab.gold_dental_omop_perio.{name} AS SELECT * FROM src_{name}")
     return c
 
 

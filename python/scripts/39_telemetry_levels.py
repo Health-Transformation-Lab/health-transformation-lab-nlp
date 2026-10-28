@@ -6,7 +6,7 @@ Runs representative pipelines, each in its own process as CI does, with DENTAL_T
 every @traced call is counted (calls per parent call, time per call), whatever the exporter. A function called more than
 --max-calls-per-parent times under one parent call, or cheaper than --min-ms and called that often,
 is `detail`: off at the default level `call`, on with DENTAL_TELEMETRY_LEVEL=detail. Writes
-python/dental_omop_nlp/telemetry_levels.yaml; entries marked `manual: true` are kept as edited, and
+python/health_transformation_lab_nlp/telemetry_levels.yaml; entries marked `manual: true` are kept as edited, and
 functions these runs don't reach keep their old level (or default to `call`).
 
 The pipelines rewrite their own outputs with the same seeds, so committed data doesn't change.
@@ -21,8 +21,8 @@ import tempfile
 
 import yaml
 
-from dental_omop_nlp import telemetry
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp import telemetry
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 RUNS = [                                    # (script, argv): fast, seeded, cover the package's main paths
     ("10_build_study.py", []),

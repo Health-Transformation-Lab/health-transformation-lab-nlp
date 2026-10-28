@@ -14,8 +14,8 @@ import json
 import numpy as np
 import pandas as pd
 
-from dental_omop_nlp import classify_status as cs
-from dental_omop_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp import classify_status as cs
+from health_transformation_lab_nlp.paths import DATASETS_DIR
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--outcome", default="algorithm_design", choices=["algorithm_design", "truth_status"])
@@ -81,7 +81,7 @@ print(f"held out: accuracy {s['accuracy']:.3f}, macro F1 {s['macro_f1']:.3f}")
 print(res["metrics"].round(3).to_string(index=False))
 print(res["shap_importance"][["feature", "role", "mean_abs_shap"]].round(3).to_string(index=False))
 
-from dental_omop_nlp.tracking import track
+from health_transformation_lab_nlp.tracking import track
 
 with track("40_classify_status", stem, simulated=True, params=s["params"] | {"scheme": a.scheme}) as run:
     run.log_metrics({k: s[k] for k in ("accuracy", "macro_f1", "cv_macro_f1")})

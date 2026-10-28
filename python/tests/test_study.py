@@ -2,13 +2,13 @@ import json
 
 import pandas as pd
 
-from dental_omop_nlp.deid import deidentify, leak_check, score_deid
-from dental_omop_nlp.labels import Status, extent_of, grade_of
-from dental_omop_nlp.labelstudio import parse_export
-from dental_omop_nlp.note_reader import read_note, read_stated_dx
-from dental_omop_nlp.reliability import consensus, fleiss_kappa, weighted_kappa
-from dental_omop_nlp.sources import read_proc_codes, read_proc_dx
-from dental_omop_nlp.study import generate_visits
+from health_transformation_lab_nlp.deid import deidentify, leak_check, score_deid
+from health_transformation_lab_nlp.labels import Status, extent_of, grade_of
+from health_transformation_lab_nlp.labelstudio import parse_export
+from health_transformation_lab_nlp.note_reader import read_note, read_stated_dx
+from health_transformation_lab_nlp.reliability import consensus, fleiss_kappa, weighted_kappa
+from health_transformation_lab_nlp.sources import read_proc_codes, read_proc_dx
+from health_transformation_lab_nlp.study import generate_visits
 
 
 def test_deid_removes_every_injected_phi_value():

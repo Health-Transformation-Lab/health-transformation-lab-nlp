@@ -12,8 +12,8 @@ import argparse
 
 import pandas as pd
 
-from dental_omop_nlp.paths import DATASETS_DIR
-from dental_omop_nlp.prediction import make_pairs, train_eval
+from health_transformation_lab_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp.prediction import make_pairs, train_eval
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--outcome", default="algorithm_design")
@@ -39,7 +39,7 @@ print(f"pairs train {res['n_pairs_train']}, test {res['n_pairs_test']}; progress
 print(f"AUROC {res['auroc']:.3f} (95% CI {res['auroc_ci_low']:.3f}-{res['auroc_ci_high']:.3f})")
 print(res["importance"].round(4).to_string(index=False))
 
-from dental_omop_nlp.tracking import track  # noqa: E402
+from health_transformation_lab_nlp.tracking import track  # noqa: E402
 
 with track("21_predict_progression", "progression", simulated=True) as run:
     run.log_metrics({k: res[k] for k in ("auroc", "auroc_ci_low", "auroc_ci_high", "progress_rate")})

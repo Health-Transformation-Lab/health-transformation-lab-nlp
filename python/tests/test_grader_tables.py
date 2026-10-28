@@ -2,8 +2,8 @@
 
 import pytest
 
-from dental_omop_nlp import grader_tables as gt
-from dental_omop_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp import grader_tables as gt
+from health_transformation_lab_nlp.paths import DATASETS_DIR
 
 DQ = {
     "dq_check": {"check_name", "category", "clinic", "n_checked", "n_fail", "pass_rate", "status"},
@@ -73,7 +73,7 @@ def test_dq_tables_are_the_same_on_every_build():
 
 def test_load_results_overwrites_every_grader_table():
     # spec 019 US1: the job writes each table whole, so a rerun leaves the same rows
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     nb = (REPO_ROOT / "databricks" / "notebooks" / "10_load_results.py").read_text()
     assert "grader_tables.dq_tables(data_dir)" in nb and "grader_tables.lab_tables(data_dir)" in nb
     assert '.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(table(name))' in nb
@@ -86,8 +86,8 @@ def test_every_dq_table_becomes_its_declared_gold_table(dq):
 
     import pandas as pd
 
-    from dental_omop_nlp import gold_names
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp import gold_names
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     spec = importlib.util.spec_from_file_location("gold_model", REPO_ROOT / "diagrams" / "_build" / "gold_model.py")
     gm = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(gm)
@@ -149,8 +149,8 @@ def test_the_lab_tables_become_their_declared_gold_tables(sim):
 
     import pandas as pd
 
-    from dental_omop_nlp import gold_names
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp import gold_names
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     spec = importlib.util.spec_from_file_location("gold_model", REPO_ROOT / "diagrams" / "_build" / "gold_model.py")
     gm = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(gm)

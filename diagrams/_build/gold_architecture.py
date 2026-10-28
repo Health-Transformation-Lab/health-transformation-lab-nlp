@@ -1,5 +1,5 @@
 """../gold/source/gold_logical_architecture.drawio and gold_physical_architecture.drawio: how results reach
-dental_omop.gold_dental_omop_perio and who reads them. The frame (lanes, Data Intelligence Platform, groups, key,
+health_transformation_lab.gold_dental_omop_perio and who reads them. The frame (lanes, Data Intelligence Platform, groups, key,
 storage) follows jcbowyer/DE_Assessment scripts/shared/diagrams/drawio_architecture.py, which copies the Databricks
 reference architecture; each pill carries its Databricks product icon (dbx_icons/, see render.md).
 Run: python3 gold_architecture.py   (then node drawio_render.js)   Synthetic data only.
@@ -118,7 +118,7 @@ pill(d, "<b>Asset Bundles</b> · GitHub CI/CD", 630, 120, 240, 34, "databricks")
 ing = pill(d, sub("Deployed files", "the bundle syncs", "committed results"), 228, 236, 144, 64, "notebooks")
 nb = pill(d, sub("Notebook jobs", "load · read · judge · score"), 402, 222, 170, 50, "notebooks")
 gpu = pill(d, sub("Serverless GPU", "MedGemma reader"), 402, 280, 170, 44, "databricks")
-py = pill(d, sub("dental_omop_nlp", "metrics in code, never by the LLM"), 584, 236, 166, 64)
+py = pill(d, sub("health_transformation_lab_nlp", "metrics in code, never by the LLM"), 584, 236, 166, 64)
 ms = pill(d, sub("Model Serving", "LLM judge (pay-per-token)"), 782, 216, 268, 44, "model-serving")
 wh = pill(d, sub("SQL warehouse", "AI/BI dashboard · ai_query"), 782, 274, 268, 44, "sql-warehouse")
 pill(d, "<b>Access control</b>", 300, 380, 190, 40, "unity-catalog")
@@ -154,10 +154,10 @@ pill(d, "<b>deploy.yml</b> → bundle deploy → <b>Load results</b><font style=
 ing = pill(d, sub("Git folder", "data/datasets/", "(bundle sync)"), 228, 236, 144, 64, "notebooks")
 nb = pill(d, sub("11 migrate → 10 load results", "07_judge_scorecard.py", "02_llm_judge.sql"), 402, 214, 170, 62, "notebooks")
 gpu = pill(d, sub("03 MedGemma reader", "serverless GPU", "6 retries, 30 min apart"), 402, 282, 170, 46, "databricks")
-py = pill(d, sub("python/dental_omop_nlp/", "results_store.py · delta.py", "judge_scorecard.py"), 584, 232, 166, 72)
+py = pill(d, sub("python/health_transformation_lab_nlp/", "results_store.py · delta.py", "judge_scorecard.py"), 584, 232, 166, 72)
 ms = pill(d, sub("serving endpoint", "var.judge_endpoint · max_usd 5"), 782, 216, 268, 44, "model-serving")
 wh = pill(d, sub("SQL warehouse var.warehouse_id", "dashboard Scorecard · ai_query"), 782, 274, 268, 44, "sql-warehouse")
-pill(d, sub("catalog dental_omop", "group dental_omop_nlp_&lt;target&gt;_admin"), 232, 374, 250, 52, "unity-catalog")
+pill(d, sub("catalog health_transformation_lab", "group health_transformation_lab_nlp_&lt;target&gt;_admin"), 232, 374, 250, 52, "unity-catalog")
 pill(d, sub("schemas", "landing_ · bronze_ · silver_ · gold_dental_omop_perio"), 494, 374, 270, 52, "unity-catalog")
 pill(d, sub("MLflow experiment + UC model", "perio_note_classifier"), 776, 374, 274, 52, "notebooks")
 pill(d, sub("Delta tables", "UC managed"), 232, 482, 130, 52, "delta-lake")
@@ -181,5 +181,5 @@ lead, sql, rd = analyse(d, True)
 d.e(wh, lead, ARROW + ORTHO + "exitX=1;exitY=0.3;entryX=0;entryY=0.5;")
 d.e(wh, sql, ARROW + ORTHO + "exitX=1;exitY=0.7;entryX=0;entryY=0.5;")
 key(d)
-storage(d, "volume dental_omop.landing_dental_omop_perio.data · runlog logs · encoder_gpu/ CSVs")
+storage(d, "volume health_transformation_lab.landing_dental_omop_perio.data · runlog logs · encoder_gpu/ CSVs")
 d.write("gold_physical_architecture")

@@ -1,4 +1,4 @@
-# Judge scorecard in R (spec 012). Twin of python/dental_omop_nlp/judge_scorecard.py: every README
+# Judge scorecard in R (spec 012). Twin of python/health_transformation_lab_nlp/judge_scorecard.py: every README
 # phenotyping metric per system against the truth and against the judge's own status, and the
 # judge's agreement with the truth. Point estimates match Python exactly (r/tests/test_parity.R);
 # the 95% ranges (bootstrap) and judge-corrected accuracy are Python's.

@@ -17,13 +17,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
 
-from dental_omop_nlp.cost_effectiveness import (
+from health_transformation_lab_nlp.cost_effectiveness import (
     calibrate_judge,
     corrected_accuracy,
     frontier,
     judge_cost,
 )
-from dental_omop_nlp.paths import CORPUS_DIR, COSTS_YAML
+from health_transformation_lab_nlp.paths import CORPUS_DIR, COSTS_YAML
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--simulated", action="store_true")
@@ -79,7 +79,7 @@ cols = ["method", "accuracy_est", "ci_low", "ci_high", "cost_usd", "usd_per_1k_c
 with pd.option_context("display.float_format", "{:.4g}".format):
     print(t[cols].to_string(index=False))
 
-from dental_omop_nlp.tracking import track  # noqa: E402
+from health_transformation_lab_nlp.tracking import track  # noqa: E402
 
 with track("16_cost_effectiveness", "cost-effectiveness", simulated=bool(prefix),
            params={"corpus_notes": costs["corpus_notes"], "prices": "ILLUSTRATIVE"}) as run:

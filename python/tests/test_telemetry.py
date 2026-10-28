@@ -6,7 +6,7 @@ import pytest
 
 pytest.importorskip("opentelemetry.sdk")
 
-from dental_omop_nlp import telemetry as tm
+from health_transformation_lab_nlp import telemetry as tm
 
 
 @pytest.fixture
@@ -85,11 +85,11 @@ def test_azure_uses_the_distro_with_sampling_live_metrics_and_the_package_logger
     monkeypatch.setattr(distro, "configure_azure_monitor", lambda **kw: seen.update(kw))
     tm.setup(tm.TelemetryConfig(exporter="azure", connection_string="InstrumentationKey=x", sampling_ratio=0.5))
     assert seen["connection_string"] == "InstrumentationKey=x" and seen["sampling_ratio"] == 0.5
-    assert seen["enable_live_metrics"] is True and seen["logger_name"] == "dental_omop_nlp"
-    assert seen["resource"].attributes["service.name"] == "dental_omop_perio"           # the data product
-    assert seen["resource"].attributes["service.namespace"] == "dental-omop-nlp"
+    assert seen["enable_live_metrics"] is True and seen["logger_name"] == "health_transformation_lab_nlp"
+    assert seen["resource"].attributes["service.name"] == "health_transformation_lab"           # the data product
+    assert seen["resource"].attributes["service.namespace"] == "health-transformation-lab-nlp"
     assert len(seen["span_processors"]) == 1                                         # the common header
-    assert logging.getLogger("dental_omop_nlp").level == logging.INFO          # no DEBUG shipped
+    assert logging.getLogger("health_transformation_lab_nlp").level == logging.INFO          # no DEBUG shipped
     tm.setup(tm.TelemetryConfig(exporter="off"))
 
 
@@ -134,7 +134,7 @@ class _FakeDbutils:
 def test_databricks_secret_sets_the_environment_child_scripts_inherit(monkeypatch):
     for k in ("DENTAL_TELEMETRY", "APPLICATIONINSIGHTS_CONNECTION_STRING"):
         monkeypatch.delenv(k, raising=False)
-    dbu = _FakeDbutils({("dental", "appinsights_connection_string"): "InstrumentationKey=abc"})
+    dbu = _FakeDbutils({("health_transformation_lab", "appinsights_connection_string"): "InstrumentationKey=abc"})
     assert tm.use_databricks_secret(dbu, "azure") == "azure"
     import os
     assert os.environ["DENTAL_TELEMETRY"] == "azure"

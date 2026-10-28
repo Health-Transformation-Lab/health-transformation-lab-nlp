@@ -1,4 +1,4 @@
-"""Write the grader dashboards and Genie spaces (spec 019) from dental_omop_nlp/dashboards.py.
+"""Write the grader dashboards and Genie spaces (spec 019) from health_transformation_lab_nlp/dashboards.py.
 
     python scripts/42_build_dashboards.py           # databricks/dashboards/<name>.lvdash.json, databricks/genie/<name>.geniespace.json
     python scripts/42_build_dashboards.py --check   # exit 1 if a committed file is stale
@@ -7,8 +7,8 @@
 import argparse
 import sys
 
-from dental_omop_nlp import dashboards
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp import dashboards
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--check", action="store_true")

@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import ladder_eval
-from dental_omop_nlp.labels import LABELS
+from health_transformation_lab_nlp import ladder_eval
+from health_transformation_lab_nlp.labels import LABELS
 
 S4 = "periodontitis_stage_4"
 

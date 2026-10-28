@@ -8,8 +8,8 @@ from typing import ClassVar
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import judge
-from dental_omop_nlp.labels import LABELS
+from health_transformation_lab_nlp import judge
+from health_transformation_lab_nlp.labels import LABELS
 
 NOTE = ("perio charting done: BOP 49%, PD up to 5mm, attachment loss 2-3 mm.\n"
         "Diagnosis: Localized Periodontitis Stage II Grade B.\n")
@@ -29,7 +29,7 @@ def test_judge_prompt_unchanged_after_sharing_criteria():
 
 
 def test_reader_prompt_shares_criteria_and_has_note():
-    from dental_omop_nlp.llm_reader import build_messages
+    from health_transformation_lab_nlp.llm_reader import build_messages
     msgs = build_messages(NOTE)
     assert msgs[0]["role"] == "system" and judge.CRITERIA in msgs[0]["content"]
     assert NOTE in msgs[-1]["content"]
@@ -38,7 +38,7 @@ def test_reader_prompt_shares_criteria_and_has_note():
 
 
 def test_parse_valid_answer():
-    from dental_omop_nlp.llm_reader import parse_answer
+    from health_transformation_lab_nlp.llm_reader import parse_answer
     out = parse_answer("Sure!\n```json\n" + _ans() + "\n```", NOTE)
     assert out["gate_ok"] and out["status"] == "periodontitis_stage_2"
     assert out["grade"] == "B" and out["extent"] == "localized"
@@ -51,14 +51,14 @@ def test_parse_valid_answer():
     (_ans(quote=""), "quote not in note"),
 ])
 def test_parse_failures_are_flagged(raw, why):
-    from dental_omop_nlp.llm_reader import parse_answer
+    from health_transformation_lab_nlp.llm_reader import parse_answer
     out = parse_answer(raw, NOTE)
     assert not out["gate_ok"] and why in out["error"]
 
 
 def test_parse_skips_medgemma_thought_block():
     # MedGemma 1.5 may think first: <unused94>thought ... <unused95> then the answer.
-    from dental_omop_nlp.llm_reader import parse_answer
+    from health_transformation_lab_nlp.llm_reader import parse_answer
     draft = _ans(status="healthy")
     out = parse_answer(f"<unused94>thought\nDraft: {draft}\nNo, it is stage II.<unused95>{_ans()}", NOTE)
     assert out["gate_ok"] and out["status"] == "periodontitis_stage_2"
@@ -67,7 +67,7 @@ def test_parse_skips_medgemma_thought_block():
 
 
 def test_parse_normalizes_grade_and_extent():
-    from dental_omop_nlp.llm_reader import parse_answer
+    from health_transformation_lab_nlp.llm_reader import parse_answer
     out = parse_answer(_ans(status="healthy", grade=None, extent=None), NOTE)
     assert out["grade"] == "NA" and out["extent"] == "NA"
 
@@ -86,7 +86,7 @@ class _Fixed:
 
 
 def _reader(raw, **kw):
-    from dental_omop_nlp.llm_reader import LLMReader
+    from health_transformation_lab_nlp.llm_reader import LLMReader
     be = _Fixed(raw)
     return LLMReader("medgemma-4b-it", backend=be, **kw), be
 
@@ -100,7 +100,7 @@ def test_reader_predicts_and_records_details():
 
 
 def test_reader_falls_back_to_note_rules_on_bad_output():
-    from dental_omop_nlp.note_reader import read_note
+    from health_transformation_lab_nlp.note_reader import read_note
     r, _ = _reader("garbage")
     pred, _ = r.predict(pd.DataFrame({"visit_id": [1], "note_text": [NOTE]}))
     assert pred == [read_note(NOTE)] and r.details.iloc[0]["fallback"]
@@ -115,7 +115,7 @@ def test_reader_never_sends_note_with_residual_phi():
 
 
 def test_few_shot_examples_seeded_k_per_status():
-    from dental_omop_nlp.llm_reader import pick_examples
+    from health_transformation_lab_nlp.llm_reader import pick_examples
     train = pd.DataFrame({"note_text": [f"note {i}" for i in range(60)],
                           "label": [LABELS[i % len(LABELS)] for i in range(60)]})
     a, b = pick_examples(train, 2, seed=1), pick_examples(train, 2, seed=1)
@@ -127,9 +127,9 @@ def test_few_shot_examples_seeded_k_per_status():
 
 
 def test_make_rung_builds_llm_reader_for_llm_models():
-    from dental_omop_nlp.llm_reader import LLMReader
-    from dental_omop_nlp.registry import load_registry
-    from dental_omop_nlp.rungs import make_rung
+    from health_transformation_lab_nlp.llm_reader import LLMReader
+    from health_transformation_lab_nlp.registry import load_registry
+    from health_transformation_lab_nlp.rungs import make_rung
     reg = load_registry()
     r = make_rung("medgemma-4b-it", reg, backend=_Fixed(_ans()))
     assert isinstance(r, LLMReader)
@@ -157,7 +157,7 @@ class _FakeOpenAI(BaseHTTPRequestHandler):
 
 
 def test_openai_backend_round_trip():
-    from dental_omop_nlp.llm_reader import LLMReader, OpenAIChat
+    from health_transformation_lab_nlp.llm_reader import LLMReader, OpenAIChat
     srv = HTTPServer(("127.0.0.1", 0), _FakeOpenAI)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     try:
@@ -174,7 +174,7 @@ def test_openai_backend_round_trip():
 
 
 def test_simulated_backend_is_labelled_and_seeded():
-    from dental_omop_nlp.llm_reader import LLMReader, SimulatedReader
+    from health_transformation_lab_nlp.llm_reader import LLMReader, SimulatedReader
     truth = {i: LABELS[i % len(LABELS)] for i in range(200)}
     level = {i: ["L1", "L2", "L3"][i % 3] for i in range(200)}
     df = pd.DataFrame({"visit_id": list(truth), "note_text": [NOTE] * 200})
@@ -187,14 +187,14 @@ def test_simulated_backend_is_labelled_and_seeded():
 
 # ---------------------------------------------------------------- judge family rule, fine-tune data
 def test_families_of_evaluated_llms():
-    from dental_omop_nlp.registry import families_of, load_registry
+    from health_transformation_lab_nlp.registry import families_of, load_registry
     reg = load_registry()
     assert families_of(reg, ["tfidf_logreg", "medgemma-4b-it", "sim:medgemma-27b-text-it"]) == {"gemma"}
     assert families_of(reg, ["note_rules"]) == set()
 
 
 def test_sft_records_use_reader_format():
-    from dental_omop_nlp.llm_reader import parse_answer, sft_records
+    from health_transformation_lab_nlp.llm_reader import parse_answer, sft_records
     train = pd.DataFrame({"note_text": [NOTE], "label": ["periodontitis_stage_2"], "grade": ["B"],
                           "extent": ["localized"]})
     rec = sft_records(train)[0]
@@ -206,7 +206,7 @@ def test_sft_records_use_reader_format():
 # ---- dtype for the GPU the reader lands on (Kaggle T4 / P100 have no native bfloat16) -------------
 
 def test_pick_dtype_matches_the_hardware(monkeypatch):
-    from dental_omop_nlp.llm_reader import pick_dtype
+    from health_transformation_lab_nlp.llm_reader import pick_dtype
     monkeypatch.delenv("DENTAL_LLM_DTYPE", raising=False)
     assert pick_dtype(cuda=True, capability=(8, 6), total_gb=24) == "bfloat16"     # A10 (Databricks)
     assert pick_dtype(cuda=True, capability=(7, 5), total_gb=30) == "float32"      # Kaggle T4 x2
@@ -215,14 +215,14 @@ def test_pick_dtype_matches_the_hardware(monkeypatch):
 
 
 def test_pick_dtype_can_be_overridden(monkeypatch):
-    from dental_omop_nlp.llm_reader import pick_dtype
+    from health_transformation_lab_nlp.llm_reader import pick_dtype
     monkeypatch.setenv("DENTAL_LLM_DTYPE", "float16")
     assert pick_dtype(cuda=True, capability=(8, 0), total_gb=80) == "float16"
 
 
 def test_local_weights_need_no_hugging_face_token(monkeypatch, tmp_path):
     # Kaggle: MedGemma comes from Kaggle Models and is converted to a local transformers folder (no HF_TOKEN)
-    from dental_omop_nlp.llm_reader import HFChat, make_backend
+    from health_transformation_lab_nlp.llm_reader import HFChat, make_backend
     for v in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"):
         monkeypatch.delenv(v, raising=False)
     monkeypatch.setenv("HF_HOME", str(tmp_path))
@@ -234,8 +234,8 @@ def test_local_weights_need_no_hugging_face_token(monkeypatch, tmp_path):
 
 
 def test_weights_reach_the_reader_from_make_rung(monkeypatch, tmp_path):
-    from dental_omop_nlp.registry import load_registry
-    from dental_omop_nlp.rungs import make_rung
+    from health_transformation_lab_nlp.registry import load_registry
+    from health_transformation_lab_nlp.rungs import make_rung
     monkeypatch.delenv("HF_TOKEN", raising=False)
     monkeypatch.setenv("HF_HOME", str(tmp_path))
     r = make_rung("medgemma-1.5-4b-it", load_registry(), backend_kind="hf", weights="/kaggle/temp/x")

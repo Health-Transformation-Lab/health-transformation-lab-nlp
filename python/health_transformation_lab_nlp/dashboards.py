@@ -4,7 +4,7 @@ datasets are wired in one place instead of hand-edited JSON.
     python scripts/42_build_dashboards.py           # write databricks/dashboards/<name>.lvdash.json
     python scripts/42_build_dashboards.py --check   # exit 1 if a committed dashboard is stale
 
-The grid is 6 columns wide. Datasets read dental_omop.gold_dental_omop_perio, the same names in every target, and
+The grid is 6 columns wide. Datasets read health_transformation_lab.gold_dental_omop_perio, the same names in every target, and
 keep to SQL that DuckDB also runs, so the tests can run every query on the tables grader_tables builds.
 """
 
@@ -15,7 +15,7 @@ import json
 
 from .telemetry import traced
 
-GOLD = "dental_omop.gold_dental_omop_perio"
+GOLD = "health_transformation_lab.gold_dental_omop_perio"
 
 
 def _lines(text: str) -> list[str]:

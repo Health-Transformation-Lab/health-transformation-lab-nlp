@@ -12,7 +12,7 @@
 # MAGIC - `fact_llm_call`: the LLM reader details, next to the rows the MedGemma reader job writes
 # MAGIC   (`source_code = databricks`)
 # MAGIC
-# MAGIC Columns take their gold names (spec 018, `dental_omop_nlp.gold_names`) as they are written.
+# MAGIC Columns take their gold names (spec 018, `health_transformation_lab_nlp.gold_names`) as they are written.
 # MAGIC
 # MAGIC and logs one MLflow run per new LLM file. Running it again adds nothing. `simulated_*` files are
 # MAGIC never loaded. Serverless CPU.
@@ -32,12 +32,12 @@ import re
 from pathlib import Path
 
 import pandas as pd
-from dental_omop_nlp import gold_names, grader_tables, results_store, tracking
+from health_transformation_lab_nlp import gold_names, grader_tables, results_store, tracking
 from pyspark.sql import functions as F
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
 commit = tracking.use_git_commit(dbutils)  # noqa: F821
-dbutils.widgets.text("catalog", "dental_omop")  # noqa: F821
+dbutils.widgets.text("catalog", "health_transformation_lab")  # noqa: F821
 dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
 dbutils.widgets.text("experiment_name", "")  # noqa: F821  the bundle's experiment; empty: no MLflow runs
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821

@@ -41,7 +41,7 @@ Every MedGemma model is **gated** on Hugging Face under the
 [HAI-DEF terms of use](https://developers.google.com/health-ai-developer-foundations/terms).
 Before any run: accept the terms on the model's Hugging Face page with your own account, then make a
 read token from that account available as `HF_TOKEN` (cloud environment secret, or the Databricks
-secret scope `dental` / `hf_token` for notebook 03). Without both, the download fails with 401/403.
+secret scope `health_transformation_lab` / `hf_token` for notebook 03). Without both, the download fails with 401/403.
 The terms also govern sharing outputs and fine-tuned weights: check them before publishing a LoRA
 adapter. `models.yaml` marks these entries `gated: true` with the licence link.
 
@@ -68,7 +68,7 @@ suppresses it (it otherwise used up the 300 new tokens before the JSON) and
 
 | Piece | Where |
 |---|---|
-| Note reader rung: prompt shares the judge's AAP/EFP criteria; JSON status/grade/extent + verbatim quote; falls back to `note_rules` and flags the row on any failure; never sends a note the residual PHI scan flags | `python/dental_omop_nlp/llm_reader.py` |
+| Note reader rung: prompt shares the judge's AAP/EFP criteria; JSON status/grade/extent + verbatim quote; falls back to `note_rules` and flags the row on any failure; never sends a note the residual PHI scan flags | `python/health_transformation_lab_nlp/llm_reader.py` |
 | Backends: `hf` (local transformers, optional LoRA adapter), `openai` (Databricks serving, vLLM, Ollama), `simulated` (dry run) | same |
 | Run it | `python scripts/11_ai_predict.py --rung medgemma-1.5-4b-it --backend hf [--shots 1] [--limit 40]` |
 | Fine-tune | `python scripts/17_medgemma_lora.py` then `--adapter runs/medgemma-lora` |

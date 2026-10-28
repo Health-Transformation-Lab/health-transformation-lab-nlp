@@ -9,8 +9,8 @@ from collections import Counter
 
 import pytest
 
-from dental_omop_nlp.labels import PerioChart, Status
-from dental_omop_nlp.note_reader import read_extent, read_grade, read_stated_dx
+from health_transformation_lab_nlp.labels import PerioChart, Status
+from health_transformation_lab_nlp.note_reader import read_extent, read_grade, read_stated_dx
 
 CASES = [
     # text, status, grade, extent
@@ -40,10 +40,10 @@ def test_reader_handles_published_forms(text, status, grade, extent):
 def _ehr_notes(n=1000, seed=3):
     import datetime as dt
 
-    from dental_omop_nlp.clinical_notes import render_clinical_note
-    from dental_omop_nlp.labels import extent_of, grade_of, label_chart
-    from dental_omop_nlp.phi import fake_person, fake_provider
-    from dental_omop_nlp.synthetic import draw_chart, draw_pct_teeth_involved, draw_risk
+    from health_transformation_lab_nlp.clinical_notes import render_clinical_note
+    from health_transformation_lab_nlp.labels import extent_of, grade_of, label_chart
+    from health_transformation_lab_nlp.phi import fake_person, fake_provider
+    from health_transformation_lab_nlp.synthetic import draw_chart, draw_pct_teeth_involved, draw_risk
     rng = random.Random(seed)
     out = []
     for _ in range(n):
@@ -59,7 +59,7 @@ def _ehr_notes(n=1000, seed=3):
 
 
 def test_every_catalogue_pattern_appears():
-    from dental_omop_nlp.dx_patterns import PATTERNS
+    from health_transformation_lab_nlp.dx_patterns import PATTERNS
     seen = Counter(m["dx_pattern"] for _, m, *_ in _ehr_notes())
     missing = [p.id for p in PATTERNS if seen[p.id] == 0]
     assert not missing, missing

@@ -7,18 +7,18 @@
 
 | Databricks MLOps practice | In this repo | Where |
 |---|---|---|
-| Separate **dev, staging, prod** environments with clear transitions | dev / uat / prod bundle targets, each in its own workspace with the same catalog and schemas (`dental_omop`, model in `gold_dental_omop_perio`), plus its own Lakebase instance, MLflow experiment and UC model | [`databricks.yml`](../databricks.yml), [deployment.md](deployment.md) |
+| Separate **dev, staging, prod** environments with clear transitions | dev / uat / prod bundle targets, each in its own workspace with the same catalog and schemas (`health_transformation_lab`, model in `gold_dental_omop_perio`), plus its own Lakebase instance, MLflow experiment and UC model | [`databricks.yml`](../databricks.yml), [deployment.md](deployment.md) |
 | **Deploy code, not models**; production models trained by production code | The bundle deploys notebooks and jobs; models are trained and registered by those jobs in each environment | `databricks/resources/` |
 | CI: unit tests on PR, integration in staging, release to prod | GitHub Actions: Python tests, R parity, Postgres tests, `bundle validate`; push to main deploys uat; prod on demand behind approval | [`.github/workflows/`](../.github/workflows/) |
-| **Track every run** | MLflow runs for steps 11, 13, 15, 16, 18, 21, tagged with step, git commit, dataset fingerprint and `simulated` | [`tracking.py`](../python/dental_omop_nlp/tracking.py) |
-| **Models in Unity Catalog** with signature and input example | Any rung (rules, TF-IDF, fusion, fine-tuned encoder) as one MLflow pyfunc, `catalog.schema.perio_note_classifier` | [`model_registry.py`](../python/dental_omop_nlp/model_registry.py), `11_ai_predict.py --register` |
+| **Track every run** | MLflow runs for steps 11, 13, 15, 16, 18, 21, tagged with step, git commit, dataset fingerprint and `simulated` | [`tracking.py`](../python/health_transformation_lab_nlp/tracking.py) |
+| **Models in Unity Catalog** with signature and input example | Any rung (rules, TF-IDF, fusion, fine-tuned encoder) as one MLflow pyfunc, `catalog.schema.perio_note_classifier` | [`model_registry.py`](../python/health_transformation_lab_nlp/model_registry.py), `11_ai_predict.py --register` |
 | **Challenger → Champion** aliases; validate before promotion; record the outcome as tags | New version = challenger. Champion only if the **acceptance test** is non-inferior to the reviewers **and** it's at least as close to the human bar as the current champion. Verdict and difference stored as version tags. Refuses simulated reviewers unless asked | `promote_if_accepted`, [`24_promote_model.py`](../python/scripts/24_promote_model.py) |
 | Inference loads the **champion alias**, so promotion needs no redeploy | `load_alias(name, "champion")`; batch scoring via `mlflow.pyfunc.spark_udf` on `models:/<name>@champion` | `model_registry.load_alias` |
-| **LLM-as-judge with MLflow** | The judge is an MLflow GenAI judge (`make_judge`, same AAP criteria) with the quote gate; `mlflow.genai.evaluate` logs one trace per chart with the judge's assessment next to agreement with reviewer consensus; `15_judge.py --backend mlflow --judges databricks:/<endpoint>=<family>` | [`mlflow_judge.py`](../python/dental_omop_nlp/mlflow_judge.py) |
+| **LLM-as-judge with MLflow** | The judge is an MLflow GenAI judge (`make_judge`, same AAP criteria) with the quote gate; `mlflow.genai.evaluate` logs one trace per chart with the judge's assessment next to agreement with reviewer consensus; `15_judge.py --backend mlflow --judges databricks:/<endpoint>=<family>` | [`mlflow_judge.py`](../python/health_transformation_lab_nlp/mlflow_judge.py) |
 | **Databricks built-in judges** | `aap_guidelines`: the built-in Guidelines judge with five plain-language AAP rules, next to the custom judge; `no_phi_in_note`: a deterministic de-identification scan on the note the model read (no LLM) | `mlflow_judge.make_guidelines_judge`, `no_phi_in_note`; [`25_judge_monitoring.py`](../python/scripts/25_judge_monitoring.py) `eval` |
 | Align the judge to human labels | `align_to_reviewers`: reviewer consensus logged as HUMAN feedback under the judge's name, then `judge.align()` (MLflow ≥ 3.14). Calibration (sensitivity, specificity, bake-off, Rogan-Gladen) stays in `cost_effectiveness.py` | `mlflow_judge.align_to_reviewers` |
 | **Monitoring**: judges on live traffic, inference tables, data profiling, alerts | **Production monitoring of judges**: the custom judge and Guidelines judge score a sample of live traces (`judge_sample_rate`, default 10%), the PHI scan scores all; `judge_monitoring` job in uat/prod only. Also data quality per clinic and over time (`20_data_quality.py`). Not yet: inference tables, data profiling of predictions, alerts | `start_monitoring`, [`05_judge_monitoring.py`](../databricks/notebooks/05_judge_monitoring.py); action item G3 |
-| **Pipeline telemetry**: traces, failures, durations, data-quality metrics | OpenTelemetry in the scripts; Application Insights through the Azure Monitor distro (free allowance: daily cap, budget alert), or any OTLP backend; KQL for failures, slow steps, pass-rate trends, freshness | [`telemetry.py`](../python/dental_omop_nlp/telemetry.py), [telemetry.md](telemetry.md), `infra/azure/` (Terraform); spec 014 |
+| **Pipeline telemetry**: traces, failures, durations, data-quality metrics | OpenTelemetry in the scripts; Application Insights through the Azure Monitor distro (free allowance: daily cap, budget alert), or any OTLP backend; KQL for failures, slow steps, pass-rate trends, freshness | [`telemetry.py`](../python/health_transformation_lab_nlp/telemetry.py), [telemetry.md](telemetry.md), `infra/azure/` (Terraform); spec 014 |
 | **Retraining**: scheduled, then triggered | Not yet | action item G4 |
 | Access: data scientists read-only in prod | Bundle gives `users` CAN_VIEW in uat/prod; jobs run as a service principal | `databricks.yml` permissions |
 
@@ -26,9 +26,9 @@
 
 ```bash
 pip install -e ".[track]"                        # MLflow >= 3.4
-python scripts/11_ai_predict.py --rung tfidf_logreg --register dental_omop.gold_dental_omop_perio.perio_note_classifier
+python scripts/11_ai_predict.py --rung tfidf_logreg --register health_transformation_lab.gold_dental_omop_perio.perio_note_classifier
 python scripts/13_reliability.py                  # acceptance test; logged to MLflow
-python scripts/24_promote_model.py --model dental_omop.gold_dental_omop_perio.perio_note_classifier --version 1 --rater ai:tfidf_logreg
+python scripts/24_promote_model.py --model health_transformation_lab.gold_dental_omop_perio.perio_note_classifier --version 1 --rater ai:tfidf_logreg
 mlflow ui --backend-store-uri sqlite:///mlruns/mlflow.db   # locally
 ```
 

@@ -7,7 +7,7 @@ import re
 
 import pytest
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 _spec = importlib.util.spec_from_file_location("build_decks", REPO_ROOT / "docs" / "build_decks.py")
 build_decks = importlib.util.module_from_spec(_spec)

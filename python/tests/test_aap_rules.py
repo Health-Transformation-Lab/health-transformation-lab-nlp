@@ -4,7 +4,7 @@ https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontit
 
 import pytest
 
-from dental_omop_nlp.labels import PerioChart, Status, extent_of, grade_of, label_chart
+from health_transformation_lab_nlp.labels import PerioChart, Status, extent_of, grade_of, label_chart
 
 P1, P2, P3, P4 = Status.P1, Status.P2, Status.P3, Status.P4
 

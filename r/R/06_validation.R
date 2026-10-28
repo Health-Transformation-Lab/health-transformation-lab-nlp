@@ -1,4 +1,4 @@
-# Spec 005 twins of python/dental_omop_nlp/plausibility.py and prevalence.py.
+# Spec 005 twins of python/health_transformation_lab_nlp/plausibility.py and prevalence.py.
 # Base R. r/tests/test_parity.R checks they match Python.
 
 PERIO_LABELS6 <- c("healthy", "gingivitis", "periodontitis_stage_1", "periodontitis_stage_2",

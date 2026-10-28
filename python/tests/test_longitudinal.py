@@ -4,9 +4,9 @@ import random
 
 import pandas as pd
 
-from dental_omop_nlp.labels import LABELS, label_chart
-from dental_omop_nlp.plausibility import FLAGS, check_history
-from dental_omop_nlp.synthetic import RiskFactors, draw_history
+from health_transformation_lab_nlp.labels import LABELS, label_chart
+from health_transformation_lab_nlp.plausibility import FLAGS, check_history
+from health_transformation_lab_nlp.synthetic import RiskFactors, draw_history
 
 
 def _hist(seed, n=6, age=50, risk=RiskFactors(0, None)):
@@ -91,8 +91,8 @@ def test_check_history_single_pass_equals_the_per_person_version():
     import numpy as np
     import pandas as pd
 
-    from dental_omop_nlp.labels import LABELS
-    from dental_omop_nlp.plausibility import CAL_TOL_MM, FLAGS, RBL_TOL_PCT, check_history
+    from health_transformation_lab_nlp.labels import LABELS
+    from health_transformation_lab_nlp.plausibility import CAL_TOL_MM, FLAGS, RBL_TOL_PCT, check_history
 
     def reference(visits, status_col):
         rows = []

@@ -3,7 +3,7 @@
     with track("13_reliability", "ai:tfidf_logreg", params={...}, simulated=True) as run:
         run.log_metrics({...}); run.log_artifact(path)
 
-- Experiment: DENTAL_MLFLOW_EXPERIMENT (default "dental-omop-nlp"); on Databricks set
+- Experiment: DENTAL_MLFLOW_EXPERIMENT (default "health-transformation-lab-nlp"); on Databricks set
   it per target (the bundle creates one experiment per environment).
 - Tracking store: MLFLOW_TRACKING_URI (Databricks: "databricks"; locally a sqlite
   file under mlruns/ is used if unset).
@@ -27,7 +27,7 @@ from pathlib import Path
 from .paths import DATASETS_DIR, REPO_ROOT
 from .telemetry import traced
 
-EXPERIMENT = "dental-omop-nlp"
+EXPERIMENT = "health-transformation-lab-nlp"
 log = logging.getLogger(__name__)
 
 
@@ -167,7 +167,7 @@ def track(step: str, run_name: str, params: dict | None = None, simulated: bool 
     with ctx as r:
         run = _Run(r.info.run_id)
         run.set_tags({"step": step, "git_commit": git_commit(), "dataset": dataset_fingerprint(),
-                      "simulated": str(bool(simulated)).lower(), "project": "dental-omop-nlp", "data": "synthetic"})
+                      "simulated": str(bool(simulated)).lower(), "project": "health-transformation-lab-nlp", "data": "synthetic"})
         if params:
             run.log_params(params)
         yield run

@@ -8,8 +8,8 @@
 import argparse
 import json
 
-from dental_omop_nlp.paths import DATASETS_DIR, RAW_DIR
-from dental_omop_nlp.study import build_study
+from health_transformation_lab_nlp.paths import DATASETS_DIR, RAW_DIR
+from health_transformation_lab_nlp.study import build_study
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--n-people", type=int, default=1200)

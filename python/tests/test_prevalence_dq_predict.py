@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.prevalence import NHANES_2009_2014, prevalence_by, wilson_ci
+from health_transformation_lab_nlp.prevalence import NHANES_2009_2014, prevalence_by, wilson_ci
 
 
 def test_wilson_ci_known_values():
@@ -33,7 +33,7 @@ def test_published_benchmark_rows():
 
 
 def test_data_quality_checks():
-    from dental_omop_nlp.dq import run_checks
+    from health_transformation_lab_nlp.dq import run_checks
     v = pd.DataFrame({
         "visit_id": [1, 2, 3], "person_id": [1, 1, 2], "clinic_id": [1, 1, 2],
         "visit_date": ["2021-01-01", "2021-07-01", "2030-01-01"], "age": [40, 40, 130],
@@ -53,7 +53,7 @@ def test_data_quality_checks():
 
 @pytest.mark.filterwarnings("error")
 def test_progression_model_learns_risk_factors():
-    from dental_omop_nlp.prediction import FEATURES, make_pairs, train_eval
+    from health_transformation_lab_nlp.prediction import FEATURES, make_pairs, train_eval
     rng = np.random.default_rng(0)
     rows = []
     for pid in range(600):
@@ -83,7 +83,7 @@ def test_progression_model_learns_risk_factors():
 
 def test_progression_model_is_unpenalized_and_returns_test_predictions():
     """Plain (unpenalized) logistic regression, so R's glm() gives the same model (parity)."""
-    from dental_omop_nlp.prediction import FEATURES, train_eval
+    from health_transformation_lab_nlp.prediction import FEATURES, train_eval
     rng = np.random.default_rng(1)
     n = 400
     pairs = pd.DataFrame({f: rng.normal(size=n) for f in FEATURES})

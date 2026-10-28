@@ -20,7 +20,7 @@ pattern is re-composed from parts; no published sentence is copied into the data
 
 ## Pattern catalogue
 
-From `python/dental_omop_nlp/dx_patterns.py`. Weights are relative within the
+From `python/health_transformation_lab_nlp/dx_patterns.py`. Weights are relative within the
 patterns that apply to a visit's status.
 
 | Pattern id | Source | Shape (illustrative, generated) | Weight |

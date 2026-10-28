@@ -14,7 +14,7 @@
 # MAGIC `29_medgemma_vs_bert.py` against the committed encoder predictions.
 # MAGIC
 # MAGIC **Before running:** accept the HAI-DEF terms for the model on Hugging Face and put a
-# MAGIC read token in a secret scope (`dental` / `hf_token`).
+# MAGIC read token in a secret scope (`health_transformation_lab` / `hf_token`).
 
 # COMMAND ----------
 
@@ -27,29 +27,29 @@ import os
 import time
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
-from dental_omop_nlp import tracking as _tracking
+from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("rung", "medgemma-1.5-4b-it")  # noqa: F821
 dbutils.widgets.text("limit", "40")                  # noqa: F821  start small: GPU quota
 dbutils.widgets.text("shots", "0")                   # noqa: F821
 dbutils.widgets.text("lora_train", "0")              # noqa: F821  >0: LoRA fine-tune on this many train notes first
-dbutils.widgets.text("catalog", "dental_omop")      # noqa: F821  set by databricks.yml
+dbutils.widgets.text("catalog", "health_transformation_lab")      # noqa: F821  set by databricks.yml
 dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
-dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
+dbutils.widgets.text("hf_secret_scope", "health_transformation_lab")    # noqa: F821
 dbutils.widgets.text("experiment_name", "")          # noqa: F821  the bundle's MLflow experiment; empty: yours
 dbutils.widgets.text("run_id", "")                   # noqa: F821  the job run ({{job.run_id}}): every retry shares it
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 run_id = dbutils.widgets.get("run_id") or f"manual-{time.strftime('%Y%m%dT%H%M%S')}"  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
 dbutils.widgets.text("telemetry", "azure")           # noqa: F821  spec 014: off / console / azure / otlp
-from dental_omop_nlp import telemetry, tracking  # noqa: E402
+from health_transformation_lab_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"),  # noqa: F821  scripts inherit it
                                 scope=dbutils.widgets.get("hf_secret_scope"))  # noqa: F821
 tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
 # ... to the bundle's experiment: on Databricks the name must be an absolute path (tracking checks it)
 os.environ["MLFLOW_TRACKING_URI"] = "databricks"
 os.environ["DENTAL_MLFLOW_EXPERIMENT"] = (dbutils.widgets.get("experiment_name")  # noqa: F821
-                                          or f"/Users/{spark.sql('select current_user()').first()[0]}/dental-omop-nlp")  # noqa: F821
+                                          or f"/Users/{spark.sql('select current_user()').first()[0]}/health-transformation-lab-nlp")  # noqa: F821
 print("MLflow experiment:", os.environ["DENTAL_MLFLOW_EXPERIMENT"])
 
 import torch  # noqa: E402
@@ -58,7 +58,7 @@ print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "n
 
 # COMMAND ----------
 
-from dental_omop_nlp import runlog  # noqa: E402
+from health_transformation_lab_nlp import runlog  # noqa: E402
 
 # Scripts print as they go and into a log on the landing volume, which survives if this notebook's Python dies.
 log = f"{runlog.log_dir(catalog)}/medgemma_reader_{dbutils.widgets.get('rung')}.log"  # noqa: F821
@@ -87,7 +87,7 @@ runlog.run(args, log_path=log, check=True)   # a crash or a kill stops here and 
 
 import pandas as pd  # noqa: E402
 
-from dental_omop_nlp.rungs import output_tag  # noqa: E402
+from health_transformation_lab_nlp.rungs import output_tag  # noqa: E402
 
 rung = dbutils.widgets.get("rung") + output_tag(adapter=adapter, shots=int(dbutils.widgets.get("shots")))  # noqa: F821
 d = pd.read_csv(f"../../data/datasets/llm_details_{rung}.csv")
@@ -115,9 +115,9 @@ else:
 # fact_prediction, per-note details in fact_llm_call, under the gold names (spec 018). Keyed by
 # (source_code, run_id, method_name): a retry of this job run replaces its rows instead of adding them again.
 # The CSVs in the Git folder are scratch.
-from dental_omop_nlp import gold_names  # noqa: E402
-from dental_omop_nlp.delta import replace_batch  # noqa: E402
-from dental_omop_nlp.results_store import run_rows  # noqa: E402
+from health_transformation_lab_nlp import gold_names  # noqa: E402
+from health_transformation_lab_nlp.delta import replace_batch  # noqa: E402
+from health_transformation_lab_nlp.results_store import run_rows  # noqa: E402
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")  # noqa: F821
 preds, details = run_rows("../../data/datasets", rung, source="databricks", run_id=run_id,

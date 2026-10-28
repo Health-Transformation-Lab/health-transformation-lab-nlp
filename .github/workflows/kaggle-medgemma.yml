@@ -66,7 +66,7 @@ jobs:
           [ -n "$tok" ] || { echo "::error::Set KAGGLE_API_TOKEN (or KAGGLE_KEY) in the GitHub environment 'dev'"; exit 1; }
           echo "KAGGLE_API_TOKEN=$tok" >> "$GITHUB_ENV"
           [ -n "$K" ] && echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"
-          echo "KERNEL=$U/dental-omop-medgemma-reader" >> "$GITHUB_ENV"
+          echo "KERNEL=$U/health-transformation-lab-medgemma-reader" >> "$GITHUB_ENV"
 
       - name: Check Kaggle accepts the credentials
         run: |

@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from dental_omop_nlp.plausibility import transition_pairs, transition_summary
+from health_transformation_lab_nlp.plausibility import transition_pairs, transition_summary
 
 
 def _visits(rows):

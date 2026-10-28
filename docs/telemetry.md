@@ -22,10 +22,10 @@ types only.
 never fails a pipeline. `DENTAL_TELEMETRY_SAMPLING` (0–1, default 1.0) sets trace sampling;
 `DENTAL_ENVIRONMENT` (default `dev`) is recorded on every span.
 
-Code: `python/dental_omop_nlp/telemetry.py`. In a script, two lines:
+Code: `python/health_transformation_lab_nlp/telemetry.py`. In a script, two lines:
 
 ```python
-from dental_omop_nlp import telemetry
+from health_transformation_lab_nlp import telemetry
 telemetry.setup()                                           # from the environment
 telemetry.start_script("20_data_quality", data_label="synthetic")
 with telemetry.pipeline_step("transitions", pairs=len(pairs)):   # optional finer steps
@@ -40,7 +40,7 @@ switch (`telemetry_exporter`, default `azure`) and read the connection string fr
 
 ## Every call, with a common header
 
-Every public function and method in `python/dental_omop_nlp/` (282 of them) carries `@traced`, which
+Every public function and method in `python/health_transformation_lab_nlp/` (282 of them) carries `@traced`, which
 runs its body inside a `with` statement, the pattern cdh-lava-core uses in every method:
 
 ```python
@@ -55,8 +55,8 @@ def build_study(seed=7):
 ```
 
 **Common header.** Every span and every log line carries `data_product_id` (default
-`dental_omop_perio`, `DENTAL_DATA_PRODUCT_ID`), `environment` (`DENTAL_ENVIRONMENT`) and
-`service.namespace` (`dental-omop-nlp`); spans add `code.namespace` (module) and `code.function`. The
+`health_transformation_lab`, `DENTAL_DATA_PRODUCT_ID`), `environment` (`DENTAL_ENVIRONMENT`) and
+`service.namespace` (`health-transformation-lab-nlp`); spans add `code.namespace` (module) and `code.function`. The
 resource names the data product as the service, so in a shared Application Insights resource one
 data product and one environment are a filter away (`customDimensions.data_product_id`,
 `cloud_RoleName`).
@@ -85,7 +85,7 @@ Each function's level is **measured, not guessed**: `python scripts/39_telemetry
 representative pipelines, each in its own process, with `DENTAL_TELEMETRY_PROFILE` set, counts every
 traced call (calls per parent call, time per call) and marks a function `detail` when it is called
 more than 20 times under one parent call, or costs under 0.5 ms and is called that often. The result
-is `python/dental_omop_nlp/telemetry_levels.yaml`, one entry per function with the measured reason.
+is `python/health_transformation_lab_nlp/telemetry_levels.yaml`, one entry per function with the measured reason.
 Edit a level by hand and add `manual: true` to keep it; functions the runs don't reach default to
 `call`. Rerun the script after adding pipelines or changing hot paths.
 
@@ -106,11 +106,11 @@ terraform -chdir=infra/azure init
 terraform -chdir=infra/azure apply -var budget_email=you@example.com   # budget_email is optional
 ```
 
-It creates, in resource group `rg-dental-omop-telemetry`:
+It creates, in resource group `rg-health-transformation-lab-telemetry`:
 
-- a Log Analytics workspace `dental-omop-nlp-logs` with a **daily cap of 0.16 GB** (31 days × 0.16
+- a Log Analytics workspace `health-transformation-lab-nlp-logs` with a **daily cap of 0.16 GB** (31 days × 0.16
   = 4.96 GB, under the 5 GB/month free ingestion per billing account), 30-day retention;
-- workspace-based Application Insights `dental-omop-nlp-appi`, **90-day retention** (included);
+- workspace-based Application Insights `health-transformation-lab-nlp-appi`, **90-day retention** (included);
 - optionally a 1 USD monthly budget on the resource group that emails on any actual charge.
 
 `terraform -chdir=infra/azure destroy` removes all of it.
@@ -123,8 +123,8 @@ block) rather than committing it.
 Put the connection string straight into the Databricks secret scope, without printing it:
 
 ```bash
-databricks secrets create-scope dental          # skip if it exists (it holds hf_token too)
-databricks secrets put-secret dental appinsights_connection_string --string-value \
+databricks secrets create-scope health_transformation_lab          # skip if it exists (it holds hf_token too)
+databricks secrets put-secret health_transformation_lab appinsights_connection_string --string-value \
   "$(terraform -chdir=infra/azure output -raw connection_string)"
 ```
 
@@ -143,7 +143,7 @@ Locally: `export DENTAL_TELEMETRY=azure APPLICATIONINSIGHTS_CONNECTION_STRING=..
 | Daily cap | Log Analytics workspace (Terraform) | 0.16 GB/day; ingestion stops for the day at the cap |
 | Budget alert | resource group (Terraform, optional) | email on any actual charge |
 | Sampling | `DENTAL_TELEMETRY_SAMPLING` | 1.0: a batch run is a few hundred spans (kilobytes), and a sampled-away failure is the one you needed. Lower it only for high-volume services |
-| Log level | `telemetry.setup()` | INFO and above from the `dental_omop_nlp` logger; no DEBUG |
+| Log level | `telemetry.setup()` | INFO and above from the `health_transformation_lab_nlp` logger; no DEBUG |
 | Live Metrics | on | real-time view, not billed as ingestion |
 
 How much has gone in this month (`Usage` reports MB):
@@ -165,7 +165,7 @@ Every call of one data product in one environment (the common header):
 ```kusto
 AppDependencies
 | where TimeGenerated > ago(1d)
-| where tostring(Properties["data_product_id"]) == "dental_omop_perio" and tostring(Properties["environment"]) == "dev"
+| where tostring(Properties["data_product_id"]) == "health_transformation_lab" and tostring(Properties["environment"]) == "dev"
 | summarize calls = count(), failures = countif(Success == false), p95_ms = percentile(DurationMs, 95)
     by function = Name
 | order by calls desc

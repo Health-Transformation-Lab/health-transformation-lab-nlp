@@ -15,9 +15,9 @@ variables.
 | Bundle mode | default (no name prefixes; schedules paused by preset) | `production` | `production` |
 | Deployed by | CI on push to `main` (not from a laptop: a second deploy state would duplicate the jobs) | CI on push to `main`, or on demand | CI on demand, after approval |
 | Runs as | the CI service principal | service principal | service principal |
-| Workspace path | the service principal's home folder | `/Workspace/Shared/.bundle/dental-omop-nlp/uat` | `.../prod` |
+| Workspace path | the service principal's home folder | `/Workspace/Shared/.bundle/health-transformation-lab-nlp/uat` | `.../prod` |
 | Workspace | your dev workspace | the UAT workspace | the prod workspace |
-| Catalog | `dental_omop` (schemas below) | same | same |
+| Catalog | `health_transformation_lab` (schemas below) | same | same |
 | `n_people` | 300 | 1,500 | 1,500 |
 | DistilBERT in the benchmark job (`run_encoder`) | no (baselines only, ~3 min; no torch install) | yes | yes |
 | GPU jobs (MedGemma reader, encoders) | yes, serverless GPU | yes, serverless GPU | yes, serverless GPU, all review notes |
@@ -25,7 +25,7 @@ variables.
 Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
 schema names are the same everywhere. One catalog, one schema per layer:
 
-| Schema in `dental_omop` | Holds |
+| Schema in `health_transformation_lab` | Holds |
 |---|---|
 | `landing_dental_omop_perio` | the `data` volume: files the pipeline writes (`DENTAL_DATA_ROOT`) |
 | `bronze_dental_omop_perio` | raw tables (empty for now) |
@@ -37,7 +37,8 @@ The bundle creates the catalog, all four schemas and the volume on deploy
 `bundle destroy` never drops them. Deploying needs Databricks CLI 0.288 or later
 and `CREATE CATALOG` on the metastore. (Older setups used `workspace.dental_dev`,
 `dental_uat.dental` and `dental_prod.dental`, made by hand or by an earlier version of
-the setup script. Nothing uses them now; drop them once the new catalog is deployed.)
+the setup script, then the catalog and secret scope that spec 021 renamed. Nothing uses
+them now; drop them once the new catalog is deployed.)
 
 No target uses `mode: development`. That mode prefixes every name (`[dev <user>]`
 on jobs, `dev_<user>_` on catalogs, schemas, volumes and registered models, which
@@ -53,14 +54,14 @@ workspace admin, owned by the target's admin group; the deploy workflow then ado
 (`bundle deployment bind`) and manages its schemas, volume and grants:
 
 ```sql
-CREATE CATALOG IF NOT EXISTS dental_omop COMMENT 'Dental OMOP. Synthetic data only.';
-ALTER CATALOG dental_omop OWNER TO `dental_omop_nlp_dev_admin`;
+CREATE CATALOG IF NOT EXISTS health_transformation_lab COMMENT 'Dental OMOP. Synthetic data only.';
+ALTER CATALOG health_transformation_lab OWNER TO `dental_omop_nlp_dev_admin`;
 ```
 
 If a catalog, schema or volume already exists in a workspace (made by hand, or
 deployed by someone else's copy of the bundle), deploy fails rather than take it
 over. Adopt it once with, e.g.,
-`databricks bundle deployment bind dental_omop dental_omop -t dev`
+`databricks bundle deployment bind health_transformation_lab health_transformation_lab -t dev`
 (resource key, then the object's name), and likewise for the schemas and volume.
 
 **A target deployed before with Terraform** (before the catalog resource) must move its state to the
@@ -73,16 +74,16 @@ target as new and duplicate its jobs. dev is already migrated; uat and prod were
 
 | Variable | Default | What it sets |
 |---|---|---|
-| `catalog`, `domain` | `dental_omop`, `dental_omop_perio` | the catalog, and the suffix of the `landing_`/`bronze_`/`silver_`/`gold_` schemas |
+| `catalog`, `domain` | `health_transformation_lab`, `health_transformation_lab` | the catalog, and the suffix of the `landing_`/`bronze_`/`silver_`/`gold_` schemas |
 | `n_people` | `300` | synthetic people in the benchmark job |
 | `run_encoder` | `false` (uat/prod `true`) | install CPU-only torch and train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |
 | `warehouse_name` → `warehouse_id` | `Serverless Starter Warehouse` | SQL warehouse for notebook 02 (looked up by name) |
 | `reader_rung`, `reader_limit` | `medgemma-1.5-4b-it`, `40` (prod `0` = all) | MedGemma job |
 | `reader_shots`, `reader_lora_train` | `0`, `0` | MedGemma reader: few-shot examples per status, and LoRA fine-tune size (0 = off). Change these, or `reader_rung` (e.g. `medgemma-4b-it`), for one run with *Run now with different parameters* |
-| `telemetry_exporter` | `azure` | Pipeline telemetry for the GPU and NHANES jobs (spec 014): `azure` sends to Application Insights with the connection string from secret `dental/appinsights_connection_string` (telemetry off if the secret is missing), or `otlp`, `console`, `off`. Setup: [telemetry.md](telemetry.md) |
+| `telemetry_exporter` | `azure` | Pipeline telemetry for the GPU and NHANES jobs (spec 014): `azure` sends to Application Insights with the connection string from secret `health_transformation_lab/appinsights_connection_string` (telemetry off if the secret is missing), or `otlp`, `console`, `off`. Setup: [telemetry.md](telemetry.md) |
 | `deid_ai_engines`, `deid_llm_endpoint` | `llm`, `ai_mask` and their `+regex_v2+guard` versions; `databricks-meta-llama-3-3-70b-instruct` | De-id AI methods job |
-| `hf_secret_scope` | `dental` | secret scope with `hf_token` |
+| `hf_secret_scope` | `health_transformation_lab` | secret scope with `hf_token` |
 | `gpu_accelerator` | `GPU_1xA10` | serverless GPU for the GPU jobs (Free Edition offers A10) |
 | `gpu_environment_version` | `4` | serverless environment for the GPU jobs; Databricks requires one when a task sets `compute` |
 | `encoder_gpu_rungs`, `encoder_gpu_lr` | the five GPU encoders; `gatortron-base=2e-5` | what the encoder GPU job fine-tunes, and learning-rate overrides |
@@ -144,9 +145,9 @@ its own workspace: names are the same in all three, so they can't share one.
    principal), both at account level through the workspace's SCIM proxy, and assigns
    them to the workspace. It gives the principal `workspace-access` (every API call
    needs it) and `databricks-sql-access` (validate looks up the SQL warehouse), and
-   `READ` on the `dental` secret scope (created if missing). It gives the group
+   `READ` on the `health_transformation_lab` secret scope (created if missing). It gives the group
    `CREATE CATALOG` on the metastore and, with `--judge-endpoint`, `CAN_QUERY` on that
-   endpoint. It does not create the catalog: the first deploy creates `dental_omop`,
+   endpoint. It does not create the catalog: the first deploy creates `health_transformation_lab`,
    its schemas and the volume, and grants the group `ALL PRIVILEGES` on the catalog.
    Deploy dev from your laptop only after running this for `dev` too, since the
    catalog grant names the target's group. It prints the principal's `id` and `applicationId`.
@@ -161,11 +162,11 @@ its own workspace: names are the same in all three, so they can't share one.
    ID are identifiers, so variables; only the client secret is a secret. `gh secret set`
    prompts for the value, so it stays out of your shell history.
    ```bash
-   gh api -X PUT repos/<owner>/dental-omop-nlp/environments/uat
-   gh variable set DATABRICKS_HOST      -R <owner>/dental-omop-nlp -e uat -b <workspace url>
-   gh variable set DATABRICKS_CLIENT_ID -R <owner>/dental-omop-nlp -e uat -b <applicationId>
-   gh variable set SERVICE_PRINCIPAL    -R <owner>/dental-omop-nlp -e uat -b <applicationId>
-   gh secret set   DATABRICKS_CLIENT_SECRET -R <owner>/dental-omop-nlp -e uat
+   gh api -X PUT repos/<owner>/health-transformation-lab-nlp/environments/uat
+   gh variable set DATABRICKS_HOST      -R <owner>/health-transformation-lab-nlp -e uat -b <workspace url>
+   gh variable set DATABRICKS_CLIENT_ID -R <owner>/health-transformation-lab-nlp -e uat -b <applicationId>
+   gh variable set SERVICE_PRINCIPAL    -R <owner>/health-transformation-lab-nlp -e uat -b <applicationId>
+   gh secret set   DATABRICKS_CLIENT_SECRET -R <owner>/health-transformation-lab-nlp -e uat
    ```
    Optional variables: `JUDGE_ENDPOINT`, `WAREHOUSE_NAME` (default
    `Serverless Starter Warehouse`), `USERS_GROUP` (default `users`).
@@ -173,8 +174,8 @@ its own workspace: names are the same in all three, so they can't share one.
 4. **Check the sign-in:** Actions → *Test that GitHub can log in to Databricks* → Run workflow, environment `uat`. It
    should print a `userName` equal to `DATABRICKS_CLIENT_ID`. Before the secret
    expires, repeat step 2 and `gh secret set`.
-5. **Secrets the jobs read**, in the `dental` scope: `hf_token` (MedGemma job) and
-   `lakebase_url` (Lakebase load), e.g. `databricks secrets put-secret dental hf_token`.
+5. **Secrets the jobs read**, in the `health_transformation_lab` scope: `hf_token` (MedGemma job) and
+   `lakebase_url` (Lakebase load), e.g. `databricks secrets put-secret health_transformation_lab hf_token`.
    The Lakebase load also needs the principal to be able to connect to the target's
    Lakebase instance; the script doesn't set that up.
 

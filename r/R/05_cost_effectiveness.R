@@ -1,4 +1,4 @@
-# Cost-effectiveness in R. Twin of python/dental_omop_nlp/cost_effectiveness.py:
+# Cost-effectiveness in R. Twin of python/health_transformation_lab_nlp/cost_effectiveness.py:
 # judge calibration on the human-reviewed charts, Rogan-Gladen corrected accuracy,
 # bootstrap CI (judge uncertainty included), cost per 1,000 correct notes, dominance
 # and ICER along the frontier. Point estimates, costs and the frontier match Python

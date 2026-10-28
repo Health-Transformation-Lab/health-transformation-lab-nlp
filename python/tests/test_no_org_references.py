@@ -4,7 +4,7 @@ states the rule, is the only file allowed to name it. The name is built from par
 import re
 import subprocess
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 NAME = re.compile(r"\b" + "care" + r"[\s_-]?" + "quest" + r"s?\b", re.IGNORECASE)   # not "care questions"
 ALLOWED = {"CLAUDE.md"}

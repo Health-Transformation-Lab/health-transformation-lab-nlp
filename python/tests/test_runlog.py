@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from dental_omop_nlp import runlog
+from health_transformation_lab_nlp import runlog
 
 
 def test_output_is_shown_as_it_comes_and_kept_in_a_log_file(tmp_path, capsys):
@@ -35,7 +35,7 @@ def test_a_failing_script_reports_its_exit_code(tmp_path):
 
 
 def test_gpu_notebooks_run_their_scripts_through_runlog():
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     for nb in ("03_medgemma_reader.py", "08_encoder_gpu.py"):
         text = (REPO_ROOT / "databricks" / "notebooks" / nb).read_text()
         assert "capture_output" not in text, nb                            # output lost if Python dies

@@ -1,5 +1,5 @@
 # The model ladder against the synthetic truth (spec 002 T015): R twin of
-# python/dental_omop_nlp/ladder_eval.py, point estimates only (bootstrap CIs differ by RNG).
+# python/health_transformation_lab_nlp/ladder_eval.py, point estimates only (bootstrap CIs differ by RNG).
 # Reads data/datasets/ladder/ladder_preds.csv and ladder_proba.csv written by
 # python/scripts/28_ladder_vs_truth.py; r/tests/test_parity.R checks R == Python. Base R only.
 

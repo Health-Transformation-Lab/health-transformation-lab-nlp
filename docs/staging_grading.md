@@ -118,9 +118,9 @@ reports ACES and its variants next to the 2017 worksheet and CDC/AAP 2012 for ev
 
 | Place | What to keep in step |
 |---|---|
-| `python/dental_omop_nlp/labels.py`, `r/R/labels.R` | ground truth; parity-tested, including 3,456 edge cases (`aap_rule_cases.csv`) |
+| `python/health_transformation_lab_nlp/labels.py`, `r/R/labels.R` | ground truth; parity-tested, including 3,456 edge cases (`aap_rule_cases.csv`) |
 | `python/tests/test_aap_rules.py` | one test per worksheet rule |
-| `python/dental_omop_nlp/aces.py`, `r/R/12_spec013.R`, `python/tests/test_aces.py` | ACES and its variants; parity-tested on 200 exams × 4 variants |
+| `python/health_transformation_lab_nlp/aces.py`, `r/R/12_spec013.R`, `python/tests/test_aces.py` | ACES and its variants; parity-tested on 200 exams × 4 variants |
 | `docs/labeling_protocol.md`, `labelstudio/chart_review.xml` | what reviewers apply |
 | `judge.CRITERIA` (shared by the judge and the MedGemma reader), `databricks/notebooks/02_llm_judge.sql` | what LLMs apply (prompt versions `judge-v2`, `reader-v2`) |
 

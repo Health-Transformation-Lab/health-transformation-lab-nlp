@@ -3,7 +3,7 @@
 import pandas as pd
 import pytest
 
-from dental_omop_nlp.completeness import (
+from health_transformation_lab_nlp.completeness import (
     CHART_INPUTS,
     column_completeness,
     complete_cases,

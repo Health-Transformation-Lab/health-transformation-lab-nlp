@@ -4,7 +4,7 @@ import re
 
 import yaml
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 DOC = (REPO_ROOT / "docs" / "model_inventory.md").read_text()
 

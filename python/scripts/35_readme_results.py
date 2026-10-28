@@ -5,13 +5,13 @@ the EDR study page (docs/edr/README.md) and the full tables in docs/results.md.
     python scripts/35_readme_results.py --check   # exit 1 if either is stale
 
 Note readers (data/datasets/ladder/), the rule phenotypes (answer key) and de-identification
-(data/deid/). Method and ranking: dental_omop_nlp/readme_results.py.
+(data/deid/). Method and ranking: health_transformation_lab_nlp/readme_results.py.
 """
 
 import argparse
 import sys
 
-from dental_omop_nlp import readme_results as rr
+from health_transformation_lab_nlp import readme_results as rr
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--check", action="store_true")

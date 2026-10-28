@@ -16,8 +16,8 @@ import argparse
 
 import pandas as pd
 
-from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
-from dental_omop_nlp.phenotype import score_orders, split_halves
+from health_transformation_lab_nlp.paths import DATASETS_DIR, REVIEW_DIR
+from health_transformation_lab_nlp.phenotype import score_orders, split_halves
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--simulated", action="store_true")
@@ -47,7 +47,7 @@ d, s = t[t.is_design_order].iloc[0], t[t.selected].iloc[0]
 print(f"\ndesign order {d['order']}: held-out kappa {d['holdout_kappa']:.3f} ({d['holdout_verdict']})")
 print(f"selected     {s['order']}: held-out kappa {s['holdout_kappa']:.3f} ({s['holdout_verdict']})")
 
-from dental_omop_nlp.tracking import track  # noqa: E402
+from health_transformation_lab_nlp.tracking import track  # noqa: E402
 
 with track("18_phenotype_order", "phenotype-orders", simulated=a.simulated) as run:
     run.log_metrics({"design_holdout_kappa": d["holdout_kappa"], "selected_holdout_kappa": s["holdout_kappa"]})

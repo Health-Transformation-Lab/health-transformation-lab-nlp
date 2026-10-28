@@ -16,11 +16,11 @@ import random
 
 import pandas as pd
 
-from dental_omop_nlp import telemetry
-from dental_omop_nlp.aces import AcesRules, aces_all
-from dental_omop_nlp.labels import PerioChart
-from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
-from dental_omop_nlp.sites import aap_from_derived, cdc_aap, derive_all, draw_mouth_columns
+from health_transformation_lab_nlp import telemetry
+from health_transformation_lab_nlp.aces import AcesRules, aces_all
+from health_transformation_lab_nlp.labels import PerioChart
+from health_transformation_lab_nlp.paths import DATASETS_DIR, REPO_ROOT
+from health_transformation_lab_nlp.sites import aap_from_derived, cdc_aap, derive_all, draw_mouth_columns
 
 OUT = REPO_ROOT / "data" / "sites"
 OUT.mkdir(parents=True, exist_ok=True)

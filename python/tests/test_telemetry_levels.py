@@ -8,7 +8,7 @@ import yaml
 
 pytest.importorskip("opentelemetry.sdk")
 
-from dental_omop_nlp import telemetry as tm
+from health_transformation_lab_nlp import telemetry as tm
 
 LEVELS_FILE = Path(tm.__file__).with_name("telemetry_levels.yaml")
 
@@ -94,7 +94,7 @@ def test_levels_file_is_valid_and_names_real_traced_functions():
     import importlib
     for name in data:
         module, _, qual = name.partition(".")
-        obj = importlib.import_module(f"dental_omop_nlp.{module}")
+        obj = importlib.import_module(f"health_transformation_lab_nlp.{module}")
         for part in qual.split("."):
             obj = vars(obj).get(part, getattr(obj, part)) if isinstance(obj, type) else getattr(obj, part)
         if isinstance(obj, (staticmethod, classmethod)):
@@ -110,7 +110,7 @@ def test_profile_from_the_environment_is_written_at_exit(tmp_path):
     import subprocess
     import sys
     out = tmp_path / "profile.jsonl"
-    code = ("from dental_omop_nlp import labels\n"
+    code = ("from health_transformation_lab_nlp import labels\n"
             "for _ in range(30): labels.label_chart(labels.PerioChart(3.0, 20.0, 2.0, 10.0, 0))\n")
     env = {**__import__("os").environ, "DENTAL_TELEMETRY_PROFILE": str(out)}
     subprocess.run([sys.executable, "-c", code], env=env, check=True)
@@ -122,7 +122,7 @@ def test_profile_from_the_environment_is_written_at_exit(tmp_path):
 def test_cal_charts_file_is_byte_identical_across_runs(tmp_path):
     import pandas as pd
 
-    from dental_omop_nlp.reliability_cal import CalParams, draw_repeated_charts, write_charts
+    from health_transformation_lab_nlp.reliability_cal import CalParams, draw_repeated_charts, write_charts
     d = draw_repeated_charts(5, 3, 2, CalParams(), seed=1)
     a, b = tmp_path / "a.csv.gz", tmp_path / "b.csv.gz"
     write_charts(d, a)

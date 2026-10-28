@@ -3,8 +3,8 @@
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import deid, deid_review
-from dental_omop_nlp.phi_challenge import CATEGORIES, build_challenge
+from health_transformation_lab_nlp import deid, deid_review
+from health_transformation_lab_nlp.phi_challenge import CATEGORIES, build_challenge
 
 NOTE = "Pt Ann Lee seen 3/4/2021, call 555-123-4567."
 
@@ -154,7 +154,7 @@ def test_simulated_exports_are_seeded_and_parse_back():
 def test_label_studio_configs_match_the_parser():
     import xml.etree.ElementTree as ET
 
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     gold = ET.parse(REPO_ROOT / "labelstudio" / "deid_gold.xml").getroot()
     labels = gold.find("Labels")
     assert (labels.get("name"), labels.get("toName")) == ("phi", "text")

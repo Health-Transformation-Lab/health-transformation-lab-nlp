@@ -137,13 +137,13 @@ when they're next touched. `python/tests/test_sql_conventions.py` checks the gol
 
 - **Style:** lowercase snake_case names, no quoted or mixed-case identifiers. Keywords lowercase in new SQL; older
   files and the dashboard queries are uppercase, so keep one case per file. Three-part names
-  (`dental_omop.gold_dental_omop_perio.fact_prediction`) outside a pipeline. CTEs, not nested subqueries;
+  (`health_transformation_lab.gold_dental_omop_perio.fact_prediction`) outside a pipeline. CTEs, not nested subqueries;
   explicit `inner join` / `left join`; no `select *` outside bronze. Each table's comment states its grain.
 - **Tables are singular**, one row per noun (`fact_prediction`, not `ai_predictions`).
 - **Gold prefixes:** `fact_<event>` one row per event or answer, with a key to each dimension it uses;
   `dim_<noun>` one row per thing described; a summary table is named `<subject>_<noun>` (`judge_metric`,
   `deid_score`); `kpi_<subject>` a metric view. Silver and bronze tables are named for what they hold.
-- **pandas frames and CSV files keep their analysis names.** `dental_omop_nlp.gold_names.to_gold` renames them
+- **pandas frames and CSV files keep their analysis names.** `health_transformation_lab_nlp.gold_names.to_gold` renames them
   when a job writes gold, and fails on a column it doesn't know: declare a new column there, with its gold name.
 - **Columns:** `<what it describes>_<kind>`, never a bare generic name (`code`, `name`, `status`, `type`,
   `value`): say whose (`predicted_status_code`, `engine_name`).
@@ -189,12 +189,12 @@ Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
 
 - Commits: imperative subject, body says why. Co-author trailer when an agent wrote it.
 - Seeds: every generator and sampler takes one; defaults are fixed.
-- Paths: use `dental_omop_nlp.paths`, never hard-code `data/`.
-- Telemetry: every public function or method in `python/dental_omop_nlp/` gets `@traced` (from
+- Paths: use `health_transformation_lab_nlp.paths`, never hard-code `data/`.
+- Telemetry: every public function or method in `python/health_transformation_lab_nlp/` gets `@traced` (from
   `.telemetry`); a test fails without it. Never put note text or row-level data in span attributes or logs.
 - Names: simulated files `simulated_*`, simulated methods `sim:<name>`, calibration-only methods `calib:<name>`.
 - R: base R only, matching Python to 1e-9 (`r/tests/test_parity.R`).
-- Databricks names: identical in every target (catalog `dental_omop`, schemas
+- Databricks names: identical in every target (catalog `health_transformation_lab`, schemas
   `landing_`/`bronze_`/`silver_`/`gold_dental_omop_perio`). Never add `dev_`,
   `[dev <user>]` or per-environment prefixes or suffixes, and never use
   `mode: development` (it adds them): each environment is its own workspace.
@@ -208,6 +208,6 @@ Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
   | `dental-omop-ci` OAuth secret | Databricks → Settings → Identity and access → Service principals → Secrets | `all-apis` (bundle deploy touches jobs, workspace files, Unity Catalog, MLflow, SQL) | GitHub environment secret `DATABRICKS_CLIENT_SECRET` |
   | Workspace personal access token (admin setup; agent reads job runs) | Databricks → Settings → Developer → Access tokens | `all-apis`, 15 days at most; revoke when not needed | cloud environment variable `DATABRICKS_TOKEN` |
   | `gh` login for `gh secret set` / `gh variable set` | `gh auth login` | `repo` (classic), or fine-grained: this repo, Secrets, Variables and Environments read and write | your laptop only |
-  | Hugging Face token for MedGemma | huggingface.co → Settings → Access tokens | Read | Databricks secret scope `dental`, key `hf_token` |
-  | Application Insights connection string (telemetry, spec 014) | Azure portal → Application Insights `dental-omop-nlp-appi` → Overview, or `terraform -chdir=infra/azure output -raw connection_string` piped straight into the secret (docs/telemetry.md); also in the git-ignored Terraform state | ingestion only: can send telemetry, can't read; doesn't expire, so rotate by recreating the resource | Databricks secret scope `dental`, key `appinsights_connection_string` |
+  | Hugging Face token for MedGemma | huggingface.co → Settings → Access tokens | Read | Databricks secret scope `health_transformation_lab`, key `hf_token` |
+  | Application Insights connection string (telemetry, spec 014) | Azure portal → Application Insights `health-transformation-lab-nlp-appi` → Overview, or `terraform -chdir=infra/azure output -raw connection_string` piped straight into the secret (docs/telemetry.md); also in the git-ignored Terraform state | ingestion only: can send telemetry, can't read; doesn't expire, so rotate by recreating the resource | Databricks secret scope `health_transformation_lab`, key `appinsights_connection_string` |
   | Kaggle API token (MedGemma on Kaggle) | kaggle.com → Settings → API → Generate New Token | the Kaggle account (no narrower scope offered); delete it on Kaggle when not running | GitHub environment `dev` secret `KAGGLE_API_TOKEN` |

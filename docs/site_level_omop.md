@@ -11,7 +11,7 @@ Postgres (Lakebase), a concept-mapping table and an Atlas feasibility check.
 
 ## 1. Site-level charts
 
-`python/dental_omop_nlp/sites.py`, `scripts/22_build_sites.py`
+`python/health_transformation_lab_nlp/sites.py`, `scripts/22_build_sites.py`
 
 - 32 teeth (universal numbering) × 6 sites: mesio-buccal, buccal, disto-buccal,
   mesio-lingual, lingual, disto-lingual. Interproximal = MB, DB, ML, DL.
@@ -62,7 +62,7 @@ Reporting prevalence under CDC/AAP makes it comparable with NHANES (action item 
 ## 4. Three storage designs, compared
 
 Same mouths, three schemas, each with the full CDM 5.4 + dental extension, on
-Postgres 16 (Lakebase is managed Postgres). `dental_omop_nlp/site_designs.py`,
+Postgres 16 (Lakebase is managed Postgres). `health_transformation_lab_nlp/site_designs.py`,
 `scripts/23_site_designs.py`; SQL in `omop/sql/site_designs/`.
 
 | | A. Post-coordinated | B. Pre-coordinated | C. Site columns |

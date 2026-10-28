@@ -34,7 +34,7 @@ results can be compared or pooled without sharing the records themselves.
 **In this repo:** the synthetic patients are loaded into OMOP CDM 5.4 plus the dental extension
 (Postgres or Databricks Lakebase), and the phenotype reads from there.
 Code: [`code_walkthrough.md` step 1](code_walkthrough.md#1-generate-the-synthetic-study) and the
-Postgres loader in `python/dental_omop_nlp/db.py`.
+Postgres loader in `python/health_transformation_lab_nlp/db.py`.
 
 ## NLP: getting facts out of free text
 

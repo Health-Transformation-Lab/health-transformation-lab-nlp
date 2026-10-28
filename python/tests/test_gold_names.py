@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import gold_names, results_store
+from health_transformation_lab_nlp import gold_names, results_store
 
 ROOT = Path(__file__).resolve().parents[2]
 _spec = importlib.util.spec_from_file_location("gold_model", ROOT / "diagrams" / "_build" / "gold_model.py")
@@ -93,7 +93,7 @@ def dashboard_columns_not_declared(dash):
     """Per dataset: names its queries read (string literals and the alias after each AS left out) that no table
     it reads declares."""
     keywords = {"select", "as", "from", "where", "round", "and", "left", "join", "on", "coalesce",
-                "dental_omop", "gold_dental_omop_perio"}
+                "health_transformation_lab", "gold_dental_omop_perio"}
     out = {}
     for ds in dash["datasets"]:
         sql = " ".join(ds["queryLines"]).lower()
@@ -114,7 +114,7 @@ def test_the_scorecard_dashboard_reads_only_declared_gold_columns():
 
 def test_the_dashboard_check_catches_an_old_column_kept_under_its_old_alias():
     dash = {"datasets": [{"name": "x", "queryLines": [
-        "SELECT ROUND(100 * difference, 1) AS `difference`, kappa AS kappa FROM dental_omop.gold_dental_omop_perio.judge_metric"]}]}
+        "SELECT ROUND(100 * difference, 1) AS `difference`, kappa AS kappa FROM health_transformation_lab.gold_dental_omop_perio.judge_metric"]}]}
     assert dashboard_columns_not_declared(dash)["x"] == {"difference", "kappa"}
 
 

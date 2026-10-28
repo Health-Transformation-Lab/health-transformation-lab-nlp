@@ -4,7 +4,7 @@ import re
 
 import yaml
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 REG = {m["id"]: m for m in yaml.safe_load((REPO_ROOT / "models.yaml").read_text())["models"]}
 
@@ -15,18 +15,18 @@ def test_every_medgemma_is_pinned_to_a_hugging_face_revision():
 
 
 def test_the_backend_loads_and_reports_the_pinned_revision():
-    from dental_omop_nlp.llm_reader import make_backend
+    from health_transformation_lab_nlp.llm_reader import make_backend
     entry = dict(REG["medgemma-4b-it"], gated=False)
     b = make_backend(entry, "hf")
     assert b.revision == entry["revision"]
-    src = (REPO_ROOT / "python" / "dental_omop_nlp" / "llm_reader.py").read_text()
+    src = (REPO_ROOT / "python" / "health_transformation_lab_nlp" / "llm_reader.py").read_text()
     assert src.count("revision=self.revision") >= 2          # processor and weights, both pinned
 
 
 def test_each_run_records_the_revision_it_used():
     import pandas as pd
 
-    from dental_omop_nlp.llm_reader import LLMReader
+    from health_transformation_lab_nlp.llm_reader import LLMReader
 
     class Fake:
         name, simulated, revision = "hf", False, "abc123"
@@ -48,7 +48,7 @@ def test_the_27b_option_is_written_down_with_its_evidence_and_hardware():
 
 
 def test_kaggle_weights_record_their_kaggle_version_and_skip_the_hub_revision():
-    from dental_omop_nlp.llm_reader import make_backend
+    from health_transformation_lab_nlp.llm_reader import make_backend
     entry = REG["medgemma-1.5-4b-it"]
     b = make_backend(entry, "hf", weights="/kaggle/temp/medgemma-hf")
     assert b.revision is None and b.version == entry["kaggle"]

@@ -3,7 +3,7 @@
 
   One task = one DE-IDENTIFIED note ([PATIENT], [DATE] ... are the engine's tags). Find anything
   that could still identify the patient. Highlights pre-filled as LEAK come from the residual scan;
-  keep them only if they really are identifiers. Field names map to dental_omop_nlp/deid_review.py
+  keep them only if they really are identifiers. Field names map to health_transformation_lab_nlp/deid_review.py
   (choices "leak", "over_redaction"; labels "leaks" on "text"); change one, change the other.
 -->
 <View>

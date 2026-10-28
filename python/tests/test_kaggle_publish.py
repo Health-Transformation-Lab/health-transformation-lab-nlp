@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 _spec = importlib.util.spec_from_file_location("publish", REPO_ROOT / "kaggle" / "publish.py")
 pub = importlib.util.module_from_spec(_spec)
@@ -48,7 +48,7 @@ def test_metadata_is_cc_by_with_a_card_and_kaggle_length_limits(tmp_path, name):
     assert owner == "someone" and 6 <= len(slug) <= 50 and slug == slug.lower()
     assert 6 <= len(meta["title"]) <= 50 and 20 <= len(meta["subtitle"]) <= 80
     card = meta["description"].lower()
-    for words in ("synthetic", "not affiliated", "not for clinical", "cc by 4.0", "github.com/jcbowyer/dental-omop-nlp",
+    for words in ("synthetic", "not affiliated", "not for clinical", "cc by 4.0", "github.com/jcbowyer/health-transformation-lab-nlp",
                   "abc1234"):
         assert words in card, words
     for f in pub.files_of(name):              # the card lists every file

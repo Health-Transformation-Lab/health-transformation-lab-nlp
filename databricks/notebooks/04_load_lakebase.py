@@ -3,7 +3,7 @@
 # MAGIC # Load the synthetic OMOP CDM into Lakebase (Postgres)
 # MAGIC
 # MAGIC Creates the OMOP CDM 5.4 + dental extension in a Lakebase schema and loads the
-# MAGIC synthetic tables (`python/dental_omop_nlp/db.py`). Synthetic data only.
+# MAGIC synthetic tables (`python/health_transformation_lab_nlp/db.py`). Synthetic data only.
 # MAGIC
 # MAGIC **Credentials**, in order:
 # MAGIC 1. A full SQLAlchemy URL in secret `<secret_scope>/lakebase_url` (simplest; the
@@ -23,12 +23,12 @@ import subprocess
 import uuid
 
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
-from dental_omop_nlp import tracking as _tracking
+from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("lakebase_instance", "dental-dev")        # noqa: F821
 dbutils.widgets.text("lakebase_database", "databricks_postgres")  # noqa: F821
 dbutils.widgets.text("lakebase_schema", "cdm_dev")             # noqa: F821
-dbutils.widgets.text("secret_scope", "dental")                 # noqa: F821
+dbutils.widgets.text("secret_scope", "health_transformation_lab")                 # noqa: F821
 w = {k: dbutils.widgets.get(k) for k in ("lakebase_instance", "lakebase_database", "lakebase_schema",  # noqa: F821
                                           "secret_scope")}
 

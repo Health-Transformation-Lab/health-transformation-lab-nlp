@@ -8,7 +8,7 @@ import sys
 
 import yaml
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 NB = REPO_ROOT / "kaggle" / "encoder_gpu.ipynb"
 WF = REPO_ROOT / ".github" / "workflows" / "kaggle-encoders.yml"
@@ -44,7 +44,7 @@ def test_notebook_runs_the_training_script_with_flags_it_has():
 def test_notebook_needs_no_token_and_clones_outside_the_output_folder():
     code = _code()
     assert "UserSecretsClient" not in code and "HF_TOKEN" not in code
-    assert 'REPO = "/kaggle/temp/dental-omop-nlp"' in code
+    assert 'REPO = "/kaggle/temp/health-transformation-lab-nlp"' in code
     assert "if COMMIT:" in code and "log -1" in code
 
 

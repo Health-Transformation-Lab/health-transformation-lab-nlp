@@ -29,12 +29,12 @@ import argparse
 
 import pandas as pd
 
-from dental_omop_nlp import telemetry
-from dental_omop_nlp.labels import LABELS
-from dental_omop_nlp.paths import DATASETS_DIR
-from dental_omop_nlp.radiograph import FEATURES as RAD_FEATURES
-from dental_omop_nlp.registry import load_registry
-from dental_omop_nlp.rungs import make_rung, output_tag
+from health_transformation_lab_nlp import telemetry
+from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp.radiograph import FEATURES as RAD_FEATURES
+from health_transformation_lab_nlp.registry import load_registry
+from health_transformation_lab_nlp.rungs import make_rung, output_tag
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--rung", required=True)
@@ -74,7 +74,7 @@ prefix = ""
 if is_llm:
     kw = {"shots": a.shots, "variant": a.variant}
     if a.backend == "simulated":
-        from dental_omop_nlp.llm_reader import SimulatedReader
+        from health_transformation_lab_nlp.llm_reader import SimulatedReader
         kw["backend"] = SimulatedReader(dict(zip(key.visit_id, key.truth_status)),
                                         dict(zip(key.visit_id, key.difficulty)), seed=4)
         prefix = "simulated_"
@@ -107,7 +107,7 @@ if is_llm:
         print(f"*** SIMULATED READER: dry run, not a MedGemma result (agreement with truth {acc:.1%}) ***")
 
 # ---- MLflow (docs/mlops.md): params, prediction file, optional Unity Catalog registration
-from dental_omop_nlp.tracking import track  # noqa: E402
+from health_transformation_lab_nlp.tracking import track  # noqa: E402
 
 with track("11_ai_predict", a.rung, simulated=bool(prefix),
            params={"rung": a.rung, "label": a.label, "n_train": len(train), "n_review": len(review), **{
@@ -118,6 +118,6 @@ with track("11_ai_predict", a.rung, simulated=bool(prefix),
         run.log_metrics({"gate_pass": d["gate_ok"].mean(), "fallback": d["fallback"].mean(),
                          "input_tokens_mean": d["input_tokens"].mean(), "output_tokens_mean": d["output_tokens"].mean()})
     if a.register:
-        from dental_omop_nlp.model_registry import log_and_register
+        from health_transformation_lab_nlp.model_registry import log_and_register
         v = log_and_register(model, a.rung, a.register, train.head(3), simulated=bool(prefix))
         print(f"registered {a.register} version {v} (alias: challenger)")

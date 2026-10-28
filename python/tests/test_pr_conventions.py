@@ -4,7 +4,7 @@ import importlib.util
 
 import pytest
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 _spec = importlib.util.spec_from_file_location("pr_conventions", REPO_ROOT / ".github" / "scripts" / "pr_conventions.py")
 pc = importlib.util.module_from_spec(_spec)

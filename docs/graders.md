@@ -5,7 +5,7 @@ versions of designs: the EHR DQ grader follows the React *Perio DQ Monitor*; the
 uplift and leaderboard slides (`docs/pitch/`). Synthetic data only; the lab grader is simulated until real runs
 exist.
 
-| Grader | Dashboard | Genie space | Tables (`dental_omop.gold_dental_omop_perio`) |
+| Grader | Dashboard | Genie space | Tables (`health_transformation_lab.gold_dental_omop_perio`) |
 |---|---|---|---|
 | **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_check`, `dq_column_missing`, `dq_prevalence`, `dq_temporal_change`, `dq_stage_transition`, `dq_source_concordance`, `fact_visit_evidence`, `dq_injected_error` |
 | **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | *Lab grader* | *Lab grader* | `dim_grader_question`, `fact_grader_answer` |
@@ -47,9 +47,9 @@ shares.
 
 ## How it's built and deployed
 
-- **Tables:** `dental_omop_nlp/grader_tables.py` builds each table from the committed CSVs. The *Load results* job
+- **Tables:** `health_transformation_lab_nlp/grader_tables.py` builds each table from the committed CSVs. The *Load results* job
   overwrites them on every run, so a rerun leaves the same rows, and every row carries the `sha256` of its files.
-- **Dashboards and spaces:** `dental_omop_nlp/dashboards.py` builds `databricks/dashboards/*.lvdash.json` and
+- **Dashboards and spaces:** `health_transformation_lab_nlp/dashboards.py` builds `databricks/dashboards/*.lvdash.json` and
   `databricks/genie/*.geniespace.json`. After changing it, run `cd python && python scripts/42_build_dashboards.py`.
   Never edit the JSON by hand: a test checks the committed files match the builder.
 - **Tests:** every dashboard query runs in DuckDB on the same tables under the same names, so the SQL is checked

@@ -31,9 +31,9 @@ import logging
 import pandas as pd
 import yaml
 
-from dental_omop_nlp import deid, deid_eval
-from dental_omop_nlp.paths import COSTS_YAML, DEID_DIR, RAW_DIR
-from dental_omop_nlp.phi_challenge import build_challenge
+from health_transformation_lab_nlp import deid, deid_eval
+from health_transformation_lab_nlp.paths import COSTS_YAML, DEID_DIR, RAW_DIR
+from health_transformation_lab_nlp.phi_challenge import build_challenge
 
 logging.getLogger("tldextract").setLevel(logging.CRITICAL)   # Presidio's URL recognizer tries the network
 
@@ -63,13 +63,13 @@ a = ap.parse_args()
 
 ch = build_challenge(a.n_notes, a.seed)
 if a.i2b2_2014:
-    from dental_omop_nlp.phi_challenge import load_i2b2_2014
+    from health_transformation_lab_nlp.phi_challenge import load_i2b2_2014
     ch += [r | {"tier": "external"} for r in load_i2b2_2014(a.i2b2_2014)]
 if a.external:
-    from dental_omop_nlp.phi_challenge import load_external
+    from health_transformation_lab_nlp.phi_challenge import load_external
     ch += load_external(a.external)
 if a.jsl48:
-    from dental_omop_nlp.phi_challenge import load_external
+    from health_transformation_lab_nlp.phi_challenge import load_external
     ch += load_external(a.jsl48, tier="jsl48")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 DEID_DIR.mkdir(parents=True, exist_ok=True)

@@ -28,11 +28,11 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from dental_omop_nlp import ladder_eval
-from dental_omop_nlp.labels import LABELS
-from dental_omop_nlp.llm_reader import summarize_details
-from dental_omop_nlp.paths import COSTS_YAML, DATASETS_DIR
-from dental_omop_nlp.registry import load_registry
+from health_transformation_lab_nlp import ladder_eval
+from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.llm_reader import summarize_details
+from health_transformation_lab_nlp.paths import COSTS_YAML, DATASETS_DIR
+from health_transformation_lab_nlp.registry import load_registry
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--bert", default=None, help="reference encoder rung (default: most accurate encoder alone)")

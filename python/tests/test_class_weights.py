@@ -2,9 +2,9 @@
 
 import pytest
 
-from dental_omop_nlp.labels import LABELS
-from dental_omop_nlp.registry import load_registry
-from dental_omop_nlp.rungs import HFEncoder, class_weights, make_rung
+from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.registry import load_registry
+from health_transformation_lab_nlp.rungs import HFEncoder, class_weights, make_rung
 
 
 def test_sqrt_inverse_frequency_weights_average_one():

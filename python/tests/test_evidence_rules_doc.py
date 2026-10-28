@@ -5,12 +5,12 @@ import re
 
 import pytest
 
-from dental_omop_nlp import readme_results as rr
-from dental_omop_nlp.labels import PerioChart, label_chart
-from dental_omop_nlp.note_reader import read_note
-from dental_omop_nlp.paths import REPO_ROOT
-from dental_omop_nlp.radiograph import read_radiograph
-from dental_omop_nlp.sources import read_exam_form, read_proc_codes, read_proc_dx
+from health_transformation_lab_nlp import readme_results as rr
+from health_transformation_lab_nlp.labels import PerioChart, label_chart
+from health_transformation_lab_nlp.note_reader import read_note
+from health_transformation_lab_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.radiograph import read_radiograph
+from health_transformation_lab_nlp.sources import read_exam_form, read_proc_codes, read_proc_dx
 
 DOC = REPO_ROOT / "docs" / "evidence_rules.md"
 EVIDENCE = ["probing_chart", "notes", "exam_form", "proc_dx_completed", "proc_dx_planned",

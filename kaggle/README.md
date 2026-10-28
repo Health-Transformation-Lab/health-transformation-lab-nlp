@@ -9,7 +9,7 @@ data only, and no token is ever stored in it.
 
 | On Kaggle (user `jcblearning`) | What it is | Made by (Actions tab) | Files here |
 |---|---|---|---|
-| Notebook `dental-omop-medgemma-reader` | MedGemma 1.5 4B reads the 240 review notes | *Run MedGemma on a free Kaggle GPU* | `medgemma_reader.ipynb`, `keras_to_hf.py`, `hf_config/`, `gemma3_chat_template.jinja` |
+| Notebook `health-transformation-lab-medgemma-reader` | MedGemma 1.5 4B reads the 240 review notes | *Run MedGemma on a free Kaggle GPU* | `medgemma_reader.ipynb`, `keras_to_hf.py`, `hf_config/`, `gemma3_chat_template.jinja` |
 | Notebook `dental-omop-encoder-gpu` | Fine-tunes the large encoders (ModernBERT-large, Longformer, GatorTron) | *Fine-tune the GPU encoders on a free Kaggle GPU* | `encoder_gpu.ipynb` |
 | Dataset `synthetic-dental-perio-notes` | Synthetic notes, labels, structured visits, 240-note review set and answer key | *Publish datasets to Kaggle* | `publish.py`, `cards/notes.md` |
 | Dataset `dental-perio-benchmark-results` | Every model's answers on the review set, the leaderboard, the judge scorecard | *Publish datasets to Kaggle* | `publish.py`, `cards/results.md` |

@@ -17,9 +17,9 @@ import argparse
 import json
 import random
 
-from dental_omop_nlp import deid, deid_review
-from dental_omop_nlp.paths import RAW_DIR
-from dental_omop_nlp.phi_challenge import build_challenge, load_external
+from health_transformation_lab_nlp import deid, deid_review
+from health_transformation_lab_nlp.paths import RAW_DIR
+from health_transformation_lab_nlp.phi_challenge import build_challenge, load_external
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--engine", default="regex_v2+guard", help="pre-annotates the gold tasks and de-identifies the QA notes")

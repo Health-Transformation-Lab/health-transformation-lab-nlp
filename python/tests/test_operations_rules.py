@@ -5,7 +5,7 @@ import re
 
 import yaml
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 REGISTER = REPO_ROOT / "ops" / "secrets_register.yaml"
 FIELDS = {"name", "what", "made_in", "scope", "stored_in", "used_by", "lifetime", "expires", "owner", "if_it_expires"}

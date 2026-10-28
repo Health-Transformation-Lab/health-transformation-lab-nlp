@@ -13,8 +13,8 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 
-from dental_omop_nlp.db import load_omop, perio_chart_from_db
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.db import load_omop, perio_chart_from_db
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--url", default=os.environ.get("DENTAL_DB_URL"), help="SQLAlchemy URL (or DENTAL_DB_URL)")

@@ -12,7 +12,7 @@ This is a personal learning project, **not affiliated** with any employer, insti
 
 ## How it was made
 
-[github.com/jcbowyer/dental-omop-nlp](https://github.com/jcbowyer/dental-omop-nlp), `python/scripts/10_build_study.py`
+[github.com/jcbowyer/health-transformation-lab-nlp](https://github.com/jcbowyer/health-transformation-lab-nlp), `python/scripts/10_build_study.py`
 (seed 42, 1,200 people, 8 clinics). Each visit gets a true periodontal chart; the status follows the AAP/EFP
 staging and grading worksheet (Tonetti, Greenwell & Kornman, J Periodontol 2018). The note is written from
 the chart in one of several clinician styles, with realistic noise: the written diagnosis is sometimes a step
@@ -31,5 +31,5 @@ appear. Each review note has a difficulty level (L1-L3).
 
 ## Licence and citation
 
-CC BY 4.0. Please cite: Bowyer J., *dental-omop-nlp: synthetic dental notes, OMOP and periodontal status
-benchmark*, https://github.com/jcbowyer/dental-omop-nlp.
+CC BY 4.0. Please cite: Bowyer J., *health-transformation-lab-nlp: synthetic dental notes, OMOP and periodontal status
+benchmark*, https://github.com/jcbowyer/health-transformation-lab-nlp.

@@ -1,6 +1,6 @@
 """Encoder fine-tuning resumes an interrupted run from its latest checkpoint, and only that."""
 
-from dental_omop_nlp.rungs import _clear_checkpoints, _last_checkpoint
+from health_transformation_lab_nlp.rungs import _clear_checkpoints, _last_checkpoint
 
 
 def _ckpt(root, step, complete=True):

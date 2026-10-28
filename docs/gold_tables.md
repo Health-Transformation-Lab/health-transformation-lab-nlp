@@ -1,4 +1,4 @@
-# Gold tables: `dental_omop.gold_dental_omop_perio`
+# Gold tables: `health_transformation_lab.gold_dental_omop_perio`
 
 > Personal learning project; synthetic data only. See [DISCLAIMER](../DISCLAIMER.md).
 
@@ -17,7 +17,7 @@ that says its kind (`is_gate_ok`, `loaded_ts`, `judged_count`, `agreement_ratio`
 
 Every column is listed in [diagrams/gold/data_model.md](../diagrams/gold/data_model.md), generated with the ERDs from
 [`diagrams/_build/gold_model.py`](../diagrams/_build/gold_model.py). Tests fail if the declaration, the names
-the jobs write ([`gold_names.py`](../python/dental_omop_nlp/gold_names.py)) and the conventions drift apart. This
+the jobs write ([`gold_names.py`](../python/health_transformation_lab_nlp/gold_names.py)) and the conventions drift apart. This
 page covers who writes what, how, and what to watch.
 
 ![Gold physical architecture](../diagrams/gold/gold_physical_architecture.png)
@@ -88,12 +88,12 @@ by `run_id`; two runs with the same answers even share a `file_sha256`. This que
 ```sql
 with latest as (
   select file_sha256
-  from dental_omop.gold_dental_omop_perio.dim_result_file
+  from health_transformation_lab.gold_dental_omop_perio.dim_result_file
   where file_kind_code = 'predictions'
   qualify row_number() over (partition by source_code, method_name order by loaded_ts desc) = 1
 )
 select p.method_name, p.visit_id, p.predicted_status_code
-from dental_omop.gold_dental_omop_perio.fact_prediction p
+from health_transformation_lab.gold_dental_omop_perio.fact_prediction p
 inner join latest l on l.file_sha256 = p.file_sha256;
 ```
 
@@ -109,7 +109,7 @@ one `run_id`. Across versions there are several rows per key on both sides, and 
 ![Gold data model](../diagrams/gold/gold_data_model_entity.png)
 
 The `judge_scorecard` job writes these six tables, and the Scorecard dashboard reads them. Every metric is
-computed in code (`python/dental_omop_nlp/judge_scorecard.py`), never by the LLM. Each table has a CSV
+computed in code (`python/health_transformation_lab_nlp/judge_scorecard.py`), never by the LLM. Each table has a CSV
 twin under `data/datasets/judge/`, under the analysis names (`simulated_*` for dry runs). Full spec:
 `specs/012-judge-scorecard/data-model.md`.
 
@@ -122,10 +122,10 @@ chart drill-down joins them:
 
 ```sql
 select a.system_name, a.visit_id, a.answer_status_code, a.truth_status_code, s.judge_status_code, v.verdict_code
-from dental_omop.gold_dental_omop_perio.fact_chart_answer a
-left join dental_omop.gold_dental_omop_perio.fact_judge_call s
+from health_transformation_lab.gold_dental_omop_perio.fact_chart_answer a
+left join health_transformation_lab.gold_dental_omop_perio.fact_judge_call s
   on s.visit_id = a.visit_id and s.call_kind_code = 'status'
-left join dental_omop.gold_dental_omop_perio.fact_judge_call v
+left join health_transformation_lab.gold_dental_omop_perio.fact_judge_call v
   on v.visit_id = a.visit_id and v.call_kind_code = 'verdict' and v.answer_status_code = a.answer_status_code;
 ```
 

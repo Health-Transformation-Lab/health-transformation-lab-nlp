@@ -37,7 +37,7 @@ verified findings only, mandatory secrets scan), with this repo's rules from `AG
 | Python and R in parity | Changes to labels, scoring, reliability or cost-effectiveness touch both sides; `r-parity` green |
 | Simulated is labelled simulated | `simulated_*` files, `sim:` / `calib:` methods; no dry-run number presented as a result in README or docs |
 | Seeds fixed | New generators and samplers take a seed with a fixed default |
-| Paths | `dental_omop_nlp.paths`, never a hard-coded `data/` |
+| Paths | `health_transformation_lab_nlp.paths`, never a hard-coded `data/` |
 | Spec for big changes | A dataset, metric, label rule or review-workflow change has a `specs/NNN-*/` entry (spec, tasks updated) |
 | Prices | Service prices name their source and date; placeholders say ILLUSTRATIVE |
 | Commits | Imperative subject, body says why, co-author trailer when an agent wrote it |

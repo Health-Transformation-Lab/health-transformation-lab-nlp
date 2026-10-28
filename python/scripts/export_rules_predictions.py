@@ -4,8 +4,8 @@ import sys
 
 import pandas as pd
 
-from dental_omop_nlp.paths import LABELS_DIR, REPO_ROOT
-from dental_omop_nlp.rungs import rules_predict
+from health_transformation_lab_nlp.paths import LABELS_DIR, REPO_ROOT
+from health_transformation_lab_nlp.rungs import rules_predict
 
 sys.path.insert(0, str(REPO_ROOT / "eval"))
 from score import score
@@ -21,7 +21,7 @@ score(test["label"], test["pred"], None, "rules_baseline", run_id="parity").to_c
 # AAP worksheet edge cases (CAL missing, tooth loss, complexity) for the R twin of label_chart
 import itertools
 
-from dental_omop_nlp.labels import PerioChart, label_chart
+from health_transformation_lab_nlp.labels import PerioChart, label_chart
 
 rows = []
 for cal, rbl, pd_, lost, vd, fc, mob, rem in itertools.product(

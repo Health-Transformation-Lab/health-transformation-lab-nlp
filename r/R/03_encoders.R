@@ -11,7 +11,7 @@
 #     with the Python fine-tuned rungs.
 #
 #  B. Fine-tuned (same numbers as Python). reticulate calls the Python
-#     HFEncoder in python/dental_omop_nlp/rungs.py, so the R user drives it and
+#     HFEncoder in python/health_transformation_lab_nlp/rungs.py, so the R user drives it and
 #     the result is identical to the Python rung. Use this when the R and
 #     Python leaderboards must line up.
 #
@@ -35,8 +35,8 @@ rung_encoder_frozen <- function(train, test, hf_id, max_len = 256) {
 rung_encoder_finetune <- function(train, test, rung_id, epochs = 3, max_len = 256) {
   sys <- reticulate::import("sys")
   sys$path$insert(0L, file.path(getwd(), "python"))
-  registry <- reticulate::import("dental_omop_nlp.registry")
-  rungs <- reticulate::import("dental_omop_nlp.rungs")
+  registry <- reticulate::import("health_transformation_lab_nlp.registry")
+  rungs <- reticulate::import("health_transformation_lab_nlp.rungs")
   model <- rungs$make_rung(rung_id, registry$load_registry(),
                            epochs = as.integer(epochs), max_len = as.integer(max_len))
   model$fit(reticulate::r_to_py(train))

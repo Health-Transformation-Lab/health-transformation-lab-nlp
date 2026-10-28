@@ -5,7 +5,7 @@ trend; ICC per level (de Vet et al. 2006: reliability = between-subject variance
 
 import pytest
 
-from dental_omop_nlp.reliability_cal import (
+from health_transformation_lab_nlp.reliability_cal import (
     CalParams,
     draw_repeated_charts,
     icc_report,
@@ -52,7 +52,7 @@ def test_draw_is_seeded_and_cal_is_whole_mm_and_never_negative():
 
 def test_reml_matches_anova_on_balanced_data():
     pytest.importorskip("statsmodels")
-    from dental_omop_nlp.reliability_cal import reml_components
+    from health_transformation_lab_nlp.reliability_cal import reml_components
     p = CalParams(round_mm=False)
     d = draw_repeated_charts(60, 8, 3, p, seed=3)
     a, r = nested_components(d), reml_components(d)
@@ -61,7 +61,7 @@ def test_reml_matches_anova_on_balanced_data():
 
 
 def test_stage_band_flips_between_visits_grow_with_probing_error():
-    from dental_omop_nlp.reliability_cal import cal_band, stage_band_flips
+    from health_transformation_lab_nlp.reliability_cal import cal_band, stage_band_flips
     assert [cal_band(x) for x in (0, 1, 2, 3, 4, 5, 9)] == ["<1", "1-2", "1-2", "3-4", "3-4", ">=5", ">=5"]
     still = draw_repeated_charts(50, 10, 3, CalParams(sd_error=0.0, mm_per_year=0.0), seed=4)
     assert stage_band_flips(still)["flip_rate"] == 0.0

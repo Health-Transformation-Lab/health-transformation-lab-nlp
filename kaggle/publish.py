@@ -21,7 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "python"))
 
-from dental_omop_nlp.paths import DATASETS_DIR as DATA
+from health_transformation_lab_nlp.paths import DATASETS_DIR as DATA
 
 REPO = HERE.parent
 DATASETS = {

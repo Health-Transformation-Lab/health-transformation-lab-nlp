@@ -1,6 +1,6 @@
 # Quantitative validation in R: reviewer reliability, and every method /
 # the rule-based algorithm / each AI model against the reviewers.
-# Twin of python/dental_omop_nlp/reliability.py; r/tests/test_parity.R checks they agree.
+# Twin of python/health_transformation_lab_nlp/reliability.py; r/tests/test_parity.R checks they agree.
 # Base R only. The `irr` package (kappam.fleiss, kappa2) gives the same
 # Fleiss and Cohen numbers if you prefer it; see the cross-check at the bottom.
 #
@@ -53,7 +53,7 @@ consensus <- function(wide) {
 }
 
 
-# ---- spec 002: clinical severity of errors (DRAFT matrix; see python/dental_omop_nlp/harm.py)
+# ---- spec 002: clinical severity of errors (DRAFT matrix; see python/health_transformation_lab_nlp/harm.py)
 severity <- function(truth, pred) {
   truth[truth == "healthy_gingivitis"] <- "healthy"; pred[pred == "healthy_gingivitis"] <- "healthy"
   t <- match(truth, STATUS_ORDER) - 1; p <- match(pred, STATUS_ORDER) - 1

@@ -42,7 +42,7 @@ only for the optional Synthea / full-OMOP path (step 6).
    repo root; every script uses paths relative to it.
 
    ```bash
-   git clone https://github.com/jcbowyer/dental-omop-nlp
+   git clone https://github.com/jcbowyer/health-transformation-lab-nlp
    ```
 
 2. **Build the data once.** The note generator is Python-only for now:
@@ -115,7 +115,7 @@ combined leaderboard.
 
 Databricks Free Edition serverless runs Python and SQL only, so the R side
 runs locally or in Posit. The Delta tables the notebook writes
-(`dental_omop.gold_dental_omop_perio.labeled_notes`, `benchmark_results`) can be read from R
+(`health_transformation_lab.gold_dental_omop_perio.labeled_notes`, `benchmark_results`) can be read from R
 with `sparklyr` / Databricks Connect when that's useful. In a paid workspace
 with classic compute, these scripts run in an R notebook unchanged.
 

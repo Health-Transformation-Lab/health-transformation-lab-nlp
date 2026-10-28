@@ -2,7 +2,7 @@
 
 from collections import Counter
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 
 def test_every_script_number_is_used_once():

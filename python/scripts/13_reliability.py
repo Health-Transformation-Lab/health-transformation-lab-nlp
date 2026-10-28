@@ -11,9 +11,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from dental_omop_nlp.paths import DATASETS_DIR, REVIEW_DIR
-from dental_omop_nlp.phenotype import collapse5
-from dental_omop_nlp.reliability import agreement_vs_humans, by_level, reliability_report
+from health_transformation_lab_nlp.paths import DATASETS_DIR, REVIEW_DIR
+from health_transformation_lab_nlp.phenotype import collapse5
+from health_transformation_lab_nlp.reliability import agreement_vs_humans, by_level, reliability_report
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--simulated", action="store_true")
@@ -71,7 +71,7 @@ print(f"\nfive categories: Fleiss kappa={rep5['fleiss_kappa']:.3f}")
 print(vh5[vh5["kind"] != "human"].drop(columns=["margin"]).round(3).to_string(index=False))
 
 # ---- MLflow (docs/mlops.md): headline numbers per method and the acceptance verdicts
-from dental_omop_nlp.tracking import track  # noqa: E402
+from health_transformation_lab_nlp.tracking import track  # noqa: E402
 
 with track("13_reliability", "reliability", simulated=a.simulated,
            params={"n_boot": a.n_boot, "margin": a.margin, "reviewers": rep["n_reviewers"], "charts": rep["n_visits"]}) as run:

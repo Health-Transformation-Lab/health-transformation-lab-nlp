@@ -7,9 +7,9 @@ import sys
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import databricks_ai as dbai
-from dental_omop_nlp.labels import LABELS
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp import databricks_ai as dbai
+from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 
 def test_labels_cover_the_six_statuses_with_short_descriptions():
@@ -85,7 +85,7 @@ def test_estimate_counts_calls_and_tokens():
 # ---- US3: the reader on a Databricks Foundation Model endpoint
 
 def test_openai_backend_defaults_to_the_databricks_workspace(monkeypatch):
-    from dental_omop_nlp.llm_reader import OpenAIChat
+    from health_transformation_lab_nlp.llm_reader import OpenAIChat
     monkeypatch.delenv("READER_BASE_URL", raising=False)
     monkeypatch.delenv("READER_API_KEY", raising=False)
     monkeypatch.setenv("DATABRICKS_HOST", "adb-1.azuredatabricks.net")
@@ -105,7 +105,7 @@ def test_llama_reader_is_in_the_registry_with_its_endpoint():
 # ---- names in the results
 
 def test_new_methods_have_plain_names_and_an_llm_group():
-    from dental_omop_nlp import readme_results as rr
+    from health_transformation_lab_nlp import readme_results as rr
     assert rr.plain_system("dbai-classify") == "Databricks AI classify"
     assert rr.plain_system("llama-3.3-70b-instruct") == "Llama 3.3 70B"
     for m in ("dbai-classify", "llama-3.3-70b-instruct"):
@@ -152,12 +152,12 @@ def test_wait_raises_on_failure_with_the_message():
 
 
 def test_ai_mask_uses_the_waiting_executor():
-    src = (REPO_ROOT / "python" / "dental_omop_nlp" / "deid.py").read_text()
+    src = (REPO_ROOT / "python" / "health_transformation_lab_nlp" / "deid.py").read_text()
     body = src[src.index("def _ai_mask_sql"):src.index("def detect_ai_mask")]
     assert "sql_execute(" in body and "urlopen" not in body
 
 
 def test_ai_mask_has_a_plain_name_and_counts_as_an_ai_tool():
-    from dental_omop_nlp import readme_results as rr
+    from health_transformation_lab_nlp import readme_results as rr
     assert rr.plain_tool("ai_mask+regex_v2+guard") == "Databricks AI mask + patterns + dental-word guard"
     assert rr.deid_group("ai_mask") == rr.DEID_GROUPS[1]

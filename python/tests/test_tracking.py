@@ -4,7 +4,7 @@ import logging
 
 import pytest
 
-from dental_omop_nlp import tracking
+from health_transformation_lab_nlp import tracking
 
 
 def test_tracking_never_fails_the_step_when_mlflow_cannot_connect(monkeypatch, caplog):
@@ -56,7 +56,7 @@ def test_passing_the_login_never_fails(monkeypatch):
 
 
 def test_gpu_notebooks_pass_their_login_to_the_scripts():
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     for nb in ("03_medgemma_reader.py", "08_encoder_gpu.py"):
         assert "tracking.pass_databricks_login()" in (REPO_ROOT / "databricks" / "notebooks" / nb).read_text(), nb
 
@@ -138,7 +138,7 @@ def test_on_databricks_the_bundle_experiment_is_used(monkeypatch):
     fake = _FakeMlflow()
     _with_mlflow(monkeypatch, fake)
     monkeypatch.setenv("MLFLOW_TRACKING_URI", "databricks")
-    monkeypatch.setenv("DENTAL_MLFLOW_EXPERIMENT", "/Workspace/Users/x/.bundle/dental/dev/dental-omop-nlp-experiment")
+    monkeypatch.setenv("DENTAL_MLFLOW_EXPERIMENT", "/Workspace/Users/x/.bundle/dental/dev/health-transformation-lab-nlp-experiment")
     with tracking.track("unit", "x", params={"shots": None}) as run:
         run.log_metrics({"a": 1.0})
     assert run.run_id == "r1" and "log_metrics" in fake.calls
@@ -159,7 +159,7 @@ def test_a_logging_error_never_fails_the_step(monkeypatch, caplog):
 def test_reader_job_logs_to_the_bundle_experiment():
     import yaml
 
-    from dental_omop_nlp.paths import REPO_ROOT
+    from health_transformation_lab_nlp.paths import REPO_ROOT
     nb = (REPO_ROOT / "databricks" / "notebooks" / "03_medgemma_reader.py").read_text()
     assert 'os.environ["MLFLOW_TRACKING_URI"] = "databricks"' in nb
     assert 'os.environ["DENTAL_MLFLOW_EXPERIMENT"]' in nb

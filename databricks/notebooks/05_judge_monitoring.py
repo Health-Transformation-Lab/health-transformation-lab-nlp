@@ -26,7 +26,7 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was deployed from
-from dental_omop_nlp import tracking as _tracking
+from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("judge_endpoint", "none")
 dbutils.widgets.text("experiment_id", "")
@@ -41,7 +41,7 @@ if endpoint in ("", "none"):
 
 import mlflow
 
-from dental_omop_nlp.mlflow_judge import start_monitoring
+from health_transformation_lab_nlp.mlflow_judge import start_monitoring
 
 mlflow.set_tracking_uri("databricks")
 started = start_monitoring(f"databricks:/{endpoint}", experiment_id, sample_rate=rate)

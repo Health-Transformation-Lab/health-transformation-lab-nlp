@@ -7,8 +7,8 @@ uses instead.
 
 import argparse
 
-from dental_omop_nlp import grader_tables
-from dental_omop_nlp.paths import DATASETS_DIR
+from health_transformation_lab_nlp import grader_tables
+from health_transformation_lab_nlp.paths import DATASETS_DIR
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--seed", type=int, default=2026)

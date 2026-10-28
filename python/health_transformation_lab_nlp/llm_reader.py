@@ -42,7 +42,7 @@ from .judge import CRITERIA
 from .labels import LABELS
 from .telemetry import traced
 
-log = logging.getLogger("dental_omop_nlp")
+log = logging.getLogger("health_transformation_lab_nlp")
 GRADES = {"A", "B", "C"}
 EXTENTS = {"localized", "generalized", "molar_incisor"}
 

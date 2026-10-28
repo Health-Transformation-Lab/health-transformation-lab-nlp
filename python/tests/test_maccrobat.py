@@ -2,7 +2,7 @@
 
 import json
 
-from dental_omop_nlp import deid_eval, maccrobat
+from health_transformation_lab_nlp import deid_eval, maccrobat
 
 
 def _doc(pairs):
@@ -152,7 +152,7 @@ def test_load_brat_folder_keeps_windows_line_endings_so_offsets_hold(tmp_path):
 
 def test_routes_from_table_keeps_only_precise_types():
     import pandas as pd
-    from dental_omop_nlp import deid_eval
+    from health_transformation_lab_nlp import deid_eval
     table = pd.DataFrame({"engine": ["a", "a", "b", "c"], "type": ["DATE", "NAME", "ID", "AGE"],
                           "chars": [10, 10, 10, 10], "precision": [1.0, 0.5, 0.9, 0.1],
                           "kept": [True, False, True, False]})
@@ -163,7 +163,7 @@ def test_maccrobat_runs_every_method_scored_on_the_synthetic_notes():
     """Its engine list once lagged the synthetic benchmark's, leaving the two best methods unscored."""
     import ast
     import pandas as pd
-    from dental_omop_nlp.paths import DEID_DIR, REPO_ROOT
+    from health_transformation_lab_nlp.paths import DEID_DIR, REPO_ROOT
     src = (REPO_ROOT / "python" / "scripts" / "32_maccrobat_deid.py").read_text()
     default = next(ast.literal_eval(n.value) for n in ast.walk(ast.parse(src))
                    if isinstance(n, ast.Assign) and getattr(n.targets[0], "id", "") == "DEFAULT")

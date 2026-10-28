@@ -141,7 +141,7 @@ def test_deploy_adopts_a_catalog_made_by_hand_before_deploying():
     doc = yaml.safe_load((ROOT / ".github" / "workflows" / "deploy.yml").read_text())
     steps = doc["jobs"]["deploy"]["steps"]
     names = [s.get("name", "") for s in steps]
-    bind = next(i for i, s in enumerate(steps) if "bundle deployment bind dental_omop dental_omop" in s.get("run", ""))
+    bind = next(i for i, s in enumerate(steps) if "bundle deployment bind health_transformation_lab health_transformation_lab" in s.get("run", ""))
     assert bind < names.index("Deploy") and "--auto-approve" in steps[bind]["run"]
     assert steps[bind].get("env", {}).get("DATABRICKS_BUNDLE_ENGINE") == "direct"
 

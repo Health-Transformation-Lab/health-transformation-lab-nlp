@@ -3,7 +3,7 @@
 import json
 import re
 
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 NB = REPO_ROOT / "kaggle" / "medgemma_reader.ipynb"
 
@@ -58,7 +58,7 @@ def _settings(nb):
 
 def test_prepared_kernel_runs_on_a_gpu_with_internet_and_the_chosen_settings(tmp_path):
     _, meta, nb = _prepare(tmp_path, "--limit", "5", "--shots", "2", "--branch", "dev-x")
-    assert meta["id"] == "someone/dental-omop-medgemma-reader" and meta["code_file"] == "medgemma_reader.ipynb"
+    assert meta["id"] == "someone/health-transformation-lab-medgemma-reader" and meta["code_file"] == "medgemma_reader.ipynb"
     assert meta["enable_gpu"] is True and meta["enable_internet"] is True
     assert meta["is_private"] is False          # public: synthetic notes only, and no token anywhere
     assert meta["kernel_type"] == "notebook" and meta["language"] == "python"
@@ -109,8 +109,8 @@ def test_workflow_pushes_waits_and_keeps_the_outputs():
 def test_repo_is_cloned_outside_the_output_folder():
     # /kaggle/working is what Kaggle keeps as output: a clone there came back as 464 files
     code = _code()
-    assert 'REPO = "/kaggle/temp/dental-omop-nlp"' in code
-    assert "dental-omop-nlp/python" not in code.replace("{REPO}/python", "")
+    assert 'REPO = "/kaggle/temp/health-transformation-lab-nlp"' in code
+    assert "health-transformation-lab-nlp/python" not in code.replace("{REPO}/python", "")
 
 
 def test_show_log_prints_the_notebook_output_without_warnings(tmp_path):

@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from dental_omop_nlp import readme_results as rr
-from dental_omop_nlp.paths import REPO_ROOT
+from health_transformation_lab_nlp import readme_results as rr
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 
 @pytest.fixture(scope="module")
@@ -416,7 +416,7 @@ def test_readme_points_to_the_judge_scorecard_and_dashboard():
 def test_judge_section_reports_agreement_and_the_gap_when_a_real_run_exists(tmp_path, monkeypatch):
     import shutil
 
-    from dental_omop_nlp.paths import JUDGE_DIR
+    from health_transformation_lab_nlp.paths import JUDGE_DIR
     for n in ("judge_metrics", "judge_agreement", "judgments", "judge_run", "chart_answers"):
         shutil.copy(JUDGE_DIR / f"simulated_{n}.csv", tmp_path / f"{n}.csv")   # stand-in for a real run
     monkeypatch.setattr(rr, "JUDGE_DIR", tmp_path)
