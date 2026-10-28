@@ -117,7 +117,7 @@ save("d1_study_process", page_w=1600, page_h=730)
 # ====================================================================== d2: platform architecture
 reset()
 title("Platform: one bundle, three environments (dev · UAT · prod) on Databricks")
-group("g_gh", "GitHub · Health-Transformation-Lab/health-transformation-lab-nlp", "ext", 40, 70, 380, 330)
+group("g_gh", "GitHub · healthtransformationlab/health-transformation-lab-nlp", "ext", 40, 70, 380, 330)
 group("g_ls", "Label Studio (separate app)", "ext", 40, 430, 380, 230)
 box("code", "Python + R code, SQL, notebooks\nspecs/, tests, parity", 70, 120, 320, 55, color=GREY, fill=GREY_F)
 box("ci", "ci.yml: pytest · R parity · Postgres tests\n· bundle validate", 70, 200, 320, 55, color=GREY, fill=GREY_F)
