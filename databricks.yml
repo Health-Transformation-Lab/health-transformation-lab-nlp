@@ -144,11 +144,13 @@ targets:
           tags:
             project: dental-omop-nlp
             data: synthetic
+            git_commit: ${bundle.git.commit}   # the commit this job was deployed from
           tasks:
             - task_key: start_monitoring
               notebook_task:
                 notebook_path: databricks/notebooks/05_judge_monitoring.py
                 base_parameters:
+                  git_commit: ${bundle.git.commit}   # shown on every run
                   judge_endpoint: ${var.judge_endpoint}
                   experiment_id: ${resources.experiments.dental_experiment.id}
                   sample_rate: ${var.judge_sample_rate}

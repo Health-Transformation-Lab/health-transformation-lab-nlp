@@ -32,6 +32,9 @@ import pandas as pd
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
 from dental_omop_nlp.rungs import output_tag
 
+dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
+from dental_omop_nlp import tracking as _tracking
+_tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("rungs", "modernbert-large,bioclinical-modernbert-large,longformer-base,clinical-longformer,gatortron-base")  # noqa: F821
 dbutils.widgets.text("lr_overrides", "gatortron-base=2e-5")             # noqa: F821  rung=rate, comma-separated
 dbutils.widgets.text("epochs", "3")                                     # noqa: F821

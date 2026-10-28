@@ -59,3 +59,33 @@ def test_gpu_notebooks_pass_their_login_to_the_scripts():
     from dental_omop_nlp.paths import REPO_ROOT
     for nb in ("03_medgemma_reader.py", "08_encoder_gpu.py"):
         assert "tracking.pass_databricks_login()" in (REPO_ROOT / "databricks" / "notebooks" / nb).read_text(), nb
+
+
+def test_git_commit_comes_from_the_deploy_when_the_code_is_not_a_git_checkout(monkeypatch):
+    """On Databricks the bundle's files aren't a git checkout, so MLflow tagged every run "unknown".
+    The deployed commit is handed in as DENTAL_GIT_COMMIT and wins over asking git."""
+    monkeypatch.setenv("DENTAL_GIT_COMMIT", "f00dfeed0123456789abcdef0123456789abcdef")
+    assert tracking.git_commit() == "f00dfee"
+    monkeypatch.setenv("DENTAL_GIT_COMMIT", "  ")
+    assert tracking.git_commit() != ""                                 # blank: falls back to git / "unknown"
+
+
+def test_notebook_hands_the_deployed_commit_to_the_code(monkeypatch):
+    import os
+
+    class Widgets:
+        def __init__(self):
+            self.values = {"git_commit": "abc1234def"}
+
+        def text(self, name, default):
+            self.values.setdefault(name, default)
+
+        def get(self, name):
+            return self.values[name]
+
+    class DBUtils:
+        widgets = Widgets()
+
+    monkeypatch.delenv("DENTAL_GIT_COMMIT", raising=False)
+    assert tracking.use_git_commit(DBUtils()) == "abc1234def"
+    assert os.environ["DENTAL_GIT_COMMIT"] == "abc1234def" and tracking.git_commit() == "abc1234"

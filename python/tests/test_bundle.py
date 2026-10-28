@@ -367,3 +367,21 @@ def test_pipeline_jobs_send_telemetry_from_the_secret_scope():
         assert not any("InstrumentationKey" in str(v) for v in p.values()), name
         text = (ROOT / "databricks/notebooks" / nb).read_text()
         assert "telemetry.use_databricks_secret(dbutils" in text and 'widgets.text("telemetry"' in text, nb
+
+
+def test_every_job_and_run_shows_the_commit_it_was_deployed_from():
+    """"Is this run on the latest code?" is answered on the job and run pages: every job is tagged with the
+    deployed commit, and every Python notebook task gets it as a parameter (shown on each run), which the
+    notebook hands to the code so MLflow runs are tagged with it instead of "unknown"."""
+    root, jobs = _load()
+    all_jobs = {k: j for k, (j, _) in jobs.items()}
+    for tgt in root["targets"].values():
+        all_jobs.update(tgt.get("resources", {}).get("jobs", {}) or {})
+    for name, j in all_jobs.items():
+        assert j.get("tags", {}).get("git_commit") == "${bundle.git.commit}", name
+        for t in j["tasks"]:
+            nb = t.get("notebook_task", {}).get("notebook_path", "")
+            if nb.endswith(".py"):
+                assert t["notebook_task"]["base_parameters"]["git_commit"] == "${bundle.git.commit}", (name, nb)
+                text = (ROOT / "databricks" / "notebooks" / nb.rsplit("/", 1)[1]).read_text()
+                assert "tracking.use_git_commit(dbutils)" in text, nb
