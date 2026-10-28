@@ -1,5 +1,6 @@
 """Build the folder `kaggle kernels push` sends: the MedGemma notebook with its settings filled in, and
-kernel-metadata.json (GPU and internet on, private). Used by .github/workflows/kaggle-medgemma.yml.
+kernel-metadata.json (GPU and internet on; public, since it holds synthetic notes only and the Hugging Face
+token stays a private Kaggle secret). Used by .github/workflows/kaggle-medgemma.yml.
 
     python kaggle/prepare_kernel.py --out build/kernel --username <kaggle user> [--rung ...] [--limit 10]
         [--shots 0] [--branch main]
@@ -45,7 +46,7 @@ def main() -> None:
     a.out.mkdir(parents=True, exist_ok=True)
     (a.out / "medgemma_reader.ipynb").write_text(json.dumps(nb, indent=1) + "\n")
     meta = {"id": f"{a.username}/{SLUG}", "title": TITLE, "code_file": "medgemma_reader.ipynb",
-            "language": "python", "kernel_type": "notebook", "is_private": True, "enable_gpu": True,
+            "language": "python", "kernel_type": "notebook", "is_private": False, "enable_gpu": True,
             "enable_tpu": False, "enable_internet": True, "dataset_sources": [], "competition_sources": [],
             "kernel_sources": [], "model_sources": []}
     (a.out / "kernel-metadata.json").write_text(json.dumps(meta, indent=1) + "\n")
