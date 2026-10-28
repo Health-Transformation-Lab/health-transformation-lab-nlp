@@ -22,6 +22,10 @@ and widens the guard test to flag the previous org name too, ignoring case as Gi
 - Commits: 57968e6 Point repo links at the renamed healthtransformationlab org
 - Range reviewed: `40e5eed..57968e6`
 
+- Update after merging `main` (06f7092): #182 had added `REPO_URL` in `kaggle/publish_model.py` with the previous
+  org name. Merged in, `test_repo_links_name_the_org` failed on it, as designed; the link now names the new org.
+  Full suite after the fix: 796 passed, 15 skipped.
+
 ## CI Status
 | Check | Status |
 |---|---|

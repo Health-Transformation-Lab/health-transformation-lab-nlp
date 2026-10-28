@@ -29,7 +29,7 @@ MODEL = {"slug": "perio-bench-note-classifier", "title": "PerioBench Note Classi
          "subtitle": "Periodontal status from a dental chart note, fine-tuned on synthetic notes"}
 INSTANCE = {"slug": "modernbert-base-cw", "base_url": "https://huggingface.co/answerdotai/ModernBERT-base"}
 WEIGHTS = ("model.safetensors", "pytorch_model.bin")
-REPO_URL = "https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp"
+REPO_URL = "https://github.com/healthtransformationlab/health-transformation-lab-nlp"
 USAGE = """## Usage
 
 ```python
