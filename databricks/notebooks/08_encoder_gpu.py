@@ -24,11 +24,11 @@ dbutils.library.restartPython()  # noqa: F821
 
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 
 import pandas as pd
+from dental_omop_nlp import runlog
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
 from dental_omop_nlp.rungs import output_tag
 
@@ -62,10 +62,8 @@ for rung in rungs:
     lr = float(lrs.get(rung, 5e-5))
     cmd = [sys.executable, str(REPO_ROOT / "python" / "scripts" / "11_ai_predict.py"), "--rung", rung,
            "--epochs", w["epochs"], "--max-len", w["max_len"], "--lr", str(lr)]
-    print(" ".join(cmd), flush=True)
-    r = subprocess.run(cmd, cwd=work, capture_output=True, text=True, check=False)  # a failure skips one rung
-    print(r.stdout[-2000:], r.stderr[-2000:])
-    if r.returncode:
+    # printed as it runs and kept in a log on the landing volume, which survives if this notebook's Python dies
+    if runlog.run(cmd, log_path=f"{runlog.log_dir(w['catalog'])}/encoder_gpu_{rung}.log", cwd=work):  # failure skips one rung
         failed.append(rung)
         continue
     method = rung + output_tag(lr=lr)
