@@ -26,11 +26,11 @@ Join on `visit_id` with `review_key.csv` from the notes dataset for the truth an
 
 ## How it was made
 
-[github.com/Health-Transformation-Lab/health-transformation-lab-nlp](https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp), `python/scripts/11_ai_predict.py`
+[github.com/healthtransformationlab/health-transformation-lab-nlp](https://github.com/healthtransformationlab/health-transformation-lab-nlp), `python/scripts/11_ai_predict.py`
 (one run per model), `28_ladder_vs_truth.py` and `36_judge_scorecard.py`. Models, prompts and settings are in
 the repo's `models.yaml`.
 
 ## Licence and citation
 
 CC BY 4.0 (these files; each model keeps its own licence). Please cite: Bowyer J., *health-transformation-lab-nlp:
-synthetic dental notes, OMOP and periodontal status benchmark*, https://github.com/Health-Transformation-Lab/health-transformation-lab-nlp.
+synthetic dental notes, OMOP and periodontal status benchmark*, https://github.com/healthtransformationlab/health-transformation-lab-nlp.

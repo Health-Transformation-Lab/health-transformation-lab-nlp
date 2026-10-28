@@ -160,12 +160,15 @@ Each takes the first part of the record, in a fixed order, that gives an answer
 
 Order: gum measurements → chart note → diagnosis codes (done, then planned) → exam form →
 procedure codes (done, then planned). When the gum measurements didn't decide, the X-ray AI is a
-floor: if it shows a higher stage than the deciding part, its stage is used.
+floor: if it shows a higher stage than the deciding part, its stage is used. This order is this repo's own
+placeholder (spec 003), not taken from a published algorithm.
 
 ### Rules, exam form first (`algorithm_design`)
 
-The study design's starting order: exam form → diagnosis codes (done, then planned) → chart note →
-gum measurements. No X-ray floor. It scores lower (72 vs 98 correct per 100 charts): about 85% of
+The study design's starting order, after Patel et al., *Methods Inf Med* 2022
+([references](references.md), item 4): exam form → diagnosis codes (done, then planned) → chart note →
+gum measurements. The exact order, and counting diagnosis codes on planned procedures with completed ones,
+are not yet checked against the paper ([action item A2](action_items.md)). No X-ray floor. It scores lower (72 vs 98 correct per 100 charts): about 85% of
 visits have an exam form, so the form decides most charts, and its checkbox is often stale.
 
 ## Stage 4 rule (`+rules4`)
