@@ -66,7 +66,7 @@ jobs:
           [ -n "$tok" ] || { echo "::error::Set KAGGLE_API_TOKEN (or KAGGLE_KEY) in the GitHub environment 'dev'"; exit 1; }
           echo "KAGGLE_API_TOKEN=$tok" >> "$GITHUB_ENV"
           [ -n "$K" ] && echo "KAGGLE_KEY=$K" >> "$GITHUB_ENV"
-          echo "KERNEL=$U/health-transformation-lab-medgemma-reader" >> "$GITHUB_ENV"
+          echo "KERNEL=$U/perio-bench-medgemma-reader" >> "$GITHUB_ENV"
 
       - name: Check Kaggle accepts the credentials
         run: |
@@ -135,7 +135,7 @@ jobs:
           git push --quiet -u origin "$BRANCH"
           body="MedGemma (\`${{ inputs.rung }}\`) answers on the synthetic review notes, collected from Kaggle by $RUN_URL (spec 016).
 
-          A pull request opened by the workflow token doesn't start CI: push a commit to this branch to run the checks before merging. After the merge, the dev deploy runs **Load results**, which appends these files to \`gold_dental_omop_perio.fact_prediction\` and \`fact_llm_call\` with \`source_code = kaggle\`. Then \`python scripts/28_ladder_vs_truth.py && python scripts/35_readme_results.py\` refreshes the README scores."
+          A pull request opened by the workflow token doesn't start CI: push a commit to this branch to run the checks before merging. After the merge, the dev deploy runs **Load results**, which appends these files to \`gold_perio_bench.fact_prediction\` and \`fact_llm_call\` with \`source_code = kaggle\`. Then \`python scripts/28_ladder_vs_truth.py && python scripts/35_readme_results.py\` refreshes the README scores."
           gh pr create --base main --head "$BRANCH" --title "Add MedGemma results from Kaggle (${{ inputs.rung }})" --body "$body" \
             || echo "::warning::Pushed $BRANCH but couldn't open the PR (Settings -> Actions -> General -> Allow GitHub Actions to create and approve pull requests). Open it here: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$BRANCH"
 

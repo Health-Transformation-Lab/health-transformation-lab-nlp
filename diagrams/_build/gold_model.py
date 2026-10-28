@@ -1,4 +1,4 @@
-"""The gold schema health_transformation_lab.gold_dental_omop_perio, declared once: tables, columns, keys, relationships.
+"""The gold schema health_transformation_lab.gold_perio_bench, declared once: tables, columns, keys, relationships.
 
 The jobs write these tables from pandas (no DDL to read), so this file is the declaration the ERDs
 and diagrams/gold/data_model.md are drawn from. python/tests/test_gold_model.py checks its columns

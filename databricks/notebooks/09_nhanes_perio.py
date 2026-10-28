@@ -26,8 +26,8 @@ from health_transformation_lab_nlp.paths import REPO_ROOT
 dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
 from health_transformation_lab_nlp import tracking as _tracking
 _tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
-dbutils.widgets.text("data_dir", "/Volumes/health_transformation_lab/landing_dental_omop_perio/data/nhanes_raw")  # noqa: F821
-dbutils.widgets.text("out_dir", "/Volumes/health_transformation_lab/landing_dental_omop_perio/data/nhanes")      # noqa: F821
+dbutils.widgets.text("data_dir", "/Volumes/health_transformation_lab/landing_perio_bench/data/nhanes_raw")  # noqa: F821
+dbutils.widgets.text("out_dir", "/Volumes/health_transformation_lab/landing_perio_bench/data/nhanes")      # noqa: F821
 data_dir, out_dir = dbutils.widgets.get("data_dir"), dbutils.widgets.get("out_dir")              # noqa: F821
 dbutils.widgets.text("telemetry", "azure")                                                         # noqa: F821
 from health_transformation_lab_nlp import telemetry  # noqa: E402
