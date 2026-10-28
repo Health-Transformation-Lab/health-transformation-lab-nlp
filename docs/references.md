@@ -136,6 +136,19 @@ Everything this repo relies on, and what it's used for.
 52. **Lundberg SM, Erion G, Chen H, et al.** *From local explanations to global understanding with
     explainable AI for trees.* Nature Machine Intelligence 2020;2:56–67. → TreeSHAP, the exact SHAP values
     XGBoost computes (`pred_contribs`) for the status classifier.
+53. **Patel JS, Tellez M, Katiyar R, Al-Hebshi NN, Santana R, Yucel RM, Ismail A.** *Periodontitis prediction
+    model using linked electronic health and dental records.* JDR Clin Trans Res 2026;11(4):555–570 (epub
+    2026-02-11). doi:10.1177/23800844251408849, PMID 41673528, PMC13292087. Follows item 51: adds medical-record
+    (EHR) features to dental-record (EDR) features for 20,946 adults; XGBoost best of four models; 4 classes
+    (healthy, stage I, stage II, stages III+IV); 70/30 stratified train/test split; sensitivity, specificity,
+    AUC and Brier score per class; PROBAST and TRIPOD-AI checklists. Experiment 1 (chi-square-selected
+    features), averages over the 4 classes in Table 2, sensitivity/specificity/AUC: 66/86/84 with dental records
+    only, 66/86/86 with medical records added; experiment 5 (medical records only) 43/70/57.
+    → Spec 013 G10 (what the status classifier could adopt) and spec 023 (synthetic medical-record features).
+    Checked on PubMed and the PMC full text: authors, volume, issue, pages and the figures above. The text is
+    inconsistent in two places: the abstract says 106 features were kept, the Methods say 109; and the
+    abstract's best result, 67/85/84, matches neither experiment 1 row of Table 2 (66/86/84, 66/86/86).
+    Published figures only: the paper's data is real patient data and never comes into this repo.
 
 ## De-identification
 

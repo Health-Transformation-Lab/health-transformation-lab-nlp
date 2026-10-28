@@ -6,6 +6,8 @@
   model (models.yaml) is attached instead and kaggle/keras_to_hf.py converts it on Kaggle.
 - encoders (kaggle-encoders.yml): the GPU encoders of spec 002 T017, the Databricks encoder_gpu job's work.
   Their weights are public on Hugging Face. Rungs and learning rates default to that job's (databricks.yml).
+- quickstart (kaggle-publish.yml, spec 025): notebooks/perio_bench_quickstart.ipynb as is, attached to the
+  two PerioBench datasets; no GPU, no internet.
 
     python kaggle/prepare_kernel.py --out build/kernel --username <kaggle user> [--rung ...] [--limit 10]
         [--shots 0] [--branch main] [--commit <sha>]
@@ -28,7 +30,10 @@ HERE = Path(__file__).resolve().parent
 JOBS = {   # notebook, slug, title: Kaggle derives the slug from the title, so keep them in step
     "medgemma": ("medgemma_reader.ipynb", "perio-bench-medgemma-reader", "perio bench medgemma reader"),
     "encoders": ("encoder_gpu.ipynb", "perio-bench-encoder-gpu", "perio bench encoder gpu"),
+    # spec 025: the quickstart, as published; reads the two attached datasets, so no GPU and no internet
+    "quickstart": ("../notebooks/perio_bench_quickstart.ipynb", "perio-bench-quickstart", "perio bench quickstart"),
 }
+QUICKSTART_DATASETS = ("perio-bench-notes", "perio-bench-results")
 
 
 def bundle_default(name: str) -> str:
@@ -43,6 +48,19 @@ def settings(source: str, values: dict) -> str:
         if n != 1:
             raise SystemExit(f"settings cell has no single '{name} = ' line")
     return source
+
+
+def quickstart(out: Path, username: str, notebook: str, slug: str, title: str) -> None:
+    """The quickstart notebook unchanged, attached to both datasets (spec 025 US2)."""
+    src = (HERE / notebook).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    (out / src.name).write_text(src.read_text())
+    meta = {"id": f"{username}/{slug}", "title": title, "code_file": src.name, "language": "python",
+            "kernel_type": "notebook", "is_private": False, "enable_gpu": False, "enable_tpu": False,
+            "enable_internet": False, "dataset_sources": [f"{username}/{d}" for d in QUICKSTART_DATASETS],
+            "competition_sources": [], "kernel_sources": [], "model_sources": []}
+    (out / "kernel-metadata.json").write_text(json.dumps(meta, indent=1) + "\n")
+    print(f"prepared {meta['id']}: the quickstart, attached to {', '.join(meta['dataset_sources'])}")
 
 
 def main() -> None:
@@ -62,6 +80,8 @@ def main() -> None:
     ap.add_argument("--save-model", default="", help="encoders: the rung whose fine-tuned weights to keep (spec 020 US3)")
     a = ap.parse_args()
     notebook, slug, title = JOBS[a.job]
+    if a.job == "quickstart":
+        return quickstart(a.out, a.username, notebook, slug, title)
 
     values = {"BRANCH": json.dumps(a.branch), "COMMIT": json.dumps(a.commit), "TEST_NOTES": str(a.limit or 10),
               "FULL_RUN": str(a.limit == 0)}
