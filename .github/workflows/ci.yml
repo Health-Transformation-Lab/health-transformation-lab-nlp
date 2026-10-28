@@ -1,6 +1,6 @@
 # Tests on every push and pull request: Python tests (incl. bundle structure),
 # R parity, and the bundle against its schema.
-name: ci
+name: Test every change (Python, R parity, bundle)
 # Changes that touch only docs (docs/, any .md, diagrams) skip CI: nothing they change is tested.
 on:
   push:
