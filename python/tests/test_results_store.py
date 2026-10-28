@@ -256,7 +256,7 @@ def test_reader_job_writes_gold_names_keyed_by_its_run():
 
 def test_load_results_job_migrates_the_old_gold_names_before_loading():
     # spec 018 US2: a task before the load copies old-named tables to the new names, so their rows are kept
-    # (after spec 019's schema move: test_bundle.test_load_results_moves_the_old_schemas_first)
+    # (after spec 021's schema move: test_bundle.test_load_results_moves_the_old_schemas_first)
     import yaml
     tasks = yaml.safe_load(_text("databricks/resources/jobs.yml"))["resources"]["jobs"]["load_results"]["tasks"]
     migrate = next(t for t in tasks if t["task_key"] == "migrate_gold_names")

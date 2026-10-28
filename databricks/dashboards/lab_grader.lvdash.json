@@ -6,7 +6,7 @@
       "queryLines": [
         "SELECT ROUND(100 * AVG(CASE WHEN is_simulated THEN 1.0 ELSE 0.0 END), 1) AS simulated_pct,\n",
         "  COUNT(DISTINCT question_id) AS questions, COUNT(DISTINCT model_name) AS models, COUNT(*) AS answers\n",
-        "FROM dental_omop.gold_dental_omop_perio.fact_grader_answer\n"
+        "FROM dental_omop.gold_perio_bench.fact_grader_answer\n"
       ]
     },
     {
@@ -23,7 +23,7 @@
         "    SUM(CASE WHEN ans.is_with_agent THEN 1 ELSE 0 END) AS n_agent,\n",
         "    AVG(CASE WHEN NOT ans.is_with_agent THEN ans.cost_usd END) AS cost_own,\n",
         "    AVG(CASE WHEN ans.is_with_agent THEN ans.cost_usd END) AS cost_agent\n",
-        "  FROM dental_omop.gold_dental_omop_perio.fact_grader_answer ans JOIN dental_omop.gold_dental_omop_perio.dim_grader_question q ON ans.question_id = q.question_id\n",
+        "  FROM dental_omop.gold_perio_bench.fact_grader_answer ans JOIN dental_omop.gold_perio_bench.dim_grader_question q ON ans.question_id = q.question_id\n",
         "  GROUP BY q.category_name, q.category_order_num)\n",
         "SELECT category_name AS category, category_order_num AS category_order, ROUND(100 * own, 1) AS own_pct,\n",
         "  ROUND(100 * agent, 1) AS agent_pct, ROUND(100 * (agent - own), 1) AS uplift_pts,\n",
@@ -41,7 +41,7 @@
         "WITH s AS (\n",
         "  SELECT q.category_name, q.category_order_num, ans.model_name, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode,\n",
         "    AVG(ans.score_ratio) AS score, COUNT(*) AS n\n",
-        "  FROM dental_omop.gold_dental_omop_perio.fact_grader_answer ans JOIN dental_omop.gold_dental_omop_perio.dim_grader_question q ON ans.question_id = q.question_id\n",
+        "  FROM dental_omop.gold_perio_bench.fact_grader_answer ans JOIN dental_omop.gold_perio_bench.dim_grader_question q ON ans.question_id = q.question_id\n",
         "  GROUP BY q.category_name, q.category_order_num, ans.model_name, ans.is_with_agent)\n",
         "SELECT category_name AS category, category_order_num AS category_order, answer_mode,\n",
         "  RANK() OVER (PARTITION BY category_name, answer_mode ORDER BY score DESC) AS rank,\n",
@@ -57,7 +57,7 @@
         "SELECT ans.model_name AS model, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode,\n",
         "  ROUND(100 * AVG(CASE WHEN ans.harm_code IN ('S1', 'S2') THEN 1.0 ELSE 0.0 END), 1) AS unsafe_pct,\n",
         "  ROUND(100 * AVG(CASE WHEN ans.harm_code = 'S2' THEN 1.0 ELSE 0.0 END), 1) AS s2_pct, COUNT(*) AS n\n",
-        "FROM dental_omop.gold_dental_omop_perio.fact_grader_answer ans\n",
+        "FROM dental_omop.gold_perio_bench.fact_grader_answer ans\n",
         "GROUP BY ans.model_name, ans.is_with_agent\n",
         "ORDER BY model, answer_mode\n"
       ]
@@ -68,7 +68,7 @@
       "queryLines": [
         "WITH l AS (\n",
         "  SELECT ans.model_name, ans.is_with_agent, q.level_code, AVG(ans.score_ratio) AS score\n",
-        "  FROM dental_omop.gold_dental_omop_perio.fact_grader_answer ans JOIN dental_omop.gold_dental_omop_perio.dim_grader_question q ON ans.question_id = q.question_id\n",
+        "  FROM dental_omop.gold_perio_bench.fact_grader_answer ans JOIN dental_omop.gold_perio_bench.dim_grader_question q ON ans.question_id = q.question_id\n",
         "  GROUP BY ans.model_name, ans.is_with_agent, q.level_code)\n",
         "SELECT ans.model_name AS model, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode, ans.level_code AS level,\n",
         "  ROUND(100 * ans.score, 1) AS score_pct FROM l ans\n",
@@ -85,7 +85,7 @@
       "queryLines": [
         "SELECT ans.model_name || CASE WHEN ans.is_with_agent THEN ' + agent' ELSE '' END AS entry, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode,\n",
         "  ROUND(AVG(ans.cost_usd), 4) AS cost_usd, ROUND(100 * AVG(ans.score_ratio), 1) AS score_pct\n",
-        "FROM dental_omop.gold_dental_omop_perio.fact_grader_answer ans\n",
+        "FROM dental_omop.gold_perio_bench.fact_grader_answer ans\n",
         "GROUP BY ans.model_name, ans.is_with_agent\n"
       ]
     }

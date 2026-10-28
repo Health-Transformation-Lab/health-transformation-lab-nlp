@@ -1,4 +1,4 @@
-# Tasks: bench schemas (spec 019)
+# Tasks: bench schemas (spec 021)
 
 - [x] T001 [US1] Failing tests: `test_schemas.py` names, `test_bundle.py` schema and job checks, `test_no_legacy_names.py`
 - [x] T002 [US1] `dental_omop_nlp/schemas.py`: benches, layers, legacy names

@@ -55,7 +55,7 @@ def build_study(seed=7):
 ```
 
 **Common header.** Every span and every log line carries `data_product_id` (default
-`perio_bench`, `DENTAL_DATA_PRODUCT_ID`; renamed in spec 019, docs/deployment.md), `environment` (`DENTAL_ENVIRONMENT`) and
+`perio_bench`, `DENTAL_DATA_PRODUCT_ID`; renamed in spec 021, docs/deployment.md), `environment` (`DENTAL_ENVIRONMENT`) and
 `service.namespace` (`dental-omop-nlp`); spans add `code.namespace` (module) and `code.function`. The
 resource names the data product as the service, so in a shared Application Insights resource one
 data product and one environment are a filter away (`customDimensions.data_product_id`,

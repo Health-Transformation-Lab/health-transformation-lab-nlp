@@ -1,5 +1,5 @@
 # Unity Catalog objects the bundle owns (docs/deployment.md): one catalog, one
-# schema per bench and layer (spec 019), and the landing volume the jobs write files to.
+# schema per bench and layer (spec 021), and the landing volume the jobs write files to.
 #
 #   dental_omop                       catalog
 #     landing_perio_bench             volumes (data: generated CSV/parquet, run files)
@@ -9,7 +9,7 @@
 #     bronze_/silver_/gold_access_bench        empty for now
 #     bronze_/silver_/gold_oral_health_bench   empty for now
 #
-# Legacy (spec 019): the old <layer>_${var.legacy_domain} schemas and their data volume keep their old
+# Legacy (spec 021): the old <layer>_${var.legacy_domain} schemas and their data volume keep their old
 # keys (landing, bronze, silver, gold, data) so a deploy neither fails on prevent_destroy nor drops them.
 # The Load results job copies them into perio_bench; retire them by hand afterwards (docs/deployment.md).
 #
@@ -38,25 +38,25 @@ resources:
     landing:
       catalog_name: ${resources.catalogs.dental_omop.name}
       name: landing_${var.legacy_domain}
-      comment: Legacy (spec 019), moved to landing_perio_bench. Landing zone (volumes) for ${var.legacy_domain}. Synthetic data only.
+      comment: Legacy (spec 021), moved to landing_perio_bench. Landing zone (volumes) for ${var.legacy_domain}. Synthetic data only.
       lifecycle:
         prevent_destroy: true
     bronze:
       catalog_name: ${resources.catalogs.dental_omop.name}
       name: bronze_${var.legacy_domain}
-      comment: Legacy (spec 019), moved to bronze_perio_bench. Raw tables for ${var.legacy_domain}. Synthetic data only.
+      comment: Legacy (spec 021), moved to bronze_perio_bench. Raw tables for ${var.legacy_domain}. Synthetic data only.
       lifecycle:
         prevent_destroy: true
     silver:
       catalog_name: ${resources.catalogs.dental_omop.name}
       name: silver_${var.legacy_domain}
-      comment: Legacy (spec 019), moved to silver_perio_bench. Cleaned tables for ${var.legacy_domain}. Synthetic data only.
+      comment: Legacy (spec 021), moved to silver_perio_bench. Cleaned tables for ${var.legacy_domain}. Synthetic data only.
       lifecycle:
         prevent_destroy: true
     gold:
       catalog_name: ${resources.catalogs.dental_omop.name}
       name: gold_${var.legacy_domain}
-      comment: Legacy (spec 019), moved to gold_perio_bench. Study tables, results and perio_note_classifier for ${var.legacy_domain}. Synthetic data only.
+      comment: Legacy (spec 021), moved to gold_perio_bench. Study tables, results and perio_note_classifier for ${var.legacy_domain}. Synthetic data only.
       lifecycle:
         prevent_destroy: true
 
@@ -130,7 +130,7 @@ resources:
       comment: Files the pipeline writes (DENTAL_DATA_ROOT). Synthetic data only.
       lifecycle:
         prevent_destroy: true
-    data:   # legacy (spec 019): the old landing volume, copied to perio_bench_data
+    data:   # legacy (spec 021): the old landing volume, copied to perio_bench_data
       catalog_name: ${resources.schemas.landing.catalog_name}
       schema_name: ${resources.schemas.landing.name}
       name: data

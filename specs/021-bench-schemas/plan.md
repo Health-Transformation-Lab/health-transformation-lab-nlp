@@ -1,4 +1,4 @@
-# Implementation Plan: bench schemas (spec 019)
+# Implementation Plan: bench schemas (spec 021)
 
 **Spec**: [spec.md](spec.md) · **Issues**: #141 (US1), #142 (US2)
 

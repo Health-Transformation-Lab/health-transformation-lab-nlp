@@ -51,7 +51,7 @@ def test_three_targets_with_expected_modes():
 
 def test_every_target_uses_the_same_catalog_and_legacy_domain():
     # dev, uat and prod are separate workspaces, so the Unity Catalog names are the
-    # same everywhere: catalog dental_omop; the bench schemas are literal names (spec 019), and
+    # same everywhere: catalog dental_omop; the bench schemas are literal names (spec 021), and
     # legacy_domain names the old <layer>_dental_omop_perio schemas kept until retired.
     root, _ = _load()
     d = {k: v["default"] for k, v in root["variables"].items() if "default" in v}
@@ -124,7 +124,7 @@ def test_mlflow_experiment_and_uc_model_per_target():
     rm = m["registered_models"]["perio_bench_note_classifier"]
     assert rm["name"] == "perio_note_classifier"
     assert rm["catalog_name"] == GOLD_CATALOG and rm["schema_name"] == GOLD_SCHEMA
-    legacy = m["registered_models"]["perio_note_classifier"]   # spec 019: kept so a deploy can't drop its versions
+    legacy = m["registered_models"]["perio_note_classifier"]   # spec 021: kept so a deploy can't drop its versions
     assert legacy["schema_name"] == "${resources.schemas.gold.name}"
 
 
@@ -155,7 +155,7 @@ def test_judge_monitoring_job_only_in_uat_and_prod():
 
 
 def test_bundle_creates_the_catalog_bench_schemas_and_landing_volume():
-    """One catalog (dental_omop) with a schema per bench and layer (spec 019), all bundle resources so a
+    """One catalog (dental_omop) with a schema per bench and layer (spec 021), all bundle resources so a
     deploy creates them; the data volume lives in landing_perio_bench. The old <layer>_dental_omop_perio
     schemas and volume stay under their old keys until retired by hand.
     prevent_destroy keeps `bundle destroy` from dropping data."""
@@ -188,7 +188,7 @@ def test_jobs_write_to_the_bundle_schema():
         p = task["notebook_task"].get("base_parameters", {})
         if "catalog" in p:
             assert p["catalog"] == GOLD_CATALOG, name
-            assert p.get("schema", GOLD_SCHEMA) == GOLD_SCHEMA, name   # the spec 019 migration takes the catalog only
+            assert p.get("schema", GOLD_SCHEMA) == GOLD_SCHEMA, name   # the spec 021 migration takes the catalog only
             seen += 1
         if "landing_schema" in p:
             assert p["landing_schema"] == LANDING, name
@@ -198,7 +198,7 @@ def test_jobs_write_to_the_bundle_schema():
 
 
 def test_load_results_moves_the_old_schemas_first():
-    """Spec 019 US2: copy the old perio schemas into perio_bench, then spec 018's renames, then the load."""
+    """Spec 021 US2: copy the old perio schemas into perio_bench, then spec 018's renames, then the load."""
     _, jobs = _load()
     tasks = jobs["load_results"][0]["tasks"]
     assert [t["task_key"] for t in tasks] == ["migrate_bench_schemas", "migrate_gold_names", "load"]

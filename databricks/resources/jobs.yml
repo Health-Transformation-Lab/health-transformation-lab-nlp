@@ -191,7 +191,7 @@ resources:
         data: synthetic
         git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
-        # spec 019: copy the old perio schemas (legacy_domain), volume files and model versions into
+        # spec 021: copy the old perio schemas (legacy_domain), volume files and model versions into
         # perio_bench first; does nothing once done, or where the old schemas never existed
         - task_key: migrate_bench_schemas
           notebook_task:

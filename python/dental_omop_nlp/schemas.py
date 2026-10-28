@@ -1,4 +1,4 @@
-"""Databricks schema names, one set per bench (spec 019).
+"""Databricks schema names, one set per bench (spec 021).
 
     perio_bench        periodontal status from charts: everything built so far (landing, bronze, silver, gold)
     access_bench       does an answer help someone actually get care (bronze, silver, gold; empty for now)

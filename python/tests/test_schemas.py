@@ -1,4 +1,4 @@
-"""Spec 019: the Databricks schemas are named for the three benches, and the old perio schemas carry over."""
+"""Spec 021: the Databricks schemas are named for the three benches, and the old perio schemas carry over."""
 from dental_omop_nlp import schemas
 
 

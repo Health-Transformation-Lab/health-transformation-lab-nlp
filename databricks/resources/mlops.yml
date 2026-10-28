@@ -19,7 +19,7 @@ resources:
         Note -> periodontal status (any rung, MLflow pyfunc). Alias challenger = newest
         version; champion = passed the acceptance test (non-inferior to reviewers).
         Synthetic data only.
-    # Legacy (spec 019): the old model, kept so a deploy doesn't drop its versions before Load results copies
+    # Legacy (spec 021): the old model, kept so a deploy doesn't drop its versions before Load results copies
     # them into perio_bench_note_classifier. Retire by hand (docs/deployment.md).
     perio_note_classifier:
       name: perio_note_classifier

@@ -23,7 +23,7 @@ variables.
 | GPU jobs (MedGemma reader, encoders) | yes, serverless GPU | yes, serverless GPU | yes, serverless GPU, all review notes |
 
 Each target is its own workspace (its own `DATABRICKS_HOST`), so catalog and
-schema names are the same everywhere. One catalog, one schema per bench and layer (spec 019,
+schema names are the same everywhere. One catalog, one schema per bench and layer (spec 021,
 `dental_omop_nlp.schemas`):
 
 | Schema in `dental_omop` | Holds |
@@ -72,9 +72,9 @@ direct engine once, by hand, before CI can deploy it:
 CI doesn't try this itself: a migrate that failed for a real reason would let the deploy treat the
 target as new and duplicate its jobs. dev is already migrated; uat and prod were never deployed.
 
-### Spec 019: from `<layer>_dental_omop_perio` to the bench schemas
+### Spec 021: from `<layer>_dental_omop_perio` to the bench schemas
 
-Until spec 019 the schemas were `landing_`/`bronze_`/`silver_`/`gold_dental_omop_perio`. They moved to
+Until spec 021 the schemas were `landing_`/`bronze_`/`silver_`/`gold_dental_omop_perio`. They moved to
 `<layer>_perio_bench`. A deploy creates the new schemas next to the old ones: the old schemas, their `data`
 volume and the old `perio_note_classifier` stay declared in the bundle under their old keys (`landing`,
 `bronze`, `silver`, `gold`, `data`, `perio_note_classifier`), because `prevent_destroy` would fail a rename
@@ -97,7 +97,7 @@ target):
 
 | Variable | Default | What it sets |
 |---|---|---|
-| `catalog`, `legacy_domain` | `dental_omop`, `dental_omop_perio` | the catalog, and the suffix of the old `landing_`/`bronze_`/`silver_`/`gold_` schemas kept until retired (spec 019) |
+| `catalog`, `legacy_domain` | `dental_omop`, `dental_omop_perio` | the catalog, and the suffix of the old `landing_`/`bronze_`/`silver_`/`gold_` schemas kept until retired (spec 021) |
 | `n_people` | `300` | synthetic people in the benchmark job |
 | `run_encoder` | `false` (uat/prod `true`) | install CPU-only torch and train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |

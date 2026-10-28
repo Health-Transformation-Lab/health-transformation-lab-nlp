@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Move the perio schemas to perio_bench (spec 019)
+# MAGIC # Move the perio schemas to perio_bench (spec 021)
 # MAGIC
 # MAGIC The layer schemas are now named for the benches: `<layer>_dental_omop_perio` became `<layer>_perio_bench`
 # MAGIC (`dental_omop_nlp.schemas`). This copies what the old schemas hold into the new ones: every table (deep
