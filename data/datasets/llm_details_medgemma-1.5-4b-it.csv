@@ -1,721 +1,721 @@
 visit_id,model,backend,prompt_version,shots,input_tokens,output_tokens,latency_s,raw,status,grade,extent,quote,gate_ok,error,fallback,pred
-634,medgemma-1.5-4b-it,hf,reader-v2,0,851,78,31.870918035507202,"```json
+634,medgemma-1.5-4b-it,hf,reader-v2,0,851,78,8.420376300811768,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""Clinical Gingival Health on an Intact Periodontium"", ""rationale"": ""The note explicitly states 'Clinical Gingival Health on an Intact Periodontium', which corresponds to the healthy status in the 2017 AAP/EFP classification.""}
 ```",healthy,NA,NA,Clinical Gingival Health on an Intact Periodontium,True,,False,healthy
-3979,medgemma-1.5-4b-it,hf,reader-v2,0,860,122,48.272714376449585,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no BOP, PD 1-3mm WNL, CAL up to 1mm"", ""rationale"": ""The note explicitly states no bleeding on probing (BOP), probing depths (PD) of 1-3mm are within normal limits (WNL), and crestal alveolar bone loss (CAL) is up to 1mm, all of which are consistent with a healthy periodontal status according to the 2017 AAP/EFP classification.""}
+3979,medgemma-1.5-4b-it,hf,reader-v2,0,860,106,10.17092227935791,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no BOP, PD 1-3mm WNL, CAL up to 1mm"", ""rationale"": ""The note explicitly states no bleeding on probing (BOP), probing depths (PD) of 1-3mm are within normal limits (WNL), and crestal alveolar bone loss (CAL) is up to 1mm, meeting the criteria for healthy periodontal status.""}
 ```",healthy,NA,NA,"no BOP, PD 1-3mm WNL, CAL up to 1mm",True,,False,healthy
-497,medgemma-1.5-4b-it,hf,reader-v2,0,863,67,26.939579725265503,"```json
-{""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""d : localized periodontitis, stage i grade a"", ""rationale"": ""The note explicitly states 'localized periodontitis, stage i grade a'.""}
+497,medgemma-1.5-4b-it,hf,reader-v2,0,863,69,7.175284147262573,"```json
+{""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""d : localized periodontitis, stage i grade a"", ""rationale"": ""The note explicitly states 'd : localized periodontitis, stage i grade a'.""}
 ```",periodontitis_stage_1,A,localized,"d : localized periodontitis, stage i grade a",True,,False,periodontitis_stage_1
-2819,medgemma-1.5-4b-it,hf,reader-v2,0,870,67,28.309492111206055,"```json
+2819,medgemma-1.5-4b-it,hf,reader-v2,0,870,67,7.100575685501099,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""d: generalized stage i grade a periodontitis."", ""rationale"": ""The note explicitly states 'd: generalized stage i grade a periodontitis.'""}
 ```",periodontitis_stage_1,A,generalized,d: generalized stage i grade a periodontitis.,True,,False,periodontitis_stage_1
-2421,medgemma-1.5-4b-it,hf,reader-v2,0,800,52,19.15396022796631,"```json
+2421,medgemma-1.5-4b-it,hf,reader-v2,0,800,52,5.909927845001221,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no BOP"", ""rationale"": ""The note explicitly states 'no BOP', which falls under the definition of healthy.""}
 ```",healthy,NA,NA,no BOP,True,,False,healthy
-174,medgemma-1.5-4b-it,hf,reader-v2,0,831,71,25.79050922393799,"```json
+174,medgemma-1.5-4b-it,hf,reader-v2,0,831,71,7.560059547424316,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""severe attachment loss"", ""rationale"": ""The note explicitly states 'severe attachment loss', which corresponds to periodontitis stage 3 according to the AAP/EFP classification.""}
 ```",periodontitis_stage_3,B,generalized,severe attachment loss,True,,False,periodontitis_stage_3
-4178,medgemma-1.5-4b-it,hf,reader-v2,0,850,67,24.384188652038574,"```json
+4178,medgemma-1.5-4b-it,hf,reader-v2,0,850,67,7.065887212753296,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage IV Grade C"", ""rationale"": ""The note explicitly states 'Generalized Periodontitis Stage IV Grade C' as the diagnosis.""}
 ```",periodontitis_stage_4,C,generalized,Generalized Periodontitis Stage IV Grade C,True,,False,periodontitis_stage_4
-300,medgemma-1.5-4b-it,hf,reader-v2,0,887,93,33.61481237411499,"```json
+300,medgemma-1.5-4b-it,hf,reader-v2,0,887,93,9.183077096939087,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""generalized"", ""quote"": ""shallow sulci throughout, CAL up to 2mm, BOP 20%"", ""rationale"": ""The note explicitly states 'shallow sulci throughout, CAL up to 2mm, BOP 20%' which meets the criteria for gingivitis (no interdental attachment loss, BOP >= 10%).""}
 ```",gingivitis,NA,NA,"shallow sulci throughout, CAL up to 2mm, BOP 20%",True,,False,gingivitis
-3593,medgemma-1.5-4b-it,hf,reader-v2,0,786,64,23.25196671485901,"```json
+3593,medgemma-1.5-4b-it,hf,reader-v2,0,786,64,6.795177698135376,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""Clinical gingival health on an intact periodontium."", ""rationale"": ""The note explicitly states 'Clinical gingival health on an intact periodontium.' which corresponds to the healthy status.""}
 ```",healthy,NA,NA,Clinical gingival health on an intact periodontium.,True,,False,healthy
-284,medgemma-1.5-4b-it,hf,reader-v2,0,799,59,21.453447341918945,"```json
+284,medgemma-1.5-4b-it,hf,reader-v2,0,799,59,6.416142463684082,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Stage III/Grade C perio."", ""rationale"": ""The note explicitly states 'Stage III/Grade C perio.'""}
 ```",periodontitis_stage_3,C,generalized,Stage III/Grade C perio.,True,,False,periodontitis_stage_3
-2903,medgemma-1.5-4b-it,hf,reader-v2,0,873,103,35.857131481170654,"```json
+2903,medgemma-1.5-4b-it,hf,reader-v2,0,873,103,9.956747055053711,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""max CAL 1mm interproximal; recession 1mm #27, PD 1-3mm WNL, bleeding on probing 38% of sites."", ""rationale"": ""The note explicitly states bleeding on probing (BOP) of 38% of sites, which meets the criteria for gingivitis (BOP >= 10%).""}
 ```",gingivitis,NA,NA,"max CAL 1mm interproximal; recession 1mm #27, PD 1-3mm WNL, bleeding on probing 38% of sites.",True,,False,gingivitis
-2633,medgemma-1.5-4b-it,hf,reader-v2,0,861,69,25.077460050582886,"```json
+2633,medgemma-1.5-4b-it,hf,reader-v2,0,861,69,7.166643142700195,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d : generalised periodontitis stage 3 grade b."", ""rationale"": ""The note explicitly states 'd : generalised periodontitis stage 3 grade b.'""}
 ```",periodontitis_stage_3,B,generalized,d : generalised periodontitis stage 3 grade b.,True,,False,periodontitis_stage_3
-3947,medgemma-1.5-4b-it,hf,reader-v2,0,856,70,26.467449426651,"```json
+3947,medgemma-1.5-4b-it,hf,reader-v2,0,856,70,7.231299877166748,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""diagnosis: generalized periodontitis, stage i grade b"", ""rationale"": ""The note explicitly states the diagnosis is 'generalized periodontitis, stage i grade b'.""}
 ```",periodontitis_stage_1,B,generalized,"diagnosis: generalized periodontitis, stage i grade b",True,,False,periodontitis_stage_1
-556,medgemma-1.5-4b-it,hf,reader-v2,0,852,76,28.19921588897705,"```json
+556,medgemma-1.5-4b-it,hf,reader-v2,0,852,76,7.7786290645599365,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""CAL up to 7mm"", ""rationale"": ""The note states CAL up to 7mm, which meets the criteria for periodontitis_stage_3 (CAL >= 5 mm).""}
 ```",periodontitis_stage_3,B,generalized,CAL up to 7mm,True,,False,periodontitis_stage_3
-1523,medgemma-1.5-4b-it,hf,reader-v2,0,846,77,28.518108129501343,"```json
+1523,medgemma-1.5-4b-it,hf,reader-v2,0,846,77,7.825011968612671,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Gen. perio St 1 Gr A"", ""rationale"": ""The note explicitly states 'Gen. perio St 1 Gr A', which directly corresponds to periodontitis stage 1, grade A.""}
 ```",periodontitis_stage_1,A,localized,Gen. perio St 1 Gr A,True,,False,periodontitis_stage_1
-2636,medgemma-1.5-4b-it,hf,reader-v2,0,851,65,24.394634246826172,"```json
+2636,medgemma-1.5-4b-it,hf,reader-v2,0,851,65,6.8474037647247314,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""A: Generalized periodontitis Stage IV Grade C."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage IV Grade C'.""}
 ```",periodontitis_stage_4,C,generalized,A: Generalized periodontitis Stage IV Grade C.,True,,False,periodontitis_stage_4
-3356,medgemma-1.5-4b-it,hf,reader-v2,0,905,61,23.409229516983032,"```json
+3356,medgemma-1.5-4b-it,hf,reader-v2,0,905,61,6.907428503036499,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""stage ii grade b periodontitis."", ""rationale"": ""The note explicitly states 'stage ii grade b periodontitis.'""}
 ```",periodontitis_stage_2,B,generalized,stage ii grade b periodontitis.,True,,False,periodontitis_stage_2
-700,medgemma-1.5-4b-it,hf,reader-v2,0,811,64,23.41880202293396,"```json
+700,medgemma-1.5-4b-it,hf,reader-v2,0,811,64,6.88187837600708,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no bleeding on probing"", ""rationale"": ""The note explicitly states 'no bleeding on probing', which is a criterion for healthy status according to the AAP/EFP classification.""}
 ```",healthy,NA,NA,no bleeding on probing,True,,False,healthy
-4219,medgemma-1.5-4b-it,hf,reader-v2,0,817,66,24.915294408798218,"```json
+4219,medgemma-1.5-4b-it,hf,reader-v2,0,817,66,7.045842409133911,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Dx: Localized periodontitis Stage II Grade B."", ""rationale"": ""The note explicitly states 'Localized periodontitis Stage II Grade B'.""}
 ```",periodontitis_stage_2,B,localized,Dx: Localized periodontitis Stage II Grade B.,True,,False,periodontitis_stage_2
-3386,medgemma-1.5-4b-it,hf,reader-v2,0,856,78,29.851807355880737,"```json
-{""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""generalized moderate chronic periodontitis"", ""rationale"": ""The note explicitly states 'generalized moderate chronic periodontitis', which corresponds to periodontitis_stage_2 based on the AAP/EFP classification.""}
+3386,medgemma-1.5-4b-it,hf,reader-v2,0,856,83,8.291043758392334,"```json
+{""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""generalized moderate chronic periodontitis"", ""rationale"": ""The note explicitly states 'generalized moderate chronic periodontitis', which corresponds to periodontitis_stage_2 according to the 2017 AAP/EFP classification.""}
 ```",periodontitis_stage_2,B,generalized,generalized moderate chronic periodontitis,True,,False,periodontitis_stage_2
-3854,medgemma-1.5-4b-it,hf,reader-v2,0,807,70,25.354699850082397,"```json
+3854,medgemma-1.5-4b-it,hf,reader-v2,0,807,70,7.36660361289978,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Impression: Localized periodontitis Stage II Grade B."", ""rationale"": ""The impression explicitly states the patient has Localized periodontitis Stage II Grade B.""}
 ```",periodontitis_stage_2,B,localized,Impression: Localized periodontitis Stage II Grade B.,True,,False,periodontitis_stage_2
-3480,medgemma-1.5-4b-it,hf,reader-v2,0,844,73,28.414702653884888,"```json
+3480,medgemma-1.5-4b-it,hf,reader-v2,0,844,73,7.544837713241577,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: shallow sulci throughout, no BOP, no attachment loss."", ""rationale"": ""The note explicitly states 'no BOP, no attachment loss' during periodontal charting, which aligns with the definition of healthy.""}
 ```",healthy,NA,NA,"perio charting done: shallow sulci throughout, no BOP, no attachment loss.",True,,False,healthy
-4282,medgemma-1.5-4b-it,hf,reader-v2,0,841,111,40.9944794178009,"```json
+4282,medgemma-1.5-4b-it,hf,reader-v2,0,841,111,10.563889503479004,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""max PD 7 mm; BWX: bone loss to apical third (~58%); CAL up to 10mm"", ""rationale"": ""The patient has generalized periodontitis with a maximum probing depth of 7 mm, bone loss to the apical third of 58%, and CAL up to 10 mm, meeting the criteria for stage 3.""}
 ```",periodontitis_stage_3,B,generalized,max PD 7 mm; BWX: bone loss to apical third (~58%); CAL up to 10mm,False,quote not in note,True,periodontitis_stage_4
-1444,medgemma-1.5-4b-it,hf,reader-v2,0,803,71,25.274978637695312,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dx: Perio health."", ""rationale"": ""The note explicitly states 'Dx: Perio health.' which corresponds to the 'healthy' status in the 2017 AAP/EFP classification.""}
+1444,medgemma-1.5-4b-it,hf,reader-v2,0,803,52,5.8830389976501465,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dx: Perio health."", ""rationale"": ""The diagnosis 'Perio health' indicates a healthy periodontal status.""}
 ```",healthy,NA,NA,Dx: Perio health.,True,,False,healthy
-3702,medgemma-1.5-4b-it,hf,reader-v2,0,912,65,25.16016721725464,"```json
+3702,medgemma-1.5-4b-it,hf,reader-v2,0,912,65,7.2193286418914795,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""generalized stage 3 grade b periodontitis"", ""rationale"": ""The note explicitly states 'generalized stage 3 grade b periodontitis'.""}
 ```",periodontitis_stage_3,B,generalized,generalized stage 3 grade b periodontitis,True,,False,periodontitis_stage_3
-1998,medgemma-1.5-4b-it,hf,reader-v2,0,875,68,25.75590753555298,"```json
+1998,medgemma-1.5-4b-it,hf,reader-v2,0,875,68,7.185299396514893,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage 3 Grade B"", ""rationale"": ""The note explicitly states the diagnosis is 'Generalized Periodontitis Stage 3 Grade B'.""}
 ```",periodontitis_stage_3,B,generalized,Generalized Periodontitis Stage 3 Grade B,True,,False,periodontitis_stage_3
-1874,medgemma-1.5-4b-it,hf,reader-v2,0,805,126,41.845988512039185,"```json
+1874,medgemma-1.5-4b-it,hf,reader-v2,0,805,126,11.891402244567871,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Pt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: PAN: bone loss to coronal third (~5%), attachment loss 1-1 mm, generalized 3-3mm pockets, localized #5 M 3mm, #11 M 4mm, no BOP. Impression: Perio health."", ""rationale"": ""The note explicitly states 'Impression: Perio health' and 'no BOP', indicating a healthy periodontal status.""}
 ```",healthy,NA,NA,"Pt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: PAN: bone loss to coronal third (~5%), attachment loss 1-1 mm, generalized 3-3mm pockets, localized #5 M 3mm, #11 M 4mm, no BOP. Impression: Perio health.",True,,False,healthy
-3422,medgemma-1.5-4b-it,hf,reader-v2,0,949,71,27.008506536483765,"```json
+3422,medgemma-1.5-4b-it,hf,reader-v2,0,949,71,7.804724931716919,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d- localized periodontitis, stage 3 grade c"", ""rationale"": ""The note explicitly states 'd- localized periodontitis, stage 3 grade c'.""}
 ```",periodontitis_stage_3,C,localized,"d- localized periodontitis, stage 3 grade c",True,,False,periodontitis_stage_3
-1712,medgemma-1.5-4b-it,hf,reader-v2,0,886,67,26.133697986602783,"```json
+1712,medgemma-1.5-4b-it,hf,reader-v2,0,886,67,7.072916269302368,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""d : localized stage iv grade b. periodontitis."", ""rationale"": ""The note explicitly states 'localized stage iv grade b. periodontitis.'"" }
 ```",periodontitis_stage_4,B,localized,d : localized stage iv grade b. periodontitis.,True,,False,periodontitis_stage_4
-2058,medgemma-1.5-4b-it,hf,reader-v2,0,872,76,29.38106894493103,"```json
+2058,medgemma-1.5-4b-it,hf,reader-v2,0,872,76,7.76243257522583,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""DIAGNOSIS: GENERALIZED STAGE 2 GRADE B. PERIODONTITIS."", ""rationale"": ""The diagnosis explicitly states 'GENERALIZED STAGE 2 GRADE B. PERIODONTITIS'.""}
 ```",periodontitis_stage_2,B,generalized,DIAGNOSIS: GENERALIZED STAGE 2 GRADE B. PERIODONTITIS.,True,,False,periodontitis_stage_2
-792,medgemma-1.5-4b-it,hf,reader-v2,0,810,63,23.9177885055542,"```json
+792,medgemma-1.5-4b-it,hf,reader-v2,0,810,63,6.7656896114349365,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""Generalized periodontitis Stage I Grade A."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage I Grade A.'""}
 ```",periodontitis_stage_1,A,generalized,Generalized periodontitis Stage I Grade A.,True,,False,periodontitis_stage_1
-3496,medgemma-1.5-4b-it,hf,reader-v2,0,952,109,40.90556740760803,"```json
+3496,medgemma-1.5-4b-it,hf,reader-v2,0,952,109,11.08015513420105,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""d:generalized severe chronic periodontitis; 6 teeth lost to periodontal disease"", ""rationale"": ""The note explicitly states 'd:generalized severe chronic periodontitis' and '6 teeth lost to periodontal disease', indicating generalized periodontitis of stage 3 severity (due to 6 teeth lost) and grade C (due to 6 teeth lost).""}
 ```",periodontitis_stage_4,C,generalized,d:generalized severe chronic periodontitis; 6 teeth lost to periodontal disease,True,,False,periodontitis_stage_4
-4198,medgemma-1.5-4b-it,hf,reader-v2,0,811,69,25.74928569793701,"```json
+4198,medgemma-1.5-4b-it,hf,reader-v2,0,811,69,7.430582284927368,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dx: Periodontium WNL."", ""rationale"": ""The note explicitly states 'Dx: Periodontium WNL.', which translates to 'Diagnosis: Periodontium WNL.', indicating a normal periodontal status.""}
 ```",healthy,NA,NA,Dx: Periodontium WNL.,True,,False,healthy
-1922,medgemma-1.5-4b-it,hf,reader-v2,0,893,75,28.193512678146362,"```json
-{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d : generalized severe chronic periodontitis"", ""rationale"": ""The note explicitly states 'd : generalized severe chronic periodontitis', which directly corresponds to periodontitis_stage_3.""}
+1922,medgemma-1.5-4b-it,hf,reader-v2,0,893,74,7.650065898895264,"```json
+{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d : generalized severe chronic periodontitis"", ""rationale"": ""The note explicitly states 'd : generalized severe chronic periodontitis', which corresponds to periodontitis_stage_3.""}
 ```",periodontitis_stage_3,B,generalized,d : generalized severe chronic periodontitis,True,,False,periodontitis_stage_3
-3966,medgemma-1.5-4b-it,hf,reader-v2,0,874,89,35.17064571380615,"```json
+3966,medgemma-1.5-4b-it,hf,reader-v2,0,874,89,8.85265588760376,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no pocketing, CAL 0; recession 3mm #11, no bleeding on probing."", ""rationale"": ""The note explicitly states 'no pocketing, CAL 0; recession 3mm #11, no bleeding on probing.' which aligns with the definition of healthy periodontal status.""}
 ```",healthy,NA,NA,"no pocketing, CAL 0; recession 3mm #11, no bleeding on probing.",True,,False,healthy
-3581,medgemma-1.5-4b-it,hf,reader-v2,0,799,70,25.050320863723755,"```json
+3581,medgemma-1.5-4b-it,hf,reader-v2,0,799,70,7.342671871185303,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Impression: Localized periodontitis Stage I Grade B."", ""rationale"": ""The impression explicitly states the patient has Localized periodontitis Stage I Grade B.""}
 ```",periodontitis_stage_1,B,localized,Impression: Localized periodontitis Stage I Grade B.,True,,False,periodontitis_stage_1
-3982,medgemma-1.5-4b-it,hf,reader-v2,0,851,63,23.14685320854187,"```json
+3982,medgemma-1.5-4b-it,hf,reader-v2,0,851,63,6.6535561084747314,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized periodontitis Stage III Grade B."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage III Grade B.'""}
 ```",periodontitis_stage_3,B,generalized,Generalized periodontitis Stage III Grade B.,True,,False,periodontitis_stage_3
-181,medgemma-1.5-4b-it,hf,reader-v2,0,801,75,26.849706649780273,"```json
-{""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Stage I/Grade B perio"", ""rationale"": ""The note explicitly states 'Stage I/Grade B perio', which corresponds to periodontitis_stage_1 with a grade of B.""}
+181,medgemma-1.5-4b-it,hf,reader-v2,0,801,80,8.139950513839722,"```json
+{""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Stage I/Grade B perio"", ""rationale"": ""The note explicitly states 'Stage I/Grade B perio' in the impression section, which corresponds to periodontitis_stage_1 with a grade of B.""}
 ```",periodontitis_stage_1,B,localized,Stage I/Grade B perio,True,,False,periodontitis_stage_1
-2653,medgemma-1.5-4b-it,hf,reader-v2,0,844,85,28.9817955493927,"```json
+2653,medgemma-1.5-4b-it,hf,reader-v2,0,844,85,8.433013916015625,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""CAL 0, shallow sulci throughout, BOP 16%"", ""rationale"": ""The note states CAL 0, shallow sulci throughout, and BOP 16%, which meets the criteria for gingivitis (no interdental attachment loss, BOP >= 10%).""}
 ```",gingivitis,NA,NA,"CAL 0, shallow sulci throughout, BOP 16%",True,,False,gingivitis
-3177,medgemma-1.5-4b-it,hf,reader-v2,0,867,83,29.18417978286743,"```json
+3177,medgemma-1.5-4b-it,hf,reader-v2,0,867,83,8.310034036636353,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""generalized moderate chronic periodontitis"", ""rationale"": ""The note explicitly states 'generalized moderate chronic periodontitis', which corresponds to periodontitis_stage_3 according to the 2017 AAP/EFP classification.""}
 ```",periodontitis_stage_3,C,generalized,generalized moderate chronic periodontitis,True,,False,periodontitis_stage_3
-652,medgemma-1.5-4b-it,hf,reader-v2,0,865,135,47.7281928062439,"```json
+652,medgemma-1.5-4b-it,hf,reader-v2,0,865,135,12.57587742805481,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""max PD 10 mm, FMX: bone loss to apical third (~44%), missing #2, #15, #18, #19, #24, #25, #30 (hx perio ext)"", ""rationale"": ""The patient has generalized periodontitis with a maximum probing depth of 10 mm, significant bone loss to the apical third, and multiple missing teeth due to periodontitis, meeting the criteria for stage 4.""}
 ```",periodontitis_stage_4,C,generalized,"max PD 10 mm, FMX: bone loss to apical third (~44%), missing #2, #15, #18, #19, #24, #25, #30 (hx perio ext)",True,,False,periodontitis_stage_4
-560,medgemma-1.5-4b-it,hf,reader-v2,0,871,73,27.82029962539673,"```json
+560,medgemma-1.5-4b-it,hf,reader-v2,0,871,73,7.551822185516357,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""D- GENERALIZED STAGE 1 GRADE A PERIODONTITIS."", ""rationale"": ""The note explicitly states 'D- GENERALIZED STAGE 1 GRADE A PERIODONTITIS.'""}
 ```",periodontitis_stage_1,A,generalized,D- GENERALIZED STAGE 1 GRADE A PERIODONTITIS.,True,,False,periodontitis_stage_1
-3246,medgemma-1.5-4b-it,hf,reader-v2,0,922,70,28.278564929962158,"```json
+3246,medgemma-1.5-4b-it,hf,reader-v2,0,922,70,7.67517876625061,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""III"", ""extent"": ""generalized"", ""quote"": ""diagnosis: stage iv grade iii periodontitis, generalized"", ""rationale"": ""The note explicitly states the diagnosis is 'stage iv grade iii periodontitis, generalized'.""}
 ```",periodontitis_stage_4,NA,generalized,"diagnosis: stage iv grade iii periodontitis, generalized",True,,False,periodontitis_stage_4
-2275,medgemma-1.5-4b-it,hf,reader-v2,0,859,76,28.306583404541016,"```json
+2275,medgemma-1.5-4b-it,hf,reader-v2,0,859,76,7.776652574539185,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: PD 1-3mm WNL, no BOP."", ""rationale"": ""The note states probing depths are 1-3mm and there is no bleeding on probing, which aligns with the definition of healthy.""}
 ```",healthy,NA,NA,"perio charting done: PD 1-3mm WNL, no BOP.",True,,False,healthy
-2842,medgemma-1.5-4b-it,hf,reader-v2,0,860,102,34.631773948669434,"```json
+2842,medgemma-1.5-4b-it,hf,reader-v2,0,860,102,9.852948665618896,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""max CAL 4mm interproximal"", ""rationale"": ""The initial stage is determined by the interdental CAL at the worst site, which is 4mm. The grade is determined by the percentage of bone loss, which is 4mm, falling into the 0.25-1.0 B range.""}
 ```",periodontitis_stage_2,B,generalized,max CAL 4mm interproximal,True,,False,periodontitis_stage_2
-720,medgemma-1.5-4b-it,hf,reader-v2,0,807,134,45.18927502632141,"```json
+720,medgemma-1.5-4b-it,hf,reader-v2,0,807,134,12.544125080108643,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Pt seen for recall exam. Med hx: T2DM, last A1c 6.6; smoker ~29 cig/day. Exam: recession 2mm #11, bleeding on probing 18% of sites, PD 1-3mm WNL. Impression: Dental biofilm-induced gingivitis, localized. Prophy, flossing instruction. 6 mo recall."", ""rationale"": ""The note explicitly states 'Impression: Dental biofilm-induced gingivitis, localized'.""}
 ```",gingivitis,NA,NA,"Pt seen for recall exam. Med hx: T2DM, last A1c 6.6; smoker ~29 cig/day. Exam: recession 2mm #11, bleeding on probing 18% of sites, PD 1-3mm WNL. Impression: Dental biofilm-induced gingivitis, localized. Prophy, flossing instruction. 6 mo recall.",True,,False,gingivitis
-1979,medgemma-1.5-4b-it,hf,reader-v2,0,869,71,26.456894159317017,"```json
+1979,medgemma-1.5-4b-it,hf,reader-v2,0,869,71,7.361446142196655,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""ii"", ""extent"": ""localized"", ""quote"": ""diagnosis: stage 2 grade ii periodontitis, localized"", ""rationale"": ""The note explicitly states 'diagnosis: stage 2 grade ii periodontitis, localized'.""}
 ```",periodontitis_stage_2,NA,localized,"diagnosis: stage 2 grade ii periodontitis, localized",True,,False,periodontitis_stage_2
-459,medgemma-1.5-4b-it,hf,reader-v2,0,853,81,30.910083770751953,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""perio charting done: BOP generalized, CAL 0, PD 1-3mm WNL."", ""rationale"": ""The note states BOP is generalized and CAL is 0, indicating no attachment loss, which aligns with the definition of gingivitis.""}
+459,medgemma-1.5-4b-it,hf,reader-v2,0,853,73,7.493969678878784,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: BOP generalized, CAL 0, PD 1-3mm WNL."", ""rationale"": ""The chart notes generalized BOP and 0 CAL, indicating gingivitis, not periodontitis.""}
 ```",gingivitis,NA,NA,"perio charting done: BOP generalized, CAL 0, PD 1-3mm WNL.",True,,False,gingivitis
-2238,medgemma-1.5-4b-it,hf,reader-v2,0,873,69,27.104971408843994,"```json
+2238,medgemma-1.5-4b-it,hf,reader-v2,0,873,69,7.193623304367065,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d- tentative diagnosis is stage 2 grade b generalized"", ""rationale"": ""The note explicitly states 'd- tentative diagnosis is stage 2 grade b generalized'.""}
 ```",periodontitis_stage_2,B,generalized,d- tentative diagnosis is stage 2 grade b generalized,True,,False,periodontitis_stage_2
-1815,medgemma-1.5-4b-it,hf,reader-v2,0,847,94,33.917667388916016,"```json
+1815,medgemma-1.5-4b-it,hf,reader-v2,0,847,94,9.174101114273071,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""no attachment loss, BOP generalized, PD 1-3mm WNL"", ""rationale"": ""The note explicitly states 'no attachment loss' and 'BOP generalized, PD 1-3mm WNL', which aligns with the definition of gingivitis under the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,"no attachment loss, BOP generalized, PD 1-3mm WNL",True,,False,gingivitis
-3309,medgemma-1.5-4b-it,hf,reader-v2,0,858,64,25.993767976760864,"```json
+3309,medgemma-1.5-4b-it,hf,reader-v2,0,858,64,6.746551513671875,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""stage iii grade c periodontitis."", ""rationale"": ""The note explicitly states the diagnosis is 'stage iii grade c periodontitis.'"" }
 ```",periodontitis_stage_3,C,localized,stage iii grade c periodontitis.,True,,False,periodontitis_stage_3
-3063,medgemma-1.5-4b-it,hf,reader-v2,0,918,66,26.14754843711853,"```json
-{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Diagnosis: Localized Periodontitis Stage III Grade B"", ""rationale"": ""The diagnosis explicitly states Localized Periodontitis Stage III Grade B.""}
+3063,medgemma-1.5-4b-it,hf,reader-v2,0,918,66,7.368844985961914,"```json
+{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Diagnosis: Localized Periodontitis Stage III Grade B"", ""rationale"": ""The diagnosis explicitly states 'Localized Periodontitis Stage III Grade B'.""}
 ```",periodontitis_stage_3,B,localized,Diagnosis: Localized Periodontitis Stage III Grade B,True,,False,periodontitis_stage_3
-1836,medgemma-1.5-4b-it,hf,reader-v2,0,828,63,24.03157353401184,"```json
+1836,medgemma-1.5-4b-it,hf,reader-v2,0,828,63,6.801828384399414,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized periodontitis Stage II Grade C."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage II Grade C.'""}
 ```",periodontitis_stage_2,C,generalized,Generalized periodontitis Stage II Grade C.,True,,False,periodontitis_stage_2
-2672,medgemma-1.5-4b-it,hf,reader-v2,0,878,71,28.154482126235962,"```json
+2672,medgemma-1.5-4b-it,hf,reader-v2,0,878,71,7.358706712722778,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d- generalzied periodontitis stage 3 grade b"", ""rationale"": ""The note explicitly states 'd- generalzied periodontitis stage 3 grade b'.""}
 ```",periodontitis_stage_3,B,generalized,d- generalzied periodontitis stage 3 grade b,True,,False,periodontitis_stage_3
-1142,medgemma-1.5-4b-it,hf,reader-v2,0,869,70,28.047098636627197,"```json
-{""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""D: LOCALIZED STAGE IV GRADE C. PERIODONTITIS."", ""rationale"": ""The note explicitly states 'localized STAGE IV GRADE C. PERIODONTITIS.'""}}
-```",,NA,NA,,False,parse: JSONDecodeError,True,periodontitis_stage_4
-481,medgemma-1.5-4b-it,hf,reader-v2,0,849,63,26.194997310638428,"```json
+1142,medgemma-1.5-4b-it,hf,reader-v2,0,869,70,7.271025896072388,"```json
+{""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""D: LOCALIZED STAGE IV GRADE C. PERIODONTITIS."", ""rationale"": ""The note explicitly states 'localized STAGE IV GRADE C. PERIODONTITIS.'"" }
+```",periodontitis_stage_4,C,localized,D: LOCALIZED STAGE IV GRADE C. PERIODONTITIS.,True,,False,periodontitis_stage_4
+481,medgemma-1.5-4b-it,hf,reader-v2,0,849,63,6.683504104614258,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""Localized periodontitis Stage III Grade C."", ""rationale"": ""The note explicitly states 'Localized periodontitis Stage III Grade C.'""}
 ```",periodontitis_stage_3,C,localized,Localized periodontitis Stage III Grade C.,True,,False,periodontitis_stage_3
-1348,medgemma-1.5-4b-it,hf,reader-v2,0,827,73,31.108462810516357,"```json
+1348,medgemma-1.5-4b-it,hf,reader-v2,0,827,73,7.584789514541626,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""bleeding on probing 25% of sites"", ""rationale"": ""Bleeding on probing (BOP) at 25% of sites meets the criteria for gingivitis (BOP >= 10%).""}
 ```",gingivitis,NA,NA,bleeding on probing 25% of sites,True,,False,gingivitis
-3764,medgemma-1.5-4b-it,hf,reader-v2,0,902,67,26.08301067352295,"```json
+3764,medgemma-1.5-4b-it,hf,reader-v2,0,902,67,7.373765707015991,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage IV Grade C"", ""rationale"": ""The note explicitly states 'Generalized Periodontitis Stage IV Grade C' as the diagnosis.""}
 ```",periodontitis_stage_4,C,generalized,Generalized Periodontitis Stage IV Grade C,True,,False,periodontitis_stage_4
-898,medgemma-1.5-4b-it,hf,reader-v2,0,857,62,24.17180061340332,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""d : generalized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'd : generalized plaque induced gingivitis', which corresponds to the gingivitis classification.""}
+898,medgemma-1.5-4b-it,hf,reader-v2,0,857,72,7.441395282745361,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""d : generalized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'd : generalized plaque induced gingivitis', which corresponds to gingivitis in the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,d : generalized plaque induced gingivitis,True,,False,gingivitis
-2924,medgemma-1.5-4b-it,hf,reader-v2,0,797,51,26.39244556427002,"```json
-{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""moderate attachment loss"", ""rationale"": ""moderate attachment loss indicates periodontitis""}
+2924,medgemma-1.5-4b-it,hf,reader-v2,0,797,52,5.842587471008301,"```json
+{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""moderate attachment loss"", ""rationale"": ""Moderate attachment loss indicates periodontitis.""}
 ```",periodontitis_stage_3,B,generalized,moderate attachment loss,True,,False,periodontitis_stage_3
-612,medgemma-1.5-4b-it,hf,reader-v2,0,803,48,19.800424814224243,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""Dx: Gingivitis."", ""rationale"": ""The note explicitly states the diagnosis is Gingivitis.""}
+612,medgemma-1.5-4b-it,hf,reader-v2,0,803,48,5.535436630249023,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""Dx: Gingivitis."", ""rationale"": ""The note explicitly states the diagnosis as Gingivitis.""}
 ```",gingivitis,NA,NA,Dx: Gingivitis.,True,,False,gingivitis
-94,medgemma-1.5-4b-it,hf,reader-v2,0,907,69,30.15650987625122,"```json
+94,medgemma-1.5-4b-it,hf,reader-v2,0,907,69,7.564188480377197,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""d- localized stage ii grade b. periodontitis."", ""rationale"": ""The note explicitly states 'd- localized stage ii grade b. periodontitis.'""}
 ```",periodontitis_stage_2,B,localized,d- localized stage ii grade b. periodontitis.,True,,False,periodontitis_stage_2
-4256,medgemma-1.5-4b-it,hf,reader-v2,0,881,190,70.90800166130066,"```json
-{""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""max PD 4 mm, bleeding on probing 13% of sites, CAL up to 1mm"", ""rationale"": ""The note states max probing depth is 4 mm, bleeding on probing is 13% of sites, and CAL is up to 1mm. This meets the criteria for periodontitis_stage_2: CAL 3-4 mm (RBL 15-33% if CAL not recorded), max probing depth <= 5 mm. The CAL is up to 1mm, which is within the 3-4 mm range, and the max probing depth is 4 mm, which is <= 5 mm. The bleeding on probing is 13%, which is >= 10%.""}
+4256,medgemma-1.5-4b-it,hf,reader-v2,0,881,190,17.34433388710022,"```json
+{""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""max PD 4 mm, bleeding on probing 13% of sites, CAL up to 1mm"", ""rationale"": ""The note states max probing depth is 4 mm, bleeding on probing is 13% of sites, and CAL is up to 1mm. This meets the criteria for periodontitis_stage_2: CAL 3-4 mm (RBL 15-33% if CAL not recorded), max probing depth <= 5 mm, and no tooth loss due to perio. The CAL of 1mm falls within the 3-4 mm range, and the probing depth of 4 mm is <= 5 mm. The bleeding on probing of 13% is >= 10%.""}
 ```",periodontitis_stage_2,C,localized,"max PD 4 mm, bleeding on probing 13% of sites, CAL up to 1mm",True,,False,periodontitis_stage_2
-1225,medgemma-1.5-4b-it,hf,reader-v2,0,853,65,26.08848261833191,"```json
-{""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Localized Stage I Grade B"", ""rationale"": ""The note explicitly states 'Localized Stage I Grade B', which directly corresponds to the classification system.""}
-```",periodontitis_stage_1,B,localized,Localized Stage I Grade B,True,,False,periodontitis_stage_1
-776,medgemma-1.5-4b-it,hf,reader-v2,0,860,75,31.902307987213135,"```json
+1225,medgemma-1.5-4b-it,hf,reader-v2,0,853,60,6.408214569091797,"```json
+{""status"": ""localized Stage I Grade B"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Localized Stage I Grade B"", ""rationale"": ""The note explicitly states 'Localized Stage I Grade B' as the periodontal status.""}
+```",,NA,NA,Localized Stage I Grade B,False,bad status 'localized Stage I Grade B',True,periodontitis_stage_1
+776,medgemma-1.5-4b-it,hf,reader-v2,0,860,75,7.662986516952515,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""D:LOCALIZED PERIODONTITIS, STAGE 1 GRADE A"", ""rationale"": ""The note explicitly states 'D:LOCALIZED PERIODONTITIS, STAGE 1 GRADE A'.""}
 ```",periodontitis_stage_1,A,localized,"D:LOCALIZED PERIODONTITIS, STAGE 1 GRADE A",True,,False,periodontitis_stage_1
-3634,medgemma-1.5-4b-it,hf,reader-v2,0,856,62,25.250849723815918,"```json
+3634,medgemma-1.5-4b-it,hf,reader-v2,0,856,62,6.619065761566162,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""bleeding on probing 28% of sites"", ""rationale"": ""Bleeding on probing (BOP) >= 10% indicates gingivitis.""}
 ```",gingivitis,NA,NA,bleeding on probing 28% of sites,True,,False,gingivitis
-2342,medgemma-1.5-4b-it,hf,reader-v2,0,861,61,25.381359577178955,"```json
+2342,medgemma-1.5-4b-it,hf,reader-v2,0,861,61,6.505007743835449,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""stage i grade a periodontitis."", ""rationale"": ""The diagnosis explicitly states 'stage i grade a periodontitis.'"" }
 ```",periodontitis_stage_1,A,localized,stage i grade a periodontitis.,True,,False,periodontitis_stage_1
-553,medgemma-1.5-4b-it,hf,reader-v2,0,822,65,24.77893900871277,"```json
+553,medgemma-1.5-4b-it,hf,reader-v2,0,822,65,6.958836793899536,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""Dx: Generalized periodontitis Stage I Grade A."", ""rationale"": ""The diagnosis explicitly states 'Generalized periodontitis Stage I Grade A'.""}
 ```",periodontitis_stage_1,A,generalized,Dx: Generalized periodontitis Stage I Grade A.,True,,False,periodontitis_stage_1
-2708,medgemma-1.5-4b-it,hf,reader-v2,0,863,54,22.007205963134766,"```json
+2708,medgemma-1.5-4b-it,hf,reader-v2,0,863,54,5.9967217445373535,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""localized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'localized plaque induced gingivitis' as the diagnosis.""}
 ```",gingivitis,NA,NA,localized plaque induced gingivitis,True,,False,gingivitis
-3773,medgemma-1.5-4b-it,hf,reader-v2,0,867,66,26.24094009399414,"```json
+3773,medgemma-1.5-4b-it,hf,reader-v2,0,867,66,6.9241111278533936,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""stage 3 grade c periodontitis."", ""rationale"": ""The note explicitly states the diagnosis is 'stage 3 grade c periodontitis'.""}
 ```",periodontitis_stage_3,C,generalized,stage 3 grade c periodontitis.,True,,False,periodontitis_stage_3
-4318,medgemma-1.5-4b-it,hf,reader-v2,0,892,78,28.912278413772583,"```json
+4318,medgemma-1.5-4b-it,hf,reader-v2,0,892,78,7.967535018920898,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Gen. perio St 3 Gr C"", ""rationale"": ""The note explicitly states 'Gen. perio St 3 Gr C', which directly corresponds to generalized periodontitis stage 3, grade C.""}
 ```",periodontitis_stage_3,C,generalized,Gen. perio St 3 Gr C,True,,False,periodontitis_stage_3
-3636,medgemma-1.5-4b-it,hf,reader-v2,0,830,54,21.576860189437866,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""Plaque-induced gingivitis."", ""rationale"": ""The note explicitly states 'Plaque-induced gingivitis.'""}
-```",gingivitis,NA,NA,Plaque-induced gingivitis.,True,,False,gingivitis
-1061,medgemma-1.5-4b-it,hf,reader-v2,0,803,52,21.94320058822632,"```json
+3636,medgemma-1.5-4b-it,hf,reader-v2,0,830,71,7.460747718811035,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""A: Plaque-induced gingivitis."", ""rationale"": ""The note explicitly states 'A: Plaque-induced gingivitis.' which corresponds to the gingivitis category in the AAP/EFP classification.""}
+```",gingivitis,NA,NA,A: Plaque-induced gingivitis.,True,,False,gingivitis
+1061,medgemma-1.5-4b-it,hf,reader-v2,0,803,52,5.856574058532715,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dx: Perio health."", ""rationale"": ""The diagnosis 'Perio health' indicates a healthy periodontal status.""}
 ```",healthy,NA,NA,Dx: Perio health.,True,,False,healthy
-1407,medgemma-1.5-4b-it,hf,reader-v2,0,861,73,28.008827209472656,"```json
+1407,medgemma-1.5-4b-it,hf,reader-v2,0,861,73,7.4763312339782715,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""D:GENERALIZED STAGE 1 GRADE A PERIODONTITIS."", ""rationale"": ""The note explicitly states 'D:GENERALIZED STAGE 1 GRADE A PERIODONTITIS.'""}
 ```",periodontitis_stage_1,A,generalized,D:GENERALIZED STAGE 1 GRADE A PERIODONTITIS.,True,,False,periodontitis_stage_1
-2752,medgemma-1.5-4b-it,hf,reader-v2,0,871,99,35.35228633880615,"```json
+2752,medgemma-1.5-4b-it,hf,reader-v2,0,871,99,9.660662651062012,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: BOP generalized, no pocketing, CAL 0; recession 1mm #11."", ""rationale"": ""The note explicitly states 'no pocketing' and 'CAL 0', indicating no interdental attachment loss, which is characteristic of gingivitis according to the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,"perio charting done: BOP generalized, no pocketing, CAL 0; recession 1mm #11.",True,,False,gingivitis
-2951,medgemma-1.5-4b-it,hf,reader-v2,0,790,72,27.84167242050171,"```json
+2951,medgemma-1.5-4b-it,hf,reader-v2,0,790,72,7.481368780136108,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Localised slight chronic periodontitis."", ""rationale"": ""The note explicitly states 'Localised slight chronic periodontitis.' which corresponds to periodontitis_stage_1.""}
 ```",periodontitis_stage_1,B,localized,Localised slight chronic periodontitis.,False,quote not in note,True,periodontitis_stage_1
-599,medgemma-1.5-4b-it,hf,reader-v2,0,803,54,20.550398349761963,"```json
+599,medgemma-1.5-4b-it,hf,reader-v2,0,803,54,6.020154714584351,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dx: Perio health."", ""rationale"": ""The diagnosis explicitly states 'Perio health', indicating a healthy periodontal status.""}
 ```",healthy,NA,NA,Dx: Perio health.,True,,False,healthy
-3716,medgemma-1.5-4b-it,hf,reader-v2,0,802,81,29.49931263923645,"```json
+3716,medgemma-1.5-4b-it,hf,reader-v2,0,802,81,8.198619365692139,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""A: Dental biofilm-induced gingivitis, localized."", ""rationale"": ""The note explicitly states 'A: Dental biofilm-induced gingivitis, localized.' which corresponds to the gingivitis category in the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,"A: Dental biofilm-induced gingivitis, localized.",True,,False,gingivitis
-1264,medgemma-1.5-4b-it,hf,reader-v2,0,846,67,28.38899564743042,"```json
+1264,medgemma-1.5-4b-it,hf,reader-v2,0,846,67,7.005043029785156,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Dx at that visit: Stage I periodontitis."", ""rationale"": ""The note explicitly states 'Dx at that visit: Stage I periodontitis.'""}
 ```",periodontitis_stage_1,A,localized,Dx at that visit: Stage I periodontitis.,True,,False,periodontitis_stage_1
-909,medgemma-1.5-4b-it,hf,reader-v2,0,856,88,31.338897228240967,"```json
+909,medgemma-1.5-4b-it,hf,reader-v2,0,856,88,8.72661828994751,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""diagnosis: generlized periodontitis stage ii grade b"", ""rationale"": ""The note explicitly states 'diagnosis: generlized periodontitis stage ii grade b', which directly corresponds to the periodontitis_stage_2, grade B classification.""}
 ```",periodontitis_stage_2,B,generalized,diagnosis: generlized periodontitis stage ii grade b,True,,False,periodontitis_stage_2
-1853,medgemma-1.5-4b-it,hf,reader-v2,0,872,65,25.1167893409729,"```json
+1853,medgemma-1.5-4b-it,hf,reader-v2,0,872,65,6.85014796257019,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""d : generalized stage ii grade a periodontitis."", ""rationale"": ""The note explicitly states 'generalized stage ii grade a periodontitis'.""}
 ```",periodontitis_stage_2,A,generalized,d : generalized stage ii grade a periodontitis.,True,,False,periodontitis_stage_2
-3514,medgemma-1.5-4b-it,hf,reader-v2,0,856,58,23.096372842788696,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""CAL 0"", ""rationale"": ""The chart notes CAL 0, indicating no interdental attachment loss, which is consistent with gingivitis.""}
+3514,medgemma-1.5-4b-it,hf,reader-v2,0,856,56,6.086422681808472,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""CAL 0"", ""rationale"": ""Interdental CAL is 0 mm, which is within the normal limits for healthy periodontal tissue.""}
 ```",gingivitis,NA,NA,CAL 0,True,,False,gingivitis
-2070,medgemma-1.5-4b-it,hf,reader-v2,0,886,65,26.651482820510864,"```json
+2070,medgemma-1.5-4b-it,hf,reader-v2,0,886,65,6.915972709655762,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""generalized periodontitis, stage iv grade c"", ""rationale"": ""The note explicitly states 'generalized periodontitis, stage iv grade c'.""}
 ```",periodontitis_stage_4,C,generalized,"generalized periodontitis, stage iv grade c",True,,False,periodontitis_stage_4
-278,medgemma-1.5-4b-it,hf,reader-v2,0,882,69,27.398701667785645,"```json
+278,medgemma-1.5-4b-it,hf,reader-v2,0,882,69,7.23895001411438,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d:generalized stage 3 grade b periodontitis."", ""rationale"": ""The note explicitly states 'd:generalized stage 3 grade b periodontitis.'""}
 ```",periodontitis_stage_3,B,generalized,d:generalized stage 3 grade b periodontitis.,True,,False,periodontitis_stage_3
-4192,medgemma-1.5-4b-it,hf,reader-v2,0,794,81,30.001694440841675,"```json
-{""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""PAN: moderate horizontal bone loss, mild pocketing"", ""rationale"": ""The note indicates moderate horizontal bone loss and mild pocketing, which corresponds to periodontitis stage 2 according to the AAP/EFP classification.""}
-```",periodontitis_stage_2,B,generalized,"PAN: moderate horizontal bone loss, mild pocketing",True,,False,periodontitis_stage_2
-3229,medgemma-1.5-4b-it,hf,reader-v2,0,851,87,33.74217104911804,"```json
+4192,medgemma-1.5-4b-it,hf,reader-v2,0,794,69,7.221799612045288,"```json
+{""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""moderate attachment loss"", ""rationale"": ""The note indicates moderate attachment loss, which corresponds to periodontitis stage 2 according to the AAP/EFP classification.""}
+```",periodontitis_stage_2,B,generalized,moderate attachment loss,True,,False,periodontitis_stage_2
+3229,medgemma-1.5-4b-it,hf,reader-v2,0,851,87,8.661304950714111,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: PD 1-3mm WNL, no BOP, no attachment loss."", ""rationale"": ""The note states probing depths are 1-3mm, there is no bleeding on probing, and no attachment loss, which aligns with the definition of gingivitis.""}
 ```",gingivitis,NA,NA,"perio charting done: PD 1-3mm WNL, no BOP, no attachment loss.",True,,False,gingivitis
-1002,medgemma-1.5-4b-it,hf,reader-v2,0,780,76,26.39864945411682,"```json
+1002,medgemma-1.5-4b-it,hf,reader-v2,0,780,76,7.783974647521973,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""minimal BOP, PAN: crestal bone WNL, no attachment loss, shallow sulci throughout."", ""rationale"": ""The note states minimal bleeding on probing, no attachment loss, and shallow sulci, indicating a healthy periodontal status.""}
 ```",healthy,NA,NA,"minimal BOP, PAN: crestal bone WNL, no attachment loss, shallow sulci throughout.",True,,False,healthy
-73,medgemma-1.5-4b-it,hf,reader-v2,0,788,76,27.325976610183716,"```json
+73,medgemma-1.5-4b-it,hf,reader-v2,0,788,76,7.789743661880493,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""O: BWX: crestal bone WNL; probing depths within normal limits; no BOP."", ""rationale"": ""The note states probing depths are within normal limits and there is no bleeding on probing, indicating a healthy periodontal status.""}
 ```",healthy,NA,NA,O: BWX: crestal bone WNL; probing depths within normal limits; no BOP.,True,,False,healthy
-81,medgemma-1.5-4b-it,hf,reader-v2,0,796,65,24.614427089691162,"```json
+81,medgemma-1.5-4b-it,hf,reader-v2,0,796,65,6.896809101104736,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""A: Periodontium WNL."", ""rationale"": ""The note states 'Periodontium WNL', which translates to 'Periodontium Within Normal Limits', indicating a healthy periodontal status.""}
 ```",healthy,NA,NA,A: Periodontium WNL.,True,,False,healthy
-1861,medgemma-1.5-4b-it,hf,reader-v2,0,774,115,39.303247928619385,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": ""generalized"", ""quote"": ""Patient seen for recall exam. Med hx: NKDA; non-smoker. Exam: localized BOP, no pocketing. Impression: Dental biofilm-induced gingivitis, generalized. Prophy, flossing instruction. 6 mo recall."", ""rationale"": ""The note explicitly states 'Impression: Dental biofilm-induced gingivitis, generalized', classifying the patient's periodontal status as gingivitis and generalized extent.""}
+1861,medgemma-1.5-4b-it,hf,reader-v2,0,774,117,11.068646669387817,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": ""generalized"", ""quote"": ""Patient seen for recall exam. Med hx: NKDA; non-smoker. Exam: localized BOP, no pocketing. Impression: Dental biofilm-induced gingivitis, generalized. Prophy, flossing instruction. 6 mo recall."", ""rationale"": ""The note explicitly states 'Impression: Dental biofilm-induced gingivitis, generalized.' This directly corresponds to the gingivitis status in the AAP/EFP classification.""}
 ```",gingivitis,NA,NA,"Patient seen for recall exam. Med hx: NKDA; non-smoker. Exam: localized BOP, no pocketing. Impression: Dental biofilm-induced gingivitis, generalized. Prophy, flossing instruction. 6 mo recall.",True,,False,gingivitis
-2025,medgemma-1.5-4b-it,hf,reader-v2,0,833,70,27.36447834968567,"```json
+2025,medgemma-1.5-4b-it,hf,reader-v2,0,833,70,7.20264458656311,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized severe chronic periodontitis."", ""rationale"": ""The note explicitly states 'Generalized severe chronic periodontitis.' which corresponds to periodontitis_stage_4.""}
 ```",periodontitis_stage_4,C,generalized,Generalized severe chronic periodontitis.,True,,False,periodontitis_stage_4
-670,medgemma-1.5-4b-it,hf,reader-v2,0,797,102,35.10239624977112,"```json
-{""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""bone loss to middle third (~25%)"", ""rationale"": ""The radiographic finding of bone loss to the middle third indicates interdental attachment loss (CAL) of 1-2 mm, which is the defining characteristic of periodontitis_stage_1 according to the 2017 AAP/EFP classification.""}
+670,medgemma-1.5-4b-it,hf,reader-v2,0,797,66,6.999652862548828,"```json
+{""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""bone loss to middle third (~25%)"", ""rationale"": ""Interdental CAL up to 3mm indicates stage 1 periodontitis.""}
 ```",periodontitis_stage_1,B,localized,bone loss to middle third (~25%),True,,False,periodontitis_stage_1
-987,medgemma-1.5-4b-it,hf,reader-v2,0,911,71,26.925626754760742,"```json
+987,medgemma-1.5-4b-it,hf,reader-v2,0,911,71,7.7339935302734375,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""d:locallized periodontitis stage ii grade b."", ""rationale"": ""The note explicitly states 'd:locallized periodontitis stage ii grade b.'""}
 ```",periodontitis_stage_2,B,localized,d:locallized periodontitis stage ii grade b.,True,,False,periodontitis_stage_2
-4147,medgemma-1.5-4b-it,hf,reader-v2,0,857,106,37.908302545547485,"```json
+4147,medgemma-1.5-4b-it,hf,reader-v2,0,857,106,10.172734022140503,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""bleeding on probing 27% of sites, no attachment loss, shallow sulci throughout."", ""rationale"": ""The note states bleeding on probing (BOP) is 27% of sites, which is less than 10%, and there is no attachment loss. This meets the criteria for healthy status according to the 2017 AAP/EFP classification.""}
 ```",healthy,NA,NA,"bleeding on probing 27% of sites, no attachment loss, shallow sulci throughout.",True,,False,healthy
-1365,medgemma-1.5-4b-it,hf,reader-v2,0,884,67,24.91894841194153,"```json
+1365,medgemma-1.5-4b-it,hf,reader-v2,0,884,67,7.023035764694214,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d- tentative diagnosis is stage iii grade c localized"", ""rationale"": ""The note explicitly states 'd- tentative diagnosis is stage iii grade c localized'.""}
 ```",periodontitis_stage_3,C,localized,d- tentative diagnosis is stage iii grade c localized,True,,False,periodontitis_stage_3
-4277,medgemma-1.5-4b-it,hf,reader-v2,0,903,65,24.56327795982361,"```json
+4277,medgemma-1.5-4b-it,hf,reader-v2,0,903,65,7.202247381210327,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""d: localized stage iii grade b periodontitis."", ""rationale"": ""The note explicitly states 'localized stage iii grade b periodontitis'.""}
 ```",periodontitis_stage_3,B,localized,d: localized stage iii grade b periodontitis.,True,,False,periodontitis_stage_3
-2430,medgemma-1.5-4b-it,hf,reader-v2,0,800,115,39.539257526397705,"```json
+2430,medgemma-1.5-4b-it,hf,reader-v2,0,800,115,11.043455839157104,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""generalized"", ""quote"": ""Pt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: CAL 0, localized BOP, FMX: crestal bone WNL, no pocketing. Impression: Dental biofilm-induced gingivitis, generalized. Prophy + OHI, re-eval gingiva next recall."", ""rationale"": ""The note explicitly states 'Impression: Dental biofilm-induced gingivitis, generalized.'""}
 ```",gingivitis,NA,NA,"Pt seen for recall exam. Med hx: HTN controlled; never smoker. Exam: CAL 0, localized BOP, FMX: crestal bone WNL, no pocketing. Impression: Dental biofilm-induced gingivitis, generalized. Prophy + OHI, re-eval gingiva next recall.",True,,False,gingivitis
-1706,medgemma-1.5-4b-it,hf,reader-v2,0,814,69,25.148057222366333,"```json
+1706,medgemma-1.5-4b-it,hf,reader-v2,0,814,69,7.295098781585693,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no attachment loss"", ""rationale"": ""The note explicitly states 'no attachment loss', which is a defining characteristic of the healthy status according to the 2017 AAP/EFP classification.""}
 ```",healthy,NA,NA,no attachment loss,True,,False,healthy
-1701,medgemma-1.5-4b-it,hf,reader-v2,0,820,55,21.213932275772095,"```json
+1701,medgemma-1.5-4b-it,hf,reader-v2,0,820,55,6.155577182769775,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""moderate attachment loss"", ""rationale"": ""Moderate attachment loss indicates periodontitis stage 2.""}
 ```",periodontitis_stage_2,B,localized,moderate attachment loss,True,,False,periodontitis_stage_2
-3127,medgemma-1.5-4b-it,hf,reader-v2,0,794,65,23.181128978729248,"```json
+3127,medgemma-1.5-4b-it,hf,reader-v2,0,794,65,6.901040077209473,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""A: Generalized periodontitis Stage II Grade C."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage II Grade C'.""}
 ```",periodontitis_stage_2,C,generalized,A: Generalized periodontitis Stage II Grade C.,True,,False,periodontitis_stage_2
-3968,medgemma-1.5-4b-it,hf,reader-v2,0,854,60,22.74862265586853,"```json
+3968,medgemma-1.5-4b-it,hf,reader-v2,0,854,60,6.441844463348389,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""periodontal health on intact periodontium"", ""rationale"": ""The note explicitly states 'periodontal health on intact periodontium', indicating no signs of periodontal disease.""}
 ```",healthy,NA,NA,periodontal health on intact periodontium,True,,False,healthy
-3433,medgemma-1.5-4b-it,hf,reader-v2,0,849,59,23.9893741607666,"```json
+3433,medgemma-1.5-4b-it,hf,reader-v2,0,849,59,6.3671746253967285,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Stage II/Grade B perio."", ""rationale"": ""The note explicitly states 'Stage II/Grade B perio.'""}
 ```",periodontitis_stage_2,B,generalized,Stage II/Grade B perio.,True,,False,periodontitis_stage_2
-4009,medgemma-1.5-4b-it,hf,reader-v2,0,848,66,24.709850072860718,"```json
+4009,medgemma-1.5-4b-it,hf,reader-v2,0,848,66,6.906421661376953,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""clinical gingival health on intact periodontium"", ""rationale"": ""The note explicitly states 'clinical gingival health on intact periodontium', indicating no signs of gingivitis or periodontitis.""}
 ```",healthy,NA,NA,clinical gingival health on intact periodontium,True,,False,healthy
-2855,medgemma-1.5-4b-it,hf,reader-v2,0,883,67,25.340635776519775,"```json
+2855,medgemma-1.5-4b-it,hf,reader-v2,0,883,67,7.053827524185181,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Dx at that visit: Stage III periodontitis."", ""rationale"": ""The note explicitly states 'Dx at that visit: Stage III periodontitis.'""}
 ```",periodontitis_stage_3,C,generalized,Dx at that visit: Stage III periodontitis.,True,,False,periodontitis_stage_3
-2065,medgemma-1.5-4b-it,hf,reader-v2,0,892,69,25.329151391983032,"```json
+2065,medgemma-1.5-4b-it,hf,reader-v2,0,892,69,7.247995376586914,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""DIAGNOSIS: STAGE IV GRADE C PERIODONTITIS."", ""rationale"": ""The diagnosis explicitly states the patient has Stage IV Grade C Periodontitis.""}
 ```",periodontitis_stage_4,C,generalized,DIAGNOSIS: STAGE IV GRADE C PERIODONTITIS.,True,,False,periodontitis_stage_4
-559,medgemma-1.5-4b-it,hf,reader-v2,0,863,66,22.65988850593567,"```json
+559,medgemma-1.5-4b-it,hf,reader-v2,0,863,66,6.939525127410889,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Dx: Localized periodontitis Stage IV Grade B."", ""rationale"": ""The note explicitly states 'Localized periodontitis Stage IV Grade B'.""}
 ```",periodontitis_stage_4,B,localized,Dx: Localized periodontitis Stage IV Grade B.,True,,False,periodontitis_stage_4
-3392,medgemma-1.5-4b-it,hf,reader-v2,0,870,65,22.713994026184082,"```json
+3392,medgemma-1.5-4b-it,hf,reader-v2,0,870,65,6.9284508228302,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized Stage II Grade C"", ""rationale"": ""The note explicitly states 'Generalized Stage II Grade C', which directly corresponds to the classification system.""}
 ```",periodontitis_stage_2,C,generalized,Generalized Stage II Grade C,True,,False,periodontitis_stage_2
-873,medgemma-1.5-4b-it,hf,reader-v2,0,858,88,30.527730464935303,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: BOP <10%, CAL 0, probing depths within normal limits."", ""rationale"": ""The note explicitly states BOP <10% and CAL 0, which meets the criteria for a healthy status according to the 2017 AAP/EFP classification.""}
-```",healthy,NA,NA,"perio charting done: BOP <10%, CAL 0, probing depths within normal limits.",True,,False,healthy
-2388,medgemma-1.5-4b-it,hf,reader-v2,0,864,61,22.158568620681763,"```json
+873,medgemma-1.5-4b-it,hf,reader-v2,0,858,79,8.034278392791748,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""BOP <10%, CAL 0, probing depths within normal limits."", ""rationale"": ""The note explicitly states BOP <10% and CAL 0, indicating no attachment loss and no bone loss, which aligns with the definition of healthy.""}
+```",healthy,NA,NA,"BOP <10%, CAL 0, probing depths within normal limits.",True,,False,healthy
+2388,medgemma-1.5-4b-it,hf,reader-v2,0,864,61,6.494777202606201,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""minimal BOP, probing depths within normal limits."", ""rationale"": ""The note states minimal BOP and probing depths within normal limits, which aligns with the definition of healthy.""}
 ```",healthy,NA,NA,"minimal BOP, probing depths within normal limits.",True,,False,healthy
-2278,medgemma-1.5-4b-it,hf,reader-v2,0,828,61,22.681596279144287,"```json
+2278,medgemma-1.5-4b-it,hf,reader-v2,0,828,61,6.626063108444214,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Loc. perio St I Gr B."", ""rationale"": ""The note explicitly states 'Loc. perio St I Gr B.'""}
 ```",periodontitis_stage_1,B,localized,Loc. perio St I Gr B.,True,,False,periodontitis_stage_1
-1469,medgemma-1.5-4b-it,hf,reader-v2,0,858,108,38.577378034591675,"```json
+1469,medgemma-1.5-4b-it,hf,reader-v2,0,858,108,10.357077836990356,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""bleeding on probing 19% of sites, CAL up to 1mm, probing depths within normal limits."", ""rationale"": ""The note indicates bleeding on probing (BOP) of 19% of sites, which meets the criteria for gingivitis (BOP >= 10%). There is no mention of interdental attachment loss or probing depths indicative of periodontitis.""}
 ```",gingivitis,NA,NA,"bleeding on probing 19% of sites, CAL up to 1mm, probing depths within normal limits.",True,,False,gingivitis
-4077,medgemma-1.5-4b-it,hf,reader-v2,0,891,67,25.1641366481781,"```json
+4077,medgemma-1.5-4b-it,hf,reader-v2,0,891,67,7.06691575050354,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""i"", ""extent"": ""generalized"", ""quote"": ""stage 1 grade i periodontitis, generalized"", ""rationale"": ""The note explicitly states 'stage 1 grade i periodontitis, generalized'.""}
 ```",periodontitis_stage_1,NA,generalized,"stage 1 grade i periodontitis, generalized",True,,False,periodontitis_stage_1
-1020,medgemma-1.5-4b-it,hf,reader-v2,0,848,69,23.678548574447632,"```json
+1020,medgemma-1.5-4b-it,hf,reader-v2,0,848,69,7.157479763031006,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""d : localized periodontitis, stage 1 grade a"", ""rationale"": ""The note explicitly states 'localized periodontitis, stage 1 grade a'.""}
 ```",periodontitis_stage_1,A,localized,"d : localized periodontitis, stage 1 grade a",True,,False,periodontitis_stage_1
-1145,medgemma-1.5-4b-it,hf,reader-v2,0,861,74,25.329087734222412,"```json
-{""status"": ""periodontitis_stage_2"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""d: generalised periodontitis stage ii grade a"", ""rationale"": ""The note explicitly states 'd: generalised periodontitis stage ii grade a', which directly corresponds to the classification.""}
+1145,medgemma-1.5-4b-it,hf,reader-v2,0,861,75,7.664062023162842,"```json
+{""status"": ""periodontitis_stage_2"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""d: generalised periodontitis stage ii grade a"", ""rationale"": ""The note explicitly states 'd: generalised periodontitis stage ii grade a', which directly corresponds to the classification criteria.""}
 ```",periodontitis_stage_2,A,generalized,d: generalised periodontitis stage ii grade a,True,,False,periodontitis_stage_2
-878,medgemma-1.5-4b-it,hf,reader-v2,0,909,65,21.658047676086426,"```json
+878,medgemma-1.5-4b-it,hf,reader-v2,0,909,65,7.222130537033081,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d : localized stage iv grade c periodontitis."", ""rationale"": ""The note explicitly states 'localized stage iv grade c periodontitis'.""}
 ```",periodontitis_stage_4,C,localized,d : localized stage iv grade c periodontitis.,True,,False,periodontitis_stage_4
-2537,medgemma-1.5-4b-it,hf,reader-v2,0,850,71,24.548987865447998,"```json
+2537,medgemma-1.5-4b-it,hf,reader-v2,0,850,71,7.3422486782073975,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d:generalized periodontitis, stage 2 grade b."", ""rationale"": ""The note explicitly states 'd:generalized periodontitis, stage 2 grade b.'""}
 ```",periodontitis_stage_2,B,generalized,"d:generalized periodontitis, stage 2 grade b.",True,,False,periodontitis_stage_2
-3247,medgemma-1.5-4b-it,hf,reader-v2,0,850,67,24.16177248954773,"```json
+3247,medgemma-1.5-4b-it,hf,reader-v2,0,850,67,7.008950710296631,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""tentative diagnosis is stage 1 grade c localized"", ""rationale"": ""The note explicitly states 'tentative diagnosis is stage 1 grade c localized'.""}
 ```",periodontitis_stage_1,C,localized,tentative diagnosis is stage 1 grade c localized,True,,False,periodontitis_stage_1
-2996,medgemma-1.5-4b-it,hf,reader-v2,0,800,70,23.361774682998657,"```json
+2996,medgemma-1.5-4b-it,hf,reader-v2,0,800,70,7.293571949005127,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Impression: Localized periodontitis Stage I Grade B."", ""rationale"": ""The impression explicitly states the patient has Localized periodontitis Stage I Grade B.""}
 ```",periodontitis_stage_1,B,localized,Impression: Localized periodontitis Stage I Grade B.,True,,False,periodontitis_stage_1
-676,medgemma-1.5-4b-it,hf,reader-v2,0,846,65,24.014633655548096,"```json
+676,medgemma-1.5-4b-it,hf,reader-v2,0,846,65,6.8347132205963135,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Stage I periodontitis."", ""rationale"": ""The note explicitly states 'Stage I periodontitis.' as the diagnosis at the previous visit.""}
 ```",periodontitis_stage_1,A,localized,Stage I periodontitis.,True,,False,periodontitis_stage_1
-3888,medgemma-1.5-4b-it,hf,reader-v2,0,803,85,30.094858646392822,"```json
+3888,medgemma-1.5-4b-it,hf,reader-v2,0,803,85,8.555965185165405,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Dx: Generalized slight chronic periodontitis."", ""rationale"": ""The diagnosis explicitly states 'Generalized slight chronic periodontitis', which corresponds to periodontitis_stage_1 according to the 2017 AAP/EFP classification.""}
 ```",periodontitis_stage_1,B,generalized,Dx: Generalized slight chronic periodontitis.,True,,False,periodontitis_stage_1
-2592,medgemma-1.5-4b-it,hf,reader-v2,0,870,74,26.681375741958618,"```json
+2592,medgemma-1.5-4b-it,hf,reader-v2,0,870,74,7.606623411178589,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""DIAGNOSIS: LOCALIZED STAGE I GRADE B. PERIODONTITIS."", ""rationale"": ""The diagnosis explicitly states 'LOCALIZED STAGE I GRADE B. PERIODONTITIS'.""}
 ```",periodontitis_stage_1,B,localized,DIAGNOSIS: LOCALIZED STAGE I GRADE B. PERIODONTITIS.,True,,False,periodontitis_stage_1
-763,medgemma-1.5-4b-it,hf,reader-v2,0,803,70,23.478089332580566,"```json
+763,medgemma-1.5-4b-it,hf,reader-v2,0,803,70,7.295292615890503,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""CAL up to 4mm"", ""rationale"": ""The patient has interdental CAL up to 4mm, which corresponds to periodontitis_stage_2.""}
 ```",periodontitis_stage_2,B,generalized,CAL up to 4mm,True,,False,periodontitis_stage_2
-3685,medgemma-1.5-4b-it,hf,reader-v2,0,852,75,25.36143469810486,"```json
+3685,medgemma-1.5-4b-it,hf,reader-v2,0,852,75,7.661225318908691,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""perio charting done: CAL 0, localized BOP, no pocketing."", ""rationale"": ""The note explicitly states CAL 0, localized BOP, and no pocketing, which aligns with the definition of gingivitis.""}
 ```",gingivitis,NA,NA,"perio charting done: CAL 0, localized BOP, no pocketing.",True,,False,gingivitis
-4094,medgemma-1.5-4b-it,hf,reader-v2,0,847,65,24.804561138153076,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""clinical gingival health on intact periodontium"", ""rationale"": ""The note explicitly states 'clinical gingival health on intact periodontium', which aligns with the definition of healthy periodontal status.""}
+4094,medgemma-1.5-4b-it,hf,reader-v2,0,847,62,6.578096866607666,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""clinical gingival health on intact periodontium"", ""rationale"": ""The note explicitly states 'clinical gingival health on intact periodontium', indicating no signs of periodontal disease.""}
 ```",healthy,NA,NA,clinical gingival health on intact periodontium,True,,False,healthy
-79,medgemma-1.5-4b-it,hf,reader-v2,0,856,65,25.336668252944946,"```json
+79,medgemma-1.5-4b-it,hf,reader-v2,0,856,65,6.873707056045532,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""generalized stage 1 grade a periodontitis"", ""rationale"": ""The note explicitly states 'generalized stage 1 grade a periodontitis'.""}
 ```",periodontitis_stage_1,A,generalized,generalized stage 1 grade a periodontitis,True,,False,periodontitis_stage_1
-2601,medgemma-1.5-4b-it,hf,reader-v2,0,850,87,31.081812143325806,"```json
+2601,medgemma-1.5-4b-it,hf,reader-v2,0,850,87,8.604329824447632,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d : generalized moderate chronic periodontitis"", ""rationale"": ""The note explicitly states 'd : generalized moderate chronic periodontitis', which corresponds to periodontitis_stage_2 according to the 2017 AAP/EFP classification.""}
 ```",periodontitis_stage_2,B,generalized,d : generalized moderate chronic periodontitis,True,,False,periodontitis_stage_2
-4218,medgemma-1.5-4b-it,hf,reader-v2,0,809,70,28.839757919311523,"```json
+4218,medgemma-1.5-4b-it,hf,reader-v2,0,809,70,7.3494017124176025,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized severe chronic periodontitis."", ""rationale"": ""The note explicitly states 'Generalized severe chronic periodontitis.' which corresponds to periodontitis_stage_3.""}
 ```",periodontitis_stage_3,C,generalized,Generalized severe chronic periodontitis.,True,,False,periodontitis_stage_3
-2545,medgemma-1.5-4b-it,hf,reader-v2,0,843,71,27.748798370361328,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no attachment loss, mild pocketing, no bleeding on probing."", ""rationale"": ""The note explicitly states 'no attachment loss, mild pocketing, no bleeding on probing.' which aligns with the definition of healthy.""}
+2545,medgemma-1.5-4b-it,hf,reader-v2,0,843,73,7.474301338195801,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no attachment loss, mild pocketing, no bleeding on probing."", ""rationale"": ""The note explicitly states 'no attachment loss, mild pocketing, no bleeding on probing.' which aligns with the definition of healthy periodontal status.""}
 ```",healthy,NA,NA,"no attachment loss, mild pocketing, no bleeding on probing.",True,,False,healthy
-3932,medgemma-1.5-4b-it,hf,reader-v2,0,859,73,28.4835422039032,"```json
+3932,medgemma-1.5-4b-it,hf,reader-v2,0,859,73,7.482630252838135,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no attachment loss, no bleeding on probing, no pocketing."", ""rationale"": ""The note explicitly states 'no attachment loss, no bleeding on probing, no pocketing.' which aligns with the definition of healthy periodontal status.""}
 ```",healthy,NA,NA,"no attachment loss, no bleeding on probing, no pocketing.",True,,False,healthy
-2224,medgemma-1.5-4b-it,hf,reader-v2,0,859,66,25.398102521896362,"```json
+2224,medgemma-1.5-4b-it,hf,reader-v2,0,859,66,6.921713590621948,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage IV Grade C"", ""rationale"": ""The note explicitly states the diagnosis is 'Generalized Periodontitis Stage IV Grade C'.""}
 ```",periodontitis_stage_4,C,generalized,Generalized Periodontitis Stage IV Grade C,True,,False,periodontitis_stage_4
-1008,medgemma-1.5-4b-it,hf,reader-v2,0,860,80,32.4606237411499,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""probing depths within normal limits, no attachment loss, minimal BOP."", ""rationale"": ""The note explicitly states probing depths are within normal limits, there is no attachment loss, and minimal bleeding on probing (BOP), which aligns with the definition of healthy.""}
+1008,medgemma-1.5-4b-it,hf,reader-v2,0,860,76,7.757414817810059,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""probing depths within normal limits, no attachment loss, minimal BOP."", ""rationale"": ""The note explicitly states probing depths within normal limits, no attachment loss, and minimal bleeding on probing, which aligns with the definition of healthy periodontal status.""}
 ```",healthy,NA,NA,"probing depths within normal limits, no attachment loss, minimal BOP.",True,,False,healthy
-669,medgemma-1.5-4b-it,hf,reader-v2,0,863,69,28.04015564918518,"```json
+669,medgemma-1.5-4b-it,hf,reader-v2,0,863,69,7.175397634506226,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""D:GENERALIZED STAGE II GRADE B PERIODONTITIS."", ""rationale"": ""The note explicitly states 'GENERALIZED STAGE II GRADE B PERIODONTITIS'.""}
 ```",periodontitis_stage_2,B,generalized,D:GENERALIZED STAGE II GRADE B PERIODONTITIS.,True,,False,periodontitis_stage_2
-1309,medgemma-1.5-4b-it,hf,reader-v2,0,811,74,29.90943694114685,"```json
+1309,medgemma-1.5-4b-it,hf,reader-v2,0,811,74,7.646484375,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Clinical gingival health on an intact periodontium."", ""rationale"": ""The note explicitly states 'Clinical gingival health on an intact periodontium.' which corresponds to the 'healthy' status in the AAP/EFP classification.""}
 ```",healthy,NA,NA,Clinical gingival health on an intact periodontium.,True,,False,healthy
-426,medgemma-1.5-4b-it,hf,reader-v2,0,858,69,29.61676836013794,"```json
+426,medgemma-1.5-4b-it,hf,reader-v2,0,858,69,7.149499177932739,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""d: generalized stage 1 grade a periodontitis."", ""rationale"": ""The note explicitly states 'd: generalized stage 1 grade a periodontitis.'""}
 ```",periodontitis_stage_1,A,generalized,d: generalized stage 1 grade a periodontitis.,True,,False,periodontitis_stage_1
-3623,medgemma-1.5-4b-it,hf,reader-v2,0,809,52,21.643473863601685,"```json
+3623,medgemma-1.5-4b-it,hf,reader-v2,0,809,52,5.939968824386597,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dx: Perio health."", ""rationale"": ""The diagnosis 'Perio health' indicates a healthy periodontal status.""}
 ```",healthy,NA,NA,Dx: Perio health.,True,,False,healthy
-4211,medgemma-1.5-4b-it,hf,reader-v2,0,851,66,25.50342869758606,"```json
+4211,medgemma-1.5-4b-it,hf,reader-v2,0,851,66,6.9037744998931885,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage II Grade B"", ""rationale"": ""The note explicitly states the diagnosis is 'Generalized Periodontitis Stage II Grade B'.""}
 ```",periodontitis_stage_2,B,generalized,Generalized Periodontitis Stage II Grade B,True,,False,periodontitis_stage_2
-1914,medgemma-1.5-4b-it,hf,reader-v2,0,875,65,26.165403604507446,"```json
+1914,medgemma-1.5-4b-it,hf,reader-v2,0,875,65,6.853747367858887,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""d : localized stage iv grade b periodontitis."", ""rationale"": ""The note explicitly states 'localized stage iv grade b periodontitis'.""}
 ```",periodontitis_stage_4,B,localized,d : localized stage iv grade b periodontitis.,True,,False,periodontitis_stage_4
-1272,medgemma-1.5-4b-it,hf,reader-v2,0,800,77,30.666985988616943,"```json
+1272,medgemma-1.5-4b-it,hf,reader-v2,0,800,77,7.891830682754517,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""Clinical gingival health on an intact periodontium."", ""rationale"": ""The note explicitly states 'Clinical gingival health on an intact periodontium.' which corresponds to the healthy status in the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,Clinical gingival health on an intact periodontium.,True,,False,gingivitis
-2960,medgemma-1.5-4b-it,hf,reader-v2,0,881,67,27.05346417427063,"```json
+2960,medgemma-1.5-4b-it,hf,reader-v2,0,881,67,7.071518659591675,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d- generalized stage ii grade b periodontitis."", ""rationale"": ""The note explicitly states 'd- generalized stage ii grade b periodontitis.'""}
 ```",periodontitis_stage_2,B,generalized,d- generalized stage ii grade b periodontitis.,True,,False,periodontitis_stage_2
-2889,medgemma-1.5-4b-it,hf,reader-v2,0,815,79,30.586268663406372,"```json
-{""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""max CAL 2mm interproximal"", ""rationale"": ""The patient has interdental CAL of 2mm, which falls into the 1-2 mm range for periodontitis_stage_1.""}
+2889,medgemma-1.5-4b-it,hf,reader-v2,0,815,79,8.056476354598999,"```json
+{""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""max CAL 2mm interproximal"", ""rationale"": ""The patient has interdental CAL of 2mm, which falls within the 1-2 mm range for periodontitis_stage_1.""}
 ```",periodontitis_stage_1,B,localized,max CAL 2mm interproximal,True,,False,periodontitis_stage_1
-1806,medgemma-1.5-4b-it,hf,reader-v2,0,919,67,28.482249975204468,"```json
+1806,medgemma-1.5-4b-it,hf,reader-v2,0,919,67,7.400823354721069,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""d:stage iv grade c. periodontitis."", ""rationale"": ""The note explicitly states 'd:stage iv grade c. periodontitis.'""}
 ```",periodontitis_stage_4,C,generalized,d:stage iv grade c. periodontitis.,True,,False,periodontitis_stage_4
-1003,medgemma-1.5-4b-it,hf,reader-v2,0,858,65,25.0267436504364,"```json
+1003,medgemma-1.5-4b-it,hf,reader-v2,0,858,65,6.850757837295532,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d:stage iii grade b periodontitis."", ""rationale"": ""The note explicitly states 'd:stage iii grade b periodontitis.'""}
 ```",periodontitis_stage_3,B,generalized,d:stage iii grade b periodontitis.,True,,False,periodontitis_stage_3
-3225,medgemma-1.5-4b-it,hf,reader-v2,0,855,66,27.887884378433228,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: shallow sulci throughout, BOP generalized."", ""rationale"": ""The note states shallow sulci throughout and generalized BOP, which aligns with the definition of gingivitis.""}
+3225,medgemma-1.5-4b-it,hf,reader-v2,0,855,63,6.677549362182617,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: shallow sulci throughout, BOP generalized."", ""rationale"": ""The note indicates shallow sulci and generalized bleeding on probing, consistent with gingivitis.""}
 ```",gingivitis,NA,NA,"perio charting done: shallow sulci throughout, BOP generalized.",True,,False,gingivitis
-2913,medgemma-1.5-4b-it,hf,reader-v2,0,821,72,27.1887469291687,"```json
+2913,medgemma-1.5-4b-it,hf,reader-v2,0,821,72,7.503824472427368,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Stage III/Grade B perio"", ""rationale"": ""The note explicitly states 'Stage III/Grade B perio', which corresponds to periodontitis stage 3 and grade B.""}
 ```",periodontitis_stage_3,B,localized,Stage III/Grade B perio,True,,False,periodontitis_stage_3
-923,medgemma-1.5-4b-it,hf,reader-v2,0,861,78,31.13199758529663,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: localized BOP, PD 1-3mm WNL."", ""rationale"": ""The note states localized BOP and probing depths of 1-3mm, which are within normal limits (WNL), indicating gingivitis.""}
+923,medgemma-1.5-4b-it,hf,reader-v2,0,861,83,8.298980712890625,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: localized BOP, PD 1-3mm WNL."", ""rationale"": ""The note states localized BOP and probing depths of 1-3mm, which are within normal limits (WNL), indicating gingivitis rather than periodontitis.""}
 ```",gingivitis,NA,NA,"perio charting done: localized BOP, PD 1-3mm WNL.",True,,False,gingivitis
-2737,medgemma-1.5-4b-it,hf,reader-v2,0,801,58,22.89646863937378,"```json
+2737,medgemma-1.5-4b-it,hf,reader-v2,0,801,58,6.3687424659729,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""no pocketing"", ""rationale"": ""The note states 'no pocketing', which indicates the absence of periodontal pockets, consistent with gingivitis.""}
 ```",gingivitis,NA,NA,no pocketing,True,,False,gingivitis
-437,medgemma-1.5-4b-it,hf,reader-v2,0,913,68,27.305158615112305,"```json
+437,medgemma-1.5-4b-it,hf,reader-v2,0,913,68,7.469175577163696,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage 2 Grade B"", ""rationale"": ""The note explicitly states the diagnosis is 'Generalized Periodontitis Stage 2 Grade B'.""}
 ```",periodontitis_stage_2,B,generalized,Generalized Periodontitis Stage 2 Grade B,True,,False,periodontitis_stage_2
-1663,medgemma-1.5-4b-it,hf,reader-v2,0,859,91,32.123963356018066,"```json
+1663,medgemma-1.5-4b-it,hf,reader-v2,0,859,91,8.927359819412231,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""perio charting done: BOP generalized, shallow sulci throughout, CAL 0; recession 2mm #22."", ""rationale"": ""The note states BOP is generalized, sulci are shallow, and CAL is 0, indicating no attachment loss. This aligns with the definition of gingivitis.""}
 ```",gingivitis,NA,NA,"perio charting done: BOP generalized, shallow sulci throughout, CAL 0; recession 2mm #22.",True,,False,gingivitis
-2213,medgemma-1.5-4b-it,hf,reader-v2,0,865,89,32.93796753883362,"```json
+2213,medgemma-1.5-4b-it,hf,reader-v2,0,865,89,8.79958963394165,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""minimal BOP, PD 1-3mm WNL, max CAL 2mm interproximal"", ""rationale"": ""The note states minimal BOP, probing depths of 1-3mm, and maximum interproximal CAL of 2mm, which aligns with the definition of gingivitis.""}
 ```",gingivitis,NA,NA,"minimal BOP, PD 1-3mm WNL, max CAL 2mm interproximal",True,,False,gingivitis
-922,medgemma-1.5-4b-it,hf,reader-v2,0,852,73,28.211019039154053,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""CAL 0, shallow sulci throughout, no bleeding on probing."", ""rationale"": ""The note explicitly states CAL 0, shallow sulci throughout, and no bleeding on probing, which aligns with the definition of healthy.""}
+922,medgemma-1.5-4b-it,hf,reader-v2,0,852,75,7.680257320404053,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""CAL 0, shallow sulci throughout, no bleeding on probing."", ""rationale"": ""The note explicitly states CAL 0, shallow sulci throughout, and no bleeding on probing, which aligns with the definition of healthy periodontal status.""}
 ```",healthy,NA,NA,"CAL 0, shallow sulci throughout, no bleeding on probing.",True,,False,healthy
-757,medgemma-1.5-4b-it,hf,reader-v2,0,891,69,26.06392240524292,"```json
+757,medgemma-1.5-4b-it,hf,reader-v2,0,891,69,7.232460975646973,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""III"", ""extent"": ""localized"", ""quote"": ""diagnosis: stage iv grade iii periodontitis, localized"", ""rationale"": ""The note explicitly states 'diagnosis: stage iv grade iii periodontitis, localized'.""}
 ```",periodontitis_stage_4,NA,localized,"diagnosis: stage iv grade iii periodontitis, localized",True,,False,periodontitis_stage_4
-3287,medgemma-1.5-4b-it,hf,reader-v2,0,870,67,24.495929956436157,"```json
+3287,medgemma-1.5-4b-it,hf,reader-v2,0,870,67,7.009371042251587,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d : stage 3 grade c periodontitis."", ""rationale"": ""The note explicitly states 'd : stage 3 grade c periodontitis.'""}
 ```",periodontitis_stage_3,C,localized,d : stage 3 grade c periodontitis.,True,,False,periodontitis_stage_3
-318,medgemma-1.5-4b-it,hf,reader-v2,0,893,76,28.77961826324463,"```json
+318,medgemma-1.5-4b-it,hf,reader-v2,0,893,76,7.784534215927124,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""generalized"", ""quote"": ""generalized 3-3mm pockets"", ""rationale"": ""The note explicitly states 'generalized 3-3mm pockets', which falls under the definition of gingivitis in the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,generalized 3-3mm pockets,True,,False,gingivitis
-3319,medgemma-1.5-4b-it,hf,reader-v2,0,847,67,22.56504464149475,"```json
+3319,medgemma-1.5-4b-it,hf,reader-v2,0,847,67,7.055023193359375,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""tentative diagnosis is stage 1 grade b localized"", ""rationale"": ""The note explicitly states 'tentative diagnosis is stage 1 grade b localized'.""}
 ```",periodontitis_stage_1,B,localized,tentative diagnosis is stage 1 grade b localized,True,,False,periodontitis_stage_1
-1119,medgemma-1.5-4b-it,hf,reader-v2,0,843,70,23.01693892478943,"```json
-{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Localized Stage III Grade B"", ""rationale"": ""The note explicitly states 'Localized Stage III Grade B', which directly corresponds to the periodontitis stage and grade definitions.""}
+1119,medgemma-1.5-4b-it,hf,reader-v2,0,843,71,7.328190565109253,"```json
+{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Localized Stage III Grade B"", ""rationale"": ""The note explicitly states 'Localized Stage III Grade B', which directly corresponds to the periodontitis_stage_3 classification.""}
 ```",periodontitis_stage_3,B,localized,Localized Stage III Grade B,True,,False,periodontitis_stage_3
-3973,medgemma-1.5-4b-it,hf,reader-v2,0,844,68,24.389688730239868,"```json
+3973,medgemma-1.5-4b-it,hf,reader-v2,0,844,68,7.051900386810303,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no pocketing, BOP generalized, slight attachment loss"", ""rationale"": ""The note states 'no pocketing, BOP generalized, slight attachment loss', indicating gingivitis without periodontitis.""}
 ```",gingivitis,NA,NA,"no pocketing, BOP generalized, slight attachment loss",True,,False,gingivitis
-1433,medgemma-1.5-4b-it,hf,reader-v2,0,787,75,26.285154104232788,"```json
-{""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Stage I/Grade A perio"", ""rationale"": ""The note explicitly states 'Stage I/Grade A perio', which corresponds to periodontitis_stage_1 with a grade of A.""}
-```",periodontitis_stage_1,A,localized,Stage I/Grade A perio,True,,False,periodontitis_stage_1
-2364,medgemma-1.5-4b-it,hf,reader-v2,0,902,61,22.367156982421875,"```json
+1433,medgemma-1.5-4b-it,hf,reader-v2,0,787,59,6.387628793716431,"```json
+{""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Stage I/Grade A perio."", ""rationale"": ""The note explicitly states 'Stage I/Grade A perio.'""}
+```",periodontitis_stage_1,A,localized,Stage I/Grade A perio.,True,,False,periodontitis_stage_1
+2364,medgemma-1.5-4b-it,hf,reader-v2,0,902,61,6.898689270019531,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""stage iii grade b periodontitis."", ""rationale"": ""The note explicitly states 'stage iii grade b periodontitis.'""}
 ```",periodontitis_stage_3,B,localized,stage iii grade b periodontitis.,True,,False,periodontitis_stage_3
-2718,medgemma-1.5-4b-it,hf,reader-v2,0,852,69,27.41509509086609,"```json
+2718,medgemma-1.5-4b-it,hf,reader-v2,0,852,69,7.127771377563477,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""d: localized periodontitis, stage 1 grade b"", ""rationale"": ""The note explicitly states 'localized periodontitis, stage 1 grade b'.""}
 ```",periodontitis_stage_1,B,localized,"d: localized periodontitis, stage 1 grade b",True,,False,periodontitis_stage_1
-4167,medgemma-1.5-4b-it,hf,reader-v2,0,846,85,29.402480840682983,"```json
-{""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""attachment loss 3-4 mm"", ""rationale"": ""The initial stage is determined by the interdental attachment loss at the worst site, which is 3-4 mm. This places the patient in periodontitis_stage_2.""}
-```",periodontitis_stage_2,B,localized,attachment loss 3-4 mm,True,,False,periodontitis_stage_2
-4296,medgemma-1.5-4b-it,hf,reader-v2,0,899,66,22.792404413223267,"```json
+4167,medgemma-1.5-4b-it,hf,reader-v2,0,846,99,9.623754978179932,"```json
+{""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""attachment loss 3-4 mm, BOP 14%, PD 1-3mm WNL"", ""rationale"": ""The note indicates interdental attachment loss of 3-4 mm, which corresponds to periodontitis stage 2 according to the 2017 AAP/EFP classification.""}
+```",periodontitis_stage_2,B,localized,"attachment loss 3-4 mm, BOP 14%, PD 1-3mm WNL",True,,False,periodontitis_stage_2
+4296,medgemma-1.5-4b-it,hf,reader-v2,0,899,66,7.270904541015625,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""A: Localized periodontitis Stage IV Grade B."", ""rationale"": ""The note explicitly states 'Localized periodontitis Stage IV Grade B'.""}
 ```",periodontitis_stage_4,B,localized,A: Localized periodontitis Stage IV Grade B.,True,,False,periodontitis_stage_4
-899,medgemma-1.5-4b-it,hf,reader-v2,0,879,89,31.04387593269348,"```json
+899,medgemma-1.5-4b-it,hf,reader-v2,0,879,89,8.82762336730957,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: PD 1-3mm WNL, no attachment loss; recession 3mm #11, no bleeding on probing."", ""rationale"": ""The note explicitly states 'no attachment loss' and 'no bleeding on probing', which aligns with the definition of gingivitis.""}
 ```",gingivitis,NA,NA,"perio charting done: PD 1-3mm WNL, no attachment loss; recession 3mm #11, no bleeding on probing.",True,,False,gingivitis
-3457,medgemma-1.5-4b-it,hf,reader-v2,0,803,66,24.133978605270386,"```json
+3457,medgemma-1.5-4b-it,hf,reader-v2,0,803,66,7.0078020095825195,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""A: Localized periodontitis Stage I Grade A."", ""rationale"": ""The note explicitly states 'Localized periodontitis Stage I Grade A'.""}
 ```",periodontitis_stage_1,A,localized,A: Localized periodontitis Stage I Grade A.,True,,False,periodontitis_stage_1
-2245,medgemma-1.5-4b-it,hf,reader-v2,0,855,94,32.56667447090149,"```json
+2245,medgemma-1.5-4b-it,hf,reader-v2,0,855,94,9.192720651626587,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""BOP 42%, PD 1-3mm WNL, CAL up to 1mm"", ""rationale"": ""The patient has bleeding on probing (BOP) of 42%, which is >= 10%, indicating gingivitis according to the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,"BOP 42%, PD 1-3mm WNL, CAL up to 1mm",True,,False,gingivitis
-2796,medgemma-1.5-4b-it,hf,reader-v2,0,846,70,25.901715993881226,"```json
+2796,medgemma-1.5-4b-it,hf,reader-v2,0,846,70,7.219516277313232,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Localized Stage 2 Grade B"", ""rationale"": ""The note explicitly states 'Localized Stage 2 Grade B', which directly corresponds to the AAP/EFP classification.""}
 ```",periodontitis_stage_2,B,localized,Localized Stage 2 Grade B,True,,False,periodontitis_stage_2
-4302,medgemma-1.5-4b-it,hf,reader-v2,0,945,71,25.133574724197388,"```json
+4302,medgemma-1.5-4b-it,hf,reader-v2,0,945,71,7.7649009227752686,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d- stage 4 grade iii periodontitis, localized"", ""rationale"": ""The note explicitly states 'd- stage 4 grade iii periodontitis, localized'.""}
 ```",periodontitis_stage_4,C,localized,"d- stage 4 grade iii periodontitis, localized",True,,False,periodontitis_stage_4
-2299,medgemma-1.5-4b-it,hf,reader-v2,0,879,96,35.68638348579407,"```json
+2299,medgemma-1.5-4b-it,hf,reader-v2,0,879,96,9.4406099319458,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""D"", ""extent"": ""generalized"", ""quote"": ""d: generalized severe chronic periodontitis; 8 teeth lost to periodontal disease"", ""rationale"": ""The note explicitly states 'generalized severe chronic periodontitis' and '8 teeth lost to periodontal disease', indicating a generalized extent and severe stage (stage 4) based on the criteria provided.""}
 ```",periodontitis_stage_4,NA,generalized,d: generalized severe chronic periodontitis; 8 teeth lost to periodontal disease,True,,False,periodontitis_stage_4
-521,medgemma-1.5-4b-it,hf,reader-v2,0,913,67,23.51400113105774,"```json
+521,medgemma-1.5-4b-it,hf,reader-v2,0,913,67,7.418041467666626,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""d- tentative diagnosis is stage iv grade c generalized"", ""rationale"": ""The note explicitly states 'd- tentative diagnosis is stage iv grade c generalized'.""}
 ```",periodontitis_stage_4,C,generalized,d- tentative diagnosis is stage iv grade c generalized,True,,False,periodontitis_stage_4
-3551,medgemma-1.5-4b-it,hf,reader-v2,0,848,80,27.248883962631226,"```json
+3551,medgemma-1.5-4b-it,hf,reader-v2,0,848,80,8.099633693695068,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no pocketing, localized BOP, CAL 0"", ""rationale"": ""The note explicitly states 'no pocketing' and 'localized BOP', indicating the absence of interdental attachment loss, which is characteristic of gingivitis, not periodontitis.""}
 ```",gingivitis,NA,NA,"no pocketing, localized BOP, CAL 0",True,,False,gingivitis
-3689,medgemma-1.5-4b-it,hf,reader-v2,0,864,75,26.895036220550537,"```json
+3689,medgemma-1.5-4b-it,hf,reader-v2,0,864,75,7.6356213092803955,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""D- LOCALIZED PERIODONTITIS, STAGE 2 GRADE B"", ""rationale"": ""The note explicitly states 'D- LOCALIZED PERIODONTITIS, STAGE 2 GRADE B'.""}
 ```",periodontitis_stage_2,B,localized,"D- LOCALIZED PERIODONTITIS, STAGE 2 GRADE B",True,,False,periodontitis_stage_2
-4061,medgemma-1.5-4b-it,hf,reader-v2,0,838,70,24.390923738479614,"```json
+4061,medgemma-1.5-4b-it,hf,reader-v2,0,838,70,7.206749200820923,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""d: localized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'd: localized plaque induced gingivitis', which corresponds to the gingivitis category in the AAP/EFP classification.""}
 ```",gingivitis,NA,NA,d: localized plaque induced gingivitis,True,,False,gingivitis
-297,medgemma-1.5-4b-it,hf,reader-v2,0,815,121,38.79817819595337,"```json
+297,medgemma-1.5-4b-it,hf,reader-v2,0,815,121,11.471806287765503,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Exam: BOP <10%, CAL 0, generalized 3-3mm pockets, localized #24 D 3mm, #25 MB 4mm, #31 DB 3mm, BWX: mild horizontal bone loss ~10%. Impression: Perio health."", ""rationale"": ""The note states BOP < 10% and CAL 0, indicating no attachment loss or inflammation, consistent with a healthy status.""}
 ```",healthy,NA,NA,"Exam: BOP <10%, CAL 0, generalized 3-3mm pockets, localized #24 D 3mm, #25 MB 4mm, #31 DB 3mm, BWX: mild horizontal bone loss ~10%. Impression: Perio health.",True,,False,healthy
-3341,medgemma-1.5-4b-it,hf,reader-v2,0,831,78,25.77284002304077,"```json
+3341,medgemma-1.5-4b-it,hf,reader-v2,0,831,78,8.035391569137573,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no bleeding on probing, PD 1-3mm WNL."", ""rationale"": ""The note explicitly states 'no bleeding on probing' and 'PD 1-3mm WNL', which aligns with the definition of healthy periodontal status.""}
 ```",healthy,NA,NA,"no bleeding on probing, PD 1-3mm WNL.",True,,False,healthy
-2774,medgemma-1.5-4b-it,hf,reader-v2,0,819,72,26.1279513835907,"```json
+2774,medgemma-1.5-4b-it,hf,reader-v2,0,819,72,7.513143301010132,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""1 teeth lost to periodontal disease"", ""rationale"": ""The note explicitly states '1 teeth lost to periodontal disease', which meets the criteria for periodontitis_stage_3.""}
 ```",periodontitis_stage_3,B,localized,1 teeth lost to periodontal disease,True,,False,periodontitis_stage_3
-455,medgemma-1.5-4b-it,hf,reader-v2,0,811,78,27.621476411819458,"```json
+455,medgemma-1.5-4b-it,hf,reader-v2,0,811,78,7.989844083786011,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Gen. perio St I Gr B."", ""rationale"": ""The note explicitly states 'Gen. perio St I Gr B.', which corresponds to periodontitis stage 1, grade B, and generalized extent.""}
 ```",periodontitis_stage_1,B,generalized,Gen. perio St I Gr B.,True,,False,periodontitis_stage_1
-2030,medgemma-1.5-4b-it,hf,reader-v2,0,839,67,24.0383083820343,"```json
+2030,medgemma-1.5-4b-it,hf,reader-v2,0,839,67,6.961423635482788,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""generalized"", ""quote"": ""A: Generalized periodontitis Stage I Grade A."", ""rationale"": ""The note explicitly states 'A: Generalized periodontitis Stage I Grade A.'""}
 ```",periodontitis_stage_1,A,generalized,A: Generalized periodontitis Stage I Grade A.,True,,False,periodontitis_stage_1
-868,medgemma-1.5-4b-it,hf,reader-v2,0,847,85,30.07099723815918,"```json
+868,medgemma-1.5-4b-it,hf,reader-v2,0,847,85,8.471509456634521,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no attachment loss, shallow sulci throughout, bleeding on probing 29% of sites"", ""rationale"": ""Bleeding on probing (BOP) of 29% of sites meets the criteria for gingivitis (BOP >= 10% of sites).""}
 ```",gingivitis,NA,NA,"no attachment loss, shallow sulci throughout, bleeding on probing 29% of sites",True,,False,gingivitis
-3912,medgemma-1.5-4b-it,hf,reader-v2,0,809,68,23.235701084136963,"```json
-{""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""9 teeth lost to periodontal disease"", ""rationale"": ""The patient has lost 9 teeth due to periodontal disease, indicating generalized periodontitis stage 4.""}
+3912,medgemma-1.5-4b-it,hf,reader-v2,0,809,64,6.85681939125061,"```json
+{""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""9 teeth lost to periodontal disease"", ""rationale"": ""The patient has 9 teeth lost to periodontal disease, indicating generalized periodontitis.""}
 ```",periodontitis_stage_4,C,generalized,9 teeth lost to periodontal disease,True,,False,periodontitis_stage_4
-768,medgemma-1.5-4b-it,hf,reader-v2,0,838,88,31.918601989746094,"```json
+768,medgemma-1.5-4b-it,hf,reader-v2,0,838,88,8.703317642211914,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""severe horizontal bone loss, vertical defect #19; deep pockets posterior sextants; severe attachment loss"", ""rationale"": ""The note describes severe horizontal bone loss, vertical defect, deep pockets, and severe attachment loss, indicating periodontitis stage 3.""}
 ```",periodontitis_stage_3,B,localized,"severe horizontal bone loss, vertical defect #19; deep pockets posterior sextants; severe attachment loss",True,,False,periodontitis_stage_3
-1378,medgemma-1.5-4b-it,hf,reader-v2,0,847,69,24.680519580841064,"```json
+1378,medgemma-1.5-4b-it,hf,reader-v2,0,847,69,7.13288140296936,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d: generalized stage 1 grade b periodontitis."", ""rationale"": ""The note explicitly states 'd: generalized stage 1 grade b periodontitis.'""}
 ```",periodontitis_stage_1,B,generalized,d: generalized stage 1 grade b periodontitis.,True,,False,periodontitis_stage_1
-3270,medgemma-1.5-4b-it,hf,reader-v2,0,842,74,26.39209818840027,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""periodontal health on intact periodontium"", ""rationale"": ""The note explicitly states 'periodontal health on intact periodontium', which corresponds to the 'healthy' status in the 2017 AAP/EFP classification.""}
+3270,medgemma-1.5-4b-it,hf,reader-v2,0,842,60,6.406236410140991,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""periodontal health on intact periodontium"", ""rationale"": ""The note explicitly states 'periodontal health on intact periodontium', which corresponds to the healthy status.""}
 ```",healthy,NA,NA,periodontal health on intact periodontium,True,,False,healthy
-938,medgemma-1.5-4b-it,hf,reader-v2,0,846,63,24.141602993011475,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no bleeding on probing"", ""rationale"": ""The note explicitly states 'no bleeding on probing' which meets the criteria for healthy status according to the AAP/EFP classification.""}
+938,medgemma-1.5-4b-it,hf,reader-v2,0,846,68,7.115095376968384,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""no bleeding on probing"", ""rationale"": ""The note explicitly states 'no bleeding on probing' which meets the criteria for healthy status according to the 2017 AAP/EFP classification.""}
 ```",healthy,NA,NA,no bleeding on probing,True,,False,healthy
-1211,medgemma-1.5-4b-it,hf,reader-v2,0,850,66,23.94230628013611,"```json
+1211,medgemma-1.5-4b-it,hf,reader-v2,0,850,66,6.896515846252441,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""d : generalized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'd : generalized plaque induced gingivitis', indicating the patient's periodontal status is gingivitis.""}
 ```",gingivitis,NA,NA,d : generalized plaque induced gingivitis,True,,False,gingivitis
-1748,medgemma-1.5-4b-it,hf,reader-v2,0,878,63,23.344073057174683,"```json
+1748,medgemma-1.5-4b-it,hf,reader-v2,0,878,63,6.707974433898926,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized periodontitis Stage III Grade B."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage III Grade B.'""}
 ```",periodontitis_stage_3,B,generalized,Generalized periodontitis Stage III Grade B.,True,,False,periodontitis_stage_3
-69,medgemma-1.5-4b-it,hf,reader-v2,0,837,65,24.48158597946167,"```json
-{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage III Grade B"", ""rationale"": ""The diagnosis explicitly states the patient has Generalized Periodontitis Stage III Grade B.""}
+69,medgemma-1.5-4b-it,hf,reader-v2,0,837,67,7.00910496711731,"```json
+{""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized Periodontitis Stage III Grade B"", ""rationale"": ""The note explicitly states 'Generalized Periodontitis Stage III Grade B' as the diagnosis.""}
 ```",periodontitis_stage_3,B,generalized,Generalized Periodontitis Stage III Grade B,True,,False,periodontitis_stage_3
-3791,medgemma-1.5-4b-it,hf,reader-v2,0,797,68,23.93119740486145,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""slight attachment loss"", ""rationale"": ""The note mentions 'slight attachment loss', which falls under the definition of gingivitis in the 2017 AAP/EFP classification.""}
+3791,medgemma-1.5-4b-it,hf,reader-v2,0,797,62,6.646334648132324,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""slight attachment loss"", ""rationale"": ""The note mentions 'slight attachment loss', which is consistent with gingivitis according to the AAP/EFP classification.""}
 ```",gingivitis,NA,NA,slight attachment loss,True,,False,gingivitis
-2360,medgemma-1.5-4b-it,hf,reader-v2,0,821,76,26.672672748565674,"```json
+2360,medgemma-1.5-4b-it,hf,reader-v2,0,821,76,7.839213132858276,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Dx: Generalized periodontitis Stage II Grade C."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage II Grade C', which directly corresponds to the AAP/EFP classification.""}
 ```",periodontitis_stage_2,C,generalized,Dx: Generalized periodontitis Stage II Grade C.,True,,False,periodontitis_stage_2
-1046,medgemma-1.5-4b-it,hf,reader-v2,0,857,74,28.573073387145996,"```json
+1046,medgemma-1.5-4b-it,hf,reader-v2,0,857,74,7.567476272583008,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""d- generalized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'd- generalized plaque induced gingivitis', which corresponds to the gingivitis category in the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,d- generalized plaque induced gingivitis,True,,False,gingivitis
-2930,medgemma-1.5-4b-it,hf,reader-v2,0,855,74,28.903055906295776,"```json
+2930,medgemma-1.5-4b-it,hf,reader-v2,0,855,74,7.571822881698608,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Gen. perio St IV Gr C."", ""rationale"": ""The note explicitly states 'Gen. perio St IV Gr C.', which corresponds to periodontitis stage 4, grade C.""}
 ```",periodontitis_stage_3,C,generalized,Gen. perio St IV Gr C.,True,,False,periodontitis_stage_3
-349,medgemma-1.5-4b-it,hf,reader-v2,0,890,67,25.427732944488525,"```json
+349,medgemma-1.5-4b-it,hf,reader-v2,0,890,67,7.0627875328063965,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""d : generalized stage ii grade b periodontitis."", ""rationale"": ""The note explicitly states 'd : generalized stage ii grade b periodontitis.'""}
 ```",periodontitis_stage_2,B,generalized,d : generalized stage ii grade b periodontitis.,True,,False,periodontitis_stage_2
-3647,medgemma-1.5-4b-it,hf,reader-v2,0,894,155,54.600870847702026,"```json
+3647,medgemma-1.5-4b-it,hf,reader-v2,0,894,155,14.362741231918335,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""perio charting done: hx extraction of 2 teeth d/t perio, BOP 16%, attachment loss 7-8 mm, generalized 5-6mm pockets, localized #5 DL 7mm, #13 MB 6mm."", ""rationale"": ""The note states attachment loss of 7-8 mm, generalized 5-6mm pockets, and localized attachment loss of 7mm on tooth #5, which meets the criteria for periodontitis stage 3 (CAL >= 5 mm or 1-4 teeth lost due to perio).""}
 ```",periodontitis_stage_3,B,localized,"perio charting done: hx extraction of 2 teeth d/t perio, BOP 16%, attachment loss 7-8 mm, generalized 5-6mm pockets, localized #5 DL 7mm, #13 MB 6mm.",True,,False,periodontitis_stage_3
-3038,medgemma-1.5-4b-it,hf,reader-v2,0,880,67,23.83545160293579,"```json
+3038,medgemma-1.5-4b-it,hf,reader-v2,0,880,67,7.040604829788208,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""d : localized stage 4 grade b periodontitis."", ""rationale"": ""The note explicitly states 'localized stage 4 grade b periodontitis'.""}
 ```",periodontitis_stage_4,B,localized,d : localized stage 4 grade b periodontitis.,True,,False,periodontitis_stage_4
-1333,medgemma-1.5-4b-it,hf,reader-v2,0,818,72,26.26327157020569,"```json
+1333,medgemma-1.5-4b-it,hf,reader-v2,0,818,72,7.489457130432129,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dental biofilm-induced gingivitis, localized."", ""rationale"": ""The note explicitly states 'Dental biofilm-induced gingivitis, localized.' which corresponds to the gingivitis category in the AAP/EFP classification.""}
 ```",gingivitis,NA,NA,"Dental biofilm-induced gingivitis, localized.",True,,False,gingivitis
-2499,medgemma-1.5-4b-it,hf,reader-v2,0,865,94,33.801807165145874,"```json
+2499,medgemma-1.5-4b-it,hf,reader-v2,0,865,94,9.201907634735107,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""perio charting done: PD 1-3mm WNL, no attachment loss, bleeding on probing 30% of sites."", ""rationale"": ""Bleeding on probing (BOP) is present in 30% of sites, meeting the criteria for gingivitis (BOP >= 10%).""}
 ```",gingivitis,NA,NA,"perio charting done: PD 1-3mm WNL, no attachment loss, bleeding on probing 30% of sites.",True,,False,gingivitis
-539,medgemma-1.5-4b-it,hf,reader-v2,0,863,66,25.34946632385254,"```json
+539,medgemma-1.5-4b-it,hf,reader-v2,0,863,66,6.930914640426636,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Diagnosis: Localized Periodontitis Stage II Grade B"", ""rationale"": ""The diagnosis explicitly states 'Localized Periodontitis Stage II Grade B'.""}
 ```",periodontitis_stage_2,B,localized,Diagnosis: Localized Periodontitis Stage II Grade B,True,,False,periodontitis_stage_2
-2992,medgemma-1.5-4b-it,hf,reader-v2,0,807,48,18.91658329963684,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""heavy BOP"", ""rationale"": ""Heavy bleeding on probing (BOP) indicates gingivitis.""}
+2992,medgemma-1.5-4b-it,hf,reader-v2,0,807,44,5.220011949539185,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""heavy BOP"", ""rationale"": ""Heavy bleeding on probing indicates gingivitis.""}
 ```",gingivitis,NA,NA,heavy BOP,True,,False,gingivitis
-163,medgemma-1.5-4b-it,hf,reader-v2,0,809,66,25.500064849853516,"```json
+163,medgemma-1.5-4b-it,hf,reader-v2,0,809,66,7.008361339569092,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""Dx: Localized periodontitis Stage III Grade B."", ""rationale"": ""The diagnosis explicitly states 'Localized periodontitis Stage III Grade B'.""}
 ```",periodontitis_stage_3,B,localized,Dx: Localized periodontitis Stage III Grade B.,True,,False,periodontitis_stage_3
-507,medgemma-1.5-4b-it,hf,reader-v2,0,908,71,28.879382133483887,"```json
+507,medgemma-1.5-4b-it,hf,reader-v2,0,908,71,7.7321577072143555,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d- localized periodontitis, stage 2 grade c"", ""rationale"": ""The note explicitly states 'd- localized periodontitis, stage 2 grade c'.""}
 ```",periodontitis_stage_2,C,localized,"d- localized periodontitis, stage 2 grade c",True,,False,periodontitis_stage_2
-693,medgemma-1.5-4b-it,hf,reader-v2,0,895,70,27.174259185791016,"```json
+693,medgemma-1.5-4b-it,hf,reader-v2,0,895,70,7.327479124069214,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""Diagnosis: Localized Periodontitis Stage III Grade C with Generalized Plaque."", ""rationale"": ""The diagnosis explicitly states 'Localized Periodontitis Stage III Grade C'.""}
 ```",periodontitis_stage_3,C,localized,Diagnosis: Localized Periodontitis Stage III Grade C with Generalized Plaque.,True,,False,periodontitis_stage_3
-2181,medgemma-1.5-4b-it,hf,reader-v2,0,909,71,28.8322651386261,"```json
+2181,medgemma-1.5-4b-it,hf,reader-v2,0,909,71,7.70085334777832,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""DIAGNOSIS: LOCALIZED STAGE III GRADE C. PERIODONTITIS."", ""rationale"": ""The diagnosis explicitly states 'Localized Stage III Grade C Periodontitis'.""}
 ```",periodontitis_stage_3,C,localized,DIAGNOSIS: LOCALIZED STAGE III GRADE C. PERIODONTITIS.,True,,False,periodontitis_stage_3
-587,medgemma-1.5-4b-it,hf,reader-v2,0,865,67,27.57905650138855,"```json
+587,medgemma-1.5-4b-it,hf,reader-v2,0,865,67,6.997416257858276,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""generalized periodontitis, stage 3 grade b"", ""rationale"": ""The note explicitly states 'generalized periodontitis, stage 3 grade b'.""}
 ```",periodontitis_stage_3,B,generalized,"generalized periodontitis, stage 3 grade b",True,,False,periodontitis_stage_3
-3565,medgemma-1.5-4b-it,hf,reader-v2,0,855,63,21.44882106781006,"```json
+3565,medgemma-1.5-4b-it,hf,reader-v2,0,855,63,6.715620040893555,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Generalized periodontitis Stage IV Grade B."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage IV Grade B.'""}
 ```",periodontitis_stage_4,B,generalized,Generalized periodontitis Stage IV Grade B.,True,,False,periodontitis_stage_4
-2170,medgemma-1.5-4b-it,hf,reader-v2,0,829,65,23.39729142189026,"```json
+2170,medgemma-1.5-4b-it,hf,reader-v2,0,829,65,6.973532199859619,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Dx: Generalized periodontitis Stage III Grade C."", ""rationale"": ""The diagnosis explicitly states 'Generalized periodontitis Stage III Grade C'.""}
 ```",periodontitis_stage_3,C,generalized,Dx: Generalized periodontitis Stage III Grade C.,True,,False,periodontitis_stage_3
-2177,medgemma-1.5-4b-it,hf,reader-v2,0,803,79,28.00109887123108,"```json
+2177,medgemma-1.5-4b-it,hf,reader-v2,0,803,79,8.022329092025757,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""BOP 23%; FMX: crestal bone WNL; probing depths within normal limits."", ""rationale"": ""The patient has no interdental attachment loss and bleeding on probing is less than 10% of sites (23%).""}
 ```",healthy,NA,NA,BOP 23%; FMX: crestal bone WNL; probing depths within normal limits.,True,,False,healthy
-1734,medgemma-1.5-4b-it,hf,reader-v2,0,800,72,27.823856830596924,"```json
+1734,medgemma-1.5-4b-it,hf,reader-v2,0,800,72,7.461620569229126,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""Exam: FMX: mild horizontal bone loss, probing depths within normal limits, BOP generalized, CAL 0. Impression: Gingivitis."", ""rationale"": ""The note explicitly states 'Impression: Gingivitis'.""}
 ```",gingivitis,NA,NA,"Exam: FMX: mild horizontal bone loss, probing depths within normal limits, BOP generalized, CAL 0. Impression: Gingivitis.",True,,False,gingivitis
-1393,medgemma-1.5-4b-it,hf,reader-v2,0,853,63,22.924496173858643,"```json
+1393,medgemma-1.5-4b-it,hf,reader-v2,0,853,63,6.686179161071777,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""generalized"", ""quote"": ""d : generalized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'd : generalized plaque induced gingivitis', indicating the patient's periodontal status.""}
 ```",gingivitis,NA,NA,d : generalized plaque induced gingivitis,True,,False,gingivitis
-2712,medgemma-1.5-4b-it,hf,reader-v2,0,871,87,32.614986419677734,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""shallow sulci throughout, no bleeding on probing, CAL 0"", ""rationale"": ""The note explicitly states 'shallow sulci throughout, no bleeding on probing, CAL 0', which meets the criteria for healthy periodontal status according to the 2017 AAP/EFP classification.""}
+2712,medgemma-1.5-4b-it,hf,reader-v2,0,871,75,7.7026143074035645,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""shallow sulci throughout, no bleeding on probing, CAL 0"", ""rationale"": ""The note explicitly states 'shallow sulci throughout, no bleeding on probing, CAL 0', which aligns with the definition of healthy periodontal status.""}
 ```",healthy,NA,NA,"shallow sulci throughout, no bleeding on probing, CAL 0",True,,False,healthy
-3606,medgemma-1.5-4b-it,hf,reader-v2,0,848,52,20.13884925842285,"```json
+3606,medgemma-1.5-4b-it,hf,reader-v2,0,848,52,5.7651331424713135,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""shallow sulci throughout, BOP generalized"", ""rationale"": ""shallow sulci throughout, BOP generalized indicates gingivitis""}
 ```",gingivitis,NA,NA,"shallow sulci throughout, BOP generalized",True,,False,gingivitis
-2015,medgemma-1.5-4b-it,hf,reader-v2,0,911,61,24.596888303756714,"```json
+2015,medgemma-1.5-4b-it,hf,reader-v2,0,911,61,6.916353940963745,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""STAGE II GRADE C PERIODONTITIS."", ""rationale"": ""The note explicitly states 'STAGE II GRADE C PERIODONTITIS.'""}
 ```",periodontitis_stage_2,C,generalized,STAGE II GRADE C PERIODONTITIS.,True,,False,periodontitis_stage_2
-1098,medgemma-1.5-4b-it,hf,reader-v2,0,848,72,27.945724487304688,"```json
+1098,medgemma-1.5-4b-it,hf,reader-v2,0,848,72,7.432891130447388,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""diagnosis: generalized periodontitis, stage 3 grade b."", ""rationale"": ""The note explicitly states the diagnosis is 'generalized periodontitis, stage 3 grade b'.""}
 ```",periodontitis_stage_3,B,generalized,"diagnosis: generalized periodontitis, stage 3 grade b.",True,,False,periodontitis_stage_3
-1585,medgemma-1.5-4b-it,hf,reader-v2,0,902,67,23.834112882614136,"```json
+1585,medgemma-1.5-4b-it,hf,reader-v2,0,902,67,7.375111818313599,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d: localized stage iv grade c. periodontitis."", ""rationale"": ""The note explicitly states 'localized stage iv grade c. periodontitis.'""}
 ```",periodontitis_stage_4,C,localized,d: localized stage iv grade c. periodontitis.,True,,False,periodontitis_stage_4
-324,medgemma-1.5-4b-it,hf,reader-v2,0,845,67,24.13698649406433,"```json
+324,medgemma-1.5-4b-it,hf,reader-v2,0,845,67,7.004616975784302,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized Stage 4 Grade C"", ""rationale"": ""The note explicitly states 'Generalized Stage 4 Grade C', which directly corresponds to the classification system.""}
 ```",periodontitis_stage_4,C,generalized,Generalized Stage 4 Grade C,True,,False,periodontitis_stage_4
-1723,medgemma-1.5-4b-it,hf,reader-v2,0,881,75,26.08215069770813,"```json
+1723,medgemma-1.5-4b-it,hf,reader-v2,0,881,75,7.708771705627441,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""D: GENERALIZED STAGE 3 GRADE B. PERIODONTITIS."", ""rationale"": ""The note explicitly states 'D: GENERALIZED STAGE 3 GRADE B. PERIODONTITIS.'""}
 ```",periodontitis_stage_3,B,generalized,D: GENERALIZED STAGE 3 GRADE B. PERIODONTITIS.,True,,False,periodontitis_stage_3
-1212,medgemma-1.5-4b-it,hf,reader-v2,0,868,70,25.658339977264404,"```json
+1212,medgemma-1.5-4b-it,hf,reader-v2,0,868,70,7.24535870552063,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""Diagnosis: Localized Periodontitis Stage II Grade C with Generalized Plaque."", ""rationale"": ""The diagnosis explicitly states 'Localized Periodontitis Stage II Grade C'.""}
 ```",periodontitis_stage_2,C,localized,Diagnosis: Localized Periodontitis Stage II Grade C with Generalized Plaque.,True,,False,periodontitis_stage_2
-2665,medgemma-1.5-4b-it,hf,reader-v2,0,873,53,19.150959253311157,"```json
+2665,medgemma-1.5-4b-it,hf,reader-v2,0,873,53,5.894973278045654,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""CAL 0"", ""rationale"": ""Interdental attachment loss (CAL) is 0, which is considered healthy.""}
 ```",healthy,NA,NA,CAL 0,True,,False,healthy
-2107,medgemma-1.5-4b-it,hf,reader-v2,0,828,68,23.392163276672363,"```json
+2107,medgemma-1.5-4b-it,hf,reader-v2,0,828,68,7.2392003536224365,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""CAL up to 3mm"", ""rationale"": ""The note states CAL up to 3mm, which corresponds to periodontitis_stage_2.""}
 ```",periodontitis_stage_2,B,generalized,CAL up to 3mm,True,,False,periodontitis_stage_2
-3559,medgemma-1.5-4b-it,hf,reader-v2,0,908,89,29.070632219314575,"```json
-{""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""D: GENERALIZED PERIODONTITIS, STAGE IV GRADE C"", ""rationale"": ""The note explicitly states 'D: GENERALIZED PERIODONTITIS, STAGE IV GRADE C', indicating the patient has generalized periodontitis at stage 4 and grade C.""}
+3559,medgemma-1.5-4b-it,hf,reader-v2,0,908,73,7.910521745681763,"```json
+{""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""D: GENERALIZED PERIODONTITIS, STAGE IV GRADE C"", ""rationale"": ""The note explicitly states 'D: GENERALIZED PERIODONTITIS, STAGE IV GRADE C'.""}
 ```",periodontitis_stage_4,C,generalized,"D: GENERALIZED PERIODONTITIS, STAGE IV GRADE C",True,,False,periodontitis_stage_4
-2496,medgemma-1.5-4b-it,hf,reader-v2,0,805,69,24.34524655342102,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no bleeding on probing"", ""rationale"": ""The note explicitly states 'no bleeding on probing', which is a criterion for healthy status according to the 2017 AAP/EFP classification.""}
+2496,medgemma-1.5-4b-it,hf,reader-v2,0,805,71,7.457000494003296,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""no bleeding on probing"", ""rationale"": ""The note explicitly states 'no bleeding on probing', which is a key criterion for the healthy status according to the 2017 AAP/EFP classification.""}
 ```",healthy,NA,NA,no bleeding on probing,True,,False,healthy
-4006,medgemma-1.5-4b-it,hf,reader-v2,0,844,89,31.305493116378784,"```json
-{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: BOP generalized, no pocketing, no attachment loss."", ""rationale"": ""The note states 'no attachment loss' and 'no pocketing', indicating the absence of interdental attachment loss, which is a defining characteristic of gingivitis according to the AAP/EFP classification.""}
+4006,medgemma-1.5-4b-it,hf,reader-v2,0,844,83,8.316295385360718,"```json
+{""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""perio charting done: BOP generalized, no pocketing, no attachment loss."", ""rationale"": ""The note explicitly states 'no attachment loss' and 'no pocketing', indicating a healthy periodontal status according to the 2017 AAP/EFP classification.""}
 ```",gingivitis,NA,NA,"perio charting done: BOP generalized, no pocketing, no attachment loss.",True,,False,gingivitis
-2373,medgemma-1.5-4b-it,hf,reader-v2,0,797,81,29.072508096694946,"```json
+2373,medgemma-1.5-4b-it,hf,reader-v2,0,797,81,8.226195812225342,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""CAL up to 3mm; recession 1mm #11, shallow sulci throughout, no BOP."", ""rationale"": ""The note states CAL up to 3mm, shallow sulci, and no BOP, which meets the criteria for healthy.""}
 ```",healthy,NA,NA,"CAL up to 3mm; recession 1mm #11, shallow sulci throughout, no BOP.",False,quote not in note,True,periodontitis_stage_2
-3181,medgemma-1.5-4b-it,hf,reader-v2,0,812,72,26.0454318523407,"```json
+3181,medgemma-1.5-4b-it,hf,reader-v2,0,812,72,7.512083530426025,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""Localised severe chronic periodontitis."", ""rationale"": ""The note explicitly states 'Localised severe chronic periodontitis.' which corresponds to periodontitis_stage_3.""}
 ```",periodontitis_stage_3,C,localized,Localised severe chronic periodontitis.,False,quote not in note,True,periodontitis_stage_3
-1092,medgemma-1.5-4b-it,hf,reader-v2,0,876,57,20.10726237297058,"```json
+1092,medgemma-1.5-4b-it,hf,reader-v2,0,876,57,6.20702862739563,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Stage I periodontitis."", ""rationale"": ""The note explicitly states 'Stage I periodontitis.'""}
 ```",periodontitis_stage_1,A,localized,Stage I periodontitis.,True,,False,periodontitis_stage_1
-2094,medgemma-1.5-4b-it,hf,reader-v2,0,856,61,22.235333681106567,"```json
+2094,medgemma-1.5-4b-it,hf,reader-v2,0,856,61,6.496676445007324,"```json
 {""status"": ""periodontitis_stage_2"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""stage ii grade a periodontitis."", ""rationale"": ""The note explicitly states 'stage ii grade a periodontitis.'""}
 ```",periodontitis_stage_2,A,localized,stage ii grade a periodontitis.,True,,False,periodontitis_stage_2
-1475,medgemma-1.5-4b-it,hf,reader-v2,0,902,66,23.741037607192993,"```json
+1475,medgemma-1.5-4b-it,hf,reader-v2,0,902,66,7.314759016036987,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""generalized"", ""quote"": ""d: generalized plaque induced gingivitis"", ""rationale"": ""The note explicitly states 'd: generalized plaque induced gingivitis', indicating the patient's periodontal status at this visit.""}
 ```",gingivitis,NA,NA,d: generalized plaque induced gingivitis,True,,False,gingivitis
-1283,medgemma-1.5-4b-it,hf,reader-v2,0,814,65,24.790847301483154,"```json
+1283,medgemma-1.5-4b-it,hf,reader-v2,0,814,65,6.923209190368652,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""generalized"", ""quote"": ""Dx: Generalized periodontitis Stage I Grade B."", ""rationale"": ""The diagnosis explicitly states 'Generalized periodontitis Stage I Grade B'.""}
 ```",periodontitis_stage_1,B,generalized,Dx: Generalized periodontitis Stage I Grade B.,True,,False,periodontitis_stage_1
-2829,medgemma-1.5-4b-it,hf,reader-v2,0,851,61,22.528309106826782,"```json
+2829,medgemma-1.5-4b-it,hf,reader-v2,0,851,61,6.5024254322052,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""stage i grade a periodontitis."", ""rationale"": ""The diagnosis explicitly states 'stage i grade a periodontitis.'"" }
 ```",periodontitis_stage_1,A,localized,stage i grade a periodontitis.,True,,False,periodontitis_stage_1
-2944,medgemma-1.5-4b-it,hf,reader-v2,0,919,67,25.065914392471313,"```json
+2944,medgemma-1.5-4b-it,hf,reader-v2,0,919,67,7.424135208129883,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d: localised periodontitis stage iii grade c"", ""rationale"": ""The note explicitly states 'd: localised periodontitis stage iii grade c'.""}
 ```",periodontitis_stage_3,C,localized,d: localised periodontitis stage iii grade c,True,,False,periodontitis_stage_3
-2576,medgemma-1.5-4b-it,hf,reader-v2,0,856,69,24.60899019241333,"```json
+2576,medgemma-1.5-4b-it,hf,reader-v2,0,856,69,7.158474445343018,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": null, ""quote"": ""localized BOP, no pocketing, CAL 0"", ""rationale"": ""The note explicitly states localized BOP, no pocketing, and CAL 0, which aligns with the definition of gingivitis.""}
 ```",gingivitis,NA,NA,"localized BOP, no pocketing, CAL 0",True,,False,gingivitis
-3484,medgemma-1.5-4b-it,hf,reader-v2,0,829,70,24.617475509643555,"```json
+3484,medgemma-1.5-4b-it,hf,reader-v2,0,829,70,7.346963405609131,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized severe chronic periodontitis."", ""rationale"": ""The note explicitly states 'Generalized severe chronic periodontitis.' which corresponds to periodontitis_stage_4.""}
 ```",periodontitis_stage_4,C,generalized,Generalized severe chronic periodontitis.,True,,False,periodontitis_stage_4
-1066,medgemma-1.5-4b-it,hf,reader-v2,0,861,80,29.711013317108154,"```json
-{""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""diagnosis: localized periodontitis, stage iii grade c"", ""rationale"": ""The note explicitly states 'diagnosis: localized periodontitis, stage iii grade c', which directly corresponds to the AAP/EFP classification.""}
+1066,medgemma-1.5-4b-it,hf,reader-v2,0,861,69,7.175021648406982,"```json
+{""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""diagnosis: localized periodontitis, stage iii grade c"", ""rationale"": ""The note explicitly states 'diagnosis: localized periodontitis, stage iii grade c'.""}
 ```",periodontitis_stage_3,C,localized,"diagnosis: localized periodontitis, stage iii grade c",True,,False,periodontitis_stage_3
-1455,medgemma-1.5-4b-it,hf,reader-v2,0,828,61,23.62329649925232,"```json
+1455,medgemma-1.5-4b-it,hf,reader-v2,0,828,61,6.6438117027282715,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Dx: Dental biofilm-induced gingivitis, localized."", ""rationale"": ""The note explicitly states 'Dx: Dental biofilm-induced gingivitis, localized.'""}
 ```",gingivitis,NA,NA,"Dx: Dental biofilm-induced gingivitis, localized.",True,,False,gingivitis
-1116,medgemma-1.5-4b-it,hf,reader-v2,0,853,77,27.454713582992554,"```json
+1116,medgemma-1.5-4b-it,hf,reader-v2,0,853,77,7.78636622428894,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Gen. perio St 4 Gr C"", ""rationale"": ""The note explicitly states 'Gen. perio St 4 Gr C', which directly corresponds to generalized periodontitis stage 4 grade C.""}
 ```",periodontitis_stage_4,C,generalized,Gen. perio St 4 Gr C,True,,False,periodontitis_stage_4
-1573,medgemma-1.5-4b-it,hf,reader-v2,0,848,66,23.270137071609497,"```json
+1573,medgemma-1.5-4b-it,hf,reader-v2,0,848,66,6.880959510803223,"```json
 {""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""clinical gingival health on intact periodontium"", ""rationale"": ""The note explicitly states 'clinical gingival health on intact periodontium', indicating no signs of gingivitis or periodontitis.""}
 ```",healthy,NA,NA,clinical gingival health on intact periodontium,True,,False,healthy
-180,medgemma-1.5-4b-it,hf,reader-v2,0,847,63,23.02248215675354,"```json
+180,medgemma-1.5-4b-it,hf,reader-v2,0,847,63,6.678591728210449,"```json
 {""status"": ""periodontitis_stage_3"", ""grade"": ""C"", ""extent"": ""generalized"", ""quote"": ""Generalized periodontitis Stage III Grade C."", ""rationale"": ""The note explicitly states 'Generalized periodontitis Stage III Grade C.'""}
 ```",periodontitis_stage_3,C,generalized,Generalized periodontitis Stage III Grade C.,True,,False,periodontitis_stage_3
-1630,medgemma-1.5-4b-it,hf,reader-v2,0,850,89,30.867345094680786,"```json
+1630,medgemma-1.5-4b-it,hf,reader-v2,0,850,89,8.802921772003174,"```json
 {""status"": ""gingivitis"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""perio charting done: BOP generalized, slight attachment loss, mild pocketing."", ""rationale"": ""The note explicitly states 'BOP generalized, slight attachment loss, mild pocketing', which aligns with the definition of gingivitis (no interdental attachment loss, BOP >= 10%).""}
 ```",gingivitis,NA,NA,"perio charting done: BOP generalized, slight attachment loss, mild pocketing.",True,,False,gingivitis
-796,medgemma-1.5-4b-it,hf,reader-v2,0,819,78,27.16884756088257,"```json
+796,medgemma-1.5-4b-it,hf,reader-v2,0,819,78,7.991039514541626,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""B"", ""extent"": ""localized"", ""quote"": ""max CAL 2mm interproximal"", ""rationale"": ""The patient has interdental CAL of 2mm, which falls within the 1-2 mm range for stage 1 periodontitis.""}
 ```",periodontitis_stage_1,B,localized,max CAL 2mm interproximal,True,,False,periodontitis_stage_1
-970,medgemma-1.5-4b-it,hf,reader-v2,0,799,64,23.89236044883728,"```json
-{""status"": ""healthy"", ""grade"": null, ""extent"": null, ""quote"": ""Clinical gingival health on an intact periodontium."", ""rationale"": ""The note explicitly states 'Clinical gingival health on an intact periodontium.' which corresponds to the healthy status.""}
+970,medgemma-1.5-4b-it,hf,reader-v2,0,799,65,6.888820171356201,"```json
+{""status"": ""healthy"", ""grade"": null, ""extent"": ""localized"", ""quote"": ""Clinical gingival health on an intact periodontium."", ""rationale"": ""The note explicitly states 'Clinical gingival health on an intact periodontium.' which corresponds to the healthy status.""}
 ```",healthy,NA,NA,Clinical gingival health on an intact periodontium.,True,,False,healthy
-723,medgemma-1.5-4b-it,hf,reader-v2,0,799,61,24.018909692764282,"```json
+723,medgemma-1.5-4b-it,hf,reader-v2,0,799,61,6.586577415466309,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Loc. perio St I Gr A."", ""rationale"": ""The note explicitly states 'Loc. perio St I Gr A.'""}
 ```",periodontitis_stage_1,A,localized,Loc. perio St I Gr A.,True,,False,periodontitis_stage_1
-1352,medgemma-1.5-4b-it,hf,reader-v2,0,871,67,25.62332320213318,"```json
+1352,medgemma-1.5-4b-it,hf,reader-v2,0,871,67,7.042194843292236,"```json
 {""status"": ""periodontitis_stage_4"", ""grade"": ""C"", ""extent"": ""localized"", ""quote"": ""d- tentative diagnosis is stage iv grade c localized"", ""rationale"": ""The note explicitly states 'd- tentative diagnosis is stage iv grade c localized'.""}
 ```",periodontitis_stage_4,C,localized,d- tentative diagnosis is stage iv grade c localized,True,,False,periodontitis_stage_4
-2641,medgemma-1.5-4b-it,hf,reader-v2,0,869,73,26.816203117370605,"```json
+2641,medgemma-1.5-4b-it,hf,reader-v2,0,869,73,7.485796213150024,"```json
 {""status"": ""periodontitis_stage_1"", ""grade"": ""A"", ""extent"": ""localized"", ""quote"": ""Diagnosis: Localized Periodontitis Stage 1 Grade A with Generalized Gingival Inflammation."", ""rationale"": ""The diagnosis explicitly states 'Localized Periodontitis Stage 1 Grade A'.""}
 ```",periodontitis_stage_1,A,localized,Diagnosis: Localized Periodontitis Stage 1 Grade A with Generalized Gingival Inflammation.,True,,False,periodontitis_stage_1
