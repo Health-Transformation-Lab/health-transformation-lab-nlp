@@ -108,6 +108,15 @@ def test_dq_genie_space_reads_only_dq_tables_and_defines_each_tile():
     assert len(space["config"]["sample_questions"]) >= 4
 
 
+@pytest.mark.parametrize("name", sorted(dash.GENIE_SPACES))
+def test_genie_space_has_one_general_instruction_and_sorted_questions(name):
+    # Genie keeps one general text instruction; sample questions are sorted by id, as an exported space is
+    space = json.loads(dash.render_genie(name))
+    assert len(space["instructions"]["text_instructions"]) == 1
+    ids = [q["id"] for q in space["config"]["sample_questions"]]
+    assert ids == sorted(ids)
+
+
 def test_genie_spaces_are_in_the_bundle_and_ci_has_a_cli_that_knows_them():
     bundle = (REPO_ROOT / "databricks" / "resources" / "genie.yml").read_text()
     for name in dash.GENIE_SPACES:

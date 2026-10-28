@@ -171,19 +171,6 @@
             "name": "f_clinic",
             "queries": [
               {
-                "name": "f_f_clinic_checks",
-                "query": {
-                  "datasetName": "checks",
-                  "fields": [
-                    {
-                      "name": "clinic",
-                      "expression": "`clinic`"
-                    }
-                  ],
-                  "disaggregated": false
-                }
-              },
-              {
                 "name": "f_f_clinic_accuracy",
                 "query": {
                   "datasetName": "accuracy",
@@ -218,11 +205,6 @@
                   {
                     "fieldName": "clinic",
                     "displayName": "Clinic",
-                    "queryName": "f_f_clinic_checks"
-                  },
-                  {
-                    "fieldName": "clinic",
-                    "displayName": "Clinic",
                     "queryName": "f_f_clinic_accuracy"
                   },
                   {
@@ -250,7 +232,7 @@
             "name": "how",
             "multilineTextboxSpec": {
               "lines": [
-                "Tiles are for all clinics; the clinic filter applies to checks, accuracy by source and prevalence. Per-visit evidence is in `dq_visits` (statuses only, never note text).\n"
+                "Tiles are for all clinics; the clinic filter applies to accuracy by source and prevalence. The checks table lists every clinic and All. Per-visit evidence is in `dq_visits` (statuses only, never note text).\n"
               ]
             }
           },
@@ -418,7 +400,7 @@
                 "showTitle": true,
                 "title": "Temporal plausibility (%)",
                 "showDescription": true,
-                "description": "Later visits whose stage improved (design rules): implausible without treatment, so lower is better."
+                "description": "Visit pairs 1–2 years apart, no treatment between, whose stage improved (design rules). Lower is better."
               }
             }
           },
@@ -449,11 +431,37 @@
         },
         {
           "widget": {
-            "name": "t_targets",
-            "multilineTextboxSpec": {
-              "lines": [
-                "Status as in the design: *within target*, *watch*, *needs attention*. Targets are set with the study team, not here.\n"
-              ]
+            "name": "t_accuracy_design",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "tiles",
+                  "fields": [
+                    {
+                      "name": "accuracy_design_pct",
+                      "expression": "`accuracy_design_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "accuracy_design_pct",
+                  "displayName": "Accuracy, exam form first (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Accuracy, exam form first (%)",
+                "showDescription": true,
+                "description": "Rules in the study design's order. The order changes the answer."
+              }
             }
           },
           "position": {
@@ -524,7 +532,7 @@
                 "showTitle": true,
                 "title": "Missing by evidence column (%)",
                 "showDescription": true,
-                "description": "Share of visits where the column is empty. Above 30% is a gap to explain."
+                "description": "Share of visits where the column is empty. Diagnosis codes done are missing as often as planned (29.5%); the per-source share answered is under Accuracy."
               }
             }
           },
@@ -616,7 +624,7 @@
                 "showTitle": true,
                 "title": "Conformance, completeness and plausibility checks",
                 "showDescription": true,
-                "description": "All = every clinic together."
+                "description": "All = every clinic together. PASS: no failures allowed and none found; REPORT: a rate to read, with no pass mark."
               }
             }
           },
@@ -1112,7 +1120,7 @@
                 "showTitle": true,
                 "title": "Stage at one visit (rows) and the next (columns), % of the row",
                 "showDescription": true,
-                "description": "Below the diagonal the stage improved: flagged as a charting or rule error unless treated."
+                "description": "Cells where the next visit's stage is lower than the earlier one show improvement: a charting or rule error unless treated."
               }
             }
           },

@@ -171,7 +171,7 @@ anything not shown."""
 
 @traced
 def dq_grader() -> dict:
-    filtered = ["checks", "accuracy", "prevalence_clinic"]
+    filtered = ["accuracy", "prevalence_clinic"]          # checks keep their All rows, so they show every clinic
     tiles = [("t_complete", "completeness_pct", "Completeness (%)",
               "Visits with exam form, diagnosis codes and gum measurements all present. All clinics."),
              ("t_accuracy", "accuracy_pct", "Accuracy (%)",
@@ -179,26 +179,29 @@ def dq_grader() -> dict:
              ("t_consistency", "consistency_pts", "Consistency (points)",
               "Spread of periodontitis prevalence across the 8 clinics (design rules). Smaller is steadier."),
              ("t_temporal", "implausible_pct", "Temporal plausibility (%)",
-              "Later visits whose stage improved (design rules): implausible without treatment, so lower is better.")]
+              "Visit pairs 1–2 years apart, no treatment between, whose stage improved (design rules). Lower is better.")]
     layout = [_text("banner", DQ_BANNER, (0, 0, 6, 3)),
               _filter("f_clinic", "clinic", filtered, "Clinic", (0, 3, 2, 2)),
-              _text("how", "Tiles are for all clinics; the clinic filter applies to checks, accuracy by source and "
-                           "prevalence. Per-visit evidence is in `dq_visits` (statuses only, never note text).",
+              _text("how", "Tiles are for all clinics; the clinic filter applies to accuracy by source and "
+                           "prevalence. The checks table lists every clinic and All. Per-visit evidence is in "
+                           "`dq_visits` (statuses only, never note text).",
                     (2, 3, 4, 2))]
     layout += [_counter(n, "tiles", f, t, d, (i, 5, 1, 3)) for i, (n, f, t, d) in enumerate(tiles)]
     layout += [_text("t_reliability", "**Reliability** (Liaw)\n\n**Not assessed**: needs real reviewers to label "
                                       "charts. Simulated reviewers are a dry run.", (4, 5, 1, 3)),
-               _text("t_targets", "Status as in the design: *within target*, *watch*, *needs attention*. Targets "
-                                  "are set with the study team, not here.", (5, 5, 1, 3)),
+               _counter("t_accuracy_design", "tiles", "accuracy_design_pct", "Accuracy, exam form first (%)",
+                        "Rules in the study design's order. The order changes the answer.", (5, 5, 1, 3)),
                _text("s_complete", "### Completeness", (0, 8, 6, 1)),
                _bar("b_missing", "missingness", "evidence_column", "pct_missing", "Missing by evidence column (%)",
-                    "Share of visits where the column is empty. Above 30% is a gap to explain.", (0, 9, 3, 6),
+                    "Share of visits where the column is empty. Diagnosis codes done are missing as often as planned (29.5%); the per-source share answered is under Accuracy.", (0, 9, 3, 6),
                     x_title="Evidence column", y_title="Missing (%)"),
                _table("tb_checks", "checks", [("clinic", "Clinic"), ("category", "Category"),
                                                ("check_name", "Check"), ("n_checked", "Checked"),
                                                ("n_fail", "Failed"), ("pass_pct", "Pass (%)"),
                                                ("status", "Status")],
-                      "Conformance, completeness and plausibility checks", "All = every clinic together.",
+                      "Conformance, completeness and plausibility checks",
+                      "All = every clinic together. PASS: no failures allowed and none found; REPORT: a rate to "
+                      "read, with no pass mark.",
                       (3, 9, 3, 6)),
                _text("s_accuracy", "### Accuracy", (0, 15, 6, 1)),
                _bar("b_answered", "accuracy", "evidence_source", ("answered", "AVG(`answered_pct`)"),
@@ -226,7 +229,7 @@ def dq_grader() -> dict:
                _text("s_temporal", "### Temporal plausibility", (0, 29, 6, 1)),
                _heatmap("h_trans", "transitions", "to_status", "from_status", "row_pct",
                         "Stage at one visit (rows) and the next (columns), % of the row",
-                        "Below the diagonal the stage improved: flagged as a charting or rule error unless treated.",
+                        "Cells where the next visit's stage is lower than the earlier one show improvement: a charting or rule error unless treated.",
                         (0, 30, 3, 7), x_title="Next visit", y_title="Earlier visit", value_title="% of row"),
                _table("tb_temporal", "temporal", [("method", "Method"), ("pairs", "Visit pairs"),
                                                   ("improved_pct", "Improved (%)"), ("same_pct", "Same (%)"),
@@ -254,10 +257,12 @@ def _id(text: str) -> str:
 
 
 def _space(tables: list[str], instructions: list[str], questions: list[str]) -> dict:
+    general = "\n\n".join(instructions)       # Genie keeps one general text instruction
     return {"version": 2,
-            "config": {"sample_questions": [{"id": _id(q), "question": [q]} for q in questions]},
+            "config": {"sample_questions": sorted(({"id": _id(q), "question": [q]} for q in questions),
+                                                  key=lambda q: q["id"])},
             "data_sources": {"tables": [{"identifier": f"{GOLD}.{t}"} for t in sorted(tables)]},
-            "instructions": {"text_instructions": [{"id": _id(i), "content": [i]} for i in instructions]}}
+            "instructions": {"text_instructions": [{"id": _id(general), "content": [general]}]}}
 
 
 DQ_TABLES = ["dq_checks", "dq_completeness", "dq_prevalence", "dq_temporal", "dq_transitions", "dq_concordance",
@@ -276,9 +281,10 @@ DQ_INSTRUCTIONS = [
      "(not 'unknown') and its agreement with truth where it answers."),
     ("Consistency: the spread of periodontitis prevalence across clinics, MAX minus MIN of dq_prevalence."
      "periodontitis where level = 'clinic' and method = 'algorithm_design', in percentage points."),
-    ("Temporal plausibility: dq_temporal.better for method 'algorithm_design', the share of later visits whose "
-     "stage improved, which is implausible without treatment; lower is better. dq_transitions has the full "
-     "matrix: row_pct is the share of the earlier stage's visits that moved to each stage."),
+    ("Temporal plausibility: dq_temporal.better for method 'algorithm_design', the share of visit pairs 1 to 2 "
+     "years apart with no treatment between (dq_temporal.pairs) whose stage improved, which is implausible; lower "
+     "is better. Use pairs as the denominator, not n_later_visits. dq_transitions has the full matrix: row_pct is "
+     "the share of the earlier stage's visit pairs that moved to each stage."),
     ("Reliability (Liaw): not assessed. It needs real reviewers to label charts; the study's reviewers are "
      "simulated, so never report a reliability figure."),
     ("dq_checks holds each check per clinic; clinic = 'All' is every clinic together. Do not add the clinic rows to "
