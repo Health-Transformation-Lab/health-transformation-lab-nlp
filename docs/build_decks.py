@@ -1,5 +1,6 @@
 """Build the slide decks from their slide sources: docs/<deck>/slides/NN-<id>.html, one <section> per slide with
-the speaker notes in its <aside>. Writes each deck's deck.html (slides scaled to the window, notes under each) and
+the speaker notes in its <aside>. Writes each deck's deck.html (a reveal.js presentation, one slide at a time: arrow
+keys or swipe to page, N for the notes, S for the speaker view, and a top nav back to the site) and
 full_text_and_notes.md (every slide's text and notes, for reading or search).
 
     python docs/build_decks.py           # every deck
@@ -13,6 +14,10 @@ from pathlib import Path
 
 DOCS = Path(__file__).resolve().parent
 PERSONAL = "A personal idea, not affiliated with or endorsed by any organization."
+SITE = "https://healthtransformationlab.org"
+REPO = "https://github.com/healthtransformationlab/health-transformation-lab-nlp"
+# deck folder under docs/ -> its page on the site and its name in the top nav
+SITE_PAGES = {"edr": ("perio-bench", "PerioBench"), "pitch": ("oral-health-bench", "OralHealthBench")}
 # deck folder under docs/ -> (title, the line above the slides)
 DECKS = {
     "pitch": ("Health Transformation Lab: Shark Tank pitch",
@@ -21,16 +26,51 @@ DECKS = {
             (f"{PERSONAL} Synthetic data only: results are scored against the generator's truth, not clinical "
              "performance, and costs use illustrative prices.")),
 }
-HEAD = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500..700&display=swap">
-<style>body{{margin:0;background:#2b2b2b;font-family:Arial,sans-serif}}*{{box-sizing:border-box;margin:0}}
-.wrap{{width:min(96vw,1280px);aspect-ratio:16/9;margin:24px auto 0;overflow:hidden;position:relative}}
-.frame{{width:1920px;height:1080px;transform-origin:0 0;position:absolute}}.frame>section{{width:1920px;height:1080px;position:relative}}
-.notes{{width:min(96vw,1280px);margin:0 auto 32px;background:#f4f1ea;padding:16px 20px;font-size:15px;line-height:1.5;color:#222}}
-.disclaimer{{width:min(96vw,1280px);margin:24px auto 0;color:#ddd;font-size:14px;line-height:1.5}}
-td,th{{padding:12px 16px;border-bottom:1px solid #D9D3C4}}ul{{padding-left:1.2em}}</style></head><body>
-<p class="disclaimer">{note}</p>
+REVEAL = "https://cdn.jsdelivr.net/npm/reveal.js@5.1.0"
+HEAD = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500..700&display=swap"><link rel="stylesheet" href="{reveal}/dist/reveal.css">
+<style>html,body{{height:100%}}body{{margin:0;background:#2b2b2b;font-family:Arial,sans-serif}}*{{box-sizing:border-box;margin:0}}
+td,th{{padding:12px 16px;border-bottom:1px solid #D9D3C4}}ul{{padding-left:1.2em}}
+.topnav{{position:fixed;top:0;left:0;right:0;z-index:50;height:56px;background:#0F2A33;border-bottom:1px solid rgba(213,227,225,.14);font-family:'Public Sans',Arial,sans-serif}}
+.topnav .bar{{height:100%;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}}
+.home{{display:flex;align-items:center;gap:10px;font-family:'Libre Baskerville',Georgia,serif;font-weight:700;font-size:15px;color:#F7F5EF;text-decoration:none;white-space:nowrap}}
+.home .mark{{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#F2A070;color:#0F2A33;font-size:15px}}
+.home:hover .name{{text-decoration:underline}}
+.topnav .links{{display:flex;align-items:center;gap:4px;min-width:0}}
+.topnav .links a,.topnav button{{color:#D5E3E1;text-decoration:none;font:600 14px 'Public Sans',Arial,sans-serif;padding:7px 11px;border-radius:8px;background:none;border:0;cursor:pointer;white-space:nowrap}}
+.topnav .links a:hover,.topnav button:hover{{color:#F7F5EF;background:rgba(255,255,255,.07)}}.topnav .links a.active,.topnav button[aria-pressed=true]{{color:#F2A070}}
+.topnav .links a.cta{{background:#F2A070;color:#0F2A33;margin-left:6px}}.topnav .links a.cta:hover{{background:#F7F5EF}}
+.topnav select{{max-width:280px;min-width:0;font:600 14px 'Public Sans',Arial,sans-serif;color:#F7F5EF;background:#15303A;border:1px solid rgba(213,227,225,.3);border-radius:8px;padding:6px 8px}}
+.disclaimer{{position:fixed;top:56px;left:0;right:0;z-index:40;height:28px;padding:0 16px;background:#15303A;color:#D5E3E1;font:13px/28px 'Public Sans',Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.reveal-viewport,.reveal{{background:#2b2b2b}}.reveal{{position:fixed;top:84px;left:0;right:0;bottom:0;width:auto;height:auto}}
+.reveal .slides{{text-align:left}}.reveal .slides>section{{height:1080px}}.reveal .controls{{color:#F2A070}}.reveal .progress{{color:#F2A070}}
+.reveal .slide-number{{font:600 14px 'Public Sans',Arial,sans-serif;background:rgba(15,42,51,.8);color:#F7F5EF}}
+.notes-panel{{position:fixed;left:0;right:0;bottom:0;z-index:45;max-height:35vh;overflow:auto;background:#f4f1ea;color:#222;padding:16px 20px 28px;font-size:15px;line-height:1.5;box-shadow:0 -8px 24px rgba(0,0,0,.3)}}
+.notes-panel[hidden]{{display:none}}
+@media (max-width:820px){{.home .name,.topnav .links a.deck,.topnav .hint{{display:none}}.topnav select{{max-width:40vw}}}}</style></head><body>
+<nav class="topnav" aria-label="Main"><div class="bar">
+<a class="home" href="{site}/" title="Back to the Health Transformation Lab home page"><span class="mark" aria-hidden="true">←</span><span class="name">Health Transformation Lab</span></a>
+<div class="links">{decks}<select id="jump" aria-label="Go to slide">{options}</select>
+<button id="notes-btn" aria-pressed="false" title="Speaker notes (N)">Notes</button>
+<a class="cta" href="{repo}" target="_blank" rel="noopener">GitHub ↗</a></div></div></nav>
+<p class="disclaimer" title="{note}">{note}</p>
+<div class="reveal"><div class="slides">
 """
-TAIL = """<script>function f(){document.querySelectorAll('.wrap').forEach(w=>w.firstChild.style.transform='scale('+w.clientWidth/1920+')')}addEventListener('resize',f);f()</script></body></html>
+TAIL = """</div></div>
+<div class="notes-panel" id="notes" hidden></div>
+<script src="{reveal}/dist/reveal.js"></script><script src="{reveal}/plugin/notes/notes.js"></script>
+<script>
+document.querySelectorAll('.slides a[href^="http"]').forEach(a=>{{a.target='_blank';a.rel='noopener'}})
+var jump=document.getElementById('jump'),panel=document.getElementById('notes'),btn=document.getElementById('notes-btn')
+function sync(){{var s=Reveal.getCurrentSlide();if(!s)return;var i=Reveal.getIndices().h;jump.selectedIndex=i;var n=s.querySelector('aside.notes');panel.innerHTML='<b>Slide '+(i+1)+' notes:</b> '+(n?n.innerHTML:'');if(!panel.hidden)fit()}}
+function fit(){{document.querySelector('.reveal').style.bottom=(panel.hidden?0:panel.offsetHeight)+'px';Reveal.layout()}}
+function toggleNotes(){{var on=panel.hidden;panel.hidden=!on;btn.setAttribute('aria-pressed',on);fit()}}
+jump.addEventListener('change',()=>{{Reveal.slide(jump.selectedIndex);jump.blur()}})
+btn.addEventListener('click',toggleNotes)
+Reveal.initialize({{width:1920,height:1080,margin:0.03,center:false,display:'flex',hash:true,history:false,
+  slideNumber:'c/t',scrollActivationWidth:null,controls:true,controlsTutorial:false,progress:true,transition:'fade',transitionSpeed:'fast',
+  keyboard:{{78:toggleNotes}},plugins:[RevealNotes]}}).then(sync)
+Reveal.on('slidechanged',sync)
+</script></body></html>
 """
 
 
@@ -48,19 +88,34 @@ def visible_text(section: str) -> list[str]:
     return [p for p in parts if p]
 
 
+def heading(section: str, sid: str) -> str:
+    """The slide's first h1 or h2, for the jump menu."""
+    found = re.search(r"<h[12][^>]*>(.*?)</h[12]>", section, re.DOTALL)
+    return html.unescape(re.sub(r"<[^>]+>", "", found.group(1))).strip() if found else sid
+
+
+def nav(deck: str) -> dict:
+    """The top nav's links to the decks on the site, and one jump-menu entry per slide."""
+    decks = "".join(f'<a class="deck{" active" if d == deck else ""}" href="{SITE}/{page}/">{name}</a>'
+                    for d, (page, name) in SITE_PAGES.items())
+    options = "".join(f'<option value="{sid}">{n}. {html.escape(heading(section, sid))}</option>'
+                      for n, (sid, section, _) in enumerate(slides(DOCS / deck), 1))
+    return {"site": SITE, "repo": REPO, "reveal": REVEAL, "decks": decks, "options": options}
+
+
 def render(deck: str) -> tuple[str, str]:
     """deck.html and full_text_and_notes.md for docs/<deck>/."""
     title, note = DECKS[deck]
-    out, md = [HEAD.format(title=title, note=html.escape(note, quote=False))], [
+    links = nav(deck)
+    out, md = [HEAD.format(title=title, note=html.escape(note), **links)], [
         f"# {title}: full text and notes\n",
         f"{PERSONAL} Built from `slides/` by `docs/build_decks.py`; edit the slides, then rebuild.\n"]
     for n, (sid, section, notes) in enumerate(slides(DOCS / deck), 1):
-        out.append(f'<div class="wrap"><div class="frame">{section}</div></div>'
-                   f'<div class="notes"><b>Slide {n} notes:</b> {notes}</div>\n')
+        out.append(section.replace("</section>", f'<aside class="notes">{notes}</aside>\n</section>', 1) + "\n")
         md.append(f"\n## Slide {n} — {sid}\n\n" + "\n".join(visible_text(section)) + "\n")
         if notes:
             md.append(f"\n**Speaker notes:** {html.unescape(notes)}\n")
-    out.append(TAIL)
+    out.append(TAIL.format(**links))
     return "".join(out), "".join(md)
 
 
