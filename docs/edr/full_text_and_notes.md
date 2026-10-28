@@ -17,7 +17,7 @@ John Bowyer · personal project, not affiliated with any organization
 
 The problem
 Common, linked to diabetes, and invisible in the data
-US adults 30+
+US adults 30+ with teeth
 42%
 have gum disease (periodontitis); 7.8% have the severe form.
 Diabetes
@@ -30,7 +30,7 @@ Dental records rarely hold one reliable diagnosis.
 The status has to be worked out from the evidence, the way a specialist would, before anyone can count it.
 NHANES 2009–2014 (Eke et al., J Am Dent Assoc 2018) · EFP and IDF consensus report (Sanz et al., 2018) · seven evidence types: this repo · 2
 
-**Speaker notes:** Three facts. One: about 42 percent of US adults aged 30 and over have periodontitis, gum disease that destroys the attachment and bone around teeth, and 7.8 percent have the severe form; that is the national survey, NHANES 2009 to 2014, published by Eke and colleagues in 2018. Two: gum disease and diabetes are linked in both directions; the European Federation of Periodontology and the International Diabetes Federation ask doctors and dentists to manage the two together. Three, and this is the one we can fix: in the dental record the diagnosis is rarely written down once, reliably. It is spread over seven kinds of evidence: the clinician's note, an exam form with a score and a checkbox, the procedure codes done and planned, the diagnosis codes on those procedures, and the gum measurements. They often disagree. So before anyone can count gum disease across clinics, or link it to diabetes in the medical record, someone, or something, has to read the chart and work out the status. If asked for sources: Eke PI et al., Periodontitis in US adults: NHANES 2009-2014, JADA 2018, https://doi.org/10.1016/j.adaj.2018.04.023; Sanz et al., J Clin Periodontol 2018, https://doi.org/10.1111/jcpe.12808. The seven evidence types are this study's design; see the evidence rules page.
+**Speaker notes:** Three facts. One: about 42 percent of US adults aged 30 and over who have teeth have periodontitis, gum disease that destroys the attachment and bone around teeth, and 7.8 percent have the severe form; that is the national survey, NHANES 2009 to 2014, published by Eke and colleagues in 2018. Two: gum disease and diabetes are linked in both directions; the European Federation of Periodontology and the International Diabetes Federation ask doctors and dentists to manage the two together. Three, and this is the one we can fix: in the dental record the diagnosis is rarely written down once, reliably. It is spread over seven kinds of evidence: the clinician's note, an exam form with a score and a checkbox, the procedure codes done and planned, the diagnosis codes on those procedures, and the gum measurements. They often disagree. So before anyone can count gum disease across clinics, or link it to diabetes in the medical record, someone, or something, has to read the chart and work out the status. If asked for sources: Eke PI et al., Periodontitis in US adults: NHANES 2009-2014, JADA 2018, https://doi.org/10.1016/j.adaj.2018.04.023; Sanz et al., J Clin Periodontol 2018, https://doi.org/10.1111/jcpe.12808. The seven evidence types are this study's design; see the evidence rules page.
 
 ## Slide 3 — solution
 
