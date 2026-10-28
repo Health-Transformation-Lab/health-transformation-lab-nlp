@@ -79,7 +79,9 @@ Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned
 | 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (80% correctly assigned) | 2 of 240 | 45 of 240 | 14–31 |
 |  | Exam form | 149 of 240 | 10 of 84 (88% correctly ruled out) | 0 of 156 (87% correctly assigned) | 48 of 240 | 33 of 240 | 33 |
 
-All 38 methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart). **LLM judge** (could an LLM replace the answer key?): its own reading matches the truth on 83% of charts (53% on hard notes), and it flags most mistakes of weak methods but only 26% of the best note model's, so it can't yet rank good methods (LLM judgment); [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading), and the *Scorecard* dashboard in Databricks.
+All 38 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](docs/results.md#phenotyping-periodontal-status-per-chart).
+
+**Can an AI check the answers?** On real notes there is no answer key, so we tested whether a general-purpose AI (a large language model) could stand in for one. It read each note and gave its own status, which matched the answer key on 83% of charts but only 53% of hard notes (they leave out what the answer key is built from). Asked whether a method's answer was right, it caught most mistakes of weak methods but only 26% of the best note model's, which are near-misses such as one stage off. So it can't replace the answer key yet. (These are LLM judgments, checked against the answer key.) Details: [judge results](docs/results.md#llm-judge-every-system-against-an-llms-reading); in Databricks, the *Scorecard* dashboard.
 
 ### De-identification
 
@@ -95,7 +97,7 @@ Best method in each group, counted on the 400 synthetic notes; groups ordered by
 | One AI tool | Stanford AI + dental-word guard | 560 of 2,714 | 41 of 2,462 | 7–8 | 5 |
 | Pattern matching only | Patterns | 645 of 2,714 | 0 of 2,462 | 9–10 | 4 |
 
-All 15 methods, per 100 with 95% CIs, on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
+All 15 methods, per 100 with a likely range for each number (95% confidence interval), on every note set, and the methods not run yet: [full de-identification table](docs/results.md#de-identification).
 
 #### The other note sets
 
@@ -190,7 +192,7 @@ L1 / L2 / L3, so it reads a written diagnosis but doesn't yet stage from the cha
 ## Action items
 
 Differences from the study design and open decisions: **[docs/action_items.md](docs/action_items.md)**.
-Also: [how we work](CLAUDE.md) · [references](docs/references.md) · [protocol](docs/labeling_protocol.md) · [plan](docs/plan.md) · owner John Bowyer · MIT.
+Also: [how we work](AGENTS.md) · [references](docs/references.md) · [protocol](docs/labeling_protocol.md) · [plan](docs/plan.md) · owner John Bowyer · MIT.
 
 ## Drill-downs
 

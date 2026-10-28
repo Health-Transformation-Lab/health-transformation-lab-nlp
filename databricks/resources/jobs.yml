@@ -9,11 +9,13 @@ resources:
       tags:
         project: dental-omop-nlp
         data: synthetic
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
         - task_key: build_and_benchmark
           notebook_task:
             notebook_path: ../notebooks/01_run_benchmark.py
             base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
               catalog: ${resources.schemas.gold.catalog_name}
               schema: ${resources.schemas.gold.name}
               landing_schema: ${resources.volumes.data.schema_name}
@@ -27,11 +29,13 @@ resources:
       tags:
         project: dental-omop-nlp
         data: synthetic
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
         - task_key: load
           notebook_task:
             notebook_path: ../notebooks/04_load_lakebase.py
             base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
               lakebase_instance: ${var.lakebase_instance}
               lakebase_database: ${var.lakebase_database}
               lakebase_schema: ${var.lakebase_schema}
@@ -42,11 +46,13 @@ resources:
       tags:
         project: dental-omop-nlp
         data: synthetic
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
         - task_key: scorecard
           notebook_task:
             notebook_path: ../notebooks/07_judge_scorecard.py
             base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
               catalog: ${resources.schemas.gold.catalog_name}
               schema: ${resources.schemas.gold.name}
               judge_endpoint: ${var.judge_endpoint}
@@ -60,6 +66,7 @@ resources:
       tags:
         project: dental-omop-nlp
         data: synthetic
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
         - task_key: judge
           notebook_task:
@@ -74,9 +81,11 @@ resources:
     # Run on demand: no schedule.
     medgemma_reader:
       name: MedGemma reader
+      max_concurrent_runs: 2   # a new run starts even while an old one waits hours to retry
       tags:
         project: dental-omop-nlp
         data: synthetic
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       environments:          # required with task-level compute on serverless
         - environment_key: gpu
           spec:
@@ -92,6 +101,7 @@ resources:
           notebook_task:
             notebook_path: ../notebooks/03_medgemma_reader.py
             base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
               catalog: ${resources.schemas.gold.catalog_name}
               schema: ${resources.schemas.gold.name}
               rung: ${var.reader_rung}
@@ -103,9 +113,11 @@ resources:
 
     encoder_gpu:
       name: Encoders on GPU
+      max_concurrent_runs: 2   # a new run starts even while an old one waits hours to retry
       tags:
         project: dental-omop-nlp
         data: synthetic
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       environments:          # required with task-level compute on serverless
         - environment_key: gpu
           spec:
@@ -121,6 +133,7 @@ resources:
           notebook_task:
             notebook_path: ../notebooks/08_encoder_gpu.py
             base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
               rungs: ${var.encoder_gpu_rungs}
               lr_overrides: ${var.encoder_gpu_lr}
               catalog: ${resources.schemas.gold.catalog_name}
@@ -135,11 +148,13 @@ resources:
       tags:
         project: dental-omop-nlp
         data: synthetic
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
         - task_key: score
           notebook_task:
             notebook_path: ../notebooks/06_deid_benchmark.py
             base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
               engines: ${var.deid_ai_engines}
               llm_endpoint: ${var.deid_llm_endpoint}
               sql_warehouse_id: ${var.warehouse_id}
@@ -153,11 +168,13 @@ resources:
       tags:
         project: dental-omop-nlp
         data: public
+        git_commit: ${bundle.git.commit}   # the commit this job was deployed from
       tasks:
         - task_key: prevalence
           notebook_task:
             notebook_path: ../notebooks/09_nhanes_perio.py
             base_parameters:
+              git_commit: ${bundle.git.commit}   # shown on every run
               data_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/nhanes_raw
               out_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/nhanes
               telemetry: ${var.telemetry_exporter}

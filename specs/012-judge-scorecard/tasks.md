@@ -19,8 +19,8 @@
 
 **Independent test**: workflow structure test; then a merge shows a dev deploy job.
 
-- [ ] T006 [US1] Failing test in `python/tests/test_setup_script.py`: on `push`, `deploy.yml` runs targets dev and uat (matrix); `workflow_dispatch` still runs only the chosen target; each still gated on `DATABRICKS_CLIENT_SECRET`
-- [ ] T007 [US1] Implement the matrix in `.github/workflows/deploy.yml`; update `docs/deployment.md`
+- [x] T006 [US1] Failing test in `python/tests/test_setup_script.py`: on `push`, `deploy.yml` runs targets dev and uat (matrix); `workflow_dispatch` still runs only the chosen target; each still gated on `DATABRICKS_CLIENT_SECRET`
+- [x] T007 [US1] Implement the matrix in `.github/workflows/deploy.yml`; update `docs/deployment.md`
 
 ## Phase 4: User Story 2 - Every README metric from the judge and the truth (P1)
 
@@ -52,8 +52,8 @@
 ## Phase 7: Polish
 
 - [x] T022 Check the endpoint's current pay-per-token price; record it with source and date in `data/datasets/judge/README.md`; confirm estimate < US$5 before the first real run
-- [ ] T023 Run the judge in dev, export, commit `data/datasets/judge/*.csv`, refresh README
-- [ ] T024 `pytest -q tests`, `ruff`, parity; `/create-pr`
+- [x] T023 Run the judge in dev, export, commit `data/datasets/judge/*.csv`, refresh README
+- [x] T024 `pytest -q tests`, `ruff`, parity; `/create-pr`
 
 ## Dependencies
 

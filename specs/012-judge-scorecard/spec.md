@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-27
 
-**Status**: Draft
+**Status**: Implemented (PR 43: real judge run in dev, dev deploys on merge)
 
 **Input**: "How can I use the Databricks LLM judge to evaluate and report on the models? Can it
 evaluate BERT models? Can I get all the metrics in my README from the LLM judge? Does the LLM

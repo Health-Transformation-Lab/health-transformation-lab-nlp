@@ -285,7 +285,7 @@ def test_every_model_that_can_be_scored_has_a_plain_name():
 
 
 def test_job_and_dashboard_names_are_short_and_the_same_in_every_target():
-    """Readable on a phone; no per-target suffix (CLAUDE.md: names identical in every target)."""
+    """Readable on a phone; no per-target suffix (AGENTS.md: names identical in every target)."""
     root, jobs = _load()
     names = [j["name"] for j, _ in jobs.values()]
     names += [j["name"] for t in root["targets"].values() for j in t.get("resources", {}).get("jobs", {}).values()]
@@ -367,3 +367,29 @@ def test_pipeline_jobs_send_telemetry_from_the_secret_scope():
         assert not any("InstrumentationKey" in str(v) for v in p.values()), name
         text = (ROOT / "databricks/notebooks" / nb).read_text()
         assert "telemetry.use_databricks_secret(dbutils" in text and 'widgets.text("telemetry"' in text, nb
+
+
+def test_every_job_and_run_shows_the_commit_it_was_deployed_from():
+    """"Is this run on the latest code?" is answered on the job and run pages: every job is tagged with the
+    deployed commit, and every Python notebook task gets it as a parameter (shown on each run), which the
+    notebook hands to the code so MLflow runs are tagged with it instead of "unknown"."""
+    root, jobs = _load()
+    all_jobs = {k: j for k, (j, _) in jobs.items()}
+    for tgt in root["targets"].values():
+        all_jobs.update(tgt.get("resources", {}).get("jobs", {}) or {})
+    for name, j in all_jobs.items():
+        assert j.get("tags", {}).get("git_commit") == "${bundle.git.commit}", name
+        for t in j["tasks"]:
+            nb = t.get("notebook_task", {}).get("notebook_path", "")
+            if nb.endswith(".py"):
+                assert t["notebook_task"]["base_parameters"]["git_commit"] == "${bundle.git.commit}", (name, nb)
+                text = (ROOT / "databricks" / "notebooks" / nb.rsplit("/", 1)[1]).read_text()
+                assert "tracking.use_git_commit(dbutils)" in text, nb
+
+
+def test_a_new_gpu_run_does_not_queue_behind_an_old_one_waiting_to_retry():
+    """GPU runs retry for hours when no GPU is free. With one run allowed at a time, a run started after a
+    deploy (new code) sat "Queued" behind an old run "Waiting for retry". Two at a time lets it start."""
+    _, jobs = _load()
+    for name in ("medgemma_reader", "encoder_gpu"):
+        assert jobs[name][0].get("max_concurrent_runs") == 2, name

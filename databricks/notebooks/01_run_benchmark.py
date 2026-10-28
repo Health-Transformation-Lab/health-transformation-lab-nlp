@@ -46,6 +46,9 @@ import os
 
 run_encoder = dbutils.widgets.get("run_encoder") == "true"   # widget defined above the install
 
+dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was deployed from
+from dental_omop_nlp import tracking as _tracking
+_tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("catalog", "dental_omop")
 dbutils.widgets.text("schema", "gold_dental_omop_perio")              # tables
 dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")   # data volume

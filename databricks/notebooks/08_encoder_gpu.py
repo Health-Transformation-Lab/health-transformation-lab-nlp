@@ -24,14 +24,17 @@ dbutils.library.restartPython()  # noqa: F821
 
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 
 import pandas as pd
+from dental_omop_nlp import runlog
 from dental_omop_nlp.paths import DATASETS_DIR, REPO_ROOT
 from dental_omop_nlp.rungs import output_tag
 
+dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
+from dental_omop_nlp import tracking as _tracking
+_tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("rungs", "modernbert-large,bioclinical-modernbert-large,longformer-base,clinical-longformer,gatortron-base")  # noqa: F821
 dbutils.widgets.text("lr_overrides", "gatortron-base=2e-5")             # noqa: F821  rung=rate, comma-separated
 dbutils.widgets.text("epochs", "3")                                     # noqa: F821
@@ -40,8 +43,9 @@ dbutils.widgets.text("catalog", "dental_omop")                          # noqa: 
 dbutils.widgets.text("schema", "gold_dental_omop_perio")                # noqa: F821
 dbutils.widgets.text("landing_schema", "landing_dental_omop_perio")     # noqa: F821
 dbutils.widgets.text("telemetry", "azure")                              # noqa: F821  spec 014
-from dental_omop_nlp import telemetry  # noqa: E402
+from dental_omop_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"))  # noqa: F821  scripts inherit it
+tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
 w = {k: dbutils.widgets.get(k) for k in ("rungs", "lr_overrides", "epochs", "max_len", "catalog",  # noqa: F821
                                           "schema", "landing_schema")}
 
@@ -58,10 +62,8 @@ for rung in rungs:
     lr = float(lrs.get(rung, 5e-5))
     cmd = [sys.executable, str(REPO_ROOT / "python" / "scripts" / "11_ai_predict.py"), "--rung", rung,
            "--epochs", w["epochs"], "--max-len", w["max_len"], "--lr", str(lr)]
-    print(" ".join(cmd), flush=True)
-    r = subprocess.run(cmd, cwd=work, capture_output=True, text=True, check=False)  # a failure skips one rung
-    print(r.stdout[-2000:], r.stderr[-2000:])
-    if r.returncode:
+    # printed as it runs and kept in a log on the landing volume, which survives if this notebook's Python dies
+    if runlog.run(cmd, log_path=f"{runlog.log_dir(w['catalog'])}/encoder_gpu_{rung}.log", cwd=work):  # failure skips one rung
         failed.append(rung)
         continue
     method = rung + output_tag(lr=lr)

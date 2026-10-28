@@ -609,10 +609,15 @@ def _judge(inp) -> tuple[str, str]:
                      f"(US${t['usd_per_chart']:.4f} per chart); latency median {t['latency_p50_s']:.1f} s, 95th "
                      f"percentile {t['latency_p95_s']:.1f} s; {int(t['gate_failures'])} answers failed the quote gate, "
                      f"{int(t['endpoint_errors'])} endpoint errors.")]
-    line = (f"**LLM judge** (could an LLM replace the answer key?): its own reading matches the truth on "
-            f"{_pct(allr['agreement'])} of charts ({_pct(hard['agreement'])} on hard notes), and it flags most "
-            f"mistakes of weak methods but only {_pct(lo['verdict_specificity'])} of the best note model's, so it "
-            f"can't yet rank good methods (LLM judgment); {link}, and the *{DASHBOARD}* dashboard in Databricks.")
+    line = (f"**Can an AI check the answers?** On real notes there is no answer key, so we tested whether a "
+            f"general-purpose AI (a large language model) could stand in for one. It read each note and gave its own "
+            f"status, which matched the answer key on {_pct(allr['agreement'])} of charts but only "
+            f"{_pct(hard['agreement'])} of hard notes (they leave out what the answer key is built from). Asked "
+            f"whether a method's answer was right, it caught most mistakes of weak methods but only "
+            f"{_pct(lo['verdict_specificity'])} of the best note model's, which are near-misses such as one stage "
+            f"off. So it can't replace the answer key yet. (These are LLM judgments, checked against the answer "
+            f"key.) Details: {link}; in Databricks, the *{DASHBOARD}* "
+            f"dashboard.")
     return "\n".join(sec), line
 
 
@@ -673,9 +678,10 @@ def results_markdown(inp: dict) -> str:
                    f"{no} of {n_charts - n_neg} ({_pct(r['sensitivity'])} correctly assigned) | {st} of {n_charts} | "
                    f"{na} of {n_charts} | {r['rank']} |")
         last_q = q
-    out += ["", f"All {len(ph)} methods, per 100 charts with 95% CIs, unsafe errors, results by note difficulty, "
-            f"and the {int(ph['n_missing'].iloc[0])} models not run yet: "
-            f"[full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}). " + _judge(inp)[1], "",
+    out += ["", f"All {len(ph)} methods, per 100 charts with a likely range for each number (95% confidence "
+            f"interval), unsafe errors, results by note difficulty, and the {int(ph['n_missing'].iloc[0])} models "
+            f"not run yet: [full phenotyping table](docs/results.md#{anchor(PHENOTYPE_TITLE)}).", "",
+            _judge(inp)[1], "",
             DEID_TITLE, "",
             f"Best method in each group, counted on the {int(de['n_notes'].iloc[0])} synthetic notes; groups ordered "
             "by their best. What the columns mean:", "",
@@ -689,8 +695,9 @@ def results_markdown(inp: dict) -> str:
         n_phi = int(r["n_phi"])
         out.append(f"| {g} | {plain_tool(m)} | {round(n_phi * (1 - r['entity_recall'])):,} of {n_phi:,} | "
                    f"{round(n_words * r['decoy_damage']):,} of {n_words:,} | {r['rank']} | {len(sub)} |")
-    out += ["", f"All {len(de)} methods, per 100 with 95% CIs, on every note set, and the methods not run yet: "
-            f"[full de-identification table](docs/results.md#{anchor(DEID_TITLE)})."]
+    out += ["", (f"All {len(de)} methods, per 100 with a likely range for each number (95% confidence interval), "
+                 "on every note set, and the methods not run yet: "
+                 f"[full de-identification table](docs/results.md#{anchor(DEID_TITLE)}).")]
     d = inp["deid"]
     jsl, asq = (d[d.tier == t].set_index("method") for t in ("jsl48", "external"))
     mac, clin = inp["maccrobat"].set_index("method"), inp["maccrobat_clinical"]

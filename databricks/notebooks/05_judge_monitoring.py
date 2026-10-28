@@ -25,6 +25,9 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
+dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was deployed from
+from dental_omop_nlp import tracking as _tracking
+_tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("judge_endpoint", "none")
 dbutils.widgets.text("experiment_id", "")
 dbutils.widgets.text("sample_rate", "0.1")

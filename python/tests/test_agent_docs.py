@@ -1,0 +1,44 @@
+"""AGENTS.md holds the rules every coding agent follows; CLAUDE.md imports it and adds only Claude Code's
+own workflow, so the rules live in one place."""
+
+from dental_omop_nlp.paths import REPO_ROOT
+
+AGENTS = REPO_ROOT / "AGENTS.md"
+CLAUDE = REPO_ROOT / "CLAUDE.md"
+RULES = ("Synthetic only. No PHI, ever.", "Python and R stay in parity.", "Test first.",
+         "Label simulated output as simulated.", "never use\n  `mode: development`", "| Credential | Where it's made |")
+
+
+def test_agents_md_has_every_shared_rule():
+    text = AGENTS.read_text()
+    for heading in ("## Ground rules", "## When a change needs a spec", "## Commands", "## Conventions"):
+        assert heading in text, heading
+    for rule in RULES:
+        assert rule in text, rule
+
+
+def test_claude_md_imports_agents_md_and_does_not_repeat_it():
+    text = CLAUDE.read_text()
+    assert "@AGENTS.md" in text.split("##")[0]                    # imported before any section
+    for rule in RULES:
+        assert rule not in text, rule                              # one copy only: AGENTS.md
+    assert "Superpowers" in text and "/speckit-specify" in text     # Claude Code's own workflow stays here
+
+
+def test_reviews_check_against_both_files():
+    for f in (".claude/review-rubric.md", ".claude/commands/pr-review.md"):
+        assert "AGENTS.md" in (REPO_ROOT / f).read_text(), f
+
+
+AGENT_DIR = REPO_ROOT / "databricks" / "agents" / "chart_review"
+
+
+def test_chart_review_agent_folder_has_its_own_agent_rules():
+    """The Databricks chart review agent gets its own AGENTS.md (what it is, its tools, rules, evaluation),
+    and a CLAUDE.md that imports it, because Claude Code reads nested CLAUDE.md files, not AGENTS.md."""
+    text = (AGENT_DIR / "AGENTS.md").read_text()
+    for heading in ("## What it is", "## Rules", "## Tools", "## Output", "## Evaluation", "## Deployment", "## Layout"):
+        assert heading in text, heading
+    assert "spec" in text.lower() and "agent:chart_review" in text          # needs a spec; how its results are named
+    assert (AGENT_DIR / "CLAUDE.md").read_text().strip().splitlines()[-1] == "@AGENTS.md"
+    assert "databricks/agents/chart_review/AGENTS.md" in AGENTS.read_text()  # the root file points to it

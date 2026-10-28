@@ -24,8 +24,10 @@
 # COMMAND ----------
 
 import os
-import subprocess
 
+dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
+from dental_omop_nlp import tracking as _tracking
+_tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("rung", "medgemma-1.5-4b-it")  # noqa: F821
 dbutils.widgets.text("limit", "40")                  # noqa: F821  start small: GPU quota
 dbutils.widgets.text("shots", "0")                   # noqa: F821
@@ -36,9 +38,10 @@ dbutils.widgets.text("hf_secret_scope", "dental")    # noqa: F821
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
 dbutils.widgets.text("telemetry", "azure")           # noqa: F821  spec 014: off / console / azure / otlp
-from dental_omop_nlp import telemetry  # noqa: E402
+from dental_omop_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"),  # noqa: F821  scripts inherit it
                                 scope=dbutils.widgets.get("hf_secret_scope"))  # noqa: F821
+tracking.pass_databricks_login()       # the scripts below log to MLflow with the notebook's login
 
 import torch  # noqa: E402
 
@@ -46,17 +49,22 @@ print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "n
 
 # COMMAND ----------
 
+from dental_omop_nlp import runlog  # noqa: E402
+
+# Scripts print as they go and into a log on the landing volume, which survives if this notebook's Python dies.
+log = f"{runlog.log_dir(catalog)}/medgemma_reader_{dbutils.widgets.get('rung')}.log"  # noqa: F821
+print("log:", log)
+
 # Build the synthetic datasets if this is a fresh Git folder
 if not os.path.exists("../../data/datasets/answer_key/review_key.csv"):
-    subprocess.run(["python", "../../python/scripts/10_build_study.py"], check=True)
+    runlog.run(["python", "../../python/scripts/10_build_study.py"], log_path=log, check=True)
 
 adapter = None
 if int(dbutils.widgets.get("lora_train") or 0):  # noqa: F821
     adapter = "/tmp/medgemma-lora"
-    r = subprocess.run(["python", "../../python/scripts/17_medgemma_lora.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
-                        "--max-train", dbutils.widgets.get("lora_train"), "--out", adapter],  # noqa: F821
-                       capture_output=True, text=True, check=True)
-    print(r.stdout[-2000:], r.stderr[-2000:])
+    runlog.run(["python", "../../python/scripts/17_medgemma_lora.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
+                "--max-train", dbutils.widgets.get("lora_train"), "--out", adapter],  # noqa: F821
+               log_path=log, check=True)
 
 args = ["python", "../../python/scripts/11_ai_predict.py", "--rung", dbutils.widgets.get("rung"),  # noqa: F821
         "--backend", "hf", "--shots", dbutils.widgets.get("shots")]  # noqa: F821
@@ -64,8 +72,7 @@ if adapter:
     args += ["--adapter", adapter]
 if int(dbutils.widgets.get("limit") or 0):  # noqa: F821  0 = all review notes
     args += ["--limit", dbutils.widgets.get("limit")]  # noqa: F821
-r = subprocess.run(args, capture_output=True, text=True)
-print(r.stdout[-3000:], r.stderr[-3000:])
+runlog.run(args, log_path=log, check=True)   # a crash or a kill stops here and says how it ended
 
 # COMMAND ----------
 
@@ -90,10 +97,7 @@ display(d.assign(correct=d.pred == d.truth).groupby("difficulty")["correct"].agg
 if int(dbutils.widgets.get("limit") or 0):  # noqa: F821
     print("skipped: set limit to 0 so MedGemma scores all 240 charts, as the encoders did")
 else:
-    r = subprocess.run(["python", "../../python/scripts/29_medgemma_vs_bert.py"], capture_output=True, text=True,
-                       check=False)
-    print(r.stdout[-4000:], r.stderr[-2000:])
-    if r.returncode == 0:
+    if runlog.run(["python", "../../python/scripts/29_medgemma_vs_bert.py"], log_path=log) == 0:
         display(pd.read_csv("../../data/datasets/ladder/medgemma_vs_bert.csv"))  # noqa: F821
 
 # COMMAND ----------
