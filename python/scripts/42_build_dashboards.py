@@ -1,4 +1,4 @@
-"""Write the grader dashboards and Genie spaces (spec 018) from dental_omop_nlp/dashboards.py.
+"""Write the grader dashboards and Genie spaces (spec 019) from dental_omop_nlp/dashboards.py.
 
     python scripts/42_build_dashboards.py           # databricks/dashboards/<name>.lvdash.json, databricks/genie/<name>.geniespace.json
     python scripts/42_build_dashboards.py --check   # exit 1 if a committed file is stale

@@ -1,4 +1,4 @@
-"""The tables the two graders read (spec 018), one DataFrame per gold table, built from committed CSVs.
+"""The tables the two graders read (spec 019), one DataFrame per gold table, built from committed CSVs.
 
     dq_tables   the EHR DQ grader: data-quality checks, completeness, prevalence, temporal plausibility,
                 transitions, concordance, per-visit evidence with its truth (statuses only, never note text)
@@ -36,7 +36,7 @@ def _read(folder: Path, f: str) -> pd.DataFrame:
 
 @traced
 def dq_tables(datasets_dir: Path) -> dict[str, pd.DataFrame]:
-    """Every dq_* table of spec 018 US1, from data/datasets/ (DATASETS_DIR)."""
+    """Every dq_* table of spec 019 US1, from data/datasets/ (DATASETS_DIR)."""
     d = Path(datasets_dir)
     out = {}
 

@@ -1,4 +1,4 @@
-# The graders on Databricks (spec 018)
+# The graders on Databricks (spec 019)
 
 Two graders, each an AI/BI dashboard plus a Genie space you can ask questions in plain words. Both are light
 versions of designs: the EHR DQ grader follows the React *Perio DQ Monitor*; the lab grader follows the pitch's
@@ -8,7 +8,7 @@ exist.
 | Grader | Dashboard | Genie space | Tables (`dental_omop.gold_dental_omop_perio`) |
 |---|---|---|---|
 | **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_checks`, `dq_completeness`, `dq_prevalence`, `dq_temporal`, `dq_transitions`, `dq_concordance`, `dq_visits`, `dq_injected_errors` |
-| **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | spec 018 US4 (next) | spec 018 US5 (next) | `grader_questions`, `grader_answers` |
+| **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | spec 019 US4 (next) | spec 019 US5 (next) | `grader_questions`, `grader_answers` |
 
 ## EHR DQ grader
 

@@ -1,4 +1,4 @@
-# Tasks: spec 018
+# Tasks: spec 019
 
 ## US1 - DQ results in gold (#102)
 - [x] T001 Failing tests: `grader_tables.dq_tables()` gives every table in the spec with its columns, `sha256` on every row, no note text

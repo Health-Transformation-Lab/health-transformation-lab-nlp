@@ -1,4 +1,4 @@
-# Plan: two graders on Databricks (spec 018)
+# Plan: two graders on Databricks (spec 019)
 
 ## Approach
 - **Tables (US1, US3):** `dental_omop_nlp/grader_tables.py` turns the committed CSVs into one DataFrame per gold

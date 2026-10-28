@@ -1,4 +1,4 @@
-"""Spec 018: the tables the two graders read, built from the committed CSVs (US1 data quality, US3 lab grader)."""
+"""Spec 019: the tables the two graders read, built from the committed CSVs (US1 data quality, US3 lab grader)."""
 
 import pytest
 
@@ -72,7 +72,7 @@ def test_dq_tables_are_the_same_on_every_build():
 
 
 def test_load_results_overwrites_every_grader_table():
-    # spec 018 US1: the job writes each table whole, so a rerun leaves the same rows
+    # spec 019 US1: the job writes each table whole, so a rerun leaves the same rows
     from dental_omop_nlp.paths import REPO_ROOT
     nb = (REPO_ROOT / "databricks" / "notebooks" / "10_load_results.py").read_text()
     assert "grader_tables.dq_tables(data_dir)" in nb
