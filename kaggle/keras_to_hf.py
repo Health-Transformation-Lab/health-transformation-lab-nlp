@@ -87,7 +87,7 @@ def convert(rung: str, out: Path, dtype: str = "bfloat16") -> None:  # pragma: n
     handle = kaggle_handle(rung)
     preset = compatible_preset(kagglehub.model_download(handle), Path(out).with_name(Path(out).name + "-preset"))
     print(f"converting {handle} ({preset}) to {out} as {dtype}", flush=True)
-    model = keras_hub.models.Gemma3CausalLM.from_preset(preset, dtype=dtype)
+    model = keras_hub.models.Gemma3CausalLM.from_preset(str(preset), dtype=dtype)   # keras-hub takes a string, not a Path
     model.export_to_transformers(str(out))
     finish(out, rung)
     print(f"wrote {out}", flush=True)
