@@ -1,7 +1,7 @@
 """Gold table and column names (spec 018; AGENTS.md "SQL and data names").
 
 pandas frames and the committed CSVs keep their analysis names; a job renames them with to_gold just
-before writing health_transformation_lab.gold_dental_omop_perio. One entry per gold table: the analysis column names it
+before writing health_transformation_lab.gold_perio_bench. One entry per gold table: the analysis column names it
 is written from, and the gold name of each.
 
     to_gold    rename for gold; an unknown column fails, naming it; _count columns become integers

@@ -62,7 +62,7 @@ def test_every_rung_the_databricks_job_runs_is_public_on_hugging_face():
 
 def test_prepared_kernel_matches_the_databricks_job_by_default(tmp_path):
     meta, s = _prepare(tmp_path, "--commit", "abc123")
-    assert meta["id"] == "someone/dental-omop-encoder-gpu" and meta["code_file"] == "encoder_gpu.ipynb"
+    assert meta["id"] == "someone/perio-bench-encoder-gpu" and meta["code_file"] == "encoder_gpu.ipynb"
     assert meta["enable_gpu"] is True and meta["enable_internet"] is True and meta["is_private"] is False
     assert meta["model_sources"] == []                       # weights come from Hugging Face, no token
     assert f'RUNGS = "{_bundle_default("encoder_gpu_rungs")}"' in s
@@ -94,7 +94,7 @@ def test_workflow_pushes_the_encoder_kernel_waits_and_opens_a_results_pr():
                  "kaggle kernels output", "kaggle/show_log.py", "kaggle/record_results.py", "upload-artifact",
                  "kaggle kernels list --mine", 'tok="${T:-$K}"', "inputs.branch || github.ref_name", "github.sha"):
         assert step in text, step
-    assert "/dental-omop-encoder-gpu" in text
+    assert "/perio-bench-encoder-gpu" in text
 
 
 def test_medgemma_is_still_the_default_job(tmp_path):

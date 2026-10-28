@@ -50,7 +50,7 @@ it is scored on the same 240 review charts with the same code, and its results a
 
 ## Tools
 
-Unity Catalog functions in `health_transformation_lab.gold_dental_omop_perio`, so the agent, SQL and the Playground
+Unity Catalog functions in `health_transformation_lab.gold_perio_bench`, so the agent, SQL and the Playground
 all call the same code. Each is a thin wrapper over a tested function in `python/health_transformation_lab_nlp/`.
 
 | Tool | Returns | Wraps |
@@ -86,7 +86,7 @@ One JSON object per visit, validated before it's kept:
 - A job in `databricks/resources/` deployed by the bundle like every other; runs on demand.
 - The model behind it is a pay-per-token serving endpoint set by a bundle variable (default `none`, which
   skips it), with AI Gateway usage tracking and rate limits on that endpoint.
-- Logged with MLflow and registered in Unity Catalog as `health_transformation_lab.gold_dental_omop_perio.chart_review_agent`
+- Logged with MLflow and registered in Unity Catalog as `health_transformation_lab.gold_perio_bench.chart_review_agent`
   only if it passes the same acceptance test as the other models.
 
 ## Layout

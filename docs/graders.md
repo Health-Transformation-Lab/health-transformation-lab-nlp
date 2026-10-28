@@ -5,7 +5,7 @@ versions of designs: the EHR DQ grader follows the React *Perio DQ Monitor*; the
 uplift and leaderboard slides (`docs/pitch/`). Synthetic data only; the lab grader is simulated until real runs
 exist.
 
-| Grader | Dashboard | Genie space | Tables (`health_transformation_lab.gold_dental_omop_perio`) |
+| Grader | Dashboard | Genie space | Tables (`health_transformation_lab.gold_perio_bench`) |
 |---|---|---|---|
 | **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_check`, `dq_column_missing`, `dq_prevalence`, `dq_temporal_change`, `dq_stage_transition`, `dq_source_concordance`, `fact_visit_evidence`, `dq_injected_error` |
 | **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | *Lab grader* | *Lab grader* | `dim_grader_question`, `fact_grader_answer` |

@@ -62,7 +62,7 @@ dbutils.widgets.text("sql_warehouse_id", "")
 # Empty = the script's default engine set (every engine; the ones without credentials are reported as not run).
 dbutils.widgets.text("engines", "")
 dbutils.widgets.text("n_notes", "400")
-# ASQ-PHI as downloaded (synthetic_clinical_queries.txt), e.g. /Volumes/health_transformation_lab/landing_dental_omop_perio/data/synthetic_clinical_queries.txt
+# ASQ-PHI as downloaded (synthetic_clinical_queries.txt), e.g. /Volumes/health_transformation_lab/landing_perio_bench/data/synthetic_clinical_queries.txt
 dbutils.widgets.text("external_path", "")
 # John Snow Labs' 48-note benchmark CSV, on a volume (tier jsl48); empty = skip that tier.
 dbutils.widgets.text("jsl48_path", "")

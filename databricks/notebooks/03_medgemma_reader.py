@@ -34,7 +34,7 @@ dbutils.widgets.text("limit", "40")                  # noqa: F821  start small: 
 dbutils.widgets.text("shots", "0")                   # noqa: F821
 dbutils.widgets.text("lora_train", "0")              # noqa: F821  >0: LoRA fine-tune on this many train notes first
 dbutils.widgets.text("catalog", "health_transformation_lab")      # noqa: F821  set by databricks.yml
-dbutils.widgets.text("schema", "gold_dental_omop_perio")  # noqa: F821
+dbutils.widgets.text("schema", "gold_perio_bench")  # noqa: F821
 dbutils.widgets.text("hf_secret_scope", "health_transformation_lab")    # noqa: F821
 dbutils.widgets.text("experiment_name", "")          # noqa: F821  the bundle's MLflow experiment; empty: yours
 dbutils.widgets.text("run_id", "")                   # noqa: F821  the job run ({{job.run_id}}): every retry shares it

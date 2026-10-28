@@ -58,7 +58,7 @@ def _settings(nb):
 
 def test_prepared_kernel_runs_on_a_gpu_with_internet_and_the_chosen_settings(tmp_path):
     _, meta, nb = _prepare(tmp_path, "--limit", "5", "--shots", "2", "--branch", "dev-x")
-    assert meta["id"] == "someone/health-transformation-lab-medgemma-reader" and meta["code_file"] == "medgemma_reader.ipynb"
+    assert meta["id"] == "someone/perio-bench-medgemma-reader" and meta["code_file"] == "medgemma_reader.ipynb"
     assert meta["enable_gpu"] is True and meta["enable_internet"] is True
     assert meta["is_private"] is False          # public: synthetic notes only, and no token anywhere
     assert meta["kernel_type"] == "notebook" and meta["language"] == "python"

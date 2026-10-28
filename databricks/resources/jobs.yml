@@ -16,9 +16,9 @@ resources:
             notebook_path: ../notebooks/01_run_benchmark.py
             base_parameters:
               git_commit: ${bundle.git.commit}   # shown on every run
-              catalog: ${resources.schemas.gold.catalog_name}
-              schema: ${resources.schemas.gold.name}
-              landing_schema: ${resources.volumes.data.schema_name}
+              catalog: ${resources.schemas.perio_bench_gold.catalog_name}
+              schema: ${resources.schemas.perio_bench_gold.name}
+              landing_schema: ${resources.volumes.perio_bench_data.schema_name}
               n_people: ${var.n_people}
               run_encoder: ${var.run_encoder}
               leak_assessment: "false"
@@ -53,8 +53,8 @@ resources:
             notebook_path: ../notebooks/07_judge_scorecard.py
             base_parameters:
               git_commit: ${bundle.git.commit}   # shown on every run
-              catalog: ${resources.schemas.gold.catalog_name}
-              schema: ${resources.schemas.gold.name}
+              catalog: ${resources.schemas.perio_bench_gold.catalog_name}
+              schema: ${resources.schemas.perio_bench_gold.name}
               judge_endpoint: ${var.judge_endpoint}
               experiment_id: ${resources.experiments.dental_experiment.id}
               usd_per_million_in: ${var.judge_usd_per_million_in}
@@ -73,8 +73,8 @@ resources:
             notebook_path: ../notebooks/02_llm_judge.sql
             warehouse_id: ${var.warehouse_id}
             base_parameters:
-              catalog: ${resources.schemas.gold.catalog_name}
-              schema: ${resources.schemas.gold.name}
+              catalog: ${resources.schemas.perio_bench_gold.catalog_name}
+              schema: ${resources.schemas.perio_bench_gold.name}
               judge_endpoint: ${var.judge_endpoint}
 
     # GPU jobs on serverless GPU (Free Edition has it; one A10 by default, var.gpu_accelerator).
@@ -102,8 +102,8 @@ resources:
             notebook_path: ../notebooks/03_medgemma_reader.py
             base_parameters:
               git_commit: ${bundle.git.commit}   # shown on every run
-              catalog: ${resources.schemas.gold.catalog_name}
-              schema: ${resources.schemas.gold.name}
+              catalog: ${resources.schemas.perio_bench_gold.catalog_name}
+              schema: ${resources.schemas.perio_bench_gold.name}
               rung: ${var.reader_rung}
               limit: ${var.reader_limit}
               shots: ${var.reader_shots}
@@ -138,9 +138,9 @@ resources:
               git_commit: ${bundle.git.commit}   # shown on every run
               rungs: ${var.encoder_gpu_rungs}
               lr_overrides: ${var.encoder_gpu_lr}
-              catalog: ${resources.schemas.gold.catalog_name}
-              schema: ${resources.schemas.gold.name}
-              landing_schema: ${resources.volumes.data.schema_name}
+              catalog: ${resources.schemas.perio_bench_gold.catalog_name}
+              schema: ${resources.schemas.perio_bench_gold.name}
+              landing_schema: ${resources.volumes.perio_bench_data.schema_name}
               telemetry: ${var.telemetry_exporter}
 
     # De-identification methods that need Databricks services (spec 007 T012b, T016): the LLM via a
@@ -161,7 +161,7 @@ resources:
               llm_endpoint: ${var.deid_llm_endpoint}
               sql_warehouse_id: ${var.warehouse_id}
               save_to_repo: "no"
-              out_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/deid_ai
+              out_dir: /Volumes/${resources.volumes.perio_bench_data.catalog_name}/${resources.volumes.perio_bench_data.schema_name}/${resources.volumes.perio_bench_data.name}/deid_ai
 
     # NHANES 2009-2014 periodontal exam (spec 013 G4): public-domain CDC files, downloaded here because
     # cdc.gov isn't reachable from every environment. Raw files and the aggregate table stay on the volume.
@@ -177,8 +177,8 @@ resources:
             notebook_path: ../notebooks/09_nhanes_perio.py
             base_parameters:
               git_commit: ${bundle.git.commit}   # shown on every run
-              data_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/nhanes_raw
-              out_dir: /Volumes/${resources.volumes.data.catalog_name}/${resources.volumes.data.schema_name}/${resources.volumes.data.name}/nhanes
+              data_dir: /Volumes/${resources.volumes.perio_bench_data.catalog_name}/${resources.volumes.perio_bench_data.schema_name}/${resources.volumes.perio_bench_data.name}/nhanes_raw
+              out_dir: /Volumes/${resources.volumes.perio_bench_data.catalog_name}/${resources.volumes.perio_bench_data.schema_name}/${resources.volumes.perio_bench_data.name}/nhanes
               telemetry: ${var.telemetry_exporter}
 
     # Spec 016: every committed model result (Kaggle runs collected into a PR, laptop runs) into the gold
@@ -197,8 +197,8 @@ resources:
             notebook_path: ../notebooks/11_migrate_gold_names.py
             base_parameters:
               git_commit: ${bundle.git.commit}   # shown on every run
-              catalog: ${resources.schemas.gold.catalog_name}
-              schema: ${resources.schemas.gold.name}
+              catalog: ${resources.schemas.perio_bench_gold.catalog_name}
+              schema: ${resources.schemas.perio_bench_gold.name}
         - task_key: load
           depends_on:
             - task_key: migrate_gold_names
@@ -206,6 +206,6 @@ resources:
             notebook_path: ../notebooks/10_load_results.py
             base_parameters:
               git_commit: ${bundle.git.commit}   # shown on every run
-              catalog: ${resources.schemas.gold.catalog_name}
-              schema: ${resources.schemas.gold.name}
+              catalog: ${resources.schemas.perio_bench_gold.catalog_name}
+              schema: ${resources.schemas.perio_bench_gold.name}
               experiment_name: ${resources.experiments.dental_experiment.name}

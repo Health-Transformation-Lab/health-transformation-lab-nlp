@@ -37,10 +37,10 @@
   "data_sources": {
     "tables": [
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.dim_grader_question"
+        "identifier": "health_transformation_lab.gold_perio_bench.dim_grader_question"
       },
       {
-        "identifier": "health_transformation_lab.gold_dental_omop_perio.fact_grader_answer"
+        "identifier": "health_transformation_lab.gold_perio_bench.fact_grader_answer"
       }
     ]
   },

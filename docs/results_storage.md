@@ -13,8 +13,8 @@
 | Model predictions, LLM reader details | `data/datasets/ai_predictions_<rung>.csv`, `llm_details_<rung>.csv` | CSV |
 | Judge verdicts, cost-effectiveness | `data/corpus/` | CSV / Parquet / PNG |
 | Model runs (optional) | MLflow (`pip install -e ".[track]"`; workspace MLflow on Databricks) | MLflow runs |
-| On Databricks | `health_transformation_lab.gold_dental_omop_perio.*` Delta tables (notebook 01); `fact_llm_call` (notebook 03) | Delta |
-| Every committed result, wherever it ran (spec 016) | `result_files`, `ai_predictions`, `llm_reader_runs` in `gold_dental_omop_perio`, loaded by the **Load results** job after each deploy; source in `data/datasets/results_manifest.csv` | Delta |
+| On Databricks | `health_transformation_lab.gold_perio_bench.*` Delta tables (notebook 01); `fact_llm_call` (notebook 03) | Delta |
+| Every committed result, wherever it ran (spec 016) | `result_files`, `ai_predictions`, `llm_reader_runs` in `gold_perio_bench`, loaded by the **Load results** job after each deploy; source in `data/datasets/results_manifest.csv` | Delta |
 | OMOP target for model output | `NOTE_NLP` (a flag for review, never `CONDITION_OCCURRENCE`) | OMOP table |
 
 Files in git are fine for a synthetic learning repo: every result is
@@ -100,7 +100,7 @@ files are never loaded.
 Every gold table, column by column, with ERDs: [gold_tables.md](gold_tables.md).
 
 ```sql
-select source_code, method_name, count(*) from health_transformation_lab.gold_dental_omop_perio.fact_prediction group by all;
+select source_code, method_name, count(*) from health_transformation_lab.gold_perio_bench.fact_prediction group by all;
 ```
 
 ## Cautions

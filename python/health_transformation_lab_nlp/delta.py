@@ -1,6 +1,6 @@
 """Idempotent Delta writes from notebooks: delete-then-append by batch key (AGENTS.md, docs/operations.md).
 
-    replace_batch(spark, rows, "health_transformation_lab.gold_dental_omop_perio.fact_prediction",
+    replace_batch(spark, rows, "health_transformation_lab.gold_perio_bench.fact_prediction",
                   {"source_code": "databricks", "run_id": run_id, "method_name": method})
 
 A retry of the same batch replaces its rows instead of adding them again. Rows carry the key columns, so a bad
