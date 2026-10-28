@@ -11,6 +11,7 @@
         [--shots 0] [--branch main] [--commit <sha>]
     python kaggle/prepare_kernel.py --job encoders --out build/kernel --username <kaggle user>
         [--rungs a,b] [--lr-overrides a=2e-5] [--epochs 3] [--max-len 256] [--limit 10] [--branch ...] [--commit ...]
+        [--save-model modernbert-base+cw]
 
 --limit 0 is the full run (FULL_RUN); any other number reads that many review notes as a test.
 """
@@ -58,6 +59,7 @@ def main() -> None:
     ap.add_argument("--lr-overrides", default=None, help="encoders, rung=rate (default: databricks.yml)")
     ap.add_argument("--epochs", type=int, default=3, help="encoders")
     ap.add_argument("--max-len", type=int, default=256, help="encoders")
+    ap.add_argument("--save-model", default="", help="encoders: the rung whose fine-tuned weights to keep (spec 020 US3)")
     a = ap.parse_args()
     notebook, slug, title = JOBS[a.job]
 
@@ -71,8 +73,9 @@ def main() -> None:
         rungs = a.rungs or bundle_default("encoder_gpu_rungs")
         lrs = bundle_default("encoder_gpu_lr") if a.lr_overrides is None else a.lr_overrides
         values |= {"RUNGS": json.dumps(rungs), "LR_OVERRIDES": json.dumps(lrs), "EPOCHS": str(a.epochs),
-                   "MAX_LEN": str(a.max_len)}
-        models, what = [], f"rungs={rungs} lr={lrs or 'default'} epochs={a.epochs}"
+                   "MAX_LEN": str(a.max_len), "SAVE_MODEL": json.dumps(a.save_model)}
+        models, what = [], (f"rungs={rungs} lr={lrs or 'default'} epochs={a.epochs}"
+                            + (f" keeping {a.save_model}" if a.save_model else ""))
 
     nb = json.loads((HERE / notebook).read_text())
     cell = next(c for c in nb["cells"] if c["cell_type"] == "code" and "BRANCH =" in "".join(c["source"]))

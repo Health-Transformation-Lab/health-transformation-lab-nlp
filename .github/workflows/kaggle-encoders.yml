@@ -3,7 +3,8 @@
 # "Fine-tune the GPU encoders on a free Kaggle GPU" -> Run workflow.
 #
 # Needs, in the GitHub environment `dev`: KAGGLE_USERNAME (variable or secret) and either KAGGLE_API_TOKEN
-# or KAGGLE_KEY (secret), the same as kaggle-medgemma.yml. No Hugging Face token: every encoder is public.
+# or KAGGLE_KEY (secret), the same as kaggle-medgemma.yml. With save_model, a full run also publishes that rung as
+# a public Kaggle model (kaggle/publish_model.py, spec 020 US3). No Hugging Face token: every encoder is public.
 # The rungs and learning rates default to the Databricks job's (databricks.yml encoder_gpu_rungs, encoder_gpu_lr;
 # a test keeps them in step).
 name: Fine-tune the GPU encoders on a free Kaggle GPU
@@ -39,6 +40,9 @@ on:
         description: "Open a pull request that commits the results (a full run; a smaller test run is never committed)"
         type: boolean
         default: true
+      save_model:
+        description: "Publish this rung's fine-tuned weights as a public Kaggle model after a full run, e.g. modernbert-base+cw (empty: none)"
+        default: ""
 
 concurrency: kaggle-encoders
 
@@ -84,7 +88,7 @@ jobs:
         run: >
           python kaggle/prepare_kernel.py --job encoders --out build/kernel --username "$KAGGLE_USERNAME"
           --rungs "${{ inputs.rungs }}" --lr-overrides "${{ inputs.lr_overrides }}" --epochs "${{ inputs.epochs }}"
-          --limit "${{ inputs.limit }}"
+          --limit "${{ inputs.limit }}" --save-model "${{ inputs.save_model }}"
           --branch "${{ inputs.branch || github.ref_name }}"
           --commit "${{ (inputs.branch == '' || inputs.branch == github.ref_name) && github.sha || '' }}"
 
@@ -143,9 +147,25 @@ jobs:
           gh pr create --base main --head "$BRANCH" --title "Add GPU encoder results from Kaggle" --body "$body" \
             || echo "::warning::Pushed $BRANCH but couldn't open the PR (Settings -> Actions -> General -> Allow GitHub Actions to create and approve pull requests). Open it here: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$BRANCH"
 
+      # Spec 020 US3: the kept weights as a public Kaggle model (Apache 2.0, the base model's licence), with a card
+      # scored from the same run's predictions. publish_model.py refuses a test run's partial predictions.
+      - name: Publish the model to Kaggle
+        if: ${{ !cancelled() && inputs.save_model != '' && inputs.limit == '0' && (inputs.wait || inputs.collect_only) }}
+        run: |
+          set -o pipefail                      # a refused upload must fail the step, not tee
+          [ -f build/output/saved_model.json ] || { echo "::error::No saved_model.json in the Kaggle output: did ${{ inputs.save_model }} fail?"; exit 1; }
+          pip install --quiet -e ./python
+          pred=$(python -c 'import json; print(json.load(open("build/output/saved_model.json"))["predictions"])')
+          python kaggle/publish_model.py --model-dir build/output/model --predictions "build/output/$pred" \
+            --out build/kaggle-model --username "$KAGGLE_USERNAME" --commit "${{ github.sha }}" --upload \
+            --message "Trained on Kaggle by ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v4
         if: ${{ always() && (inputs.wait || inputs.collect_only) }}
         with:
           name: encoders-kaggle
-          path: build/output
+          path: |
+            build/output
+            !build/output/model
           if-no-files-found: warn

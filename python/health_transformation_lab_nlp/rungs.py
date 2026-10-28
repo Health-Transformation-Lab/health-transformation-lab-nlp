@@ -227,6 +227,13 @@ class HFEncoder:
         proba = torch.softmax(torch.tensor(logits), dim=-1).numpy()
         return [LABELS[i] for i in proba.argmax(axis=1)], proba
 
+    @traced
+    def save(self, path) -> None:
+        """The fine-tuned model and its tokenizer in transformers format (config with the six labels, weights,
+        tokenizer files), loadable with AutoModelForSequenceClassification.from_pretrained(path)."""
+        self.model.save_pretrained(str(path))
+        self.tok.save_pretrained(str(path))
+
 
 @traced
 def output_tag(class_weight: str | None = None, seed: int = 42, adapter: str | None = None,
