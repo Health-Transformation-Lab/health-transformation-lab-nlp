@@ -28,7 +28,8 @@ token, so the PR was opened by hand. Approve.
 ## CI Status
 | Check | Status |
 |---|---|
-| python, postgres, bundle, check | started by the review commit (a PR opened by the workflow token doesn't start CI) |
+| python (first run, 910b592) | ❌ `fact_llm_call: no gold name for column(s) ['revision']`: the reader's new column wasn't declared. Fixed in #215 (#214), merged into this branch |
+| python, postgres, bundle, r-parity, check (after the merge) | see the PR |
 
 ## What the run measured (synthetic notes; not evidence about real records)
 | | medgemma-4b-it (this PR) | medgemma-1.5-4b-it (on main) |
@@ -54,7 +55,10 @@ Clean.
 None.
 
 ### 🟡 Should fix (Important, non-blocking)
-None in this PR. Outside it, the workflow could not open its own PR, and its warning names the repo setting
+- **Fixed by #215.** The file's `revision` column had no gold name, so CI failed here and Load results would
+  have failed too. The fix is merged into this branch and no-ops once #215 is on main.
+
+Outside this PR: Outside it, the workflow could not open its own PR, and its warning names the repo setting
 (Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"). That setting is
 the owner's to change. Until then, results PRs are opened by hand.
 
