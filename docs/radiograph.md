@@ -4,10 +4,10 @@
 > explores what a possible proof of concept *could* look like if structured
 > radiograph AI output were added to periodontal phenotyping. It uses simulated
 > data and public information only. It is not affiliated with or endorsed by
-> Overjet or any other organization,
-> does not reflect any organization's business, research or partnership work,
-> is not an integration with any vendor, uses no vendor data, files or APIs,
-> and implies no agreement to build one. See [DISCLAIMER](../DISCLAIMER.md).
+> Overjet or any other organization, does not reflect any organization's
+> business, research or partnership work, is not an integration with any
+> vendor, uses no vendor data, files or APIs, and implies no agreement to build
+> one. See [DISCLAIMER](../DISCLAIMER.md).
 
 Spec: [specs/003-radiograph-structured-data](../specs/003-radiograph-structured-data/spec.md).
 
