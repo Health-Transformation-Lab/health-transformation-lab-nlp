@@ -26,6 +26,9 @@
 import os
 import subprocess
 
+dbutils.widgets.text("git_commit", "")  # noqa: F821  set by the job: the commit it was deployed from
+from dental_omop_nlp import tracking as _tracking
+_tracking.use_git_commit(dbutils)  # noqa: F821  MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("rung", "medgemma-1.5-4b-it")  # noqa: F821
 dbutils.widgets.text("limit", "40")                  # noqa: F821  start small: GPU quota
 dbutils.widgets.text("shots", "0")                   # noqa: F821

@@ -39,6 +39,11 @@ def enabled() -> bool:
 
 
 def git_commit() -> str:
+    """Short commit of the code that's running: the deployed commit on Databricks (DENTAL_GIT_COMMIT, set by
+    use_git_commit from the job), else asked of git, else "unknown"."""
+    deployed = os.environ.get("DENTAL_GIT_COMMIT", "").strip()
+    if deployed:
+        return deployed[:7]
     try:
         return subprocess.run(["git", "-C", str(REPO_ROOT), "rev-parse", "--short", "HEAD"],
                               capture_output=True, text=True, timeout=10, check=False).stdout.strip() or "unknown"
@@ -78,6 +83,16 @@ class _Run:
         if self.run_id and Path(path).exists():
             import mlflow
             mlflow.log_artifact(str(path))
+
+
+def use_git_commit(dbutils) -> str:
+    """In a Databricks notebook: read the `git_commit` job parameter (the commit the bundle was deployed from)
+    and hand it to this code and the scripts it starts. Returns it ("" when run by hand)."""
+    dbutils.widgets.text("git_commit", "")
+    commit = dbutils.widgets.get("git_commit").strip()
+    if commit:
+        os.environ["DENTAL_GIT_COMMIT"] = commit
+    return commit
 
 
 def pass_databricks_login() -> bool:

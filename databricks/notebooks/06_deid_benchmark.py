@@ -53,6 +53,9 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 # Pay-per-token Foundation Model endpoint for the llm engine; pick any chat model listed under Serving.
+dbutils.widgets.text("git_commit", "")   # set by the job: the commit it was deployed from
+from dental_omop_nlp import tracking as _tracking
+_tracking.use_git_commit(dbutils)   # MLflow runs and the scripts it starts are tagged with it
 dbutils.widgets.text("llm_endpoint", "databricks-meta-llama-3-3-70b-instruct")
 # SQL warehouse for ai_mask; empty = the first warehouse the workspace has (Free Edition has one).
 dbutils.widgets.text("sql_warehouse_id", "")
