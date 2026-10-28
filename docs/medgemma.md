@@ -109,17 +109,20 @@ placeholder error rates and say nothing about MedGemma.
   verification and free capacity, and some accounts get none, so the `medgemma_reader` job can wait and
   retry for hours without starting. [`kaggle/medgemma_reader.ipynb`](../kaggle/medgemma_reader.ipynb) runs
   the same `11_ai_predict.py` on Kaggle's free "GPU T4 x2" (about 30 GPU-hours a week): clone, install,
-  token from Kaggle Secrets, a 10-note test, then all 240 notes with *Save & Run All*. The reader picks
+  convert MedGemma, a 10-note test, then all 240 notes with *Save & Run All*. No Hugging Face token: the
+  weights come from Kaggle Models ([keras/medgemma](https://www.kaggle.com/models/keras/medgemma), the
+  `kaggle:` handle in `models.yaml`, attached through `model_sources`), a Keras preset that
+  [`kaggle/keras_to_hf.py`](../kaggle/keras_to_hf.py) exports to a `transformers` folder (keras-hub's
+  exporter, plus MedGemma's chat template and stop tokens) and `--weights` loads. The reader picks
   the weights dtype for the GPU (`llm_reader.pick_dtype`: bfloat16 on A10/A100/H100, float32 on T4 x2,
   `DENTAL_LLM_DTYPE` to force one). Download the prediction CSVs from the Output tab into
   `data/datasets/`, then run `28_ladder_vs_truth.py` and `35_readme_results.py`.
   **From GitHub:** Actions → *Run MedGemma on a free Kaggle GPU* → Run workflow pushes the notebook to Kaggle
-  (`kaggle kernels push --accelerator NvidiaTeslaT4`, public: synthetic notes only, and the Hugging Face token stays a private Kaggle secret), waits, and keeps the predictions and
+  (`kaggle kernels push --accelerator NvidiaTeslaT4`, public: synthetic notes only, no token in it), waits, and keeps the predictions and
   the Kaggle log as a workflow artifact. Needs `KAGGLE_USERNAME` and `KAGGLE_API_TOKEN` (or
   `KAGGLE_KEY`) in the GitHub environment `dev` (Kaggle → Settings → API → Generate New Token; delete it
-  there when done). The Hugging Face token stays a Kaggle secret: after the first push, open the
-  notebook on kaggle.com, Add-ons → Secrets → attach `HF_TOKEN`, and run the workflow again. `limit` 10
-  is a test; `limit` 0 reads all 240 notes (hours: turn `wait` off, then rerun with `collect_only`).
+  there when done). Nothing to set up on kaggle.com: a pushed notebook can't read Kaggle Secrets, which is
+  why it no longer uses a Hugging Face token. `limit` 10 is a test; `limit` 0 reads all 240 notes (hours: turn `wait` off, then rerun with `collect_only`).
 - **Paid Databricks:** register through MLflow, serve on GPU Model Serving, and
   batch-score with `ai_query`. Costs go in `costs.yaml` as a self-hosted GPU method.
 - **Evaluation:** the same split, scorer, harm grading, difficulty levels and
@@ -143,9 +146,14 @@ used the pinned revision.
 | `medgemma-4b-pt` | 4B, pretrained only | not in the registry | not instruction-tuned, so unsuited to a zero-shot reader |
 
 **MedGemma 4B v1 against 1.5 (next).** This is the same hardware and code as the 1.5 run, so it isolates
-the effect of the version. On kaggle.com, open the notebook, set `RUNG = "medgemma-4b-it"` and
-`FULL_RUN = True` in the Settings cell, check that `HF_TOKEN` is attached, then **Save & Run All**. When it
-finishes, run the GitHub workflow with `collect_only` to open the results PR.
+the effect of the version. The Kaggle notebook loads MedGemma from Kaggle Models (`kaggle/keras_to_hf.py`),
+which needs two things per model, and only 1.5 has them so far:
+- the model's `kaggle:` handle in `models.yaml`, from kaggle.com/models/keras/medgemma;
+- Google's `config.json` and `generation_config.json` for it in `kaggle/hf_config/`, from
+  `google/medgemma-4b-it` on Hugging Face (terms accepted).
+
+Add both, check that the converter reproduces the Hugging Face weights as it does for 1.5, then run the
+workflow with rung `medgemma-4b-it`. Runs on Hugging Face weights instead load the pinned revision.
 
 ## Next: MedGemma 27B
 

@@ -230,8 +230,10 @@ class HFChat:  # pragma: no cover - needs model weights and the [llm] extra
     name, simulated = "hf", False
 
     def __init__(self, hf_id: str, modality: str = "multimodal", adapter: str | None = None,
-                 max_new_tokens: int = 300, dtype: str = "auto", device_map: str = "auto", revision: str | None = None):
+                 max_new_tokens: int = 300, dtype: str = "auto", device_map: str = "auto", revision: str | None = None,
+                 version: str | None = None):
         self.hf_id, self.modality, self.adapter, self.revision = hf_id, modality, adapter, revision
+        self.version = version or revision     # what each run records: the Hugging Face commit or the Kaggle version
         self.max_new_tokens, self.dtype, self.device_map = max_new_tokens, dtype, device_map
         self.model = None
 
@@ -315,9 +317,13 @@ def _hf_token() -> str | None:
 @traced
 def make_backend(entry: dict, kind: str, **kw):
     if kind == "hf":
-        if entry.get("gated") and not _hf_token():
+        weights = kw.get("weights")   # a local transformers folder (Kaggle: kaggle/keras_to_hf.py); no token needed
+        if entry.get("gated") and not weights and not _hf_token():
             raise RuntimeError(f"{entry['hf']} is gated ({entry.get('license', 'see its model card')}): accept "
                                "the terms on its Hugging Face page, then set HF_TOKEN to a read token from that account")
+        if weights:   # converted Kaggle Models weights: their Kaggle version is the pin, recorded with each run
+            return HFChat(weights, entry.get("modality", "multimodal"), adapter=kw.get("adapter"),
+                          version=entry.get("kaggle", "local weights"))
         return HFChat(entry["hf"], entry.get("modality", "multimodal"), adapter=kw.get("adapter"),
                       revision=entry.get("revision"))
     if kind == "openai":
@@ -355,7 +361,7 @@ class LLMReader:
         for _, r in test.iterrows():
             note, vid = r["note_text"], r.get("visit_id")
             row = {"visit_id": vid, "model": self.model_id, "backend": self.backend.name,
-                   "revision": getattr(self.backend, "revision", None) or "",
+                   "revision": getattr(self.backend, "version", None) or getattr(self.backend, "revision", None) or "",
                    "prompt_version": self.variant, "shots": self.shots, "input_tokens": 0, "output_tokens": 0,
                    "latency_s": 0.0, "raw": "", "status": None, "grade": "NA", "extent": "NA", "quote": "",
                    "gate_ok": False, "error": ""}

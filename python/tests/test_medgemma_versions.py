@@ -45,3 +45,10 @@ def test_the_27b_option_is_written_down_with_its_evidence_and_hardware():
     for must in ("medgemma-27b-text-it", "87.7", "64.4", "2507.05201", "GB", "not run"):
         assert must in sec, must
     assert "27B" in REG["medgemma-27b-text-it"].get("note", "")
+
+
+def test_kaggle_weights_record_their_kaggle_version_and_skip_the_hub_revision():
+    from dental_omop_nlp.llm_reader import make_backend
+    entry = REG["medgemma-1.5-4b-it"]
+    b = make_backend(entry, "hf", weights="/kaggle/temp/medgemma-hf")
+    assert b.revision is None and b.version == entry["kaggle"]
