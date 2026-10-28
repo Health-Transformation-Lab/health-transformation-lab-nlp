@@ -123,10 +123,11 @@ print("loaded:", list(new.file) or "nothing new")
 
 # COMMAND ----------
 
-# The graders' tables (spec 019): data quality now, the lab grader later. Each is small and built whole from the
+# The graders' tables (spec 019): data quality, and the lab grader (a SIMULATED sample until real runs exist). Each is small and built whole from the
 # deployed CSVs, so it is overwritten on every run: a rerun leaves the same rows. sha256 says which files it holds.
-for name, df in grader_tables.dq_tables(data_dir).items():
+for name, df in {**grader_tables.dq_tables(data_dir), **grader_tables.lab_tables(data_dir)}.items():
+    df = gold_names.to_gold(df.assign(git_commit=commit, loaded_at=now), name)   # gold column names
     empty = [c for c in df.columns if df[c].isna().all()]
-    spark.createDataFrame(df.astype({c: "string" for c in empty}).assign(git_commit=commit, loaded_at=now)) \
+    spark.createDataFrame(df.astype({c: "string" for c in empty})) \
         .write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(table(name))  # noqa: F821
     print(f"{name}: {len(df)} rows")

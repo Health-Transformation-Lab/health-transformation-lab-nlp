@@ -10,7 +10,7 @@ Only G10 is planned so far (plan.md). Test first for each.
       grade modifiers on synthetic charts, seed gives the same result twice
 - [x] T003 `classify_status.py`: `features`, `SCHEMES`, `split_people`, `tune`, `train_eval`, `shap_values`,
       `AAP_ROLE`; every public function `@traced`
-- [x] T004 `scripts/42_classify_status.py --outcome --scheme --seed`: writes `data/datasets/classify_status/`,
+- [x] T004 `scripts/40_classify_status.py --outcome --scheme --seed`: writes `data/datasets/classify_status/`,
       prints "SYNTHETIC", logs to MLflow
 - [x] T005 Run it on both schemes and commit the outputs
 - [x] T006 Docs: references (Patel 2022 Frontiers), process table, code walkthrough section on reading SHAP

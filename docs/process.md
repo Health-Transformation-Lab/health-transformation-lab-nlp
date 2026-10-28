@@ -124,7 +124,7 @@ same as completed ones is an open decision for the study lead (action item A2).
 | Clinic-level prevalence, published comparison | `prevalence.py` (Py + R), `scripts/19_prevalence.py` | `prevalence/` |
 | Data quality: conformance, completeness, plausibility | `dq.py`, `scripts/20_data_quality.py` | `data_quality/` |
 | Prediction of progression, feature importance | `prediction.py`, `scripts/21_predict_progression.py` | `prediction/` |
-| Status from the recorded chart, explained with SHAP (spec 013 G10) | `classify_status.py`, `scripts/42_classify_status.py` | `classify_status/` |
+| Status from the recorded chart, explained with SHAP (spec 013 G10) | `classify_status.py`, `scripts/40_classify_status.py` | `classify_status/` |
 
 Differences from the study design and open decisions: [action_items.md](action_items.md).
 

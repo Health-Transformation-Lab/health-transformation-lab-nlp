@@ -21,6 +21,7 @@ erDiagram
     fact_prediction }o..o{ fact_chart_answer : "method_name = system_name"
     fact_prediction ||..o| judge_queue : "sampled from"
     judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
+    dim_grader_question ||--o{ fact_grader_answer : "question_id"
     review_key
     dim_result_file
     fact_prediction
@@ -33,6 +34,16 @@ erDiagram
     deid_score
     judge_queue
     fact_corpus_judge_call
+    dq_check
+    dq_column_missing
+    dq_prevalence
+    dq_temporal_change
+    dq_stage_transition
+    dq_source_concordance
+    fact_visit_evidence
+    dq_injected_error
+    dim_grader_question
+    fact_grader_answer
 ```
 
 ## Every column (full)
@@ -54,6 +65,7 @@ erDiagram
     fact_prediction }o..o{ fact_chart_answer : "method_name = system_name"
     fact_prediction ||..o| judge_queue : "sampled from"
     judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
+    dim_grader_question ||--o{ fact_grader_answer : "question_id"
     review_key {
         bigint visit_id PK "review chart (240)"
         string truth_status "the generator's truth"
@@ -212,6 +224,139 @@ erDiagram
         string error_text "ai_query error"
         string prompt_version_code "judge-v2"
         string judge_model_name "serving endpoint"
+    }
+    dq_check {
+        string check_name "e.g. plausibility:temporal_stage_drop"
+        string check_category_code "conformance · completeness · plausibility"
+        bigint checked_count "rows the check looked at"
+        bigint failed_count "rows that failed it"
+        double pass_ratio "1 - failed / checked"
+        string check_status_code "PASS (none allowed, none found) · REPORT (a rate to read)"
+        string clinic_code "1-8, or All"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    dq_column_missing {
+        string evidence_column_name "column of the structured record"
+        bigint row_count "visits"
+        bigint missing_count "visits where it is empty"
+        double missing_pct "missing / visits, 0-100"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    dq_prevalence {
+        string method_name "status source: algorithm_design, notes, truth_status, ..."
+        string level_code "clinic · scale"
+        string group_name "clinic 1-8, or all_visits · complete_cases · reference_set"
+        bigint subject_count "people (clinic) or visits with a status (scale)"
+        double periodontitis_ratio "share with periodontitis"
+        double periodontitis_ci_low_ratio "95% interval, low (clinic rows)"
+        double periodontitis_ci_high_ratio "95% interval, high (clinic rows)"
+        double stage3_4_ratio "share with stage III-IV"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    dq_temporal_change {
+        string method_name "status source"
+        bigint later_visit_count "visits after a patient's first"
+        double perio_resolved_ratio "later visits where periodontitis disappeared"
+        double stage_drop_ratio "later visits where the stage dropped"
+        bigint visit_pair_count "pairs 1-2 years apart, no treatment between"
+        double better_ratio "pairs whose stage improved: implausible"
+        double same_ratio "pairs with the same stage"
+        double worse_ratio "pairs whose stage worsened"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    dq_stage_transition {
+        string method_name "algorithm_design"
+        string from_status_code "stage at the earlier visit"
+        string to_status_code "stage at the next"
+        bigint visit_pair_count "visit pairs"
+        double row_pct "share of the earlier stage's pairs, 0-100"
+        string direction_code "better · same · worse"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    dq_source_concordance {
+        string method_a_name "first source"
+        string method_b_name "second source"
+        bigint visit_count "visits where both give a value"
+        double agreement_ratio "share that agree"
+        double kappa_coef "Cohen's kappa"
+        string level_code "status · stage · ..."
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    fact_visit_evidence {
+        bigint visit_id PK "visit"
+        bigint person_id "patient"
+        date visit_date "date of the visit (synthetic)"
+        bigint visit_seq_num "0 = the patient's first visit"
+        boolean is_in_review "one of the 240 review charts"
+        string note_status_code "status read from the chart note"
+        string exam_form_status_code "from the exam form; unknown when missing"
+        string dx_completed_status_code "from diagnosis codes on completed procedures"
+        string dx_planned_status_code "from diagnosis codes on planned procedures"
+        string probing_chart_status_code "from gum measurements; unknown when not charted"
+        string rules_v0_status_code "rules, gum measurements first"
+        string rules_design_status_code "rules in the study design's order"
+        string truth_status_code "the generator's truth"
+        string clinic_code "clinic 1-8"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    dq_injected_error {
+        bigint injected_error_count "errors injected"
+        double caught_ratio "share the temporal checks flag"
+        double false_flag_ratio "visits flagged with no error injected"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    dim_grader_question {
+        string question_id PK "q001 ..."
+        string category_name "Access to care · Clinical cases · Medical-dental integration · ..."
+        bigint category_order_num "1 = access to care, shown first"
+        string level_code "L1 recall · L2 routine reasoning · L3 individualized reasoning"
+        bigint key_point_count "key points a full answer covers"
+        string source_text "the published evidence behind the question"
+        boolean is_simulated "true for the simulated sample"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    fact_grader_answer {
+        string question_id FK "question"
+        string model_name "model answering; sim: names in the sample"
+        boolean is_with_agent "answered with the open agent"
+        bigint covered_key_point_count "key points the answer covered"
+        double score_ratio "covered / key points"
+        string harm_code "S0 safe · S1 reversible harm · S2 irreversible harm"
+        double cost_usd "cost of the answer"
+        string judge_model_name "judge; never a family under test"
+        string run_id "the grading run"
+        boolean is_simulated "true for the simulated sample"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
     }
 ```
 
@@ -433,3 +578,186 @@ One per corpus judge call (ai_query). Written by: LLM judge (02_llm_judge.sql): 
 |  | `error_text` | string | ai_query error |
 |  | `prompt_version_code` | string | judge-v2 |
 |  | `judge_model_name` | string | serving endpoint |
+
+### `dq_check`
+
+One per (data-quality check, clinic); clinic_code All = every clinic. Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+|  | `check_name` | string | e.g. plausibility:temporal_stage_drop |
+|  | `check_category_code` | string | conformance · completeness · plausibility |
+|  | `checked_count` | bigint | rows the check looked at |
+|  | `failed_count` | bigint | rows that failed it |
+|  | `pass_ratio` | double | 1 - failed / checked |
+|  | `check_status_code` | string | PASS (none allowed, none found) · REPORT (a rate to read) |
+|  | `clinic_code` | string | 1-8, or All |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `dq_column_missing`
+
+One per evidence column. Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+|  | `evidence_column_name` | string | column of the structured record |
+|  | `row_count` | bigint | visits |
+|  | `missing_count` | bigint | visits where it is empty |
+|  | `missing_pct` | double | missing / visits, 0-100 |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `dq_prevalence`
+
+One per (method, clinic or scale). Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+|  | `method_name` | string | status source: algorithm_design, notes, truth_status, ... |
+|  | `level_code` | string | clinic · scale |
+|  | `group_name` | string | clinic 1-8, or all_visits · complete_cases · reference_set |
+|  | `subject_count` | bigint | people (clinic) or visits with a status (scale) |
+|  | `periodontitis_ratio` | double | share with periodontitis |
+|  | `periodontitis_ci_low_ratio` | double | 95% interval, low (clinic rows) |
+|  | `periodontitis_ci_high_ratio` | double | 95% interval, high (clinic rows) |
+|  | `stage3_4_ratio` | double | share with stage III-IV |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `dq_temporal_change`
+
+One per method. Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+|  | `method_name` | string | status source |
+|  | `later_visit_count` | bigint | visits after a patient's first |
+|  | `perio_resolved_ratio` | double | later visits where periodontitis disappeared |
+|  | `stage_drop_ratio` | double | later visits where the stage dropped |
+|  | `visit_pair_count` | bigint | pairs 1-2 years apart, no treatment between |
+|  | `better_ratio` | double | pairs whose stage improved: implausible |
+|  | `same_ratio` | double | pairs with the same stage |
+|  | `worse_ratio` | double | pairs whose stage worsened |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `dq_stage_transition`
+
+One per (method, stage at a visit, stage at the next). Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+|  | `method_name` | string | algorithm_design |
+|  | `from_status_code` | string | stage at the earlier visit |
+|  | `to_status_code` | string | stage at the next |
+|  | `visit_pair_count` | bigint | visit pairs |
+|  | `row_pct` | double | share of the earlier stage's pairs, 0-100 |
+|  | `direction_code` | string | better · same · worse |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `dq_source_concordance`
+
+One per (pair of evidence sources, level). Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+|  | `method_a_name` | string | first source |
+|  | `method_b_name` | string | second source |
+|  | `visit_count` | bigint | visits where both give a value |
+|  | `agreement_ratio` | double | share that agree |
+|  | `kappa_coef` | double | Cohen's kappa |
+|  | `level_code` | string | status · stage · ... |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `fact_visit_evidence`
+
+One per synthetic visit: each evidence source's status and the truth (statuses only, never note text). Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+| PK | `visit_id` | bigint | visit |
+|  | `person_id` | bigint | patient |
+|  | `visit_date` | date | date of the visit (synthetic) |
+|  | `visit_seq_num` | bigint | 0 = the patient's first visit |
+|  | `is_in_review` | boolean | one of the 240 review charts |
+|  | `note_status_code` | string | status read from the chart note |
+|  | `exam_form_status_code` | string | from the exam form; unknown when missing |
+|  | `dx_completed_status_code` | string | from diagnosis codes on completed procedures |
+|  | `dx_planned_status_code` | string | from diagnosis codes on planned procedures |
+|  | `probing_chart_status_code` | string | from gum measurements; unknown when not charted |
+|  | `rules_v0_status_code` | string | rules, gum measurements first |
+|  | `rules_design_status_code` | string | rules in the study design's order |
+|  | `truth_status_code` | string | the generator's truth |
+|  | `clinic_code` | string | clinic 1-8 |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `dq_injected_error`
+
+One row: charting errors injected into the synthetic data and how many the checks catch. Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+|  | `injected_error_count` | bigint | errors injected |
+|  | `caught_ratio` | double | share the temporal checks flag |
+|  | `false_flag_ratio` | double | visits flagged with no error injected |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `dim_grader_question`
+
+One per grader question. Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+| PK | `question_id` | string | q001 ... |
+|  | `category_name` | string | Access to care · Clinical cases · Medical-dental integration · ... |
+|  | `category_order_num` | bigint | 1 = access to care, shown first |
+|  | `level_code` | string | L1 recall · L2 routine reasoning · L3 individualized reasoning |
+|  | `key_point_count` | bigint | key points a full answer covers |
+|  | `source_text` | string | the published evidence behind the question |
+|  | `is_simulated` | boolean | true for the simulated sample |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `fact_grader_answer`
+
+One per (question, model, with or without the agent, run). Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+| FK | `question_id` | string | question |
+|  | `model_name` | string | model answering; sim: names in the sample |
+|  | `is_with_agent` | boolean | answered with the open agent |
+|  | `covered_key_point_count` | bigint | key points the answer covered |
+|  | `score_ratio` | double | covered / key points |
+|  | `harm_code` | string | S0 safe · S1 reversible harm · S2 irreversible harm |
+|  | `cost_usd` | double | cost of the answer |
+|  | `judge_model_name` | string | judge; never a family under test |
+|  | `run_id` | string | the grading run |
+|  | `is_simulated` | boolean | true for the simulated sample |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |

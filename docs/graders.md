@@ -7,8 +7,8 @@ exist.
 
 | Grader | Dashboard | Genie space | Tables (`health_transformation_lab.gold_dental_omop_perio`) |
 |---|---|---|---|
-| **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_checks`, `dq_completeness`, `dq_prevalence`, `dq_temporal`, `dq_transitions`, `dq_concordance`, `dq_visits`, `dq_injected_errors` |
-| **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | spec 019 US4 (next) | spec 019 US5 (next) | `grader_questions`, `grader_answers` |
+| **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_check`, `dq_column_missing`, `dq_prevalence`, `dq_temporal_change`, `dq_stage_transition`, `dq_source_concordance`, `fact_visit_evidence`, `dq_injected_error` |
+| **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | *Lab grader* | *Lab grader* | `dim_grader_question`, `fact_grader_answer` |
 
 ## EHR DQ grader
 
@@ -22,7 +22,28 @@ Five domain tiles, then one section per domain:
 | Temporal plausibility | Kahn | Later visits whose stage improved (design rules); the full stage-to-stage matrix |
 | Reliability | Liaw | **Not assessed**: needs real reviewers |
 
-`dq_visits` holds statuses only (what each evidence source says, and the truth), never note text.
+`fact_visit_evidence` holds statuses only (what each evidence source says, and the truth), never note text.
+
+## Lab grader
+
+**A SIMULATED sample until a real run exists: every number is made up.** `python/scripts/43_simulated_grader.py`
+(seeded) writes `data/datasets/grader/simulated_grader_*.csv`: 25 questions in each of five categories, three
+`sim:` models, each answering on its own and with the agent. A real run commits `grader/grader_questions.csv` and
+`grader/grader_answers.csv` with the same columns, and Load results uses those instead. The *Simulated rows* tile
+then reads 0.
+
+Practices from GlobalDentBench (`docs/dentbench_methods.md`), as the pitch's uplift and leaderboard slides use them:
+
+| On the dashboard | Measure |
+|---|---|
+| Uplift by category, access to care first | Score with the agent minus on its own, in points, with a 95% interval; cost per answer beside it |
+| Leaderboard | Models ranked within a category, on their own and with the agent separately; never one overall rank |
+| Safety | Unsafe (S1 + S2) and irreversible (S2) shares; harm graded by clinicians' rules, not by the judge |
+| By reasoning level | L1 recall, L2 routine, L3 individualized, and their macro average |
+| Cost against score | One point per model and answer mode |
+
+Score = key points covered / key points (five per question). The judge comes from a family no evaluated model
+shares.
 
 ## How it's built and deployed
 

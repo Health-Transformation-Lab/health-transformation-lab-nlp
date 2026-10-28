@@ -1,0 +1,126 @@
+question_id,category,category_order,level,n_key_points,source,simulated
+q001,Access to care,1,L1,5,simulated: no evidence attached,True
+q002,Access to care,1,L2,5,simulated: no evidence attached,True
+q003,Access to care,1,L2,5,simulated: no evidence attached,True
+q004,Access to care,1,L2,5,simulated: no evidence attached,True
+q005,Access to care,1,L2,5,simulated: no evidence attached,True
+q006,Access to care,1,L3,5,simulated: no evidence attached,True
+q007,Access to care,1,L3,5,simulated: no evidence attached,True
+q008,Access to care,1,L1,5,simulated: no evidence attached,True
+q009,Access to care,1,L2,5,simulated: no evidence attached,True
+q010,Access to care,1,L1,5,simulated: no evidence attached,True
+q011,Access to care,1,L3,5,simulated: no evidence attached,True
+q012,Access to care,1,L3,5,simulated: no evidence attached,True
+q013,Access to care,1,L2,5,simulated: no evidence attached,True
+q014,Access to care,1,L3,5,simulated: no evidence attached,True
+q015,Access to care,1,L2,5,simulated: no evidence attached,True
+q016,Access to care,1,L3,5,simulated: no evidence attached,True
+q017,Access to care,1,L2,5,simulated: no evidence attached,True
+q018,Access to care,1,L2,5,simulated: no evidence attached,True
+q019,Access to care,1,L1,5,simulated: no evidence attached,True
+q020,Access to care,1,L1,5,simulated: no evidence attached,True
+q021,Access to care,1,L2,5,simulated: no evidence attached,True
+q022,Access to care,1,L2,5,simulated: no evidence attached,True
+q023,Access to care,1,L2,5,simulated: no evidence attached,True
+q024,Access to care,1,L1,5,simulated: no evidence attached,True
+q025,Access to care,1,L2,5,simulated: no evidence attached,True
+q026,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q027,Clinical cases,2,L1,5,simulated: no evidence attached,True
+q028,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q029,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q030,Clinical cases,2,L1,5,simulated: no evidence attached,True
+q031,Clinical cases,2,L1,5,simulated: no evidence attached,True
+q032,Clinical cases,2,L3,5,simulated: no evidence attached,True
+q033,Clinical cases,2,L3,5,simulated: no evidence attached,True
+q034,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q035,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q036,Clinical cases,2,L3,5,simulated: no evidence attached,True
+q037,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q038,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q039,Clinical cases,2,L3,5,simulated: no evidence attached,True
+q040,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q041,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q042,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q043,Clinical cases,2,L1,5,simulated: no evidence attached,True
+q044,Clinical cases,2,L3,5,simulated: no evidence attached,True
+q045,Clinical cases,2,L1,5,simulated: no evidence attached,True
+q046,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q047,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q048,Clinical cases,2,L1,5,simulated: no evidence attached,True
+q049,Clinical cases,2,L3,5,simulated: no evidence attached,True
+q050,Clinical cases,2,L2,5,simulated: no evidence attached,True
+q051,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q052,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q053,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q054,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q055,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q056,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q057,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q058,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q059,Medical-dental integration,3,L1,5,simulated: no evidence attached,True
+q060,Medical-dental integration,3,L3,5,simulated: no evidence attached,True
+q061,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q062,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q063,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q064,Medical-dental integration,3,L1,5,simulated: no evidence attached,True
+q065,Medical-dental integration,3,L3,5,simulated: no evidence attached,True
+q066,Medical-dental integration,3,L3,5,simulated: no evidence attached,True
+q067,Medical-dental integration,3,L1,5,simulated: no evidence attached,True
+q068,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q069,Medical-dental integration,3,L3,5,simulated: no evidence attached,True
+q070,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q071,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q072,Medical-dental integration,3,L2,5,simulated: no evidence attached,True
+q073,Medical-dental integration,3,L3,5,simulated: no evidence attached,True
+q074,Medical-dental integration,3,L3,5,simulated: no evidence attached,True
+q075,Medical-dental integration,3,L3,5,simulated: no evidence attached,True
+q076,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q077,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q078,Barriers to care,4,L3,5,simulated: no evidence attached,True
+q079,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q080,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q081,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q082,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q083,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q084,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q085,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q086,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q087,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q088,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q089,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q090,Barriers to care,4,L3,5,simulated: no evidence attached,True
+q091,Barriers to care,4,L3,5,simulated: no evidence attached,True
+q092,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q093,Barriers to care,4,L3,5,simulated: no evidence attached,True
+q094,Barriers to care,4,L3,5,simulated: no evidence attached,True
+q095,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q096,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q097,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q098,Barriers to care,4,L3,5,simulated: no evidence attached,True
+q099,Barriers to care,4,L1,5,simulated: no evidence attached,True
+q100,Barriers to care,4,L2,5,simulated: no evidence attached,True
+q101,Cost and coverage,5,L3,5,simulated: no evidence attached,True
+q102,Cost and coverage,5,L1,5,simulated: no evidence attached,True
+q103,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q104,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q105,Cost and coverage,5,L3,5,simulated: no evidence attached,True
+q106,Cost and coverage,5,L1,5,simulated: no evidence attached,True
+q107,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q108,Cost and coverage,5,L3,5,simulated: no evidence attached,True
+q109,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q110,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q111,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q112,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q113,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q114,Cost and coverage,5,L1,5,simulated: no evidence attached,True
+q115,Cost and coverage,5,L1,5,simulated: no evidence attached,True
+q116,Cost and coverage,5,L1,5,simulated: no evidence attached,True
+q117,Cost and coverage,5,L1,5,simulated: no evidence attached,True
+q118,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q119,Cost and coverage,5,L1,5,simulated: no evidence attached,True
+q120,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q121,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q122,Cost and coverage,5,L3,5,simulated: no evidence attached,True
+q123,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q124,Cost and coverage,5,L2,5,simulated: no evidence attached,True
+q125,Cost and coverage,5,L2,5,simulated: no evidence attached,True

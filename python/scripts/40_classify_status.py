@@ -1,6 +1,6 @@
 """Classify periodontal status from the recorded chart and explain it with SHAP (spec 013 G10).
 
-    python scripts/42_classify_status.py [--outcome algorithm_design|truth_status] [--scheme 5level|3level]
+    python scripts/40_classify_status.py [--outcome algorithm_design|truth_status] [--scheme 5level|3level]
 
 Gradient-boosted trees (XGBoost, the `ml` extra), people split 80/20, hyperparameters by 5-fold grouped
 cross-validation, one-vs-rest metrics, exact TreeSHAP on the held-out visits. SYNTHETIC: the labels come from
@@ -83,6 +83,6 @@ print(res["shap_importance"][["feature", "role", "mean_abs_shap"]].round(3).to_s
 
 from health_transformation_lab_nlp.tracking import track
 
-with track("42_classify_status", stem, simulated=True, params=s["params"] | {"scheme": a.scheme}) as run:
+with track("40_classify_status", stem, simulated=True, params=s["params"] | {"scheme": a.scheme}) as run:
     run.log_metrics({k: s[k] for k in ("accuracy", "macro_f1", "cv_macro_f1")})
     run.log_artifact(out / f"{stem}_shap_importance.csv")

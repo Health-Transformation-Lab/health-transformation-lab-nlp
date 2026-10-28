@@ -1,0 +1,1124 @@
+{
+  "datasets": [
+    {
+      "name": "status",
+      "displayName": "status",
+      "queryLines": [
+        "SELECT ROUND(100 * AVG(CASE WHEN is_simulated THEN 1.0 ELSE 0.0 END), 1) AS simulated_pct,\n",
+        "  COUNT(DISTINCT question_id) AS questions, COUNT(DISTINCT model_name) AS models, COUNT(*) AS answers\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.fact_grader_answer\n"
+      ]
+    },
+    {
+      "name": "uplift",
+      "displayName": "uplift",
+      "queryLines": [
+        "WITH s AS (\n",
+        "  SELECT q.category_name, q.category_order_num,\n",
+        "    AVG(CASE WHEN NOT ans.is_with_agent THEN ans.score_ratio END) AS own,\n",
+        "    AVG(CASE WHEN ans.is_with_agent THEN ans.score_ratio END) AS agent,\n",
+        "    VAR_SAMP(CASE WHEN NOT ans.is_with_agent THEN ans.score_ratio END) AS v_own,\n",
+        "    VAR_SAMP(CASE WHEN ans.is_with_agent THEN ans.score_ratio END) AS v_agent,\n",
+        "    SUM(CASE WHEN NOT ans.is_with_agent THEN 1 ELSE 0 END) AS n_own,\n",
+        "    SUM(CASE WHEN ans.is_with_agent THEN 1 ELSE 0 END) AS n_agent,\n",
+        "    AVG(CASE WHEN NOT ans.is_with_agent THEN ans.cost_usd END) AS cost_own,\n",
+        "    AVG(CASE WHEN ans.is_with_agent THEN ans.cost_usd END) AS cost_agent\n",
+        "  FROM health_transformation_lab.gold_dental_omop_perio.fact_grader_answer ans JOIN health_transformation_lab.gold_dental_omop_perio.dim_grader_question q ON ans.question_id = q.question_id\n",
+        "  GROUP BY q.category_name, q.category_order_num)\n",
+        "SELECT category_name AS category, category_order_num AS category_order, ROUND(100 * own, 1) AS own_pct,\n",
+        "  ROUND(100 * agent, 1) AS agent_pct, ROUND(100 * (agent - own), 1) AS uplift_pts,\n",
+        "  ROUND(100 * (agent - own - 1.96 * SQRT(v_own / n_own + v_agent / n_agent)), 1) AS uplift_lo,\n",
+        "  ROUND(100 * (agent - own + 1.96 * SQRT(v_own / n_own + v_agent / n_agent)), 1) AS uplift_hi,\n",
+        "  ROUND(cost_own, 4) AS cost_own_usd, ROUND(cost_agent, 4) AS cost_agent_usd, n_own AS answers_each\n",
+        "FROM s\n",
+        "ORDER BY category_order_num\n"
+      ]
+    },
+    {
+      "name": "leaderboard",
+      "displayName": "leaderboard",
+      "queryLines": [
+        "WITH s AS (\n",
+        "  SELECT q.category_name, q.category_order_num, ans.model_name, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode,\n",
+        "    AVG(ans.score_ratio) AS score, COUNT(*) AS n\n",
+        "  FROM health_transformation_lab.gold_dental_omop_perio.fact_grader_answer ans JOIN health_transformation_lab.gold_dental_omop_perio.dim_grader_question q ON ans.question_id = q.question_id\n",
+        "  GROUP BY q.category_name, q.category_order_num, ans.model_name, ans.is_with_agent)\n",
+        "SELECT category_name AS category, category_order_num AS category_order, answer_mode,\n",
+        "  RANK() OVER (PARTITION BY category_name, answer_mode ORDER BY score DESC) AS rank,\n",
+        "  model_name AS model, ROUND(100 * score, 1) AS score_pct, n\n",
+        "FROM s\n",
+        "ORDER BY category_order_num, answer_mode, rank\n"
+      ]
+    },
+    {
+      "name": "safety",
+      "displayName": "safety",
+      "queryLines": [
+        "SELECT ans.model_name AS model, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode,\n",
+        "  ROUND(100 * AVG(CASE WHEN ans.harm_code IN ('S1', 'S2') THEN 1.0 ELSE 0.0 END), 1) AS unsafe_pct,\n",
+        "  ROUND(100 * AVG(CASE WHEN ans.harm_code = 'S2' THEN 1.0 ELSE 0.0 END), 1) AS s2_pct, COUNT(*) AS n\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.fact_grader_answer ans\n",
+        "GROUP BY ans.model_name, ans.is_with_agent\n",
+        "ORDER BY model, answer_mode\n"
+      ]
+    },
+    {
+      "name": "by_level",
+      "displayName": "by_level",
+      "queryLines": [
+        "WITH l AS (\n",
+        "  SELECT ans.model_name, ans.is_with_agent, q.level_code, AVG(ans.score_ratio) AS score\n",
+        "  FROM health_transformation_lab.gold_dental_omop_perio.fact_grader_answer ans JOIN health_transformation_lab.gold_dental_omop_perio.dim_grader_question q ON ans.question_id = q.question_id\n",
+        "  GROUP BY ans.model_name, ans.is_with_agent, q.level_code)\n",
+        "SELECT ans.model_name AS model, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode, ans.level_code AS level,\n",
+        "  ROUND(100 * ans.score, 1) AS score_pct FROM l ans\n",
+        "UNION ALL\n",
+        "SELECT ans.model_name AS model, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode, 'Macro average' AS level,\n",
+        "  ROUND(100 * AVG(ans.score), 1) AS score_pct\n",
+        "FROM l ans\n",
+        "GROUP BY ans.model_name, ans.is_with_agent\n"
+      ]
+    },
+    {
+      "name": "cost_vs_score",
+      "displayName": "cost_vs_score",
+      "queryLines": [
+        "SELECT ans.model_name || CASE WHEN ans.is_with_agent THEN ' + agent' ELSE '' END AS entry, CASE WHEN ans.is_with_agent THEN 'With the agent' ELSE 'On its own' END AS answer_mode,\n",
+        "  ROUND(AVG(ans.cost_usd), 4) AS cost_usd, ROUND(100 * AVG(ans.score_ratio), 1) AS score_pct\n",
+        "FROM health_transformation_lab.gold_dental_omop_perio.fact_grader_answer ans\n",
+        "GROUP BY ans.model_name, ans.is_with_agent\n"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "lab_grader",
+      "displayName": "Lab grader",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "banner",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Lab grader: do AI answers improve with an open agent built on public evidence?\n",
+                "**SIMULATED sample: every number on this page is made up, not a result.** It shows the shape of what a real run\n",
+                "brings back (the pitch's uplift and leaderboard slides) until one exists; the *Simulated rows* tile then reads 0.\n",
+                "Practices from GlobalDentBench: five key points per answer, harm graded S0 safe, S1 reversible, S2 irreversible,\n",
+                "reasoning levels L1–L3 macro-averaged, cost per answer, and a judge from a family no model shares.\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "c_sim",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "status",
+                  "fields": [
+                    {
+                      "name": "simulated_pct",
+                      "expression": "`simulated_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "simulated_pct",
+                  "displayName": "Simulated rows (%)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Simulated rows (%)",
+                "showDescription": true,
+                "description": "100 until a real run is committed."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "c_q",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "status",
+                  "fields": [
+                    {
+                      "name": "questions",
+                      "expression": "`questions`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "questions",
+                  "displayName": "Questions"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Questions",
+                "showDescription": true,
+                "description": "About 25 per category: a pilot that shows direction only."
+              }
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 3,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "c_m",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "status",
+                  "fields": [
+                    {
+                      "name": "models",
+                      "expression": "`models`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "models",
+                  "displayName": "Models"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Models",
+                "showDescription": true,
+                "description": "Each answers every question on its own and with the agent."
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 3,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "c_a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "status",
+                  "fields": [
+                    {
+                      "name": "answers",
+                      "expression": "`answers`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "answers",
+                  "displayName": "Answers"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Answers",
+                "showDescription": true,
+                "description": "Every answer judged on its key points and graded for harm."
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "f_category",
+            "queries": [
+              {
+                "name": "f_f_category_uplift",
+                "query": {
+                  "datasetName": "uplift",
+                  "fields": [
+                    {
+                      "name": "category",
+                      "expression": "`category`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f_f_category_leaderboard",
+                "query": {
+                  "datasetName": "leaderboard",
+                  "fields": [
+                    {
+                      "name": "category",
+                      "expression": "`category`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "category",
+                    "displayName": "Category",
+                    "queryName": "f_f_category_uplift"
+                  },
+                  {
+                    "fieldName": "category",
+                    "displayName": "Category",
+                    "queryName": "f_f_category_leaderboard"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Category"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 3,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "f_model",
+            "queries": [
+              {
+                "name": "f_f_model_leaderboard",
+                "query": {
+                  "datasetName": "leaderboard",
+                  "fields": [
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f_f_model_safety",
+                "query": {
+                  "datasetName": "safety",
+                  "fields": [
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f_f_model_by_level",
+                "query": {
+                  "datasetName": "by_level",
+                  "fields": [
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "model",
+                    "displayName": "Model",
+                    "queryName": "f_f_model_leaderboard"
+                  },
+                  {
+                    "fieldName": "model",
+                    "displayName": "Model",
+                    "queryName": "f_f_model_safety"
+                  },
+                  {
+                    "fieldName": "model",
+                    "displayName": "Model",
+                    "queryName": "f_f_model_by_level"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Model"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 6,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "s_uplift",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Uplift by category, access to care first\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_uplift",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "uplift",
+                  "fields": [
+                    {
+                      "name": "category",
+                      "expression": "`category`"
+                    },
+                    {
+                      "name": "own_pct",
+                      "expression": "`own_pct`"
+                    },
+                    {
+                      "name": "agent_pct",
+                      "expression": "`agent_pct`"
+                    },
+                    {
+                      "name": "uplift_pts",
+                      "expression": "`uplift_pts`"
+                    },
+                    {
+                      "name": "uplift_lo",
+                      "expression": "`uplift_lo`"
+                    },
+                    {
+                      "name": "uplift_hi",
+                      "expression": "`uplift_hi`"
+                    },
+                    {
+                      "name": "cost_own_usd",
+                      "expression": "`cost_own_usd`"
+                    },
+                    {
+                      "name": "cost_agent_usd",
+                      "expression": "`cost_agent_usd`"
+                    },
+                    {
+                      "name": "answers_each",
+                      "expression": "`answers_each`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "category",
+                    "displayName": "Category"
+                  },
+                  {
+                    "fieldName": "own_pct",
+                    "displayName": "On its own (%)"
+                  },
+                  {
+                    "fieldName": "agent_pct",
+                    "displayName": "With the agent (%)"
+                  },
+                  {
+                    "fieldName": "uplift_pts",
+                    "displayName": "Uplift (points)"
+                  },
+                  {
+                    "fieldName": "uplift_lo",
+                    "displayName": "95% CI low"
+                  },
+                  {
+                    "fieldName": "uplift_hi",
+                    "displayName": "95% CI high"
+                  },
+                  {
+                    "fieldName": "cost_own_usd",
+                    "displayName": "Cost per answer, own (US$)"
+                  },
+                  {
+                    "fieldName": "cost_agent_usd",
+                    "displayName": "Cost per answer, agent (US$)"
+                  },
+                  {
+                    "fieldName": "answers_each",
+                    "displayName": "Answers each"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score with and without the agent",
+                "showDescription": true,
+                "description": "Score = key points covered / key points. Interval: answers treated as independent. The uplift can be small, zero or negative."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "s_board",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Leaderboard within each category (never one rank across categories)\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_board",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "leaderboard",
+                  "fields": [
+                    {
+                      "name": "category",
+                      "expression": "`category`"
+                    },
+                    {
+                      "name": "answer_mode",
+                      "expression": "`answer_mode`"
+                    },
+                    {
+                      "name": "rank",
+                      "expression": "`rank`"
+                    },
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    },
+                    {
+                      "name": "score_pct",
+                      "expression": "`score_pct`"
+                    },
+                    {
+                      "name": "n",
+                      "expression": "`n`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "category",
+                    "displayName": "Category"
+                  },
+                  {
+                    "fieldName": "answer_mode",
+                    "displayName": "Answer"
+                  },
+                  {
+                    "fieldName": "rank",
+                    "displayName": "Rank"
+                  },
+                  {
+                    "fieldName": "model",
+                    "displayName": "Model"
+                  },
+                  {
+                    "fieldName": "score_pct",
+                    "displayName": "Score (%)"
+                  },
+                  {
+                    "fieldName": "n",
+                    "displayName": "Answers"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Models ranked within a category"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 3,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "b_board",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "leaderboard",
+                  "fields": [
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    },
+                    {
+                      "name": "answer_mode",
+                      "expression": "`answer_mode`"
+                    },
+                    {
+                      "name": "score_pct",
+                      "expression": "`score_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "model",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Model"
+                },
+                "y": {
+                  "fieldName": "score_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score (%)"
+                },
+                "color": {
+                  "fieldName": "answer_mode",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "answer_mode"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score by model (%)",
+                "showDescription": true,
+                "description": "Pick one category with the filter."
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 14,
+            "width": 3,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "s_safety",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Safety: unsafe (S1 + S2) and irreversible harm (S2)\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 22,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "b_unsafe",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "safety",
+                  "fields": [
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    },
+                    {
+                      "name": "answer_mode",
+                      "expression": "`answer_mode`"
+                    },
+                    {
+                      "name": "unsafe_pct",
+                      "expression": "`unsafe_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "model",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Model"
+                },
+                "y": {
+                  "fieldName": "unsafe_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Unsafe (%)"
+                },
+                "color": {
+                  "fieldName": "answer_mode",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "answer_mode"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Unsafe answers (%)",
+                "showDescription": true,
+                "description": "S1 reversible or S2 irreversible harm, graded by clinicians' rules, not by the judge."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 23,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_safety",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "safety",
+                  "fields": [
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    },
+                    {
+                      "name": "answer_mode",
+                      "expression": "`answer_mode`"
+                    },
+                    {
+                      "name": "unsafe_pct",
+                      "expression": "`unsafe_pct`"
+                    },
+                    {
+                      "name": "s2_pct",
+                      "expression": "`s2_pct`"
+                    },
+                    {
+                      "name": "n",
+                      "expression": "`n`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "model",
+                    "displayName": "Model"
+                  },
+                  {
+                    "fieldName": "answer_mode",
+                    "displayName": "Answer"
+                  },
+                  {
+                    "fieldName": "unsafe_pct",
+                    "displayName": "Unsafe, S1+S2 (%)"
+                  },
+                  {
+                    "fieldName": "s2_pct",
+                    "displayName": "Irreversible, S2 (%)"
+                  },
+                  {
+                    "fieldName": "n",
+                    "displayName": "Answers"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Harm by model"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 23,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "s_level",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### By reasoning level: L1 recall, L2 routine, L3 individualized\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 29,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "b_level",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "by_level",
+                  "fields": [
+                    {
+                      "name": "level",
+                      "expression": "`level`"
+                    },
+                    {
+                      "name": "answer_mode",
+                      "expression": "`answer_mode`"
+                    },
+                    {
+                      "name": "score_pct",
+                      "expression": "`score_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "level",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Level"
+                },
+                "y": {
+                  "fieldName": "score_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score (%)"
+                },
+                "color": {
+                  "fieldName": "answer_mode",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "answer_mode"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score by level (%)",
+                "showDescription": true,
+                "description": "The macro average weights each level equally, so easy questions don't flatter a model."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 30,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tb_level",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "by_level",
+                  "fields": [
+                    {
+                      "name": "model",
+                      "expression": "`model`"
+                    },
+                    {
+                      "name": "answer_mode",
+                      "expression": "`answer_mode`"
+                    },
+                    {
+                      "name": "level",
+                      "expression": "`level`"
+                    },
+                    {
+                      "name": "score_pct",
+                      "expression": "`score_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "model",
+                    "displayName": "Model"
+                  },
+                  {
+                    "fieldName": "answer_mode",
+                    "displayName": "Answer"
+                  },
+                  {
+                    "fieldName": "level",
+                    "displayName": "Level"
+                  },
+                  {
+                    "fieldName": "score_pct",
+                    "displayName": "Score (%)"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "By model and level"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 30,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "s_cost",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Cost against score\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 36,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "sc_cost",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cost_vs_score",
+                  "fields": [
+                    {
+                      "name": "cost_usd",
+                      "expression": "`cost_usd`"
+                    },
+                    {
+                      "name": "score_pct",
+                      "expression": "`score_pct`"
+                    },
+                    {
+                      "name": "answer_mode",
+                      "expression": "`answer_mode`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "cost_usd",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Cost per answer (US$)"
+                },
+                "y": {
+                  "fieldName": "score_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score (%)"
+                },
+                "color": {
+                  "fieldName": "answer_mode",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "answer_mode"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Cost per answer (US$) against score (%)",
+                "showDescription": true,
+                "description": "One point per model, on its own and with the agent."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 37,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "t_cost",
+            "multilineTextboxSpec": {
+              "lines": [
+                "In GlobalDentBench (2026), paying more for a model did not reliably buy a better answer, so cost sits next to score here.\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 37,
+            "width": 2,
+            "height": 6
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -168,3 +168,25 @@ def test_reader_job_logs_to_the_bundle_experiment():
     params = jobs["resources"]["jobs"]["medgemma_reader"]["tasks"][0]["notebook_task"]["base_parameters"]
     assert params["experiment_name"] == "${resources.experiments.dental_experiment.name}"
     assert params["run_id"] == "{{job.run_id}}"          # the batch key: the same for every retry of a run
+
+
+def test_a_logging_warning_keeps_the_root_cause(monkeypatch, caplog):
+    # MedGemma reader on serverless GPU: log_artifact failed with urllib3's "Max retries exceeded with url: <long
+    # path> (Caused by ...)"; cutting the message at 200 characters dropped the cause, the part that says why
+    fake = _FakeMlflow(fail_on="log_artifact")
+    msg = ("HTTPSConnectionPool(host='us-east-2.storage.cloud.databricks.com', port=443): Max retries exceeded with "
+           "url: /api/2.0/fs/files/WorkspaceInternal/Jobs/mlflow-tracking/1/" + "a" * 300 + "/x.csv "
+           "(Caused by NameResolutionError: Failed to resolve 'us-east-2.storage.cloud.databricks.com')")
+
+    def fail(*a, **kw):
+        raise RuntimeError(msg)
+
+    fake.module.log_artifact = fail
+    _with_mlflow(monkeypatch, fake)
+    monkeypatch.setenv("MLFLOW_TRACKING_URI", "databricks")
+    monkeypatch.setenv("DENTAL_MLFLOW_EXPERIMENT", "/Shared/dental")
+    with caplog.at_level(logging.WARNING), tracking.track("unit", "x") as run:
+        run.log_artifact(__file__)
+    assert "us-east-2.storage.cloud.databricks.com" in caplog.text           # where
+    assert "Caused by NameResolutionError" in caplog.text                    # why
+    assert len(caplog.records[-1].getMessage()) < 600                         # still one readable line

@@ -33,14 +33,14 @@ was out of reach), so the docs present SHAP as this repo's choice, not the paper
 - **Dependency:** optional extra `ml = ["xgboost>=2.0"]`; CI's python job installs it. No `shap` package.
 - **R:** out of scope (FR-007: model outputs are not part of label/scoring parity).
 - **Output:** `data/datasets/classify_status/` (summary, metrics per class, SHAP importance, per-visit SHAP for
-  the test set), labelled synthetic. Script `scripts/42_classify_status.py`.
+  the test set), labelled synthetic. Script `scripts/40_classify_status.py`.
 
 ## Files
 
 | File | Change |
 |---|---|
 | `python/dental_omop_nlp/classify_status.py` | new: features, schemes, train/tune/evaluate, SHAP |
-| `python/scripts/42_classify_status.py` | new: run it, write outputs, MLflow `track` |
+| `python/scripts/40_classify_status.py` | new: run it, write outputs, MLflow `track` |
 | `python/tests/test_classify_status.py` | new, written first |
 | `python/pyproject.toml`, `.github/workflows/ci.yml` | `ml` extra; CI installs it |
 | `docs/references.md`, `docs/process.md`, `docs/code_walkthrough.md` | the paper, where the model sits, how to read SHAP |

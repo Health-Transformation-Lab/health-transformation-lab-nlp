@@ -76,6 +76,51 @@ TABLES: dict[str, dict[str, str]] = {
                                "judge_model": "judge_model_name"},
 }
 
+# spec 019: the EHR DQ grader's tables, built whole from committed CSVs by grader_tables and overwritten each run
+_DQ_PROV = {"source_files": "source_files_text", "sha256": "file_sha256", "git_commit": "git_commit_sha",
+            "loaded_at": "loaded_ts"}
+TABLES |= {
+    "dq_check": {"check_name": "check_name", "category": "check_category_code", "n_checked": "checked_count",
+                 "n_fail": "failed_count", "pass_rate": "pass_ratio", "status": "check_status_code",
+                 "clinic": "clinic_code", **_DQ_PROV},
+    "dq_column_missing": {"evidence_column": "evidence_column_name", "n_rows": "row_count",
+                          "n_missing": "missing_count", "pct_missing": "missing_pct", **_DQ_PROV},
+    "dq_prevalence": {"method": "method_name", "level": "level_code", "group_name": "group_name",
+                      "n": "subject_count", "periodontitis": "periodontitis_ratio",
+                      "periodontitis_ci_low": "periodontitis_ci_low_ratio",
+                      "periodontitis_ci_high": "periodontitis_ci_high_ratio", "stage3_4": "stage3_4_ratio",
+                      **_DQ_PROV},
+    "dq_temporal_change": {"method": "method_name", "n_later_visits": "later_visit_count",
+                           "perio_resolved": "perio_resolved_ratio", "stage_drop": "stage_drop_ratio",
+                           "pairs": "visit_pair_count", "better": "better_ratio", "same": "same_ratio",
+                           "worse": "worse_ratio", **_DQ_PROV},
+    "dq_stage_transition": {"method": "method_name", "from_status": "from_status_code",
+                            "to_status": "to_status_code", "n": "visit_pair_count", "row_pct": "row_pct",
+                            "direction": "direction_code", **_DQ_PROV},
+    "dq_source_concordance": {"method_a": "method_a_name", "method_b": "method_b_name", "n": "visit_count",
+                              "pct_agree": "agreement_ratio", "kappa": "kappa_coef", "level": "level_code",
+                              **_DQ_PROV},
+    "fact_visit_evidence": {"visit_id": "visit_id", "person_id": "person_id", "visit_date": "visit_date",
+                            "visit_seq": "visit_seq_num", "in_review": "is_in_review",
+                            "notes": "note_status_code", "exam_form": "exam_form_status_code",
+                            "proc_dx_completed": "dx_completed_status_code",
+                            "proc_dx_planned": "dx_planned_status_code",
+                            "probing_chart": "probing_chart_status_code", "algorithm_v0": "rules_v0_status_code",
+                            "algorithm_design": "rules_design_status_code", "truth_status": "truth_status_code",
+                            "clinic": "clinic_code", **_DQ_PROV},
+    "dq_injected_error": {"injected_errors": "injected_error_count", "caught_share": "caught_ratio",
+                          "flag_rate_without_error": "false_flag_ratio", **_DQ_PROV},
+    # the lab grader: a SIMULATED sample until real runs are committed
+    "dim_grader_question": {"question_id": "question_id", "category": "category_name",
+                            "category_order": "category_order_num", "level": "level_code",
+                            "n_key_points": "key_point_count", "source": "source_text", "simulated": "is_simulated",
+                            **_DQ_PROV},
+    "fact_grader_answer": {"question_id": "question_id", "model": "model_name", "with_agent": "is_with_agent",
+                           "key_points_covered": "covered_key_point_count", "score": "score_ratio",
+                           "harm": "harm_code", "cost_usd": "cost_usd", "judge": "judge_model_name",
+                           "run_id": "run_id", "simulated": "is_simulated", **_DQ_PROV},
+}
+
 RENAMED = {"result_files": "dim_result_file", "ai_predictions": "fact_prediction", "llm_reader_runs": "fact_llm_call",
            "chart_answers": "fact_chart_answer", "judgments": "fact_judge_call", "judge_metrics": "judge_metric",
            "judge_agreement": "judge_agreement", "judge_run": "judge_cost", "deid_scores": "deid_score"}

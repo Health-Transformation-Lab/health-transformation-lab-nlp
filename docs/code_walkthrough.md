@@ -270,7 +270,7 @@ and every charted visit has CAL. One oddity it surfaces: older age pulls *away* 
 0.135 for stage IV, 0.05 over all classes); unexplained so far.
 
 - Code: [`classify_status.py`](../python/health_transformation_lab_nlp/classify_status.py);
-  [`scripts/42_classify_status.py`](../python/scripts/42_classify_status.py). Needs the `ml` extra
+  [`scripts/40_classify_status.py`](../python/scripts/40_classify_status.py). Needs the `ml` extra
   (`pip install -e "python[ml]"`). No R twin (spec 013 FR-007: model outputs are outside label/scoring parity).
 - Output: `data/datasets/classify_status/`.
 
