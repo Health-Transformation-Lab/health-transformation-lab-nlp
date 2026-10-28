@@ -44,8 +44,13 @@ From `data/corpus/simulated_cost_effectiveness.csv` (1,000,000 notes, illustrati
 
 Two things to take from the shape, not the numbers:
 
-1. **Inference is cheap next to people.** Even the most expensive row is in the
-   hundreds of dollars for a million notes at these prices.
+1. **The cost depends on the model, not only on people.** Every row above is a short
+   prompt over the note; the most expensive is in the hundreds of dollars for a
+   million notes at these prices. A frontier commercial model costs far more: at
+   list price, about $5,500 for the note alone and about $1.2 million reading the
+   whole record with examples and reasoning, three calls a visit (assumed tokens;
+   `docs/claims.yaml`, `tiers`). Choose the least costly model that passes the
+   acceptance test.
 2. **Overlapping intervals.** Most rows' CIs overlap, so on ~240 reviewed charts
    the frontier can't separate them. More review charts, or the acceptance test,
    decide, not the point estimates.
