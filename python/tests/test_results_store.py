@@ -221,3 +221,12 @@ def test_run_rows_label_one_runs_files_with_their_batch_key(tmp_path):
         assert set(d.method) == {"medgemma-x+k2"} and set(d.source) == {"databricks"} and set(d.run_id) == {"77"}
         assert d.sha256.str.fullmatch(r"[0-9a-f]{64}").all()
     assert preds.sha256.iloc[0] != details.sha256.iloc[0]          # each file's own version
+
+
+def test_load_notebook_leaves_the_reader_jobs_rows_alone():
+    # the reader job writes its CSVs next to the loader's and its rows carry sha256 (issue #94): the loader
+    # counts those versions as loaded, and deletes only rows it wrote, never the reader's
+    nb = _text("databricks/notebooks/10_load_results.py")
+    assert "source = 'databricks'" in nb                 # the reader's versions count as loaded
+    assert "AND source <> 'databricks'" in nb           # the delete never reaches them
+    assert "the reader job's own rows have no sha256" not in nb
