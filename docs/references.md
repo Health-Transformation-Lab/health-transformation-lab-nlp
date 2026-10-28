@@ -128,6 +128,14 @@ Everything this repo relies on, and what it's used for.
 14. **Fleiss JL.** *Measuring nominal scale agreement among many raters.*
     Psychol Bull 1971;76(5):378–382. → Reviewer reliability.
 15. **Cohen J.** *Weighted kappa.* Psychol Bull 1968;70(4):213–220. → Ordinal agreement.
+26. **Patel JS, et al.** *Developing and testing a prediction model for periodontal disease using machine
+    learning and big electronic dental record data.* Frontiers in Artificial Intelligence 2022.
+    doi:10.3389/frai.2022.979525. → Design of the status classifier (`classify_status.py`, spec 013 G10):
+    XGBoost, 80/20 split, 5-fold cross-validated hyperparameters, one-vs-all metrics. Whether it used SHAP
+    was not checked against the full text; SHAP here is this repo's choice.
+27. **Lundberg SM, Erion G, Chen H, et al.** *From local explanations to global understanding with
+    explainable AI for trees.* Nature Machine Intelligence 2020;2:56–67. → TreeSHAP, the exact SHAP values
+    XGBoost computes (`pred_contribs`) for the status classifier.
 
 ## De-identification
 
