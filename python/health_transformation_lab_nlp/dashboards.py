@@ -298,8 +298,9 @@ profile (spec 026, after KEEPER)."""
 
 def _recheck_layout() -> list[dict]:
     return [_text("recheck_banner", RECHECK_BANNER, (0, 0, 6, 3)),
-            _filter("f_recheck_clinic", "clinic", ["mismatch_rules", "mismatch_visits"], "Clinic", (0, 3, 2, 2)),
-            _filter("f_rule", "rule", ["mismatch_visits"], "Rule", (2, 3, 2, 2)),
+            # the clinic filter leaves the rule scores alone, so their All rows stay (as page 1 keeps its checks')
+            _filter("f_recheck_clinic", "clinic", ["mismatch_visits"], "Clinic", (0, 3, 2, 2)),
+            _filter("f_rule", "rule", ["mismatch_visits", "mismatch_rules"], "Rule", (2, 3, 2, 2)),
             _filter("f_visit", "visit_id", ["mismatch_visits", "case_profile"], "Visit", (4, 3, 2, 2),
                     widget_type="filter-single-select"),
             _table("tb_rules", "mismatch_rules", [("rule", "Rule"), ("clinic", "Clinic"),
@@ -309,14 +310,19 @@ def _recheck_layout() -> list[dict]:
                                                   ("injected_caught", "Injected errors caught"),
                                                   ("injected_checkable", "Injected errors checkable")],
                    "Each rule against the truth (synthetic)",
-                   "All = every clinic. Per-clinic injected-error counts are too few to compare.", (0, 5, 6, 6)),
+                   "All = every clinic; the clinic filter doesn't apply here, so All always shows. Blank precision "
+                   "or recall = the rule flags nothing there. Per-clinic injected-error counts are too few to "
+                   "compare.", (0, 5, 6, 6)),
             _table("tb_flagged", "mismatch_visits", [("visit_id", "Visit"), ("clinic", "Clinic"),
                                                      ("visit_date", "Date"), ("rules_failed", "Rules failed"),
                                                      ("rule", "Rule"), ("evidence", "Evidence")],
-                   "Flagged visits, most rules failed first", "", (0, 11, 3, 9)),
-            _table("tb_profile", "case_profile", [("category", "Category"), ("item", "Item"),
+                   "Flagged visits, most rules failed first",
+                   "One row per visit and failed rule. Rules failed counts all of the visit's rules, even when the "
+                   "rule filter shows only some of them.", (0, 11, 3, 9)),
+            _table("tb_profile", "case_profile", [("visit_id", "Visit"), ("category", "Category"), ("item", "Item"),
                                                   ("shown_value", "Value"), ("unit", "Unit")],
                    "Case profile of the selected visit",
+                   "Pick a visit in the Visit filter; until then every flagged visit's profile is listed. "
                    "Structured values only, never note text. Not recorded = the record lacks it.", (3, 11, 3, 9))]
 
 

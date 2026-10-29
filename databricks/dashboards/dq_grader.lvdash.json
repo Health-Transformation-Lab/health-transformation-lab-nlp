@@ -1357,19 +1357,6 @@
             "name": "f_recheck_clinic",
             "queries": [
               {
-                "name": "f_f_recheck_clinic_mismatch_rules",
-                "query": {
-                  "datasetName": "mismatch_rules",
-                  "fields": [
-                    {
-                      "name": "clinic",
-                      "expression": "`clinic`"
-                    }
-                  ],
-                  "disaggregated": false
-                }
-              },
-              {
                 "name": "f_f_recheck_clinic_mismatch_visits",
                 "query": {
                   "datasetName": "mismatch_visits",
@@ -1388,11 +1375,6 @@
               "widgetType": "filter-multi-select",
               "encodings": {
                 "fields": [
-                  {
-                    "fieldName": "clinic",
-                    "displayName": "Clinic",
-                    "queryName": "f_f_recheck_clinic_mismatch_rules"
-                  },
                   {
                     "fieldName": "clinic",
                     "displayName": "Clinic",
@@ -1429,6 +1411,19 @@
                   ],
                   "disaggregated": false
                 }
+              },
+              {
+                "name": "f_f_rule_mismatch_rules",
+                "query": {
+                  "datasetName": "mismatch_rules",
+                  "fields": [
+                    {
+                      "name": "rule",
+                      "expression": "`rule`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
               }
             ],
             "spec": {
@@ -1440,6 +1435,11 @@
                     "fieldName": "rule",
                     "displayName": "Rule",
                     "queryName": "f_f_rule_mismatch_visits"
+                  },
+                  {
+                    "fieldName": "rule",
+                    "displayName": "Rule",
+                    "queryName": "f_f_rule_mismatch_rules"
                   }
                 ]
               },
@@ -1614,7 +1614,7 @@
                 "showTitle": true,
                 "title": "Each rule against the truth (synthetic)",
                 "showDescription": true,
-                "description": "All = every clinic. Per-clinic injected-error counts are too few to compare."
+                "description": "All = every clinic; the clinic filter doesn't apply here, so All always shows. Blank precision or recall = the rule flags nothing there. Per-clinic injected-error counts are too few to compare."
               }
             }
           },
@@ -1696,7 +1696,9 @@
               },
               "frame": {
                 "showTitle": true,
-                "title": "Flagged visits, most rules failed first"
+                "title": "Flagged visits, most rules failed first",
+                "showDescription": true,
+                "description": "One row per visit and failed rule. Rules failed counts all of the visit's rules, even when the rule filter shows only some of them."
               }
             }
           },
@@ -1716,6 +1718,10 @@
                 "query": {
                   "datasetName": "case_profile",
                   "fields": [
+                    {
+                      "name": "visit_id",
+                      "expression": "`visit_id`"
+                    },
                     {
                       "name": "category",
                       "expression": "`category`"
@@ -1743,6 +1749,10 @@
               "encodings": {
                 "columns": [
                   {
+                    "fieldName": "visit_id",
+                    "displayName": "Visit"
+                  },
+                  {
                     "fieldName": "category",
                     "displayName": "Category"
                   },
@@ -1764,7 +1774,7 @@
                 "showTitle": true,
                 "title": "Case profile of the selected visit",
                 "showDescription": true,
-                "description": "Structured values only, never note text. Not recorded = the record lacks it."
+                "description": "Pick a visit in the Visit filter; until then every flagged visit's profile is listed. Structured values only, never note text. Not recorded = the record lacks it."
               }
             }
           },

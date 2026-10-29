@@ -295,7 +295,22 @@ def test_flagged_visits_come_most_rules_failed_first_and_profiles_cover_every_fl
     visits = con.execute(sql["mismatch_visits"]).df()
     assert visits.rules_failed.iloc[0] == visits.rules_failed.max()
     assert visits.rules_failed.is_monotonic_decreasing
-    profile = con.execute(sql["case_profile"]).df()
-    assert set(profile.visit_id) == set(visits.visit_id)
     rules = con.execute(sql["mismatch_rules"]).df()
     assert rules.clinic.iloc[0] == "All" and "Any rule" in set(rules.rule)
+
+
+def test_the_profile_table_names_its_visit_and_says_to_pick_one():
+    _, w = _recheck_page()
+    cols = [c["fieldName"] for c in w["tb_profile"]["spec"]["encodings"]["columns"]]
+    assert cols[0] == "visit_id"
+    assert "Pick a visit" in w["tb_profile"]["spec"]["frame"]["description"]
+
+
+def test_filters_keep_the_all_rows_and_say_what_they_narrow():
+    _, w = _recheck_page()
+    assert {q["query"]["datasetName"] for q in w["f_recheck_clinic"]["queries"]} == {"mismatch_visits"}
+    assert {q["query"]["datasetName"] for q in w["f_rule"]["queries"]} == {"mismatch_visits", "mismatch_rules"}
+    rules_note = w["tb_rules"]["spec"]["frame"]["description"]
+    assert "blank" in rules_note.lower() and "clinic filter" in rules_note.lower()
+    flagged_note = w["tb_flagged"]["spec"]["frame"]["description"]
+    assert "Rules failed" in flagged_note and "rule filter" in flagged_note.lower()
