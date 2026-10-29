@@ -160,3 +160,16 @@ def test_the_publish_token_is_in_the_secrets_register_with_its_scope():
     tok = next(c for c in reg if "HF_PUBLISH_TOKEN" in c["stored_in"])
     assert "healthtransformationlab" in tok["scope"] and "write" in tok["scope"]
     assert tok["expires"] and "kaggle-publish.yml" in tok["used_by"]
+
+
+def test_the_workflow_falls_back_to_hf_token_and_the_check_names_both():
+    # issue #249: the owner's existing HF_TOKEN secret is used when HF_PUBLISH_TOKEN isn't set
+    wf = yaml.safe_load((REPO_ROOT / ".github" / "workflows" / "kaggle-publish.yml").read_text())
+    for step in wf["jobs"]["huggingface"]["steps"]:
+        if "HF_PUBLISH_TOKEN" in str(step.get("env", {})):
+            assert step["env"]["HF_PUBLISH_TOKEN"] == "${{ secrets.HF_PUBLISH_TOKEN || secrets.HF_TOKEN }}"
+    for token, match in (("", "HF_PUBLISH_TOKEN or HF_TOKEN"), ("abc", "HF_PUBLISH_TOKEN or HF_TOKEN")):
+        with pytest.raises(SystemExit, match=match):
+            hpub.check_token(token, whoami=lambda t: {})
+    reg = yaml.safe_load((REPO_ROOT / "ops" / "secrets_register.yaml").read_text())["credentials"]
+    assert "HF_TOKEN" in next(c for c in reg if "HF_PUBLISH_TOKEN" in c["stored_in"])["stored_in"]

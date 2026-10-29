@@ -8,7 +8,7 @@ healthtransformationlab organisation (spec 025). Used by .github/workflows/kaggl
 The files are kaggle/publish.py's (FR-001: one list for both platforms), passed through its check() and copied
 under raw/. The notes also get data/train.csv and data/test.csv with one column set, so the dataset viewer and
 load_dataset() show a train and a test split. README.md is the card: a YAML header (licence, task, tags, configs)
-and the body from huggingface/cards/<name>.md. Uploading needs HF_PUBLISH_TOKEN (a fine-grained token with write
+and the body from huggingface/cards/<name>.md. Uploading needs HF_PUBLISH_TOKEN, or the workflow passes HF_TOKEN in its place (a token with write
 access to the organisation's repositories); check_token() checks it before any upload.
 """
 
@@ -105,16 +105,16 @@ def org_card() -> str:
 def check_token(token: str, whoami) -> str:
     """Fail fast, naming the setting: missing, wrong shape, or unable to write to the organisation. Returns the user."""
     if not token:
-        raise SystemExit("HF_PUBLISH_TOKEN is not set in the GitHub environment 'dev' (huggingface/README.md)")
+        raise SystemExit("HF_PUBLISH_TOKEN or HF_TOKEN is not set in the GitHub environment 'dev' (huggingface/README.md)")
     if not token.startswith("hf_"):
-        raise SystemExit("HF_PUBLISH_TOKEN doesn't look like a Hugging Face token (it should start with hf_)")
+        raise SystemExit("HF_PUBLISH_TOKEN or HF_TOKEN doesn't look like a Hugging Face token (it should start with hf_)")
     me = whoami(token)                                # one cheap authenticated call
     role = next((o.get("roleInOrg") for o in me.get("orgs", []) if o.get("name") == ORG), None)
     fine = (me.get("auth") or {}).get("accessToken", {}).get("fineGrained")
     scoped = [s for s in (fine or {}).get("scoped", []) if s.get("entity", {}).get("name") == ORG]
     if role not in ("admin", "write", "contributor") or (fine and not any(
             any("write" in p for p in s.get("permissions", [])) for s in scoped)):
-        raise SystemExit(f"HF_PUBLISH_TOKEN can't write to the {ORG} organisation: give it write access to the "
+        raise SystemExit(f"HF_PUBLISH_TOKEN or HF_TOKEN can't write to the {ORG} organisation: give it write access to the "
                          "organisation's repositories (huggingface/README.md)")
     return me["name"]
 
