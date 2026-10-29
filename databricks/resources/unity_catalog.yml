@@ -7,8 +7,8 @@
 #     bronze_perio_bench                     raw tables       (empty for now)
 #     silver_perio_bench                     cleaned tables   (empty for now)
 #     gold_perio_bench                       study tables, results, perio_note_classifier
-#     bronze_/silver_/gold_access_bench      empty until access_bench has a pipeline
 #     bronze_/silver_/gold_oral_health_bench empty until oral_health_bench has a pipeline
+#     bronze_/silver_/gold_access_bench      empty until access_bench has a pipeline
 #
 # The old schemas (<layer>_${var.legacy_domain}) stay declared in databricks.yml, under the dev target that
 # deployed them, until they are retired (docs/deployment.md).
@@ -59,24 +59,6 @@ resources:
       comment: Study tables, results and perio_note_classifier for perio_bench. Synthetic data only.
       lifecycle:
         prevent_destroy: true
-    access_bench_bronze:
-      catalog_name: ${resources.catalogs.health_transformation_lab.name}
-      name: bronze_access_bench
-      comment: Raw tables for access_bench; empty until it has a pipeline. Synthetic data only.
-      lifecycle:
-        prevent_destroy: true
-    access_bench_silver:
-      catalog_name: ${resources.catalogs.health_transformation_lab.name}
-      name: silver_access_bench
-      comment: Cleaned tables for access_bench; empty until it has a pipeline. Synthetic data only.
-      lifecycle:
-        prevent_destroy: true
-    access_bench_gold:
-      catalog_name: ${resources.catalogs.health_transformation_lab.name}
-      name: gold_access_bench
-      comment: Study tables and results for access_bench; empty until it has a pipeline. Synthetic data only.
-      lifecycle:
-        prevent_destroy: true
     oral_health_bench_bronze:
       catalog_name: ${resources.catalogs.health_transformation_lab.name}
       name: bronze_oral_health_bench
@@ -93,6 +75,24 @@ resources:
       catalog_name: ${resources.catalogs.health_transformation_lab.name}
       name: gold_oral_health_bench
       comment: Study tables and results for oral_health_bench; empty until it has a pipeline. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    access_bench_bronze:
+      catalog_name: ${resources.catalogs.health_transformation_lab.name}
+      name: bronze_access_bench
+      comment: Raw tables for access_bench; empty until it has a pipeline. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    access_bench_silver:
+      catalog_name: ${resources.catalogs.health_transformation_lab.name}
+      name: silver_access_bench
+      comment: Cleaned tables for access_bench; empty until it has a pipeline. Synthetic data only.
+      lifecycle:
+        prevent_destroy: true
+    access_bench_gold:
+      catalog_name: ${resources.catalogs.health_transformation_lab.name}
+      name: gold_access_bench
+      comment: Study tables and results for access_bench; empty until it has a pipeline. Synthetic data only.
       lifecycle:
         prevent_destroy: true
 

@@ -43,6 +43,17 @@ docs, decks, dashboards, Genie instructions, table and column names, issues and 
 words is fine. `python/tests/test_wording.py` fails CI on the phrases to avoid in any other tracked file (past PR
 reviews in `pull_requests/` are records and stay as written).
 
+## The benchmarks
+
+Always in this order, wherever two or more are named (prose, lists, tables, decks, cards, schemas, code):
+**PerioBench, then OralHealthBench, then AccessBench**; in code, `perio_bench`, `oral_health_bench`, `access_bench`.
+`python/tests/test_bench_order.py` fails CI on a list out of order.
+
+- **PerioBench: trustworthy records.** Measure the data quality of electronic dental records.
+- **OralHealthBench (planned): accurate AI answers.** Score the AI that millions of people ask on the questions that
+  matter at the seam of medical and dental care: medicines, chronic disease, emergencies.
+- **AccessBench (exploratory): getting care.** Whether an answer helps someone actually get care.
+
 ## When a change needs a spec
 
 Anything that changes a dataset, a metric, a label rule or the review workflow gets a spec first:
@@ -213,8 +224,8 @@ Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
 - Names: simulated files `simulated_*`, simulated methods `sim:<name>`, calibration-only methods `calib:<name>`.
 - R: base R only, matching Python to 1e-9 (`r/tests/test_parity.R`).
 - Databricks names: identical in every target (catalog `health_transformation_lab`, schemas `<layer>_<bench>`:
-  `landing_`/`bronze_`/`silver_`/`gold_perio_bench`, and `bronze_`/`silver_`/`gold_` for `access_bench` and
-  `oral_health_bench`; `health_transformation_lab_nlp.schemas`, spec 022). Never add `dev_`,
+  `landing_`/`bronze_`/`silver_`/`gold_perio_bench`, and `bronze_`/`silver_`/`gold_` for `oral_health_bench` and
+  `access_bench`; `health_transformation_lab_nlp.schemas`, spec 022). Never add `dev_`,
   `[dev <user>]` or per-environment prefixes or suffixes, and never use
   `mode: development` (it adds them): each environment is its own workspace.
   dev is deployed by CI on every merge to `main`; don't `bundle deploy` it from a laptop.
