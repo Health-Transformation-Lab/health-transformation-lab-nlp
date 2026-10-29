@@ -10,10 +10,10 @@ Most benchmarks test exam knowledge. Studies of real patient cases, including dr
 Health Transformation Lab
 A personal idea
 Two open benchmarks:
-OralHealthBench
-, for AI answers on oral health and getting care, and
 PerioBench
-, for finding gum disease in dental records.
+, finding gum disease in dental records, built and tested on synthetic records; and
+OralHealthBench
+, AI answers on oral health and getting care, planned on top of GlobalDentBench.
 John Bowyer · personal project, not affiliated with any organization
 
 **Speaker notes:** AI passes the dental exam, and it fails the real patient. Most AI benchmarks test exam knowledge, and published studies of real patient cases have found AI falling short. On real hospital cases, AI models didn't follow the clinical guidelines doctors use (Hager and colleagues, Nature Medicine, 2024). Members of the public using AI did no better than those using a source of their choice (Bean and colleagues, Nature Medicine, 2026). And on drug interactions, chatbots were often wrong where a standard interaction checker was right (Al-Ashwal and colleagues, 2023). I am proposing an independent, open lab, called the Health Transformation Lab. Its mission: better oral health for millions of Americans, and better overall health through the links between medical and dental care. It does that by making AI accurate on two things today's tests leave out. One is where medicine meets dentistry: medicines, chronic disease such as diabetes, and emergencies. The other is the social factors that decide whether people get care: cost, coverage, distance and transportation, what researchers call the social determinants of health. This is a personal idea: nothing has been registered or built, no organization is behind it, and no partner has agreed to anything.
@@ -474,7 +474,7 @@ Health Transformation Lab · Drill-down
 
 ## Slide 24 — close
 
-Health Transformation Lab · OralHealthBench and PerioBench
+Health Transformation Lab · PerioBench and OralHealthBench
 Oral health for all.
 Millions, directly, in public, and verified.
 Give us 180 days to measure it.
