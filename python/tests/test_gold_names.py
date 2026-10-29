@@ -259,3 +259,11 @@ def test_the_migration_notebook_carries_the_legacy_schemas_and_checks_every_key_
     assert stale.index("continue") < stale.index("drops.append")   # a stale table, never checked, gets no DROP
     jobs = (ROOT / "databricks/resources/jobs.yml").read_text()
     assert "legacy_gold_schemas: ${var.legacy_gold_schemas}" in jobs
+
+
+def test_a_key_column_neither_table_has_counts_as_null_on_both_sides():
+    # issue #248: the old catalog's fact_llm_call and the current one both lack run_id
+    nb = (ROOT / "databricks/notebooks/11_migrate_gold_names.py").read_text()
+    assert "keyed(src, key, current)" in nb and "keyed(current, key, src)" in nb
+    assert 'if k in other.columns else "string"' in nb
+    assert "src.schema[k]" not in nb                   # the lookup that failed when src lacked the column too
