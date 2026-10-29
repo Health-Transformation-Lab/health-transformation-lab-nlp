@@ -1,5 +1,5 @@
 ---
-pr: pending
+pr: 268
 branch: docs/266-benchmark-status
 title: "Say how far along each benchmark is: PerioBench built, OralHealthBench planned, AccessBench exploratory"
 author: jcbowyer
