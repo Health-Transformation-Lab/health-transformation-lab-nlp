@@ -96,6 +96,12 @@ without row data); graduation (N matches, two misses, fewer than N, non-reversib
 lineage coverage; evaluate shape and intervals; ablation directions; no-notes import. Not covered: a real
 run table from a workspace (US5).
 
+## Addendum (2026-10-29, later commit)
+US8 (forecasting and alert batching) was added to the spec with `ops/dependency_inventory.csv`. Checked: the
+inventory carries no invented dates (two Python end-of-life months cite their PEPs; model and platform rows
+say unknown); the credential forecast reads expiry dates only and never a value. No test or metric change in
+this repo; the code lives in the shared package.
+
 ## Verdict
 Approve with one should-fix: label the illustrative timing and cost values in `incident.csv`. Everything
 else meets the rubric. Merge when CI is green and the owner has read the findings.

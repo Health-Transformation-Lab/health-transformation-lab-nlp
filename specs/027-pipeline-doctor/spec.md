@@ -126,6 +126,21 @@ Root-cause answers on the incident set are scored with the MLflow GenAI judge pa
 (`make_judge`, a Guidelines scorer on the runbook's rules, a deterministic no-PHI scorer on every
 trace), and a sample of production traces is scored the same way.
 
+### US8 - The doctor forecasts the failures that have not happened yet, and batches the alerts (P1)
+A log can only say what broke. The credential register (`ops/secrets_register.yaml`: expiry dates, never
+values), a dependency inventory (`ops/dependency_inventory.csv`: end-of-support dates and support status
+for models, runtimes, platform versions, endpoints) and the run table's trends give `forecast` rows with a
+predicted failure class and date: `credential_expiry`, `deprecation`, `cost_anomaly` and `source_late` from
+the cost and duration lines, `volume_anomaly` from a feed drifting toward its bounds, `schema_drift` from a
+schema hash that keeps changing. Severity follows the days ladder in AGENTS.md "Alerts and severity";
+unknown expiry is itself a SEV4 finding. `digest` routes every alert by that ladder (SEV1/2 now, SEV3 daily,
+SEV4 weekly), one message per owner per period, each problem once with a count, repeats carried and a
+repeating SEV2 flagged for level review. Implemented in the shared package
+(`healthtransformationlab/pipeline-doctor` v0.4.0, `forecast.py` and `digest.py`); this repo supplies the
+register and the inventory. First run on this repo's real register (2026-10-29): one credential expiring in
+13 days (SEV3) and five with unknown expiry (SEV4 each); the inventory carries no invented dates (two
+Python end-of-life months from their PEPs; the model and platform rows say "unknown").
+
 ## Evaluation: the incident set
 
 The first rows of `data/ops/incident.csv` are the incidents already written down in this repo's specs,

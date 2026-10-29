@@ -28,6 +28,11 @@
 - [ ] T019 Second project adopts it: its config, runbook, lineage and incident set; run `evaluate` and `ablation` there
 - [ ] T020 Paper draft: the four tables as a contract, the ladder, the ablation on both projects, limits
 
+## US8 - Forecasting and alert batching (in the shared package)
+- [x] T021 `pipeline-doctor` `forecast.py`: credential expiry, deprecation (dated or marked deprecated), cost and duration trends, volume drift, schema-change frequency; `digest.py`: route now/daily/weekly, dedupe, repeats, level review, render (46 tests there)
+- [x] T022 `ops/dependency_inventory.csv` with no invented dates; first forecast on the real register recorded in spec.md
+- [ ] T023 This repo installs `pipeline-doctor` and drops its own `doctor.py` copy (US7 T018); a `pipeline_forecast` job runs the forecaster and writes the digests
+
 ## US5 - The doctor runs as a job and writes its decisions
 - [ ] T010 Failing bundle tests: job `pipeline_doctor` runs `12_pipeline_doctor.py` with catalog, schema, judge endpoint and `max_usd`; writes are delete-then-append by `run_id`
 - [ ] T011 Notebook: read `system.lakeflow.job_run_timeline` and the span export into `fact_pipeline_run`; call the module; write `fact_remediation_decision`; notification at the runbook severity

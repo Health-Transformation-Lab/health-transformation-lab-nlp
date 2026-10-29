@@ -62,6 +62,16 @@ print(doctor.ablation(inc, cfg, rb, lin).round(2).to_string(index=False))
 EOF
 ```
 
+## Forecasting and alert batching
+
+The same tables predict failures before they happen: the secrets register's expiry dates, the dependency
+inventory's end-of-support dates (`ops/dependency_inventory.csv`), and the run table's cost, duration,
+volume and schema trends, each giving a predicted class, a date and a severity from the days ladder.
+Alerts are routed by that ladder and batched into one digest per owner per period, each problem once.
+Both live in the shared package (`pipeline-doctor` `forecast.py`, `digest.py`); this repo supplies the two
+files. The inventory has no invented dates: a model or platform without a published end-of-support date
+says `unknown`.
+
 ## Next
 
 The job (`pipeline_doctor`, after a failed run), the root-cause rung with its judge, and extracting the
