@@ -24,7 +24,6 @@ from __future__ import annotations
 import math
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import yaml
 
@@ -311,7 +310,7 @@ def graduation(decisions: pd.DataFrame, runbook: pd.DataFrame, n: int = TRAILING
         recent = d["is_match"].astype(bool).tolist()[-n:] if len(d) else []
         last_two_missed = len(recent) >= 2 and not recent[-1] and not recent[-2]
         automatic = bool(e["is_reversible"]) and len(recent) >= n and all(recent) and not last_two_missed
-        rows.append({"failure_class_code": cls, "decision_count": int(len(d)), "recent_match_count": int(sum(recent)),
+        rows.append({"failure_class_code": cls, "decision_count": len(d), "recent_match_count": int(sum(recent)),
                      "is_reversible": bool(e["is_reversible"]),
                      "run_mode_code": "automatic" if automatic else "recommend_only"})
     return pd.DataFrame(rows)
