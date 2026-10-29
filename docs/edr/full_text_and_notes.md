@@ -9,6 +9,11 @@ Nobody can count it.
 PerioBench: can finding gum disease accurately in the dental record improve care for millions of patients? Checked against gum specialists, built and tested end to end on synthetic records.
 Health Transformation Lab
 Synthetic data only
+Two open benchmarks:
+OralHealthBench
+, for AI answers on oral health and getting care, and
+PerioBench
+, for finding gum disease in dental records.
 John Bowyer · personal project, not affiliated with any organization
 
 **Speaker notes:** Gum disease is one of the most common chronic diseases in adults, and it is written down at almost every dental visit. But it is written down in pieces: a checkbox here, a billing code there, measurements, and a free-text note. Nobody can count it across clinics, so nobody can study it at scale, link it to diabetes, or see whether care is working. PerioBench asks one question: can finding gum disease accurately in the dental record improve care for people with it, so it is found earlier, treated, followed over time and managed alongside diabetes? Agreement with gum specialists reviewing the same records is how we check the result; better patient care is the goal. Everything shown is on synthetic records, built so the right answer is known; it is a rehearsal of the real study, not a result on real patients. This is a personal project, not any organization's plan.
@@ -203,17 +208,17 @@ Synthetic notes with fake names and dates; also tested on public benchmark sets 
 
 How the two paths connect
 The record gives the test its right answers
-This path
+PerioBench
 The record
 Synthetic patients whose right answer is known, in the format medicine uses.
 The bridge
 Test questions
 Case questions written from those patients, with the right answer already scored.
-The other path
-The lab
+OralHealthBench
+AI answers
 AI tested where medicine meets dentistry and access to care, in public.
 One harness, narrow to broad:
 the same models, runners, harm grades and leaderboards score AI first on gum charts, then on case questions, then on broader medical-dental ones.
-The lab's pitch: docs/pitch/ · Health Transformation Lab · the dental record (EDR) · 11
+OralHealthBench pitch: docs/pitch/ · Health Transformation Lab · the dental record (EDR) · 11
 
 **Speaker notes:** The landing page has two paths, and this is how they meet. This path builds synthetic patients whose right answers are known, in the same format medicine uses. That makes them a source of test questions: case questions written from those patients, with the right answer already scored. The other path, the lab, is about testing AI where medicine meets dentistry and on access to care, in public. Both use one harness: the same models, runners, harm grades and leaderboards, scoring AI first on gum charts, then on case questions from synthetic patients, then on broader medical-dental questions. The lab's pitch is in docs/pitch.

@@ -9,6 +9,11 @@ It fails the real patient.
 And no test we found checks whether it links the mouth to the rest of the body, or helps people get care. Oral health for all means fixing the test.
 Health Transformation Lab
 A personal idea
+Two open benchmarks:
+OralHealthBench
+, for AI answers on oral health and getting care, and
+PerioBench
+, for finding gum disease in dental records.
 John Bowyer · personal project, not affiliated with any organization
 
 **Speaker notes:** AI passes the dental exam, and it fails the real patient. And no test we found checks whether it connects oral health to the rest of a person's health, or whether it helps people actually get care. I am proposing an independent, open lab, called the Health Transformation Lab for now. Its mission: better oral health for millions of Americans, and better overall health through the links between medical and dental care. It does that by making AI accurate on two things today's tests leave out. One is where medicine meets dentistry: medicines, chronic disease such as diabetes, and emergencies. The other is the social factors that decide whether people get care: cost, coverage, distance and transportation, what researchers call the social determinants of health. This is a personal idea: nothing has been registered or built, no organization is behind it, and no partner has agreed to anything.
@@ -79,7 +84,7 @@ CDC NCHS Data Brief 531 (2025; visits 2020–2022) · EFP and IDF consensus repo
 Where the impact is
 From thousands, indirectly, to millions, directly
 How oral health research reaches people today
-What the lab adds
+What OralHealthBench adds
 Who it reaches
 Thousands of experts
 Millions: 40 million a day ask OpenAI’s AI about health
@@ -96,7 +101,7 @@ The main move.
 Put the medical-dental link and the social factors of care on AI’s public scorecards, each question traced to published evidence. An open AI agent then shows the lift.
 Research keeps its place. This adds a public channel · Source: OpenAI, Jan 2026 (global) · 5
 
-**Speaker notes:** Today, oral health research reaches thousands of experts, indirectly: they find the papers, reports and data portals, and each study measures its own impact. That work stays. What the lab adds reaches millions, directly, in public, with third parties verifying it. The main move is this: put the medical-dental link and the social factors of care on the public scorecards that grade AI. Every question traces back to published evidence, so anyone can drill down from the test to the science behind it. Once the questions are on the scorecard, every AI model tested on that scorecard is graded on them, and AI companies work to improve what they are graded on. An open AI agent is the second step: it shows how much better the answers get with the evidence. If asked about the numbers: thousands is my description of the research audience, not a measured figure. Millions is the audience of the public AI tools: OpenAI reported in January 2026 that more than 40 million people a day ask its AI assistant health questions, worldwide, including 1.6 to 1.9 million health insurance questions a week; Google reported 950 million monthly users of its AI assistant in July 2026. That is the reach available, not a promise. Nobody publishes how many of those questions are dental; measuring that could be an early result of the 180 days. If asked whether the people who run the scorecards will accept the questions: it is their decision, so we ask as partners.
+**Speaker notes:** Today, oral health research reaches thousands of experts, indirectly: they find the papers, reports and data portals, and each study measures its own impact. That work stays. What OralHealthBench adds reaches millions, directly, in public, with third parties verifying it. The main move is this: put the medical-dental link and the social factors of care on the public scorecards that grade AI. Every question traces back to published evidence, so anyone can drill down from the test to the science behind it. Once the questions are on the scorecard, every AI model tested on that scorecard is graded on them, and AI companies work to improve what they are graded on. An open AI agent is the second step: it shows how much better the answers get with the evidence. If asked about the numbers: thousands is my description of the research audience, not a measured figure. Millions is the audience of the public AI tools: OpenAI reported in January 2026 that more than 40 million people a day ask its AI assistant health questions, worldwide, including 1.6 to 1.9 million health insurance questions a week; Google reported 950 million monthly users of its AI assistant in July 2026. That is the reach available, not a promise. Nobody publishes how many of those questions are dental; measuring that could be an early result of the 180 days. If asked whether the people who run the scorecards will accept the questions: it is their decision, so we ask as partners.
 
 ## Slide 6 — ask
 
@@ -166,7 +171,7 @@ Health Transformation Lab · Drill-down
 ## Slide 10 — workflow
 
 How the agent works
-One question, and where the lab fits
+One question, and where the open agent fits
 1
 Someone asks
 A person with no dentist, a doctor or a policymaker asks an oral health question.
@@ -399,7 +404,7 @@ Open
 Anyone. Benchmarks, definitions, model cards and aggregate, de-identified measures under an open license.
 Path 2
 Registered
-Sign in and accept terms of use. The lab’s models and agents, called through MCP or an API, with usage limits and logging.
+Sign in and accept terms of use. The models and agents behind OralHealthBench and PerioBench, called through MCP or an API, with usage limits and logging.
 Path 3
 Agreement
 A signed data use agreement, reviewed and approved, for detailed or licensed data in a secure environment.
@@ -469,7 +474,7 @@ Health Transformation Lab · Drill-down
 
 ## Slide 24 — close
 
-Health Transformation Lab
+Health Transformation Lab · OralHealthBench and PerioBench
 Oral health for all.
 Millions, directly, in public, and verified.
 Give us 180 days to measure it.

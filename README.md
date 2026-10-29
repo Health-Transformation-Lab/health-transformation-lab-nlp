@@ -8,7 +8,8 @@
 million people a day ask OpenAI's assistant alone about their health (OpenAI, January 2026), and those answers shape
 the care they seek and get. AI developers such as OpenAI, Anthropic and Google improve what public benchmarks measure,
 and no public benchmark we found checks answers where medicine meets dentistry, or whether an answer helps someone get
-care. The lab builds those benchmarks in the open: [healthtransformationlab.org](https://healthtransformationlab.org).
+care. The lab builds two such benchmarks in the open, **OralHealthBench** (AI answers on oral health and getting care)
+and **PerioBench** (finding gum disease in dental records): [healthtransformationlab.org](https://healthtransformationlab.org).
 
 Two benchmarks so far, each with a short pitch that drills down to the detail.
 
@@ -40,8 +41,8 @@ the same evidence gets 173: the order is one of the findings.
 
 <a href="docs/pitch/full_text_and_notes.md"><img src="docs/img/pitch_deck_cover.png" alt="AI passes the dental exam. It fails the real patient." width="480"></a>
 
-Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench,
-2026). No public test we found checks whether they connect the mouth to the rest of the body: a medicine that makes a tooth
+Twelve leading AI models average 81% on dental licensing-exam questions but 22% on questions built from published
+patient cases (GlobalDentBench, 2026). No public test we found checks whether they connect the mouth to the rest of the body: a medicine that makes a tooth
 extraction unsafe, or gum disease and diabetes. OralHealthBench puts those questions, each traced to published
 evidence, with public results so improvements are visible, and measures how much an open evidence agent improves
 their answers. Its companion, **AccessBench**, asks whether an answer works for someone with no coverage, no car or
@@ -55,7 +56,7 @@ no dentist nearby.
 ## How the two paths connect
 
 The dental record path builds synthetic patients whose right answers are known, in OMOP, the format medicine
-already uses. Those patients become test questions for the lab. One harness, with the same models, runners, harm grades
+already uses. Those patients become test questions for OralHealthBench. One harness, with the same models, runners, harm grades
 and leaderboards, scores AI first on gum charts, then on case questions, then on broader medical-dental questions.
 
 ## Run it
