@@ -273,9 +273,9 @@ pitch:
   reach:
     - value: "40 million"
       kind: cited
-      source: "OpenAI, January 2026 (global)"
-      checked: null
-      covers: people a day asking OpenAI's assistant health questions, worldwide
+      source: "OpenAI report, January 2026, as reported by Axios (axios.com/2026/01/05/chatgpt-openai-health-insurance-aca, an exclusive, headline corrected to global) and Medical Economics (2026-01-07): more than 40 million people use ChatGPT daily for health questions, worldwide; 1.6 to 1.9 million health-insurance messages a week. Read via that reporting: openai.com refuses automated requests"
+      checked: 2026-10-29
+      covers: people a day asking ChatGPT health questions, worldwide (OpenAI's own data, not independently verified)
   tests:
     - value: "8,000"
       kind: cited
