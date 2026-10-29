@@ -41,13 +41,14 @@ the same evidence gets 173: the order is one of the findings.
 <a href="docs/pitch/full_text_and_notes.md"><img src="docs/img/pitch_deck_cover.png" alt="AI passes the dental exam. It fails the real patient." width="480"></a>
 
 Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench,
-2026). Benchmarks today test exam knowledge, and studies of real-world use find the same gap: on real hospital cases,
-models followed neither diagnostic nor treatment guidelines (Hager et al., 2024); people using them did no better than
-people using their usual sources (Bean et al., 2026); and against a standard drug-interaction checker, ChatGPT-3.5 got
-47% of 255 drug pairs right (Al-Ashwal et al., 2023). OralHealthBench asks real-world questions where dentistry meets
-medicine, such as a medicine that makes a tooth extraction unsafe, each traced to published evidence, with public results so improvements are visible, and measures how much an open evidence agent improves
-their answers. Its companion, **AccessBench**, asks whether an answer works for someone with no coverage, no car or
-no dentist nearby.
+2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real
+hospital cases, models followed neither diagnostic nor treatment guidelines (Hager et al., 2024); people using them
+did no better than people using a source of their choice (Bean et al., 2026); and against a standard drug-interaction
+checker, ChatGPT-3.5 got 47% of 255 drug pairs right (Al-Ashwal et al., 2023). OralHealthBench asks real-world
+questions where dentistry meets medicine, such as a medicine that makes a tooth extraction unsafe, each traced to
+published evidence, with public results so improvements are visible, and measures how much an open evidence agent
+improves their answers. Its companion, **AccessBench**, asks whether an answer works for someone with no coverage, no
+car or no dentist nearby.
 
 | For | Go to |
 |---|---|

@@ -1,11 +1,11 @@
-"""Issue #221: Health Transformation Lab is the name, not a "working name". Past PR reviews in pull_requests/ are
-records and stay as written."""
+"""Issue #221: Health Transformation Lab is the name, not a "working name" or a name "for now". Past PR reviews in
+pull_requests/ are records and stay as written."""
 import re
 import subprocess
 
 from health_transformation_lab_nlp.paths import REPO_ROOT
 
-PHRASE = re.compile(r"working name", re.IGNORECASE)
+PHRASE = re.compile(r"working name|Health Transformation Lab for now", re.IGNORECASE)
 ALLOWED = {"python/tests/test_no_working_name.py"}
 
 
