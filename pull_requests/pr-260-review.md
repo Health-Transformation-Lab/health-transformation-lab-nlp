@@ -92,3 +92,25 @@ Approve with nits. Merge once CI is green on the head.
 
 The website is a separate repo, `healthtransformationlab.github.io`. Its landing page gets the same wording in its
 own PR, and its deck copies should be refreshed from this branch after the merge.
+
+## Second round (owner feedback, 2026-10-29)
+The owner asked for three more changes. Each was checked against the files before it was made.
+- **"Diagnosis" needs a doctor, so it comes out where it describes what the record or AI does.**
+  - EDR slide 2 now says "rarely say plainly whether a patient has gum disease".
+  - The Hager paraphrase becomes "didn't follow the clinical guidelines doctors use".
+  - The agent is built "not to replace a dentist or doctor"; MedGemma supports "research and tools, not clinical
+    decisions".
+  - "Diagnosis codes" stays, as the name of a field in the record (what a dentist recorded), which `AGENTS.md`
+    allows.
+- **"Phenotype" comes off the slides.** EDR slides 3 and 8 now say "how well records identify a disease" and "the
+  rules". The scientific-details page keeps the term for researchers.
+- **Absolute data claims were inaccurate.**
+  - "Synthetic data only" and "no real patient data" overstated it. The de-identification tools are also scored
+    on clinical text that others published already de-identified: MACCROBAT, committed under its CC BY licence,
+    and John Snow Labs' 48-note set, kept outside the repo.
+  - The disclaimer, both READMEs, the EDR cover tag and footer, and slides 4 and 10 now say the patient records are
+    synthetic and no identifiable patient data (PHI) is used.
+- **The cover images still showed "working name" and the old problem line.** Both
+  `docs/img/{edr,pitch}_deck_cover.png` are re-rendered from slide 1 of the built decks at 960×540, in Chromium.
+
+Tests: 1051 passed, 15 skipped.

@@ -4,7 +4,7 @@
 
 > **Personal learning project.** Built on my own time. Not affiliated with or endorsed by any employer, institution or
 > vendor, and nothing here reflects official business or research of any
-> organization. Synthetic data only. See [DISCLAIMER.md](../../DISCLAIMER.md).
+> organization. The patients are synthetic. See [DISCLAIMER.md](../../DISCLAIMER.md).
 
 Can periodontal status be phenotyped from a dental EHR, and can AI reading the
 chart notes match clinicians? (**OMOP** = a common format for health records; **NLP** = software
@@ -134,7 +134,7 @@ Run every step (seeded, simulated reviewers): `cd python && pip install -e ".[de
 
 ## Ground rules
 
-- **Synthetic data only**, never PHI or employer data; no note reaches Label Studio or a model until
+- **Synthetic patient records**, never PHI or employer data; no note reaches Label Studio or a model until
   a final check finds no identifier left. **Python and R** give the same numbers (parity-tested).
 
 ## How results are measured

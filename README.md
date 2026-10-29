@@ -1,7 +1,7 @@
 # Health Transformation Lab
 
 > **Personal learning project.** Built on my own time: not affiliated with or endorsed by any employer,
-> institution or vendor, and nothing here is any organization's plan, study or finding. Synthetic data only. See
+> institution or vendor, and nothing here is any organization's plan, study or finding. The patients are synthetic. See
 > [DISCLAIMER.md](DISCLAIMER.md).
 
 **The goal: better health answers from AI, and better care for the millions of people who ask.** More than 40
@@ -42,7 +42,7 @@ the same evidence gets 173: the order is one of the findings.
 
 Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench,
 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real
-hospital cases, models followed neither diagnostic nor treatment guidelines (Hager et al., 2024); people using them
+hospital cases, models didn't follow the clinical guidelines doctors use (Hager et al., 2024); people using them
 did no better than people using a source of their choice (Bean et al., 2026); and against a standard drug-interaction
 checker, ChatGPT-3.5 got 47% of 255 drug pairs right (Al-Ashwal et al., 2023). OralHealthBench asks real-world
 questions where dentistry meets medicine, such as a medicine that makes a tooth extraction unsafe, each traced to
@@ -71,5 +71,5 @@ cd .. && python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R  
 python docs/build_decks.py                         # rebuild both decks from docs/<deck>/slides/
 ```
 
-Ground rules: synthetic data only, never PHI; Python and R in parity; anything simulated is labelled simulated
+Ground rules: synthetic patient records, never identifiable patient data (PHI); Python and R in parity; anything simulated is labelled simulated
 ([AGENTS.md](AGENTS.md)). Open decisions: [action items](docs/action_items.md). Owner John Bowyer · MIT licence.
