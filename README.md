@@ -8,8 +8,10 @@
 million people a day ask OpenAI's assistant alone about their health (OpenAI, January 2026), and those answers shape
 the care they seek and get. AI developers such as OpenAI, Anthropic and Google improve what public benchmarks measure,
 and no public benchmark we found checks answers where medicine meets dentistry, or whether an answer helps someone get
-care. The lab builds two such benchmarks in the open, **OralHealthBench** (AI answers on oral health and getting care)
-and **PerioBench** (finding gum disease in dental records): [healthtransformationlab.org](https://healthtransformationlab.org).
+care. The lab builds its benchmarks in the open: **PerioBench** (finding gum disease in dental records) has working
+code and results on synthetic records; **OralHealthBench** (AI answers on oral health and getting care) is planned,
+building on GlobalDentBench; and **AccessBench** (whether an answer helps someone get care) is exploratory.
+[healthtransformationlab.org](https://healthtransformationlab.org).
 
 Two benchmarks so far, each with a short pitch that drills down to the detail.
 
@@ -37,7 +39,7 @@ the same evidence gets 173: the order is one of the findings.
 | **Scientists** | [the study](docs/edr/README.md): the seven kinds of evidence, every method with 95% intervals, the acceptance test, models, de-identification |
 | **Engineers** | [code walkthrough](docs/code_walkthrough.md), [deployment](docs/deployment.md), [how we work](AGENTS.md) |
 
-## 2. OralHealthBench: correct answers where medicine meets dentistry
+## 2. OralHealthBench (planned): correct answers where medicine meets dentistry
 
 <a href="docs/pitch/full_text_and_notes.md"><img src="docs/img/pitch_deck_cover.png" alt="AI passes the dental exam. It fails the real patient." width="480"></a>
 
@@ -45,11 +47,11 @@ Twelve leading AI models average 81% on dental licensing-exam questions but 22% 
 patient cases (GlobalDentBench, 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real
 hospital cases, models didn't follow the clinical guidelines doctors use (Hager et al., 2024); people using them
 did no better than people using a source of their choice (Bean et al., 2026); and against a standard drug-interaction
-checker, ChatGPT-3.5 got 47% of 255 drug pairs right (Al-Ashwal et al., 2023). OralHealthBench asks real-world
-questions where dentistry meets medicine, such as a medicine that makes a tooth extraction unsafe, each traced to
-published evidence, with public results so improvements are visible, and measures how much an open evidence agent
-improves their answers. Its companion, **AccessBench**, asks whether an answer works for someone with no coverage, no
-car or no dentist nearby.
+checker, ChatGPT-3.5 got 47% of 255 drug pairs right (Al-Ashwal et al., 2023). OralHealthBench, planned
+and building on GlobalDentBench, will ask real-world questions where dentistry meets medicine, such as a medicine that
+makes a tooth extraction unsafe, each traced to published evidence, with public results so improvements are visible,
+and will measure how much an open evidence agent improves their answers. A third idea, **AccessBench**, is exploratory:
+it would ask whether an answer works for someone with no coverage, no car or no dentist nearby.
 
 | For | Go to |
 |---|---|
