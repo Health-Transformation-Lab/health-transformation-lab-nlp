@@ -68,3 +68,12 @@ def test_backfilled_issue_quotes_the_text_verbatim_and_says_so():
     assert issue["title_key"] == "016 CHORE" and issue["title_text"] == "Add the thing"
     assert "## What changed\n- the thing" in issue["body"] and "verbatim" in issue["body"]
     assert "PR #150" in issue["body"] and issue["labels"] == ["backfilled"]
+
+
+def test_the_organisation_name_is_redacted_from_titles_and_branches():
+    assert tm.redact("claude/remove-care" + "quest-references") == "claude/remove-[org]-references"
+    row = tm.manifest_row("B", {"number": 1, "title": "Drop Care" + "Quest mentions", "body": "", "created_at": "2026-01-01T00:00:00Z",
+                                "merged_at": "2026-01-01T00:00:00Z", "head": {"ref": "claude/remove-care" + "quest-references"}},
+                          {"sha": "abc1234def", "parent_sha": "000", "committed_ts": "2026-01-01T00:00:00Z",
+                           "subject": "x", "body": ""}, ["README.md"], None)
+    assert "[org]" in row["title_text"] and "[org]" in row["branch_name"]

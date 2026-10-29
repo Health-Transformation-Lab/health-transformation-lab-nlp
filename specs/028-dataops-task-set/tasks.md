@@ -4,7 +4,7 @@
 
 ## US1 - Every PR and direct commit is a row in a manifest #352
 - [x] T001 Failing tests in `python/tests/test_task_mine.py`: issue from branch or body, squash subject → PR, spec from text, candidate rule, tiers, ids, manifest row shape
-- [x] T002 Implement `task_mine.py`; `scripts/46_mine_tasks.py` writes `data/tasks/task_manifest.csv` (196 rows: 77 A, 67 B, 52 C; 115 candidates)
+- [x] T002 Implement `task_mine.py`; `scripts/46_mine_tasks.py` writes `data/tasks/task_manifest.csv` (197 rows after #357 merged; 116 candidates: 49 A, 45 B, 22 C); the organisation name CLAUDE.md forbids is redacted from old titles and branch names; ids are unique when two PRs close one issue
 
 ## US2 - Every candidate without an issue gets a backfilled record #353
 - [x] T003 Failing test: `backfill_issue()` quotes the text verbatim, names the source, carries the label

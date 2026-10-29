@@ -90,11 +90,17 @@ def build_manifest() -> pd.DataFrame:
             files = changed_files(c["parent_sha"], c["sha"])
             rows.append(tm.manifest_row("C", None, c, files, None))
     df = pd.DataFrame(rows, columns=tm.MANIFEST_COLUMNS)
+    dup = df.duplicated("instance_id", keep=False)   # two PRs that close the same issue: keep both, distinct ids
+    df.loc[dup & df["pr_number"].notna(), "instance_id"] = (
+        df.loc[dup & df["pr_number"].notna(), "instance_id"] + "_pr" + df.loc[dup & df["pr_number"].notna(), "pr_number"].astype(int).astype(str))
     df["spec_number"] = df["spec_number"].astype("string")
     df["pr_number"] = df["pr_number"].astype("Int64")
     if OUT.exists():   # keep issue numbers a previous backfill filled in
-        old = pd.read_csv(OUT, dtype={"issue_number": "Int64", "spec_number": "string"}).set_index("instance_id")["issue_number"]
-        df["issue_number"] = df.apply(lambda r: r["issue_number"] or old.get(r["instance_id"]), axis=1)
+        old = pd.read_csv(OUT, dtype={"issue_number": "Int64", "spec_number": "string"}) \
+                .drop_duplicates("instance_id").set_index("instance_id")["issue_number"]
+        kept = df["instance_id"].map(old)
+        df["issue_number"] = [n if not pd.isna(n) else (k if not pd.isna(k) else None)
+                              for n, k in zip(df["issue_number"], kept)]
     return df
 
 

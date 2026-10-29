@@ -21,11 +21,21 @@ BODY_ISSUE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?|refs?)\s+#(
 SQUASH_SUBJECT = re.compile(r"\(#(\d+)\)\s*$")
 SPEC_REF = re.compile(r"\bspec(?:s/)?\s*(\d{3})\b|\b(\d{3}) (?:US|AI|BUG|CHORE|DOCS)\d+\b", re.IGNORECASE)
 TOOL_BRANCHES = ("dependabot/", "kaggle-results/")
+# CLAUDE.md "Organization names": the name never appears in a tracked file, not even in an old branch name
+# or title copied from history. Built the same way as python/tests/test_no_org_references.py.
+_ORG = re.compile(r"\b" + "care" + r"[\s_-]?" + "quest" + r"s?\b", re.IGNORECASE)
+REDACTED = "[org]"
 PROTECTED = ("conftest.py", "pytest.ini", "pyproject.toml", "tox.ini", "setup.cfg", ".pytest.ini")
 MANIFEST_COLUMNS = ["instance_id", "tier_code", "pr_number", "issue_number", "merge_commit_sha", "base_commit_sha",
                     "created_ts", "merged_ts", "branch_name", "title_text", "statement_source_code", "spec_number",
                     "changed_file_count", "is_code_changed", "is_tests_changed", "is_only_protected_fix",
                     "is_candidate"]
+
+
+@traced
+def redact(text: str | None) -> str:
+    """Replace the organisation name CLAUDE.md forbids with `[org]`, wherever history mentions it."""
+    return _ORG.sub(REDACTED, text or "")
 
 
 @traced
@@ -108,7 +118,7 @@ def manifest_row(tier: str, pr: dict | None, commit: dict, files: list[str], iss
     return {"instance_id": instance_id(tier, number, issue_number, commit["sha"]), "tier_code": tier,
             "pr_number": number, "issue_number": issue_number, "merge_commit_sha": commit["sha"],
             "base_commit_sha": commit["parent_sha"], "created_ts": created, "merged_ts": merged,
-            "branch_name": branch, "title_text": title, "statement_source_code": source,
+            "branch_name": redact(branch), "title_text": redact(title), "statement_source_code": source,
             "spec_number": spec_from_text(title, body, branch), **f}
 
 
