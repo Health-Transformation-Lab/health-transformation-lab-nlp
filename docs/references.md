@@ -37,6 +37,21 @@ Everything this repo relies on, and what it's used for.
    Code: github.com/FreedomIntelligence/GlobalDentBench.
    → Safety severity S0/S1/S2, reasoning levels, judge selection, key-point
    scoring ([dentbench_methods.md](dentbench_methods.md)).
+54. **Hager P, Jungmann F, Holland R, et al.** *Evaluation and mitigation of the limitations of large language
+    models in clinical decision-making.* Nat Med 2024;30(9):2613-2622.
+    [doi:10.1038/s41591-024-03097-1](https://doi.org/10.1038/s41591-024-03097-1).
+    → 2,400 real hospital cases (MIMIC-IV): models did significantly worse than physicians, followed neither
+    diagnostic nor treatment guidelines, and could not interpret lab results. Cited in the README and pitch.
+55. **Bean AM, Payne RE, Parsons G, et al.** *Reliability of LLMs as medical assistants for the general public: a
+    randomized preregistered study.* Nat Med 2026;32(2):609-615.
+    [doi:10.1038/s41591-025-04074-y](https://doi.org/10.1038/s41591-025-04074-y).
+    → 1,298 members of the public: the models alone named the condition in 94.9% of cases, people using them in
+    under 34.5%, no better than a control group; knowledge benchmarks did not predict this.
+56. **Al-Ashwal FY, Zawiah M, Gharaibeh L, Abu-Farha R, Bitar AN.** *Evaluating the sensitivity, specificity, and
+    accuracy of ChatGPT-3.5, ChatGPT-4, Bing AI, and Bard against conventional drug-drug interactions clinical
+    tools.* Drug Healthc Patient Saf 2023;15:137-147.
+    [doi:10.2147/DHPS.S425858](https://doi.org/10.2147/DHPS.S425858).
+    → 255 drug pairs against Micromedex: accuracy from 0.469 (ChatGPT-3.5) to 0.788 (Bing AI). 2023-era chatbots.
 
 ## Data models and classification
 

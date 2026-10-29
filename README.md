@@ -1,7 +1,7 @@
 # Health Transformation Lab
 
 > **Personal learning project.** Built on my own time: not affiliated with or endorsed by any employer,
-> institution or vendor, and nothing here is any organization's plan, study or finding. Synthetic data only. See
+> institution or vendor, and nothing here is any organization's plan, study or finding. The patients are synthetic. See
 > [DISCLAIMER.md](DISCLAIMER.md).
 
 **The goal: better health answers from AI, and better care for the millions of people who ask.** More than 40
@@ -41,11 +41,14 @@ the same evidence gets 173: the order is one of the findings.
 <a href="docs/pitch/full_text_and_notes.md"><img src="docs/img/pitch_deck_cover.png" alt="AI passes the dental exam. It fails the real patient." width="480"></a>
 
 Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench,
-2026). No public test we found checks whether they connect the mouth to the rest of the body: a medicine that makes a tooth
-extraction unsafe, or gum disease and diabetes. OralHealthBench puts those questions, each traced to published
-evidence, with public results so improvements are visible, and measures how much an open evidence agent improves
-their answers. Its companion, **AccessBench**, asks whether an answer works for someone with no coverage, no car or
-no dentist nearby.
+2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real
+hospital cases, models didn't follow the clinical guidelines doctors use (Hager et al., 2024); people using them
+did no better than people using a source of their choice (Bean et al., 2026); and against a standard drug-interaction
+checker, ChatGPT-3.5 got 47% of 255 drug pairs right (Al-Ashwal et al., 2023). OralHealthBench asks real-world
+questions where dentistry meets medicine, such as a medicine that makes a tooth extraction unsafe, each traced to
+published evidence, with public results so improvements are visible, and measures how much an open evidence agent
+improves their answers. Its companion, **AccessBench**, asks whether an answer works for someone with no coverage, no
+car or no dentist nearby.
 
 | For | Go to |
 |---|---|
@@ -55,8 +58,9 @@ no dentist nearby.
 ## How the two paths connect
 
 The dental record path builds synthetic patients whose right answers are known, in OMOP, the format medicine
-already uses. Those patients become test questions for the lab. One harness, with the same models, runners, harm grades
-and leaderboards, scores AI first on gum charts, then on case questions, then on broader medical-dental questions.
+already uses. Those patients become test questions for the lab. AI is tested the same way at every step, with the same
+models, harm grades and leaderboards: first on gum charts, then on case questions, then on broader medical-dental
+questions.
 
 ## Run it
 
@@ -67,5 +71,5 @@ cd .. && python/scripts/make_parity_inputs.sh && Rscript r/tests/test_parity.R  
 python docs/build_decks.py                         # rebuild both decks from docs/<deck>/slides/
 ```
 
-Ground rules: synthetic data only, never PHI; Python and R in parity; anything simulated is labelled simulated
+Ground rules: synthetic patient records, never identifiable patient data (PHI); Python and R in parity; anything simulated is labelled simulated
 ([AGENTS.md](AGENTS.md)). Open decisions: [action items](docs/action_items.md). Owner John Bowyer · MIT licence.
