@@ -66,7 +66,7 @@ What the columns mean:
 - **Periodontitis correctly assigned**: (in brackets) of the 156 charts with periodontitis, the share the method said have it. No answer counts against it. The standard name is sensitivity.
 - **Incorrect stage**: right that it is or isn't periodontitis, but the wrong stage (1 mild to 4 most severe), or healthy and gingivitis mixed up.
 - **No answer (evidence not available)**: the method gave no status because what it reads wasn't in the record, e.g. no probing chart was taken.
-- **Rank**: where it plausibly ranks among all 40 methods.
+- **Rank**: where it plausibly ranks among all 50 methods.
 - **Stage 4 rule**: keyword rules decide stage 4, which the trained AI rarely learned (few stage 4 notes to learn from).
 
 Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned (out of the 84 without it) + incorrectly ruled out (out of the 156 with it) + incorrect stage + no answer.
@@ -74,13 +74,13 @@ Each row adds up to the 240 charts: correct + periodontitis incorrectly assigned
 | Question | Method | Correct | Periodontitis incorrectly assigned | Periodontitis incorrectly ruled out | Incorrect stage | No answer | Rank |
 |---|---|---:|---:|---:|---:|---:|---|
 | 1. Whole record available | Rules, gum measurements first | 234 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (100% correctly assigned) | 6 of 240 | 0 of 240 | 1 |
-| 2. Only the note available | Trained AI (ModernBERT) + stage 4 rule | 219 of 240 | 4 of 84 (95% correctly ruled out) | 1 of 156 (99% correctly assigned) | 16 of 240 | 0 of 240 | 2–10 |
-|  | Keyword rules (simple baseline) | 189 of 240 | 10 of 84 (88% correctly ruled out) | 8 of 156 (95% correctly assigned) | 33 of 240 | 0 of 240 | 17–32 |
-|  | Medical AI, untrained (MedGemma 1.5 4B) + stage 4 rule | 185 of 240 | 8 of 84 (90% correctly ruled out) | 10 of 156 (94% correctly assigned) | 37 of 240 | 0 of 240 | 19–33 |
-| 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (80% correctly assigned) | 2 of 240 | 45 of 240 | 14–33 |
-|  | Exam form | 149 of 240 | 10 of 84 (88% correctly ruled out) | 0 of 156 (87% correctly assigned) | 48 of 240 | 33 of 240 | 35 |
+| 2. Only the note available | Trained AI (ModernBERT) + stage 4 rule | 219 of 240 | 4 of 84 (95% correctly ruled out) | 1 of 156 (99% correctly assigned) | 16 of 240 | 0 of 240 | 2–12 |
+|  | Medical AI, untrained (MedGemma 4B) + stage 4 rule | 196 of 240 | 10 of 84 (88% correctly ruled out) | 8 of 156 (95% correctly assigned) | 26 of 240 | 0 of 240 | 19–39 |
+|  | Keyword rules (simple baseline) | 189 of 240 | 10 of 84 (88% correctly ruled out) | 8 of 156 (95% correctly assigned) | 33 of 240 | 0 of 240 | 22–42 |
+| 3. One part of the record alone | Gum measurements (probing chart) | 193 of 240 | 0 of 84 (100% correctly ruled out) | 0 of 156 (80% correctly assigned) | 2 of 240 | 45 of 240 | 18–43 |
+|  | Exam form | 149 of 240 | 10 of 84 (88% correctly ruled out) | 0 of 156 (87% correctly assigned) | 48 of 240 | 33 of 240 | 45 |
 
-All 40 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 9 models not run yet: [full phenotyping table](../results.md#phenotyping-periodontal-status-per-chart).
+All 50 methods, per 100 charts with a likely range for each number (95% confidence interval), unsafe errors, results by note difficulty, and the 4 models not run yet: [full phenotyping table](../results.md#phenotyping-periodontal-status-per-chart).
 
 **Can an AI check the answers?** On real notes there is no answer key, so we tested whether a general-purpose AI (a large language model) could stand in for one. It read each note and gave its own status, which matched the answer key on 83% of charts but only 53% of hard notes (they leave out what the answer key is built from). Asked whether a method's answer was right, it caught most mistakes of weak methods but only 26% of the best note model's, which are near-misses such as one stage off. So it can't replace the answer key yet. (These are LLM judgments, checked against the answer key.) Details: [judge results](../results.md#llm-judge-every-system-against-an-llms-reading); in Databricks, the *Scorecard* dashboard.
 
@@ -123,7 +123,7 @@ step, with links to the code; the Databricks notebook
 | 1 | Generate synthetic patients over time (8 clinics): notes, exam forms, procedure codes and diagnoses, probing chart; fake PHI in notes | [1](../code_walkthrough.md#1-generate-the-synthetic-study) |
 | 2 | Remove names, dates and other identifiers; a final check holds back any note with one left | [2](../code_walkthrough.md#2-de-identify-and-gate) |
 | 3 | Read and compare the diagnostic evidence; build the rule-based phenotype | [3–5](../code_walkthrough.md#3-read-the-diagnostic-evidence) |
-| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma 1.5 4B | [6](../code_walkthrough.md#6-ai-models-read-the-notes) |
+| 4 | AI models read the notes only: baselines, 12 BERT models, MedGemma 1.5 4B and 4B v1 | [6](../code_walkthrough.md#6-ai-models-read-the-notes) |
 | 5 | Periodontists label the same 240 charts, each on their own, in a labeling tool (Label Studio) | [7](../code_walkthrough.md#7-reviewers-stage-charts) |
 | 6 | Does the AI agree with the periodontists as often as they agree with each other? Also: which order of checking the evidence agrees best | [8–9](../code_walkthrough.md#8-reliability-and-the-acceptance-test) |
 | 7 | Over time: catch impossible changes and bad data; compare clinics; predict who gets worse | [10–12](../code_walkthrough.md#10-over-time-plausibility-and-data-quality) |
@@ -168,26 +168,29 @@ All 12 are BERT-type models: AI that reads text and picks a label. [What is a BE
 
 Plus baselines and MedGemma ([1.5 4B](https://huggingface.co/google/medgemma-1.5-4b-it),
 [27B text](https://huggingface.co/google/medgemma-27b-text-it); [arXiv 2507.05201](https://arxiv.org/abs/2507.05201)).
-**Status:** six encoders have run on CPU (3 epochs, 2026-10-26). On the 240 synthetic review charts
+**Status:** eleven encoders have results (3 epochs): the base-size models on CPU (2026-10-26), and the large
+ModernBERTs and the Longformers on Kaggle GPUs (#225). On the 240 synthetic review charts
 (against the generator's truth, with 95% bootstrap CIs; `28_ladder_vs_truth.py`):
-- alone they score 77-82% (ModernBERT base best), **not distinguishable** from the note rules (79%), and
+- alone they score 77-83% (ModernBERT base and large best), **not distinguishable** from the note rules (79%), and
   miss nearly every stage IV chart (7 in 3,484 training notes);
 - letting the note rules decide stage IV (`+rules4`) lifts every model to 87-91%, the only methods
   clearly better than the rules (difference CI excludes 0);
-- they're overconfident (calibration error 0.15-0.18 vs 0.06 for TF-IDF).
+- they're overconfident (calibration error 0.14-0.18 vs 0.06 for TF-IDF).
 - class-weighted training (`--class-weight sqrt`) gives **no reliable gain**: over three seeds ModernBERT base
   averages 82% (80-84%) with stage IV recall 21%, 0%, 0%; BERT base stays at 0%. The seed alone moves accuracy
   ~4 points, as much as the spread between encoders. The `+rules4` hybrid holds at 90-91% on every seed;
 - Bio_ClinicalBERT (trained on hospital notes) scores 80%, like the others.
 
-The Longformers and large ModernBERTs need a GPU. Agreement with *simulated* reviewers is a dry run, not a result.
+Agreement with *simulated* reviewers is a dry run, not a result.
 
 **MedGemma vs BERT:** `29_medgemma_vs_bert.py` scores each MedGemma run (zero-shot, few-shot, LoRA)
 against the best encoder on the same charts (paired CI, stage IV recall, by note difficulty, fallback
-rate, assumed cost). First real run, `medgemma-1.5-4b-it` zero-shot on CPU: **0.758** (0.700-0.808)
-vs 0.838 for `modernbert-base+cw`, difference -0.079 (-0.154 to -0.013); 100% / 97% / 16% on
-L1 / L2 / L3, so it reads a written diagnosis but doesn't yet stage from the chart
-([details](../medgemma.md)). Few-shot and LoRA not run yet (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; LoRA needs a GPU:
+rate, assumed cost). Two real zero-shot runs: `medgemma-1.5-4b-it` on CPU scores **0.758** (0.700-0.808)
+and `medgemma-4b-it` (MedGemma 4B v1, on Kaggle) **0.779** (0.725-0.833), against 0.825 for
+`modernbert-base+cw`: differences -0.067 (-0.138 to 0.000) and -0.046 (-0.104 to 0.012), so on 240 charts
+neither can be told apart from the encoder. On L1 / L2 / L3, 1.5 gets 100% / 97% / 16% and 4B v1
+97% / 68% / 43%: 1.5 reads a written diagnosis but rarely stages from the chart, while 4B v1 stages more
+charts from their findings and handles old terms and copied-forward text worse ([details](../medgemma.md)). Few-shot and LoRA not run yet (gated: accept the [HAI-DEF terms](https://developers.google.com/health-ai-developer-foundations/terms) on Hugging Face and set `HF_TOKEN`; LoRA needs a GPU:
 [notebook 03](../../databricks/notebooks/03_medgemma_reader.py)); `--simulated` is a dry run, not a result.
 
 ## Action items

@@ -105,9 +105,9 @@ edr:
       covers: synthetic charts ModernBERT on the note, plus the stage 4 rule, got right
     - value: "185"
       kind: measured
-      file: docs/edr/README.md
-      match: "185 of 240"
-      covers: synthetic charts MedGemma 1.5 4B (untrained) plus the stage 4 rule got right
+      file: data/datasets/ladder/ladder_vs_truth.csv
+      match: "medgemma-1.5-4b-it+rules4,240,0.7708333333333334,"
+      covers: synthetic charts MedGemma 1.5 4B (untrained) plus the stage 4 rule got right (accuracy 185/240 = 0.7708333)
     - value: "189"
       kind: measured
       file: docs/edr/README.md
