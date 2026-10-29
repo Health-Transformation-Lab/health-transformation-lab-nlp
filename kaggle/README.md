@@ -71,9 +71,11 @@ Kaggle, not the workflow artifact. A full run takes hours: to collect it later, 
 
 ## The collection
 
-Kaggle's API can't make collections, so do this once on kaggle.com: your profile → **Collections** → **New
-collection** "Health Transformation Lab: Perio Bench", then add the two notebooks, the two datasets and, later,
-the model `perio-bench-note-classifier` (each page's ⋮ menu → *Add to collection*). Make it public.
+A Kaggle collection is a private list: kaggle.com offers no setting to make one public, and Kaggle's API can't
+make collections. So the shared starting point is the table under [What's on Kaggle](#whats-on-kaggle), and every
+item there is public on its own. For your own list, on kaggle.com: your profile → **Collections** → **New
+collection** "Health Transformation Lab: Perio Bench", then add the three notebooks, the two datasets and the model
+`perio-bench-note-classifier` (each page's ⋮ menu → *Add to collection*). It's optional (issue #270).
 
 ## When something fails
 
