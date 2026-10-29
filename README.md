@@ -17,11 +17,11 @@ Two benchmarks so far, each with a short pitch that drills down to the detail.
 
 ## 1. PerioBench: better care for gum disease by finding it accurately in dental records
 
-<a href="docs/edr/full_text_and_notes.md"><img src="docs/img/edr_deck_cover.png" alt="Gum disease is in the dental record. Nobody can count it." width="480"></a>
+<a href="docs/edr/full_text_and_notes.md"><img src="docs/img/edr_deck_cover.png" alt="Gum disease is in the dental record. It's hard to count." width="480"></a>
 
 The goal is better care for people with periodontitis. Gum disease is written down at almost every dental visit,
-but in pieces: notes, forms, codes and measurements that often disagree, so it is missed, can't be followed over
-time, and can't be linked to diabetes care. A tool that reads the whole record and finds gum disease accurately
+but in pieces: notes, forms, codes and measurements that often disagree, so it is often missed, hard to follow over
+time, and hard to link to diabetes care. A tool that reads the whole record and finds gum disease accurately
 (phenotyping, to researchers) lets clinics find it earlier and treat it. PerioBench scores how well rules and AI find
 it in the record; agreement with gum specialists reviewing the same record is how that is checked, not the goal.
 It runs end to end on **synthetic** records:
