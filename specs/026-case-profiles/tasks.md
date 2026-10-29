@@ -48,10 +48,10 @@ synthetic and says so; all wording follows `AGENTS.md` "Words" (`test_wording.py
 
 **Goal**: the profile and flags where people already look. **Independent test**: dashboard and Genie files build from code, `--check` passes, the page reads only declared gold tables.
 
-- [ ] T017 [US3] Failing tests in `python/tests/test_dashboards.py`: the DQ grader has a "Records to recheck" page with a synthetic banner, the rule-score table with checkable counts, the flagged-visit table and a visit-filtered profile table; its datasets read only declared gold tables; the Genie space lists the mismatch tables and its instructions call flags record mismatches (Genie's own answers are LLM output, checked by hand on dev)
-- [ ] T018 [US3] Add the page to `dq_grader()` in `dashboards.py` (banner: "Synthetic records. A mismatch is a coding or charting gap, not a clinical error."; clinic, rule and visit filters)
-- [ ] T019 [US3] Extend `DQ_TABLES`, `DQ_INSTRUCTIONS` (the rules, the denominators, "not checkable", the Words rule) and `DQ_QUESTIONS` ("Which visits have a stage III code but max CAL under 3 mm?", "Which rule adds the most flags no other rule makes?") in `dashboards.py`
-- [ ] T020 [US3] Rebuild `databricks/dashboards/dq_grader.lvdash.json` and `databricks/genie/dq_grader.geniespace.json` with `scripts/42_build_dashboards.py`; describe the page in `docs/graders.md`
+- [x] T017 [US3] Failing tests in `python/tests/test_dashboards.py`: the DQ grader has a "Records to recheck" page with a synthetic banner, the rule-score table with checkable counts, the flagged-visit table and a visit-filtered profile table; its datasets read only declared gold tables; the Genie space lists the mismatch tables and its instructions call flags record mismatches (Genie's own answers are LLM output, checked by hand on dev)
+- [x] T018 [US3] Add the page to `dq_grader()` in `dashboards.py` (banner: "Synthetic records. A mismatch is a coding or charting gap, not a clinical error."; clinic, rule and visit filters)
+- [x] T019 [US3] Extend `DQ_TABLES`, `DQ_INSTRUCTIONS` (the rules, the denominators, "not checkable", the Words rule) and `DQ_QUESTIONS` ("Which visits have a stage III code but max CAL under 3 mm?", "Which rule adds the most flags no other rule makes?") in `dashboards.py`
+- [x] T020 [US3] Rebuild `databricks/dashboards/dq_grader.lvdash.json` and `databricks/genie/dq_grader.geniespace.json` with `scripts/42_build_dashboards.py`; describe the page in `docs/graders.md`
 
 ## Phase 6: Polish
 

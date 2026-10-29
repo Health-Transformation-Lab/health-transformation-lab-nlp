@@ -250,3 +250,52 @@ def test_dq_genie_space_explains_the_record_mismatch_rules():
         assert term in text, term
     questions = " ".join(q["question"][0] for q in space["config"]["sample_questions"])
     assert "stage III code" in questions
+
+
+# ---------------------------------------------------------------- spec 026 US3: Records to recheck
+
+def _recheck_page():
+    pages = json.loads(dash.render("dq_grader"))["pages"]
+    page = next(p for p in pages if p["name"] == "records_to_recheck")
+    return page, {i["widget"]["name"]: i["widget"] for i in page["layout"]}
+
+
+def test_dq_grader_has_a_records_to_recheck_page_after_the_grader():
+    pages = json.loads(dash.render("dq_grader"))["pages"]
+    assert [p["displayName"] for p in pages] == ["EHR DQ grader", "Records to recheck"]
+
+
+def test_the_recheck_page_says_synthetic_and_what_a_mismatch_is():
+    _, w = _recheck_page()
+    banner = "".join(w["recheck_banner"]["multilineTextboxSpec"]["lines"])
+    assert "Synthetic" in banner and "coding or charting gap, not a clinical error" in banner
+    assert "checkable" in banner
+
+
+def test_the_recheck_page_shows_rule_scores_flagged_visits_and_a_visit_profile():
+    _, w = _recheck_page()
+    datasets = {q["query"]["datasetName"] for x in w.values() for q in x.get("queries", [])}
+    assert {"mismatch_rules", "mismatch_visits", "case_profile"} <= datasets
+    rules = [c["fieldName"] for c in w["tb_rules"]["spec"]["encodings"]["columns"]]
+    assert {"checkable", "flagged", "precision_pct", "recall_pct", "only_this_rule"} <= set(rules)
+    visit_filter = w["f_visit"]
+    assert visit_filter["spec"]["widgetType"] == "filter-single-select"
+    assert {q["query"]["datasetName"] for q in visit_filter["queries"]} == {"mismatch_visits", "case_profile"}
+
+
+def test_the_recheck_datasets_read_only_the_spec_026_tables():
+    sql = {d["name"]: "".join(d["queryLines"]) for d in _datasets("dq_grader")}
+    for name in ("mismatch_rules", "mismatch_visits", "case_profile"):
+        tables = set(re.findall(r"gold_perio_bench\.(\w+)", sql[name]))
+        assert tables <= {"fact_record_mismatch", "dq_mismatch_rule", "fact_case_profile_item", "fact_visit_evidence"}
+
+
+def test_flagged_visits_come_most_rules_failed_first_and_profiles_cover_every_flagged_visit(con):
+    sql = {d["name"]: "".join(d["queryLines"]) for d in _datasets("dq_grader")}
+    visits = con.execute(sql["mismatch_visits"]).df()
+    assert visits.rules_failed.iloc[0] == visits.rules_failed.max()
+    assert visits.rules_failed.is_monotonic_decreasing
+    profile = con.execute(sql["case_profile"]).df()
+    assert set(profile.visit_id) == set(visits.visit_id)
+    rules = con.execute(sql["mismatch_rules"]).df()
+    assert rules.clinic.iloc[0] == "All" and "Any rule" in set(rules.rule)
