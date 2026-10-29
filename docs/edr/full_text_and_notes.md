@@ -17,7 +17,7 @@ John Bowyer · personal project, not affiliated with any organization
 
 The problem
 Common, linked to diabetes, and invisible in the data
-US adults 30+
+US adults 30+ with teeth
 42%
 have gum disease (periodontitis); 7.8% have the severe form.
 Diabetes
@@ -30,7 +30,7 @@ Dental records rarely hold one reliable diagnosis.
 The status has to be worked out from the evidence, the way a specialist would, before anyone can count it.
 NHANES 2009–2014 (Eke et al., J Am Dent Assoc 2018) · EFP and IDF consensus report (Sanz et al., 2018) · seven evidence types: this repo · 2
 
-**Speaker notes:** Three facts. One: about 42 percent of US adults aged 30 and over have periodontitis, gum disease that destroys the attachment and bone around teeth, and 7.8 percent have the severe form; that is the national survey, NHANES 2009 to 2014, published by Eke and colleagues in 2018. Two: gum disease and diabetes are linked in both directions; the European Federation of Periodontology and the International Diabetes Federation ask doctors and dentists to manage the two together. Three, and this is the one we can fix: in the dental record the diagnosis is rarely written down once, reliably. It is spread over seven kinds of evidence: the clinician's note, an exam form with a score and a checkbox, the procedure codes done and planned, the diagnosis codes on those procedures, and the gum measurements. They often disagree. So before anyone can count gum disease across clinics, or link it to diabetes in the medical record, someone, or something, has to read the chart and work out the status. If asked for sources: Eke PI et al., Periodontitis in US adults: NHANES 2009-2014, JADA 2018, https://doi.org/10.1016/j.adaj.2018.04.023; Sanz et al., J Clin Periodontol 2018, https://doi.org/10.1111/jcpe.12808. The seven evidence types are this study's design; see the evidence rules page.
+**Speaker notes:** Three facts. One: about 42 percent of US adults aged 30 and over who have teeth have periodontitis, gum disease that destroys the attachment and bone around teeth, and 7.8 percent have the severe form; that is the national survey, NHANES 2009 to 2014, published by Eke and colleagues in 2018. Two: gum disease and diabetes are linked in both directions; the European Federation of Periodontology and the International Diabetes Federation ask doctors and dentists to manage the two together. Three, and this is the one we can fix: in the dental record the diagnosis is rarely written down once, reliably. It is spread over seven kinds of evidence: the clinician's note, an exam form with a score and a checkbox, the procedure codes done and planned, the diagnosis codes on those procedures, and the gum measurements. They often disagree. So before anyone can count gum disease across clinics, or link it to diabetes in the medical record, someone, or something, has to read the chart and work out the status. If asked for sources: Eke PI et al., Periodontitis in US adults: NHANES 2009-2014, JADA 2018, https://doi.org/10.1016/j.adaj.2018.04.023; Sanz et al., J Clin Periodontol 2018, https://doi.org/10.1111/jcpe.12808. The seven evidence types are this study's design; see the evidence rules page.
 
 ## Slide 3 — solution
 
@@ -102,15 +102,15 @@ under $15*
 Open LLM, hosted (Llama 3.3 70B)
 the note
 ~$260
-Frontier LLM (Claude Fable 5.1)
+Frontier LLM (Gemini 3.1 Pro, Claude Fable 5.1)
 the note
-~$5,500
+~$1,100–$5,500
 Frontier LLM, 3 calls a visit
 whole record, examples, reasoning†
-~$1.2M
-List prices: Databricks (2026-10-26), claude.com/pricing (2026-10-28) · *illustrative compute · †assumed 20k tokens in, 4k out a call · 5
+~$260k–$1.2M
+List prices: Databricks (2026-10-26), ai.google.dev, claude.com (2026-10-28) · *illustrative compute · †assumed 20k tokens in, 4k out a call · 5
 
-**Speaker notes:** The economics, and it depends on the model. Reading a million visits by hand, at the protocol's pace of about 2 minutes a chart, is 33,333 hours of a specialist's time. Software for the same million visits ranges from under 15 dollars to about 1.2 million, depending on the model. A small model trained on dental notes, on our own hardware, costs under 15 dollars, at illustrative compute prices. An open model hosted per token, Llama 3.3 70B at Databricks list price, costs about 260 dollars for the note alone. A frontier commercial model, Claude Fable 5.1 at Anthropic's list price, costs about 5,500 dollars for the note alone. And if that frontier model reads the whole record, with worked examples and reasoning, three calls a visit, it is about 1.2 million dollars; batch pricing halves that. Those token counts are assumed, about 20 thousand in and 4 thousand out a call, not measured. The note-only token count is estimated from our synthetic notes, characters divided by four, and they are shorter than real ones; the prompt and answer lengths are assumed. The acceptance test is small: about 31 specialist hours, 233 charts each read by 4 reviewers. So the choice is the least costly model that passes the acceptance test. If asked for a dollar figure for people: at an illustrative 100 dollars an hour, validation is about 3,100 dollars and reviewing everything by hand about 3.3 million. If asked about errors: the study also counts unsafe errors, such as missing severe disease, and reports them separately.
+**Speaker notes:** The economics, and it depends on the model. Reading a million visits by hand, at the protocol's pace of about 2 minutes a chart, is 33,333 hours of a specialist's time. Software for the same million visits ranges from under 15 dollars to about 1.2 million, depending on the model. A small model trained on dental notes, on our own hardware, costs under 15 dollars, at illustrative compute prices. An open model hosted per token, Llama 3.3 70B at Databricks list price, costs about 260 dollars for the note alone. A frontier commercial model at list price costs about 1,100 dollars for the note alone with Google's Gemini 3.1 Pro, and about 5,500 with Anthropic's Claude Fable 5.1. And if a frontier model reads the whole record, with worked examples and reasoning, three calls a visit, it is about 260 thousand dollars with Gemini and about 1.2 million with Fable; batch pricing halves either. Those token counts are assumed, about 20 thousand in and 4 thousand out a call, not measured. The note-only token count is estimated from our synthetic notes, characters divided by four, and they are shorter than real ones; the prompt and answer lengths are assumed. The acceptance test is small: about 31 specialist hours, 233 charts each read by 4 reviewers. So the choice is the least costly model that passes the acceptance test. If asked for a dollar figure for people: at an illustrative 100 dollars an hour, validation is about 3,100 dollars and reviewing everything by hand about 3.3 million. If asked about errors: the study also counts unsafe errors, such as missing severe disease, and reports them separately.
 
 ## Slide 6 — ask
 
