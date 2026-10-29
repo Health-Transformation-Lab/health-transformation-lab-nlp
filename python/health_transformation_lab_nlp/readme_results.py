@@ -292,8 +292,8 @@ def yes_no(truth: pd.Series, pred: pd.Series, score=None) -> dict:
 
 @traced
 def breakdown(truth: pd.Series, pred: pd.Series) -> dict:
-    """Share of charts in each box (they add to 1): correct; incorrect diagnosis, i.e. wrong about
-    periodontitis yes/no, split by what the system said; incorrect stage (right about periodontitis,
+    """Share of charts in each box (they add to 1): correct; wrong about periodontitis
+    yes/no, split by what the system said; incorrect stage (right about periodontitis,
     wrong status otherwise: stage, or healthy vs gingivitis); no answer."""
     answered = pred.notna()
     perio_t = truth.str.startswith("periodontitis")

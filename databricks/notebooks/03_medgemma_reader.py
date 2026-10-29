@@ -41,6 +41,11 @@ dbutils.widgets.text("run_id", "")                   # noqa: F821  the job run (
 catalog, schema = dbutils.widgets.get("catalog"), dbutils.widgets.get("schema")  # noqa: F821
 run_id = dbutils.widgets.get("run_id") or f"manual-{time.strftime('%Y%m%dT%H%M%S')}"  # noqa: F821
 os.environ["HF_TOKEN"] = dbutils.secrets.get(dbutils.widgets.get("hf_secret_scope"), "hf_token")  # noqa: F821
+from health_transformation_lab_nlp import llm_reader  # noqa: E402
+from health_transformation_lab_nlp.registry import load_registry  # noqa: E402
+_entry = {m["id"]: m for m in load_registry()["models"]}[dbutils.widgets.get("rung")]  # noqa: F821
+if _entry.get("gated"):
+    llm_reader.check_hf_access(_entry["hf"])   # #230: an expired token fails here, not after the GPU and the study build
 dbutils.widgets.text("telemetry", "azure")           # noqa: F821  spec 014: off / console / azure / otlp
 from health_transformation_lab_nlp import telemetry, tracking  # noqa: E402
 telemetry.use_databricks_secret(dbutils, dbutils.widgets.get("telemetry"),  # noqa: F821  scripts inherit it

@@ -10,6 +10,7 @@ import pytest
 
 from health_transformation_lab_nlp import judge
 from health_transformation_lab_nlp.labels import LABELS
+from health_transformation_lab_nlp.paths import REPO_ROOT
 
 NOTE = ("perio charting done: BOP 49%, PD up to 5mm, attachment loss 2-3 mm.\n"
         "Diagnosis: Localized Periodontitis Stage II Grade B.\n")
@@ -240,3 +241,54 @@ def test_weights_reach_the_reader_from_make_rung(monkeypatch, tmp_path):
     monkeypatch.setenv("HF_HOME", str(tmp_path))
     r = make_rung("medgemma-1.5-4b-it", load_registry(), backend_kind="hf", weights="/kaggle/temp/x")
     assert r.backend.hf_id == "/kaggle/temp/x"
+
+
+class _Refused(Exception):
+    def __init__(self, status):
+        super().__init__(f"{status} Client Error")
+        self.response = type("R", (), {"status_code": status})()
+
+
+class _Api:
+    def __init__(self, status=None):
+        self.status, self.calls = status, []
+
+    def auth_check(self, repo, token=None):
+        self.calls.append((repo, token))
+        if self.status:
+            raise _Refused(self.status)
+
+
+def test_hugging_face_access_is_checked_with_one_call_before_any_work(monkeypatch):
+    # #230: an expired token failed only when the weights loaded, after the GPU and the study build, and again on retry
+    from health_transformation_lab_nlp.llm_reader import check_hf_access
+    monkeypatch.setenv("HF_TOKEN", "hf_good")
+    api = _Api()
+    check_hf_access("google/medgemma-1.5-4b-it", api=api)
+    assert api.calls == [("google/medgemma-1.5-4b-it", "hf_good")]
+
+
+@pytest.mark.parametrize("status, says", [(401, "expired or revoked"), (403, "no access"), (500, "could not be checked")])
+def test_a_refused_hugging_face_token_fails_at_once_naming_it(monkeypatch, status, says):
+    from health_transformation_lab_nlp.llm_reader import check_hf_access
+    monkeypatch.setenv("HF_TOKEN", "hf_old")
+    with pytest.raises(RuntimeError, match=says) as e:
+        check_hf_access("google/medgemma-1.5-4b-it", api=_Api(status))
+    assert "HF_TOKEN" in str(e.value) and "hf_token" in str(e.value) and "hf_old" not in str(e.value)
+
+
+def test_a_missing_hugging_face_token_fails_without_a_call(monkeypatch, tmp_path):
+    from health_transformation_lab_nlp.llm_reader import check_hf_access
+    for v in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"):
+        monkeypatch.delenv(v, raising=False)
+    monkeypatch.setenv("HF_HOME", str(tmp_path))
+    api = _Api()
+    with pytest.raises(RuntimeError, match="HF_TOKEN is not set"):
+        check_hf_access("google/medgemma-1.5-4b-it", api=api)
+    assert api.calls == []
+
+
+def test_the_reader_notebook_checks_the_token_before_building_the_study():
+    nb = (REPO_ROOT / "databricks" / "notebooks" / "03_medgemma_reader.py").read_text()
+    assert "check_hf_access(" in nb
+    assert nb.index("check_hf_access(") < nb.index("10_build_study.py")

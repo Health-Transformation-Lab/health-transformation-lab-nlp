@@ -25,6 +25,24 @@ Read `DISCLAIMER.md` and `.specify/memory/constitution.md` first. The short vers
 - **Test first.** Write the failing test, then the code.
 - **Label simulated output as simulated.** Never present a dry-run number as a result.
 
+## Words: we find gum disease in records, we don't diagnose
+
+We aren't clinicians. "Diagnosis" is only ever something a dentist recorded (`diagnosis code`, "the recorded
+diagnosis"), never something our rules, models or agents do. What we do is phenotyping, but most readers don't know
+the word: say it plainly first and give the term once in brackets, e.g. "finding gum disease in dental records
+(phenotyping)", then "case finding".
+
+| Avoid | Write |
+|---|---|
+| diagnose, AI diagnoses, diagnostic tool | identify or find gum disease in the record; record-reading or case-finding tool |
+| accurate diagnosis, diagnosis accuracy | agreement with gum specialists reviewing the same record |
+| inaccurate or wrong diagnosis, misdiagnosis | record mismatch ("the recorded code doesn't fit the chart"); records to recheck |
+
+A mismatch is often a coding or charting gap, not a clinical error: never imply a dentist got it wrong. This covers
+docs, decks, dashboards, Genie instructions, table and column names, issues and PRs. Quoting a cited paper's own
+words is fine. `python/tests/test_wording.py` fails CI on the phrases to avoid in any other tracked file (past PR
+reviews in `pull_requests/` are records and stay as written).
+
 ## When a change needs a spec
 
 Anything that changes a dataset, a metric, a label rule or the review workflow gets a spec first:

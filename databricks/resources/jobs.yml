@@ -201,6 +201,7 @@ resources:
               git_commit: ${bundle.git.commit}   # shown on every run
               catalog: ${resources.schemas.perio_bench_gold.catalog_name}
               schema: ${resources.schemas.perio_bench_gold.name}
+              legacy_gold_schemas: ${var.legacy_gold_schemas}   # issue #228: rows only an old schema still holds
         - task_key: load
           depends_on:
             - task_key: migrate_gold_names

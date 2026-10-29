@@ -10,6 +10,7 @@ ALLOWED = (
     "databricks.yml",                                     # legacy_domain: dev keeps its old schemas
     "docs/deployment.md",                                 # what was renamed, and retiring the legacy schemas
     "python/tests/test_bundle.py", "python/tests/test_no_legacy_schema_names.py",
+    "python/tests/test_rename.py",                        # the old catalog's gold schema the migration reads (#228)
 )
 
 

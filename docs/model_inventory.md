@@ -19,15 +19,15 @@ refuses to call one unless its endpoint is configured.
 | BERT base · [1810.04805](https://arxiv.org/abs/1810.04805) · general, classifier | `google-bert/bert-base-uncased` | Google | Apache-2.0 | results |
 | DistilBERT · [1910.01108](https://arxiv.org/abs/1910.01108) · general, classifier | `distilbert/distilbert-base-uncased` | Hugging Face | Apache-2.0 | results |
 | ModernBERT base · [2412.13663](https://arxiv.org/abs/2412.13663) · general, classifier, long context | `answerdotai/ModernBERT-base` | Answer.AI | Apache-2.0 | results |
-| ModernBERT large · [2412.13663](https://arxiv.org/abs/2412.13663) · general, classifier, long context | `answerdotai/ModernBERT-large` | Answer.AI | Apache-2.0 | not run |
-| Longformer · [2004.05150](https://arxiv.org/abs/2004.05150) · general, long context; also the base of the PHI tagger | `allenai/longformer-base-4096` | Allen Institute for AI | Apache-2.0 | not run as a classifier; used by the PHI tagger (section 3) |
+| ModernBERT large · [2412.13663](https://arxiv.org/abs/2412.13663) · general, classifier, long context | `answerdotai/ModernBERT-large` | Answer.AI | Apache-2.0 | results |
+| Longformer · [2004.05150](https://arxiv.org/abs/2004.05150) · general, long context; also the base of the PHI tagger | `allenai/longformer-base-4096` | Allen Institute for AI | Apache-2.0 | results as a classifier; also the base of the PHI tagger (section 3) |
 | SciBERT · [1903.10676](https://arxiv.org/abs/1903.10676) · scientific, classifier | `allenai/scibert_scivocab_uncased` | Allen Institute for AI | **none on the card** (the `allenai/scibert` GitHub repository is Apache-2.0): confirm before approval | results |
 | Bio_ClinicalBERT · [1904.03323](https://arxiv.org/abs/1904.03323) · clinical, classifier | `emilyalsentzer/Bio_ClinicalBERT` | Alsentzer et al. (MIT) | MIT | results |
 | GatorTron base · [Nature Digital Medicine 2022](https://doi.org/10.1038/s41746-022-00742-2) · clinical, classifier | `UFNLP/gatortron-base` | University of Florida / NVIDIA | Apache-2.0 | not run |
 | BiomedBERT · [2007.15779](https://arxiv.org/abs/2007.15779) · biomedical, classifier | `microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext` | Microsoft | MIT | results |
 | BioClinical ModernBERT base · [2506.10896](https://arxiv.org/abs/2506.10896) · clinical, classifier, long context | `thomas-sounack/BioClinical-ModernBERT-base` | Sounack et al. (Dana-Farber) | MIT | results |
-| BioClinical ModernBERT large · [2506.10896](https://arxiv.org/abs/2506.10896) · clinical, classifier, long context | `thomas-sounack/BioClinical-ModernBERT-large` | Sounack et al. (Dana-Farber) | MIT | not run |
-| Clinical-Longformer · [2201.11838](https://arxiv.org/abs/2201.11838) · clinical, long context | `yikuan8/Clinical-Longformer` | Northwestern University (Luo lab) | **none on the card**: confirm before approval | not run |
+| BioClinical ModernBERT large · [2506.10896](https://arxiv.org/abs/2506.10896) · clinical, classifier, long context | `thomas-sounack/BioClinical-ModernBERT-large` | Sounack et al. (Dana-Farber) | MIT | results |
+| Clinical-Longformer · [2201.11838](https://arxiv.org/abs/2201.11838) · clinical, long context | `yikuan8/Clinical-Longformer` | Northwestern University (Luo lab) | **none on the card**: confirm before approval | results |
 
 Clinical models were pretrained on clinical notes by their authors (for example MIMIC-III for
 Bio_ClinicalBERT and Clinical-Longformer); only their published weights are used here.
@@ -44,7 +44,7 @@ Bio_ClinicalBERT and Clinical-Longformer); only their published weights are used
 | Model · paper · domain, role | Source | Organisation | Licence | Status |
 |---|---|---|---|---|
 | MedGemma 1.5 4B (instruction-tuned) · [2507.05201](https://arxiv.org/abs/2507.05201) · medical, note reader (LLM) | `google/medgemma-1.5-4b-it` | Google (Health AI Developer Foundations) | [HAI-DEF terms of use](https://developers.google.com/health-ai-developer-foundations/terms) (accept on Hugging Face first) | results (240 notes) |
-| MedGemma 4B (instruction-tuned) · [2507.05201](https://arxiv.org/abs/2507.05201) · medical, note reader (LLM) | `google/medgemma-4b-it` | Google (HAI-DEF) | HAI-DEF terms | not run |
+| MedGemma 4B (instruction-tuned) · [2507.05201](https://arxiv.org/abs/2507.05201) · medical, note reader (LLM) | `google/medgemma-4b-it` | Google (HAI-DEF) | HAI-DEF terms | results (240 notes) |
 | MedGemma 27B text (instruction-tuned) · [2507.05201](https://arxiv.org/abs/2507.05201) · medical, note reader (LLM) | `google/medgemma-27b-text-it` | Google (HAI-DEF) | HAI-DEF terms | not run (needs a large GPU) |
 | PHI tagger: Longformer base fine-tuned on MACCROBAT (CC BY 4.0) · spec 010 · de-identification | `allenai/longformer-base-4096` + own fine-tune (not published) | this repo | Apache-2.0 base; MACCROBAT CC BY 4.0 | results (`data/deid/maccrobat_*`) |
 | Stanford de-identifier · Chambon et al., JAMIA 2023 · clinical, de-identification | `StanfordAIMI/stanford-deidentifier-base` | Stanford AIMI | MIT | results (de-id benchmark) |
@@ -103,6 +103,5 @@ workspace settings change where the text can go:
 - **Databricks-managed models**: `ai_classify`, `ai_extract`, `ai_mask` and the default built-in judge run on
   models Databricks doesn't name in their documentation, and can change. Record the workspace's cross-Geo and
   partner-powered AI settings with the approval.
-- **Not run yet** (no real results): ModernBERT large, BioClinical ModernBERT large, GatorTron, Clinical-
-  Longformer, Longformer as a classifier, SapBERT, GTE-ModernColBERT, MedGemma 4B and 27B,
+- **Not run yet** (no real results): GatorTron, SapBERT, GTE-ModernColBERT, MedGemma 27B,
   `ai_classify`, and every service in section 4 except the judge.
