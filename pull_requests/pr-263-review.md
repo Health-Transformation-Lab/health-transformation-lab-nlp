@@ -1,5 +1,5 @@
 ---
-pr: pending
+pr: 263
 branch: docs/262-name-the-two-benchmarks
 title: "Say what the lab is: name its two benchmarks on the decks and README"
 author: jcbowyer
