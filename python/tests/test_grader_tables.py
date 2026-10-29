@@ -17,6 +17,8 @@ DQ = {
                   "exam_form", "proc_dx_completed", "proc_dx_planned", "probing_chart", "algorithm_v0",
                   "algorithm_design"},
     "dq_injected_error": {"injected_errors", "caught_share", "flag_rate_without_error"},
+    # spec 026 US1
+    "fact_case_profile_item": {"visit_id", "category", "category_order", "item", "item_order", "value", "unit"},
 }
 PROVENANCE = {"sha256", "source_files"}   # analysis names; gold_names.to_gold renames them for gold
 
@@ -157,3 +159,10 @@ def test_the_lab_tables_become_their_declared_gold_tables(sim):
     for name, df in gt.lab_tables(DATASETS_DIR).items():
         gold = gold_names.to_gold(df.assign(git_commit="abc", loaded_at=pd.Timestamp("2026-10-28", tz="UTC")), name)
         assert list(gold.columns) == [c.name for c in gm.TABLES[name].columns], name
+
+
+def test_every_visit_has_a_case_profile_in_gold(dq):
+    p = dq["fact_case_profile_item"]
+    visits = dq["fact_visit_evidence"]
+    assert set(p.visit_id) == set(visits.visit_id)
+    assert p.groupby("visit_id").category.nunique().eq(9).all()

@@ -21,6 +21,7 @@ def test_the_model_declares_the_gold_tables_the_jobs_write():
                     # spec 019: the EHR DQ grader
                     "dq_check", "dq_column_missing", "dq_prevalence", "dq_temporal_change", "dq_stage_transition",
                     "dq_source_concordance", "fact_visit_evidence", "dq_injected_error",
+                    "fact_case_profile_item",   # spec 026
                     "dim_grader_question", "fact_grader_answer"}
 
 

@@ -115,6 +115,11 @@ TABLES |= {
                             "clinic": "clinic_code", **_DQ_PROV},
     "dq_injected_error": {"injected_errors": "injected_error_count", "caught_share": "caught_ratio",
                           "flag_rate_without_error": "false_flag_ratio", **_DQ_PROV},
+    # spec 026: case profiles (statuses and measures as short labels, never note text)
+    "fact_case_profile_item": {"visit_id": "visit_id", "category": "category_name",
+                               "category_order": "category_order_num", "item": "item_name",
+                               "item_order": "item_order_num", "value": "item_value_name", "unit": "item_unit_name",
+                               **_DQ_PROV},
     # the lab grader: a SIMULATED sample until real runs are committed
     "dim_grader_question": {"question_id": "question_id", "category": "category_name",
                             "category_order": "category_order_num", "level": "level_code",

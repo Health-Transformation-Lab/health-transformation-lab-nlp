@@ -7,7 +7,7 @@ exist.
 
 | Grader | Dashboard | Genie space | Tables (`health_transformation_lab.gold_perio_bench`) |
 |---|---|---|---|
-| **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_check`, `dq_column_missing`, `dq_prevalence`, `dq_temporal_change`, `dq_stage_transition`, `dq_source_concordance`, `fact_visit_evidence`, `dq_injected_error` |
+| **EHR DQ grader**: is the dental record fit for periodontal phenotyping? | *EHR DQ grader* | *EHR DQ grader* | `dq_check`, `dq_column_missing`, `dq_prevalence`, `dq_temporal_change`, `dq_stage_transition`, `dq_source_concordance`, `fact_visit_evidence`, `dq_injected_error`, `fact_case_profile_item` |
 | **Lab grader**: do AI answers on medical-dental and access-to-care questions improve with the open agent? | *Lab grader* | *Lab grader* | `dim_grader_question`, `fact_grader_answer` |
 
 ## EHR DQ grader
@@ -23,6 +23,14 @@ Five domain tiles, then one section per domain:
 | Reliability | Liaw | **Not assessed**: needs real reviewers |
 
 `fact_visit_evidence` holds statuses only (what each evidence source says, and the truth), never note text.
+
+**Case profiles** (spec 026, after KEEPER: Schuemie, Ostropolets et al., npj Digit Med 2025).
+`fact_case_profile_item` lays out every synthetic visit's structured evidence the same way, in nine categories:
+demographics, presentation (the recorded diagnosis codes and exam form), visit context, measurements, tests and
+imaging, risk factors, treatment, other readings (the note reader and the rule phenotypes), and after the visit (the
+next visit's recorded code and the plausibility checks it fails). A value the record lacks reads "not recorded".
+It is built from `visits_structured.csv` when Load results runs, so it isn't committed twice. Genie can show any
+visit's profile ("Show the case profile of visit 1234."); the Records to recheck page comes with spec 026 US3.
 
 ## Lab grader
 
