@@ -1,8 +1,8 @@
 """Databricks schema names, one set per bench (spec 022).
 
     perio_bench        periodontal status from charts: everything built so far (landing, bronze, silver, gold)
-    access_bench       does an answer help someone actually get care (bronze, silver, gold; empty for now)
     oral_health_bench  the umbrella scorecard (bronze, silver, gold; empty for now)
+    access_bench       does an answer help someone actually get care (bronze, silver, gold; empty for now)
 
 All live in the health_transformation_lab catalog (spec 021), with the same names in every target (AGENTS.md,
 Conventions); databricks/resources/unity_catalog.yml declares them.
@@ -18,8 +18,8 @@ from .telemetry import traced
 CATALOG = "health_transformation_lab"
 LAYERS: dict[str, tuple[str, ...]] = {
     "perio_bench": ("landing", "bronze", "silver", "gold"),
-    "access_bench": ("bronze", "silver", "gold"),
     "oral_health_bench": ("bronze", "silver", "gold"),
+    "access_bench": ("bronze", "silver", "gold"),
 }
 
 

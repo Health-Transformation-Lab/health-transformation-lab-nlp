@@ -84,7 +84,7 @@ def test_deck_has_labelled_previous_and_next_buttons(deck):
 @pytest.mark.parametrize("deck", sorted(build_decks.DECKS))
 def test_slides_name_the_benchmark_not_the_lab(deck):
     # issue #264: "the lab" alone doesn't tell a reader what it is; a slide or its notes names the benchmark
-    # (OralHealthBench, PerioBench) or the agent it means. "Health Transformation Lab", the name, is fine.
+    # (PerioBench, OralHealthBench) or the agent it means. "Health Transformation Lab", the name, is fine.
     for sid, section, notes in build_decks.slides(REPO_ROOT / "docs" / deck):
         text = " ".join(build_decks.visible_text(section)) + " " + notes
         hit = re.search(r"\bthe lab\b", text, re.IGNORECASE)

@@ -404,7 +404,7 @@ Open
 Anyone. Benchmarks, definitions, model cards and aggregate, de-identified measures under an open license.
 Path 2
 Registered
-Sign in and accept terms of use. The models and agents behind OralHealthBench and PerioBench, called through MCP or an API, with usage limits and logging.
+Sign in and accept terms of use. The models and agents behind PerioBench and OralHealthBench, called through MCP or an API, with usage limits and logging.
 Path 3
 Agreement
 A signed data use agreement, reviewed and approved, for detailed or licensed data in a secure environment.
