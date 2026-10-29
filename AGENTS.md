@@ -54,6 +54,31 @@ Always in this order, wherever two or more are named (prose, lists, tables, deck
   matter at the seam of medical and dental care: medicines, chronic disease, emergencies.
 - **AccessBench (exploratory): getting care.** Whether an answer helps someone actually get care.
 
+## Sources of truth (the map)
+
+Mental model: **synthetic dental notes go in; a status (healthy to periodontitis stage 4) with a verbatim
+quote comes out; the answer key and a second-model judge score it; the ladder and leaderboards compare
+systems.** Read the file that owns a concern before changing anything that touches it.
+
+| Concern | Lives in |
+|---|---|
+| Labels, the six statuses, grade and extent rules | `python/health_transformation_lab_nlp/labels.py` |
+| Synthetic charts and notes | `synthetic.py`, `notes.py` (seeded; `scripts/10_build_study.py` rebuilds) |
+| Reader prompt, parsing, the quote gate | `llm_reader.py` (`PROMPTS`, `parse_answer`) |
+| Judge prompts and gates | `judge.py`; scorecard in `judge_scorecard.py` (spec 012) |
+| Metrics and the shared Python/R contract | `eval/score.py`, `eval/score.R`, `eval/README.md` |
+| Model ladder and rungs | `models.yaml`, `rungs.py`, `ladder_eval.py` |
+| Answer key and committed data | `data/datasets/answer_key/review_key.csv`; paths only via `paths.py` |
+| Gold table names and column rules | `gold_names.py`, `diagrams/_build/gold_model.py`, "SQL and data names" below |
+| Telemetry (`@traced`, levels) | `telemetry.py`, `telemetry_levels.yaml` |
+| Kaggle: GPUs, datasets, Kaggle Benchmarks task | `kaggle/README.md`, `kaggle/perio_bench_task.py`, `kbench.py`, `docs/kaggle_benchmarks.md` |
+| Settings, secrets, alerts, reruns | `databricks.yml`, `ops/secrets_register.yaml`, `docs/operations.md` |
+| Specs, decisions, PR reviews | `specs/NNN-*/`, `docs/adr/`, `pull_requests/` |
+| The rules every coding agent follows | this file; Claude Code's own workflow in `CLAUDE.md` |
+
+Generated files are never edited by hand: `docs/edr/README.md` and `docs/results.md` come from
+`scripts/35_readme_results.py`, the decks from `docs/build_decks.py`.
+
 ## When a change needs a spec
 
 Anything that changes a dataset, a metric, a label rule or the review workflow gets a spec first:
@@ -210,6 +235,7 @@ cd python && python scripts/35_readme_results.py  # refresh the results leaderbo
 cd python && python scripts/42_build_dashboards.py  # rebuild the grader dashboards and Genie spaces (spec 019)
 cd python && python scripts/43_simulated_grader.py  # the lab grader's SIMULATED sample (seeded), until real runs exist
 python docs/build_decks.py                        # rebuild the slide decks after editing docs/<deck>/slides/
+cd python && pytest -q tests/test_kbench.py && python ../kaggle/perio_bench_task.py   # PerioBench as a Kaggle Benchmarks task (docs/kaggle_benchmarks.md)
 ```
 
 Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
