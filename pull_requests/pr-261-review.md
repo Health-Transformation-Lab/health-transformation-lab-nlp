@@ -1,5 +1,5 @@
 ---
-pr: pending
+pr: 261
 branch: docs/237-openai-40m-check
 title: "Record OpenAI's 40 million as checked, via the reporting of its January 2026 data"
 author: jcbowyer
