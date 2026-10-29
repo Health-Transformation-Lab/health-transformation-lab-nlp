@@ -11,7 +11,7 @@
 - [x] T004 `--backfill-issues`: label `backfilled`, title key continues the count, closed on creation with a comment; 67 issues (#278-#344); manifest updated
 
 ## US3 - `tasks.jsonl` rows with `patch`, `test_patch` and the two gates #354
-- [ ] T005 Failing tests: split a diff into `patch` (non-test) and `test_patch` (`python/tests/`); statement from issue / PR / commit by tier; `created_at`
+- [ ] T005 Failing tests: split a diff into `patch` (non-test) and `test_patch` (`python/tests/`); statement from issue / PR / commit by tier; `created_at`; `base_commit` = the PR's merge base with `main` (PR review #358, should-fix 1), recorded in the manifest
 - [ ] T006 `scripts/47_build_tasks.py` writes `data/tasks/tasks.jsonl`; excludes fixes only in grader-stripped files
 - [ ] T007 Gates with the competition's evaluator (`swegemma eval --skip-agent-patch`, then with `patch`); drop and list failures
 
