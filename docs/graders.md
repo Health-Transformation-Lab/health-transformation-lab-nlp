@@ -30,7 +30,7 @@ demographics, presentation (the recorded diagnosis codes and exam form), visit c
 imaging, risk factors, treatment, other readings (the note reader and the rule phenotypes), and after the visit (the
 next visit's recorded code and the plausibility checks it fails). A value the record lacks reads "not recorded".
 It is built from `visits_structured.csv` when Load results runs, so it isn't committed twice. Genie can show any
-visit's profile ("Show the case profile of visit 1234."); the Records to recheck page comes with spec 026 US3.
+visit's profile ("Show the case profile of visit 1234.").
 
 **Record mismatches** (spec 026 US2). Six rules ask whether a visit's recorded code (the completed diagnosis code)
 fits the rest of its record. A failed rule is a record to recheck: usually a coding or charting gap, never a
@@ -65,6 +65,15 @@ and `no_periodontal_care` find the most on their own, the second with many false
 often right with no procedure billed yet). Of the 45 injected charting errors, 34 have a code; the rules catch 11
 of those, where the temporal checks (`dq_injected_error`) catch 15 of all 45. Per-clinic injected-error counts are
 too few to compare.
+
+**Records to recheck** (spec 026 US3) is the EHR DQ grader's second page. It shows:
+
+- each rule's scores against the truth, with how many visits it can check;
+- the flagged visits, most rules failed first, filtered by clinic and rule;
+- the selected visit's case profile beside them.
+
+A banner says the data is synthetic and that a flag is a coding or charting gap, not a clinical error. The page's
+datasets read only `dq_mismatch_rule`, `fact_record_mismatch`, `fact_case_profile_item` and `fact_visit_evidence`.
 
 ## Lab grader
 
