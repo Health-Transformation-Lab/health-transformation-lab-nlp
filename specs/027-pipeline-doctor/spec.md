@@ -126,7 +126,7 @@ Root-cause answers on the incident set are scored with the MLflow GenAI judge pa
 (`make_judge`, a Guidelines scorer on the runbook's rules, a deterministic no-PHI scorer on every
 trace), and a sample of production traces is scored the same way.
 
-### US8 - The doctor forecasts the failures that have not happened yet, and batches the alerts (P1)
+### US8 - The doctor forecasts the failures that have not happened yet, and batches the alerts (P1) #359
 A log can only say what broke. The credential register (`ops/secrets_register.yaml`: expiry dates, never
 values), a dependency inventory (`ops/dependency_inventory.csv`: end-of-support dates and support status
 for models, runtimes, platform versions, endpoints) and the run table's trends give `forecast` rows with a
