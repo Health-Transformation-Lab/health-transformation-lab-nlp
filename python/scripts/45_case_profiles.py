@@ -12,7 +12,7 @@ when Load results runs (grader_tables), not written here.
 import pandas as pd
 
 from health_transformation_lab_nlp import telemetry
-from health_transformation_lab_nlp.case_profile import check_rules, score_rules
+from health_transformation_lab_nlp.case_profile import check_rules, record_mismatches, score_rules
 from health_transformation_lab_nlp.paths import DATASETS_DIR
 
 telemetry.setup()
@@ -25,11 +25,7 @@ out.mkdir(exist_ok=True)
 checks = check_rules(v)
 scores = score_rules(checks, v, truth)
 injected = truth.set_index("visit_id").record_error.fillna("").astype(str) != ""
-failed = checks[checks.outcome == "fail"].drop(columns="outcome").assign(
-    rule_label=lambda x: x.rule.map(dict(zip(scores.rule, scores.rule_label))),
-    clinic=lambda x: x.visit_id.map(v.set_index("visit_id").clinic_id).astype(str),
-    injected_error=lambda x: x.visit_id.map(injected))[
-    ["visit_id", "rule", "rule_label", "evidence", "related_visit_id", "clinic", "injected_error"]]
+failed = record_mismatches(checks, v, truth)
 failed.to_csv(out / "record_mismatch.csv", index=False)
 scores.to_csv(out / "mismatch_rule_score.csv", index=False)
 

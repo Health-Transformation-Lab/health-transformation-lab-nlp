@@ -318,6 +318,7 @@ TABLES = {
             C("rule_label_name", "string", "the rule in plain words"),
             C("mismatch_evidence_text", "string", "the values that triggered it"),
             C("related_visit_id", "bigint", "stage drops: the earlier visit with the higher code; else null"),
+            C("failed_rule_count", "bigint", "how many rules this visit fails: the visits failing most come first"),
             C("clinic_code", "string", "clinic 1-8"),
             C("is_injected_error", "boolean", "the visit carries an injected charting error (synthetic answer key)"),
             *DQ_PROV]),
@@ -389,7 +390,8 @@ RELATIONSHIPS = [
     R("dim_grader_question", "fact_grader_answer", ("question_id",), ("question_id",), "question_id"),
     R("fact_visit_evidence", "fact_case_profile_item", ("visit_id",), ("visit_id",), "visit_id"),
     R("fact_visit_evidence", "fact_record_mismatch", ("visit_id",), ("visit_id",), "visit_id"),
-    R("fact_record_mismatch", "dq_mismatch_rule", ("rule_name",), ("rule_name",), "rule_name", "}o..o{", derived=True),
+    R("fact_record_mismatch", "dq_mismatch_rule", ("rule_name",), ("rule_name",),
+      "rule_name (scores are per rule and clinic: join on clinic_code too)", "}o..o{", derived=True),
 ]
 
 AREAS = {   # fill, legend label

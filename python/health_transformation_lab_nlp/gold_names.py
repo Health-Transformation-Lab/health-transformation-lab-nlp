@@ -122,6 +122,7 @@ TABLES |= {
                                **_DQ_PROV},
     "fact_record_mismatch": {"visit_id": "visit_id", "rule": "rule_name", "rule_label": "rule_label_name",
                              "evidence": "mismatch_evidence_text", "related_visit_id": "related_visit_id",
+                             "failed_rule_count": "failed_rule_count",
                              "clinic": "clinic_code", "injected_error": "is_injected_error", **_DQ_PROV},
     "dq_mismatch_rule": {"rule": "rule_name", "rule_label": "rule_label_name", "clinic": "clinic_code",
                          "checkable_count": "checkable_count", "not_checkable_count": "not_checkable_count",

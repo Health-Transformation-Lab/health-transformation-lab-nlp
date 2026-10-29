@@ -454,7 +454,7 @@ DQ_INSTRUCTIONS = [
      "recheck: it is usually a coding or charting gap, never a judgment that a dentist got it wrong. rule_name is "
      "code_vs_chart, code_above_chart, code_below_chart, no_periodontal_care, code_vs_radiograph or stage_drop; "
      "mismatch_evidence_text gives the values; for stage_drop, related_visit_id is the earlier visit with the "
-     "higher code. dq_mismatch_rule scores each rule, and any_rule, against the generator's truth over the visits "
+     "higher code; failed_rule_count is how many rules the visit fails (list visits with most first). dq_mismatch_rule scores each rule, and any_rule, against the generator's truth over the visits "
      "it can check (checkable_count), overall (clinic_code = 'All') and per clinic: precision_ratio, recall_ratio, "
      "only_rule_count (flags no other rule makes), injected_caught_count of injected_checkable_count. Always give "
      "checkable_count with a rule's precision or recall. Per-clinic injected-error counts are too few to compare."),

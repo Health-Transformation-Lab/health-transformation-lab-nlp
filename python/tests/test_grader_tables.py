@@ -20,7 +20,8 @@ DQ = {
     # spec 026 US1
     "fact_case_profile_item": {"visit_id", "category", "category_order", "item", "item_order", "value", "unit"},
     # spec 026 US2
-    "fact_record_mismatch": {"visit_id", "rule", "rule_label", "evidence", "related_visit_id", "clinic",
+    "fact_record_mismatch": {"visit_id", "rule", "rule_label", "evidence", "related_visit_id", "failed_rule_count",
+                             "clinic",
                              "injected_error"},
     "dq_mismatch_rule": {"rule", "rule_label", "clinic", "checkable_count", "not_checkable_count", "flagged_count",
                          "code_truth_mismatch_count", "true_flag_count", "precision", "recall", "only_rule_count",

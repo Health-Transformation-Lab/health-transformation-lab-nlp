@@ -133,9 +133,10 @@ RANK = {s: i for i, s in enumerate(LABELS)}          # healthy 0, gingivitis 1, 
 STAGE_2, STAGE_3 = RANK["periodontitis_stage_2"], RANK["periodontitis_stage_3"]
 PERIO = RANK["periodontitis_stage_1"]
 
-HIGH_CODE_MAX_CAL_MM = 3.0    # 2017 AAP/EFP: stage I is interdental CAL 1-2 mm ...
-HIGH_CODE_RBL_PCT = 15.0      # ... bone loss under 15% ...
-HIGH_CODE_MAX_PD_MM = 6.0     # ... max probing depth 4 mm or less (stage III starts at 6 mm), no tooth lost
+HIGH_CODE_MAX_CAL_MM = 3.0    # 2017 AAP/EFP: CAL under 3 mm is stage I's attachment loss (1-2 mm) ...
+HIGH_CODE_RBL_PCT = 15.0      # ... bone loss under 15% is stage I's ...
+HIGH_CODE_MAX_PD_MM = 6.0     # ... and PD under 6 mm is below stage III's depth; with no tooth lost, nothing in the
+                              # chart reaches stage III
 LOW_CODE_CAL_MM = 3.0         # beyond stage I: CAL 3 mm or more or bone loss 15% or more is periodontitis, and
 LOW_CODE_RBL_PCT = 15.0       # gingivitis has no attachment or bone loss
 CHART_STEPS = 1               # code and chart reading may differ by one step on the ladder above
@@ -247,6 +248,21 @@ def check_rules(visits: pd.DataFrame) -> pd.DataFrame:
     out["visit_id"] = out.visit_id.astype("int64")
     out["related_visit_id"] = out.related_visit_id.astype("Int64")
     return out
+
+
+@traced
+def record_mismatches(checks: pd.DataFrame, visits: pd.DataFrame, truth: pd.DataFrame) -> pd.DataFrame:
+    """The failed rules only, one row per (visit, rule), with how many rules the visit fails (so the visits failing
+    most sort first), its clinic and whether it carries an injected charting error (synthetic answer key)."""
+    failed = checks[checks.outcome == "fail"].drop(columns="outcome")
+    clinic = visits.set_index("visit_id").clinic_id.astype("int64").astype(str)
+    injected = truth.set_index("visit_id").record_error.fillna("").astype(str) != ""
+    out = failed.assign(rule_label=failed.rule.map(LABEL),
+                        failed_rule_count=failed.visit_id.map(failed.visit_id.value_counts()).astype("int64"),
+                        clinic=failed.visit_id.map(clinic),
+                        injected_error=failed.visit_id.map(injected).fillna(False).astype(bool))
+    return out[["visit_id", "rule", "rule_label", "evidence", "related_visit_id", "failed_rule_count", "clinic",
+                "injected_error"]].reset_index(drop=True)
 
 
 def _scores(g: pd.DataFrame) -> dict:

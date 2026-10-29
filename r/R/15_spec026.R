@@ -5,8 +5,8 @@ LABELS_026 <- c("healthy", "gingivitis", paste0("periodontitis_stage_", 1:4))
 RULES_026 <- c("code_vs_chart", "code_above_chart", "code_below_chart", "no_periodontal_care",
                "code_vs_radiograph", "stage_drop")
 PERIO_026 <- 2; STAGE2_026 <- 3; STAGE3_026 <- 4
-HIGH_CODE_MAX_CAL_MM <- 3; HIGH_CODE_RBL_PCT <- 15; HIGH_CODE_MAX_PD_MM <- 6
-LOW_CODE_CAL_MM <- 3; LOW_CODE_RBL_PCT <- 15; CHART_STEPS <- 1
+HIGH_CODE_MAX_CAL_MM_026 <- 3; HIGH_CODE_RBL_PCT_026 <- 15; HIGH_CODE_MAX_PD_MM_026 <- 6
+LOW_CODE_CAL_MM_026 <- 3; LOW_CODE_RBL_PCT_026 <- 15; CHART_STEPS_026 <- 1
 
 rank_026 <- function(s) match(s, LABELS_026) - 1   # NA for unknown or missing
 
@@ -36,12 +36,12 @@ check_rules_026 <- function(v) {
                                                                             ifelse(fail, "fail", "pass")))
   ok <- function(x) !is.na(x) & x
   rules <- list(
-    code_vs_chart = out_of(charted & !is.na(chart), ok(abs(code - chart) > CHART_STEPS)),
+    code_vs_chart = out_of(charted & !is.na(chart), ok(abs(code - chart) > CHART_STEPS_026)),
     code_above_chart = out_of(charted & !is.na(cal) & !is.na(rbl) & !is.na(pdmm) & !is.na(lost),
-                              ok(code >= STAGE3_026 & cal < HIGH_CODE_MAX_CAL_MM & rbl < HIGH_CODE_RBL_PCT &
-                                 lost == 0 & pdmm < HIGH_CODE_MAX_PD_MM)),
+                              ok(code >= STAGE3_026 & cal < HIGH_CODE_MAX_CAL_MM_026 & rbl < HIGH_CODE_RBL_PCT_026 &
+                                 lost == 0 & pdmm < HIGH_CODE_MAX_PD_MM_026)),
     code_below_chart = out_of(charted & !is.na(cal) & !is.na(rbl),
-                              ok(code < PERIO_026 & (cal >= LOW_CODE_CAL_MM | rbl >= LOW_CODE_RBL_PCT))),
+                              ok(code < PERIO_026 & (cal >= LOW_CODE_CAL_MM_026 | rbl >= LOW_CODE_RBL_PCT_026))),
     no_periodontal_care = out_of(rep(TRUE, nrow(v)), ok(code >= PERIO_026 & !care)),
     code_vs_radiograph = out_of(!is.na(rad), ok(code < PERIO_026 & rad >= STAGE2_026)),
     stage_drop = out_of(!is.na(v$peak_rank), ok(code < v$peak_rank)))

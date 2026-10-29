@@ -260,3 +260,41 @@ def test_every_rule_is_scored_on_the_study_with_its_checkable_count():
     assert (overall.checkable_count > 0).all() and (overall.flagged_count > 0).all()
     assert overall.loc["any_rule", "checkable_count"] == (v.proc_dx_completed != "unknown").sum()
     assert overall.loc["any_rule", "injected_checkable_count"] == 34
+
+
+@pytest.mark.parametrize("kw, fails", [
+    # code_above_chart: CAL < 3, bone loss < 15, PD < 6, no tooth lost; each edge sits outside
+    ({"rec_max_cal_mm": 2.9}, True), ({"rec_max_cal_mm": 3.0}, False),
+    ({"rec_rbl_pct": 14.9}, True), ({"rec_rbl_pct": 15.0}, False),
+    ({"rec_max_probing_depth_mm": 5.9}, True), ({"rec_max_probing_depth_mm": 6.0}, False),
+    ({"rec_teeth_lost_perio": 1.0}, False),
+])
+def test_code_above_chart_at_its_thresholds(kw, fails):
+    base = {"proc_dx_completed": S + "3", "probing_chart": S + "2", "rec_max_cal_mm": 2.0, "rec_rbl_pct": 10.0,
+            "rec_teeth_lost_perio": 0.0, "rec_max_probing_depth_mm": 4.0}
+    assert _outcome([_visit(**(base | kw))], 1, "code_above_chart") == ("fail" if fails else "pass")
+
+
+@pytest.mark.parametrize("kw, fails", [
+    # code_below_chart: CAL >= 3 or bone loss >= 15; each edge sits inside
+    ({"rec_max_cal_mm": 2.9}, False), ({"rec_max_cal_mm": 3.0}, True),
+    ({"rec_rbl_pct": 14.9}, False), ({"rec_rbl_pct": 15.0}, True),
+])
+def test_code_below_chart_at_its_thresholds(kw, fails):
+    base = {"proc_dx_completed": "gingivitis", "probing_chart": S + "1", "rec_max_cal_mm": 1.0, "rec_rbl_pct": 5.0}
+    assert _outcome([_visit(**(base | kw))], 1, "code_below_chart") == ("fail" if fails else "pass")
+
+
+@pytest.mark.parametrize("chart, fails", [(S + "1", False), ("gingivitis", True)])
+def test_code_vs_chart_allows_one_step(chart, fails):
+    assert _outcome([_visit(probing_chart=chart)], 1, "code_vs_chart") == ("fail" if fails else "pass")
+
+
+def test_each_mismatch_row_carries_how_many_rules_its_visit_fails(two_visits):
+    v = pd.DataFrame([_visit(proc_dx_completed="healthy", probing_chart=S + "2", rec_max_cal_mm=4.0,
+                             radiograph_ai=S + "3")])
+    m = cp.record_mismatches(cp.check_rules(v), v, pd.DataFrame({"visit_id": [1], "record_error": [None]}))
+    assert set(m.rule) == {"code_vs_chart", "code_below_chart", "code_vs_radiograph"}
+    assert set(m.failed_rule_count) == {3}
+    assert list(m.columns) == ["visit_id", "rule", "rule_label", "evidence", "related_visit_id", "failed_rule_count",
+                               "clinic", "injected_error"]

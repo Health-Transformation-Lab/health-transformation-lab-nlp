@@ -24,7 +24,7 @@ erDiagram
     dim_grader_question ||--o{ fact_grader_answer : "question_id"
     fact_visit_evidence ||--o{ fact_case_profile_item : "visit_id"
     fact_visit_evidence ||--o{ fact_record_mismatch : "visit_id"
-    fact_record_mismatch }o..o{ dq_mismatch_rule : "rule_name"
+    fact_record_mismatch }o..o{ dq_mismatch_rule : "rule_name (scores are per rule and clinic: join on clinic_code too)"
     review_key
     dim_result_file
     fact_prediction
@@ -74,7 +74,7 @@ erDiagram
     dim_grader_question ||--o{ fact_grader_answer : "question_id"
     fact_visit_evidence ||--o{ fact_case_profile_item : "visit_id"
     fact_visit_evidence ||--o{ fact_record_mismatch : "visit_id"
-    fact_record_mismatch }o..o{ dq_mismatch_rule : "rule_name"
+    fact_record_mismatch }o..o{ dq_mismatch_rule : "rule_name (scores are per rule and clinic: join on clinic_code too)"
     review_key {
         bigint visit_id PK "review chart (240)"
         string truth_status "the generator's truth"
@@ -358,6 +358,7 @@ erDiagram
         string rule_label_name "the rule in plain words"
         string mismatch_evidence_text "the values that triggered it"
         bigint related_visit_id "stage drops: the earlier visit with the higher code; else null"
+        bigint failed_rule_count "how many rules this visit fails: the visits failing most come first"
         string clinic_code "clinic 1-8"
         boolean is_injected_error "the visit carries an injected charting error (synthetic answer key)"
         string source_files_text "the committed CSVs the table is built from"
@@ -808,6 +809,7 @@ One per (synthetic visit, failed record-mismatch rule): a recorded code that doe
 |  | `rule_label_name` | string | the rule in plain words |
 |  | `mismatch_evidence_text` | string | the values that triggered it |
 |  | `related_visit_id` | bigint | stage drops: the earlier visit with the higher code; else null |
+|  | `failed_rule_count` | bigint | how many rules this visit fails: the visits failing most come first |
 |  | `clinic_code` | string | clinic 1-8 |
 |  | `is_injected_error` | boolean | the visit carries an injected charting error (synthetic answer key) |
 |  | `source_files_text` | string | the committed CSVs the table is built from |
