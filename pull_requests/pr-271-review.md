@@ -63,4 +63,4 @@ None.
 `cd python && python -m pytest -q tests`: 1054 passed, 15 skipped.
 
 ## Verdict
-Approve. It can merge once CI is green. Only `.md` files and a test change, so no Databricks deploy is expected.
+Approve. It can merge once CI is green. The test is a `.py` file, so the merge starts the usual dev deploy, which changes nothing in Databricks.
