@@ -13,8 +13,8 @@ DQ grader's design is the React *Perio Data Quality (DQ) Monitor* (a personal ar
 grader has no design beyond the pitch (`docs/pitch/`, slides 11 uplift, 12 tests and 13 leaderboard) and
 GlobalDentBench's practices (`docs/dentbench_methods.md`).
 
-> Personal learning project; synthetic data only. "Health Transformation Lab" is a working name for a personal
-> idea, not any organization's plan. The DQ grader reads the synthetic study's structured evidence (statuses and
+> Personal learning project; synthetic data only. Health Transformation Lab is a personal idea, not any
+> organization's plan. The DQ grader reads the synthetic study's structured evidence (statuses and
 > measurements, never note text). The lab grader holds only a simulated sample until real runs exist, and says so
 > on every page and in every Genie answer.
 
