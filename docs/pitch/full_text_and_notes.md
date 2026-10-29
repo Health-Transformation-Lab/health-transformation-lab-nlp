@@ -254,7 +254,7 @@ A UK public health guidance test with 8,000 questions, and a government policy t
 Nothing on oral health policy
 arXiv 2605.24636, 2603.08281, 2505.06046, 2511.04705, 2406.06056, 2403.12025. A first search, not a full review · Drill-down
 
-**Speaker notes:** Someone may ask whether public AI tests exist beyond clinical dentistry. From a first search: partly, and nothing specific to oral health. For medical-dental integration, the closest is one category of the global dental test, covering systemic health, medicines and safety. For the social side of health, often called social determinants or SDOH, the existing tests mostly check whether AI can spot social factors, such as housing or transport, inside medical records. Google has also published health equity question sets that check for biased answers. I found none that tests whether an AI answer actually works for a person given their circumstances, such as no coverage, no car, or no dentist nearby, and none for oral health. That is the test most worth writing, and it is the same ground as the access-to-care questions. For education, there are many tests built from licensing exams, but they measure what the AI knows, not whether a professional learned anything. For grants, I found one 2026 study that had AI review six UK research grant proposals; it is a method, not a standing test, and nothing covers philanthropic grantmaking. For policy and advocacy, there is a UK public health guidance test called PubHealthBench, with over eight thousand questions, and a government policy test called POLIS-Bench; nothing covers oral health policy. So the gap is the opening: where no test exists, the lab can help write one with partners. This was a first search, not a full review, so say that if pressed.
+**Speaker notes:** Someone may ask whether public AI tests exist beyond clinical dentistry. From a first search: partly, and nothing specific to oral health. For medical-dental integration, the closest is one category of the global dental test, covering systemic health, medicines and safety. For the social side of health, often called social determinants or SDOH, the existing tests mostly check whether AI can spot social factors, such as housing or transport, inside medical records. Google has also published health equity question sets that check for biased answers. I found none that tests whether an AI answer actually works for a person given their circumstances, such as no coverage, no car, or no dentist nearby, and none for oral health. That is the test most worth writing, and it is the same ground as the access-to-care questions. For education, there are many tests built from licensing exams, but they measure what the AI knows, not whether a professional learned anything. For grants, I found one 2026 study that had AI review six UK research grant proposals; it is a method, not a standing test, and nothing covers philanthropic grantmaking. For policy and advocacy, there is a UK public health guidance test called PubHealthBench, with over eight thousand questions, and a government policy test called POLIS-Bench; nothing covers oral health policy. So the gap is the opening: where no test exists, OralHealthBench can help write one with partners. This was a first search, not a full review, so say that if pressed.
 
 ## Slide 13 — leaderboard
 
@@ -366,7 +366,7 @@ Request access
 4
 Learn the tool, run the analysis
 A trusted answer, for those who finish the path
-What the lab adds: the research goes to them
+The open agent: the research goes to them
 1
 Ask in the AI tool they already use
 2
@@ -376,7 +376,7 @@ The answer comes with the story and the numbers
 A trusted answer, in the moment they ask
 Today's path stays. Agreements remain for sensitive data · Health Transformation Lab · Drill-down
 
-**Speaker notes:** One question, two paths. Today, someone finds a data portal or a report, requests access, learns the tool and runs the analysis. That works for researchers, and it stays. On the right is what the lab adds: they ask in the tool they already use, and the answer is built on published science. If asked: data use agreements stay in place for sensitive data.
+**Speaker notes:** One question, two paths. Today, someone finds a data portal or a report, requests access, learns the tool and runs the analysis. That works for researchers, and it stays. On the right is what the open agent adds: they ask in the tool they already use, and the answer is built on published science. If asked: data use agreements stay in place for sensitive data.
 
 ## Slide 19 — doubleclick
 
