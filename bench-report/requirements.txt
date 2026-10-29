@@ -1,0 +1,4 @@
+# Databricks Apps installs these before running app.yaml's command (the front end is built into web/dist first)
+fastapi>=0.115
+uvicorn>=0.30
+databricks-sdk>=0.40

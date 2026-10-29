@@ -1,0 +1,9 @@
+# Databricks App (spec 029 US3). Databricks sets DATABRICKS_HOST and the app's own service principal
+# (DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET); the warehouse id comes from the app's sql-warehouse resource.
+# Build the front end (web/dist) before deploying: see README.md, "Run it as a Databricks App".
+command: ["uvicorn", "bench_report.main:app", "--host", "0.0.0.0", "--port", "8000"]
+env:
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse
+  - name: BENCH_REPORT_CATALOG
+    value: health_transformation_lab

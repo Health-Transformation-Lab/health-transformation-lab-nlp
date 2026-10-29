@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bench-report"
+version = "0.1.0"
+description = "Reports for the Health Transformation Lab benches, read from the Databricks gold tables. Synthetic data."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "databricks-sdk>=0.40",
+]
+
+[project.optional-dependencies]
+# fixtures: run the reports on the committed snapshot of the gold tables (local work and tests), no workspace needed
+fixtures = ["duckdb>=1.1"]
+dev = ["duckdb>=1.1", "pytest>=8", "httpx>=0.27"]
+
+[tool.setuptools.packages.find]
+include = ["bench_report*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
