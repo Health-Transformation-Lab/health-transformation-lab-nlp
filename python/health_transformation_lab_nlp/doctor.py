@@ -1,12 +1,14 @@
 """The pipeline doctor (spec 027): DataOps on top of the run tables.
 
-Automated remediation is mostly a metadata problem. Every pipeline is a row in a config table
+Most of what breaks in production is visible in metadata before anyone reads a log; this measures the share. Every pipeline is a row in a config table
 (`ops/pipeline_config.yaml`), every run is a row in a run table (`fact_pipeline_run`, from the spec 014 spans),
 lineage says what fed what, and the runbook (`ops/runbook.yaml`) says what may be done per failure class.
 The doctor reads those tables, never logs and never note text:
 
     signals      freshness, volume, schema, quality, duration, cost: a run against the pipeline's last ok runs
-    classify     rules first; `unknown` is the only class the LLM (root-cause rung) ever sees
+    classify     rules first, configuration-management classes before the rest (credential expiry,
+                 vulnerability, deprecation, config drift between environments); `unknown` is the only class
+                 the LLM (root-cause rung) ever sees
     recommend    the first allowed runbook action, the impact one hop down the lineage, severity, owner,
                  and a templated notification (no free LLM text)
     graduation   a reversible class runs unattended after N matches with the human; two misses send it back
@@ -39,18 +41,29 @@ RUN_COLUMNS = ["pipeline_name", "step_name", "run_id", "started_ts", "ended_ts",
                "error_text", "duration_seconds", "cost_usd", "git_commit_sha", "data_label_code"]
 SIGNAL_NAMES = ["freshness_seconds", "volume_ratio", "is_schema_changed", "quality_ratio", "duration_ratio",
                 "cost_ratio"]
-CLASSES = ["config", "platform", "schema_drift", "volume_anomaly", "quality_fail", "cost_anomaly", "source_late",
-           "unknown"]
+CLASSES = ["credential_expiry", "vulnerability", "deprecation", "config_drift", "config", "platform", "schema_drift",
+           "volume_anomaly", "quality_fail", "cost_anomaly", "source_late", "unknown"]
 TRAILING_RUNS = 5
 VOLUME_BOUNDS = (0.5, 2.0)
 COST_BOUND = 3.0
 
-_CONFIG_TYPES = {"MissingSetting", "KeyError", "ValueError", "PermissionError", "AuthenticationError"}
+# Configuration-management failures come first: they are invisible in logs until the damage is done and
+# visible in tables before it. They are what pages people in practice.
+_CREDENTIAL_TYPES = {"AuthenticationError", "PermissionError", "Unauthorized", "Forbidden", "ExpiredToken"}
+_CREDENTIAL_WORDS = ("expired", "401", "403", "unauthorized", "invalid token", "token expired", "credential",
+                     "authentication failed", "access denied")
+_VULNERABILITY_WORDS = ("cve-", "vulnerability", "security advisory", "dependabot", "ghsa-", "critical severity")
+_DEPRECATION_TYPES = {"DeprecationWarning", "FutureWarning", "NotFound", "ModelNotFound"}
+_DEPRECATION_WORDS = ("deprecated", "no longer supported", "end of life", "end-of-life", "retired", "model not found",
+                      "endpoint not found", "removed in version", "unsupported version")
+_DRIFT_WORDS = ("differs between", "mismatch", "not in target", "only in dev", "only in prod", "config drift",
+                "value differs", "environments differ")
+_CONFIG_TYPES = {"MissingSetting", "KeyError", "ValueError"}
 _CONFIG_WORDS = ("setting", "secret", "connection string", "is not set", "parameter", "credential", "token")
 _PLATFORM_TYPES = {"Py4JException", "OSError", "ResourceExhausted", "CUDAError", "MemoryError", "TimeoutError"}
 _PLATFORM_WORDS = ("gpu", "illegal seek", "signal", "killed", "memory", "py4j", "communication channel", "no space")
 
-# What the LLM rung is handed when a rule can't decide (spec 027, rung 3): the run row, the last N runs,
+# What the LLM rung is handed when a rule can't decide (rung 3): the run row, the last N runs,
 # lineage one hop each way, the runbook entry. Counted in fields, a proxy for tokens: the ablation's cost
 # of troubleshooting without the metadata.
 _LLM_CONTEXT_FIELDS = len(RUN_COLUMNS) * (1 + TRAILING_RUNS) + 4 * 4 + 6
@@ -201,6 +214,14 @@ def classify(run: dict, history: pd.DataFrame, config: pd.DataFrame, now=None) -
     def hit(cls, rule):
         return {"failure_class_code": cls, "rule_name": rule, "signals": s}
 
+    if etype in _CREDENTIAL_TYPES or any(w in etext for w in _CREDENTIAL_WORDS):
+        return hit("credential_expiry", "error_type_or_text:credential")
+    if any(w in etext for w in _VULNERABILITY_WORDS):
+        return hit("vulnerability", "error_text:vulnerability")
+    if etype in _DEPRECATION_TYPES or any(w in etext for w in _DEPRECATION_WORDS):
+        return hit("deprecation", "error_type_or_text:deprecation")
+    if any(w in etext for w in _DRIFT_WORDS):
+        return hit("config_drift", "error_text:config_drift")
     if etype in _CONFIG_TYPES or any(w in etext for w in _CONFIG_WORDS):
         return hit("config", "error_type_or_text:config")
     if etype in _PLATFORM_TYPES or any(w in etext for w in _PLATFORM_WORDS):
@@ -357,6 +378,7 @@ ABLATIONS = {
     "full": "config table, typed conventions, lineage, metrics and run history all on",
     "no_config": "no config table: no SLA, no retry policy, no output names (impact unknown, late sources unseen)",
     "no_conventions": "no typed, consistently named signals: only error_text and row counts, as a plain log gives",
+    # switch-off test: each condition hides one piece of metadata; whatever drops is what that piece contributed
     "no_lineage": "no lineage table: the impact of a failure is unknown",
     "no_metrics": "no OpenTelemetry metrics: no duration, no cost per run",
     "no_history": "no run history: no trailing median for volume, schema, duration or cost",

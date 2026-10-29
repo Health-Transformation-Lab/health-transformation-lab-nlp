@@ -31,8 +31,9 @@ median. Duration and cost are the OpenTelemetry metrics `pipeline.run.duration_s
 ## The ladder
 
 1. **Deterministic**: retry, rerun, hold downstream (already in the jobs and `runlog.py`).
-2. **Classify** (`doctor.classify`, rules in order): `config`, `platform`, `schema_drift`,
-   `volume_anomaly`, `quality_fail`, `cost_anomaly`, `source_late`, `unknown`.
+2. **Classify** (`doctor.classify`, rules in order): the configuration-management classes first
+   (`credential_expiry`, `vulnerability`, `deprecation`, `config_drift`, `config`), then `platform`,
+   `schema_drift`, `volume_anomaly`, `quality_fail`, `cost_anomaly`, `source_late`, `unknown`.
 3. **Root cause** (LLM, `unknown` only; planned): run row, last N runs, lineage one hop, runbook entry.
 4. **Recommend** (`doctor.recommend`): first allowed action, impact one hop down the lineage, severity,
    owner, templated notification. Never an action off the runbook's list.
@@ -43,8 +44,9 @@ median. Duration and cost are the OpenTelemetry metrics `pipeline.run.duration_s
 
 `data/ops/incident.csv` is the repo's own incident history as run rows (GPU not free, Python died,
 Illegal seek, a short Kaggle run, new columns, a missing secret, a failed quality check, a run that hit
-its budget). `doctor.evaluate` scores the doctor on them; `doctor.ablation` re-runs the eval with the
-config table, the typed conventions, lineage, the metrics or the run history switched off, one at a time.
+its budget). `doctor.evaluate` scores the doctor on them; `doctor.ablation` is a switch-off test: it re-runs the
+eval with the config table, the typed conventions, lineage, the metrics or the run history hidden, one at a
+time, and whatever drops is what that piece contributed.
 Results and reading: spec 027, "The ablation". Nine incidents is a small set and the intervals say so.
 
 Adding an incident: one row in `incident.csv` with the class, the action taken, whether it was reversible,

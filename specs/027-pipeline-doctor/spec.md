@@ -20,7 +20,7 @@ allow-list, asks a person, and earns the right to act alone, one failure class a
 
 ## The idea in one paragraph
 
-Automated remediation is mostly a metadata problem. If every pipeline is a row in a config table
+Most of what breaks in production is visible in metadata before anyone reads a log, and the share is measured, not assumed. If every pipeline is a row in a config table
 (owner, SLA, expectations, retry policy, downstream consumers, runbook pointer), every run is a row in
 a run log (what ran, how long, counts, schema hash, which checks passed), and lineage says what fed
 what, then an agent does not read logs: it reads tables. It classifies the failure from freshness,
@@ -68,9 +68,10 @@ group-by. They are computed from `fact_pipeline_run` by `doctor.signals`, shown 
 1. **Deterministic** (no AI): retry with backoff; rerun an idempotent step; hold downstream when a
    source is late. Already in the job definitions (spec 004) and `runlog.py`; the doctor records what
    they did.
-2. **Classify** (rules): `config` (missing secret, bad parameter), `platform` (GPU not available, Python
-   died, storage), `schema_drift`, `volume_anomaly`, `quality_fail`, `cost_anomaly`, `source_late`,
-   `unknown`, in that order. Rules on the six signals and `error_type_name` decide; `unknown` is the only
+2. **Classify** (rules), configuration-management classes first because they page people and hide in
+   logs: `credential_expiry`, `vulnerability`, `deprecation`, `config_drift`, `config` (missing secret, bad
+   parameter); then `platform` (GPU not available, Python died, storage), `schema_drift`, `volume_anomaly`,
+   `quality_fail`, `cost_anomaly`, `source_late`, `unknown`, in that order. Rules on the six signals and `error_type_name` decide; `unknown` is the only
    class the LLM sees.
 3. **Root cause** (LLM, `unknown` only): the agent gets the run row, the pipeline's last N runs,
    lineage one hop each way and the runbook; it returns a root-cause hypothesis, the evidence rows it
@@ -145,7 +146,7 @@ docs and job definitions. Each is one row with the action taken and whether the 
 
 The set grows with every new incident: an incident write-up adds a row.
 
-## The ablation: what each piece of metadata buys
+## The switch-off test (an ablation): what each piece of metadata contributes
 
 The claim behind this spec, "automated remediation is mostly a metadata problem", is tested, not
 asserted. `doctor.ablation` re-runs the incident eval with one piece switched off at a time and reports

@@ -78,12 +78,23 @@ def test_signals_without_history_are_null_not_errors(config):
     (_run(sha="new-columns"), "schema_drift"),
     (_run(failed=3), "quality_fail"),
     (_run(error_type="RuntimeError", error_text="something nobody has seen before"), "unknown"),
+    # configuration-management failures: what pages people in practice
+    (_run(error_type="AuthenticationError", error_text="401 Unauthorized: token expired"), "credential_expiry"),
+    (_run(error_type="RuntimeError", error_text="Dependabot: CVE-2026-1234 critical severity in requests"), "vulnerability"),
+    (_run(error_type="NotFound", error_text="model medgemma-4b-it v1 is deprecated; endpoint not found"), "deprecation"),
+    (_run(error_type="RuntimeError", error_text="judge_endpoint differs between dev and uat"), "config_drift"),
 ])
 def test_classify_rules_cover_the_incidents_this_repo_has_had(run, expected, history, config):
     out = doctor.classify(run, history, config)
     assert out["failure_class_code"] == expected
     assert set(out["signals"]) >= {"freshness_seconds", "volume_ratio", "is_schema_changed", "quality_ratio",
                                    "duration_ratio"}
+
+
+def test_configuration_management_classes_win_over_the_rest(history, config):
+    """An expired token on a run that also wrote no rows is a credential problem, not a volume anomaly."""
+    run = _run(rows=0, error_type="AuthenticationError", error_text="403 access denied: token expired")
+    assert doctor.classify(run, history, config)["failure_class_code"] == "credential_expiry"
 
 
 def test_a_run_that_never_started_is_source_late(history, config):

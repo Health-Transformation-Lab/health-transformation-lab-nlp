@@ -14,6 +14,34 @@
 #   investigate      send to the root-cause rung (LLM) and the owner
 
 entries:
+  # Configuration-management classes first: a credential that expired, a vulnerability advisory, a
+  # deprecated model or dependency, a setting that differs between environments. Invisible in logs until
+  # the damage is done; visible in tables (a secrets register with expiry dates, a dependency inventory,
+  # a model inventory, one config declaration per setting) before it.
+  - failure_class_code: credential_expiry
+    description_text: a credential expired or was revoked (401/403, token expired); the register says who renews it
+    allowed_action_codes: [fix_setting, page_owner]
+    is_reversible: true
+    severity_code: SEV2
+    escalate_to_name: repo owner
+  - failure_class_code: vulnerability
+    description_text: a security advisory on a dependency or model the pipeline uses
+    allowed_action_codes: [hold_downstream, page_owner]
+    is_reversible: true
+    severity_code: SEV2
+    escalate_to_name: repo owner
+  - failure_class_code: deprecation
+    description_text: a model, endpoint, API or dependency version is deprecated, retired or no longer found
+    allowed_action_codes: [hold_downstream, page_owner]
+    is_reversible: true
+    severity_code: SEV3
+    escalate_to_name: repo owner
+  - failure_class_code: config_drift
+    description_text: a setting differs between environments (dev, uat, prod) or from its one declaration
+    allowed_action_codes: [fix_setting, hold_downstream, page_owner]
+    is_reversible: true
+    severity_code: SEV2
+    escalate_to_name: repo owner
   - failure_class_code: platform
     description_text: the platform failed, not the data (no GPU free, Python died, storage refused)
     allowed_action_codes: [retry, rerun, page_owner]
