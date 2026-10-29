@@ -179,7 +179,8 @@ def test_the_token_check_forgives_paste_mistakes():
     # issue #255: a token pasted with a line break, quotes or as a NAME=value line is still the token
     ok = {"name": "someone", "orgs": [{"name": "healthtransformationlab", "roleInOrg": "admin"}]}
     seen = []
-    for raw in (" hf_abc\n", '"hf_abc"', "'hf_abc'", "HF_PUBLISH_TOKEN=hf_abc", "HF_TOKEN = 'hf_abc'\r\n"):
+    for raw in (" hf_abc\n", '"hf_abc"', "'hf_abc'", "HF_PUBLISH_TOKEN=hf_abc", "HF_TOKEN = 'hf_abc'\r\n",
+                '"HF_TOKEN=hf_abc"', "export HF_TOKEN=hf_abc"):
         assert hpub.clean_token(raw) == "hf_abc", raw
         assert hpub.check_token(raw, whoami=lambda t: seen.append(t) or ok) == "someone"
     assert set(seen) == {"hf_abc"}                               # Hugging Face only ever sees the cleaned token

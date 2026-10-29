@@ -108,7 +108,7 @@ NAME_PREFIX = re.compile(r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=\s*")   # a NA
 
 def clean_token(raw: str) -> str:
     """The token without the usual paste mistakes: whitespace or a line break, quotes, a NAME= prefix (issue #255)."""
-    token = NAME_PREFIX.sub("", raw.strip())
+    token = NAME_PREFIX.sub("", raw.strip().strip("'\"").strip())   # quotes may wrap the token or the whole line
     return token.strip().strip("'\"").strip()
 
 
