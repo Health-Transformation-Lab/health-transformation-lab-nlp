@@ -55,6 +55,15 @@ while old judge calls are unmigrated, so it never pays for them twice. The decis
 `gold_names.migration_plan` (tested). Old tables aren't dropped: the task prints the `DROP TABLE` statements to run
 after checking.
 
+It then reads the old gold schemas in the bundle variable `legacy_gold_schemas` (issue #228). Specs 021 and 022
+rebuilt gold in a new catalog and schema from committed files, which can't bring back rows only Databricks wrote:
+the MedGemma reader's runs were left in the old catalog's gold schema. For each table there, old-named or already
+renamed, the task adds the rows whose batch key the current table lacks (a key column the current table doesn't
+have yet counts as null), checks that every old key arrived, and only then adds its `DROP TABLE` to the list.
+A table without a batch key that its own job rebuilds (the scorecard's summaries, the de-id scores, the corpus
+judge's calls) is reported as stale and gets no `DROP`: compare it by hand before dropping it. A schema that doesn't exist is skipped (uat and prod
+never had one). The decisions are `gold_names.legacy_plan` (tested).
+
 Jobs that haven't run in the workspace yet write more tables to gold: `study_benchmark`
 (`01_run_benchmark.py`) writes `person`, `visit_occurrence`, `measurement`, `note` (OMOP, official names),
 `labeled_notes` and `benchmark_results`, and `encoder_gpu` writes `encoder_gpu_predictions`. Those three get

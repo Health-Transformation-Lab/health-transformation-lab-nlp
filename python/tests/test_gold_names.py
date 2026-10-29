@@ -201,3 +201,61 @@ def test_the_migration_notebook_follows_the_plan_and_checks_row_counts():
 def test_the_scorecard_waits_for_the_migration_so_it_never_pays_for_calls_it_has():
     nb = (ROOT / "databricks/notebooks/07_judge_scorecard.py").read_text()
     assert "gold_names.migration_plan(" in nb and "run Load results first" in nb
+
+
+# issue #228: tables left in the old gold schemas (the old catalog before spec 021, the old schema before
+# spec 022; databricks.yml legacy_gold_schemas) are carried into the current schema.
+
+def test_a_legacy_old_named_table_is_merged_into_the_current_new_one():
+    plan = gold_names.legacy_plan({"ai_predictions": _cols("fact_prediction")},
+                                  {"fact_prediction": declared("fact_prediction")})
+    assert plan == [("merge", "ai_predictions", "fact_prediction")]
+
+
+def test_a_legacy_table_already_under_its_new_name_is_merged_too():
+    plan = gold_names.legacy_plan({"fact_prediction": declared("fact_prediction")},
+                                  {"fact_prediction": declared("fact_prediction")})
+    assert plan == [("merge", "fact_prediction", "fact_prediction")]
+
+
+def test_a_legacy_table_with_no_current_one_is_copied():
+    plan = gold_names.legacy_plan({"judgments": _cols("fact_judge_call")}, {})
+    assert plan == [("copy", "judgments", "fact_judge_call")]
+
+
+def test_a_legacy_summary_the_current_job_rebuilds_is_stale():
+    plan = gold_names.legacy_plan({"judge_metrics": _cols("judge_metric"), "judge_metric": declared("judge_metric")},
+                                  {"judge_metric": declared("judge_metric")})
+    assert plan == [("stale", "judge_metrics", "judge_metric"), ("stale", "judge_metric", "judge_metric")]
+
+
+def test_legacy_reader_details_with_their_revision_column_are_carried():
+    plan = gold_names.legacy_plan({"llm_reader_runs": _cols("fact_llm_call") + ["revision"]},
+                                  {"fact_llm_call": declared("fact_llm_call")})
+    assert plan == [("merge", "llm_reader_runs", "fact_llm_call")]
+
+
+def test_a_legacy_table_with_an_unknown_column_fails_naming_it():
+    plan = gold_names.legacy_plan({"ai_predictions": _cols("fact_prediction") + ["mystery"]}, {})
+    assert plan == [("fail", "ai_predictions", "mystery")]
+
+
+def test_tables_the_migration_doesnt_know_are_left_alone():
+    assert gold_names.legacy_plan({"person": ["person_id"]}, {}) == []
+
+
+def test_legacy_schemas_are_parsed_and_a_malformed_one_fails_naming_it():
+    assert gold_names.legacy_schemas(" a.b , c_1.d_2 ,") == [("a", "b"), ("c_1", "d_2")]
+    assert gold_names.legacy_schemas("") == []
+    with pytest.raises(ValueError, match="legacy_gold_schemas.*a.b.c"):
+        gold_names.legacy_schemas("a.b.c")
+
+
+def test_the_migration_notebook_carries_the_legacy_schemas_and_checks_every_key_arrived():
+    nb = (ROOT / "databricks/notebooks/11_migrate_gold_names.py").read_text()
+    assert "gold_names.legacy_plan(" in nb and "gold_names.legacy_schemas(" in nb
+    assert "rows not carried" in nb                    # a legacy table with rows missing gets no DROP
+    stale = nb[nb.index('if action == "stale":'):]
+    assert stale.index("continue") < stale.index("drops.append")   # a stale table, never checked, gets no DROP
+    jobs = (ROOT / "databricks/resources/jobs.yml").read_text()
+    assert "legacy_gold_schemas: ${var.legacy_gold_schemas}" in jobs

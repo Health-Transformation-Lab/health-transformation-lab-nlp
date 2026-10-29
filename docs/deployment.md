@@ -101,6 +101,7 @@ Kaggle names changed too (kaggle/README.md lists the old items to delete).
 | Variable | Default | What it sets |
 |---|---|---|
 | `catalog`, `legacy_domain` | `health_transformation_lab`, `dental_omop_perio` | the catalog, and the suffix of the old schemas dev keeps until retired (spec 022) |
+| `legacy_gold_schemas` | the old catalog's and the spec 021 gold schemas | old gold schemas (`catalog.schema`, comma-separated) whose rows Load results' first task carries into `gold_perio_bench`; missing ones are skipped. Set it to empty once they are dropped (issue #228) |
 | `n_people` | `300` | synthetic people in the benchmark job |
 | `run_encoder` | `false` (uat/prod `true`) | install CPU-only torch and train the DistilBERT rung in the benchmark job; over 16 minutes on serverless CPU |
 | `judge_endpoint` | `none` | Model Serving endpoint for `ai_query` (notebook 02) |

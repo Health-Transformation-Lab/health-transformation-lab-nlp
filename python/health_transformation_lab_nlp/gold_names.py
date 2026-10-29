@@ -8,9 +8,13 @@ is written from, and the gold name of each.
     from_gold  the reverse, for a job that reads gold back into the analysis code (the judge resume)
     RENAMED    old table name -> new (same name: columns renamed in place)
     migration_plan  what databricks/notebooks/11_migrate_gold_names.py does with each old table
+    legacy_plan     the same for a table left in an old gold schema (issue #228)
+    legacy_schemas  the legacy_gold_schemas setting, parsed and checked
 """
 
 from __future__ import annotations
+
+import re
 
 import pandas as pd
 
@@ -187,3 +191,37 @@ def migration_plan(existing: dict[str, list[str]]) -> list[tuple[str, str, str]]
         else:
             plan.append(("merge" if target in MERGE_KEYS else "stale", old, target))
     return plan
+
+
+@traced
+def legacy_plan(legacy: dict[str, list[str]], current: dict[str, list[str]]) -> list[tuple[str, str, str]]:
+    """(action, legacy table, current table) for each table in an old gold schema (legacy: name -> columns) that
+    the current schema's tables (current) take over, old-named or already renamed: copy (none there yet), merge
+    (add the rows whose MERGE_KEYS it lacks), stale (rebuilt every run from committed files) or fail (the third
+    item is then the unknown columns). Tables the migration doesn't know (OMOP, study tables) are left out."""
+    plan = []
+    for name, cols in legacy.items():
+        if name not in RENAMED and name not in TABLES:
+            continue
+        candidates = _TARGETS.get(name, (RENAMED.get(name, name),))
+        target = next((t for t in candidates if not _unknown(cols, t)), None)
+        if target is None:
+            plan.append(("fail", name, ", ".join(_unknown(cols, candidates[0]))))
+        elif target not in current:
+            plan.append(("copy", name, target))
+        else:
+            plan.append(("merge" if target in MERGE_KEYS else "stale", name, target))
+    return plan
+
+
+@traced
+def legacy_schemas(setting: str) -> list[tuple[str, str]]:
+    """legacy_gold_schemas ("catalog.schema,catalog.schema"; empty for none) as (catalog, schema) pairs."""
+    out = []
+    for item in (s.strip() for s in setting.split(",")):
+        if not item:
+            continue
+        if not re.fullmatch(r"\w+\.\w+", item):
+            raise ValueError(f"legacy_gold_schemas: {item!r} is not catalog.schema")
+        out.append(tuple(item.split(".")))
+    return out

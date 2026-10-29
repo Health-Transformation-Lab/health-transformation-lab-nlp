@@ -27,6 +27,9 @@ variables:
   legacy_domain:
     description: Suffix of the old layer schemas dev keeps until retired (spec 022; docs/deployment.md)
     default: dental_omop_perio
+  legacy_gold_schemas:
+    description: Old gold schemas (catalog.schema, comma-separated) whose rows Load results' first task carries into gold_perio_bench; missing ones are skipped (issue #228)
+    default: dental_omop.gold_dental_omop_perio,health_transformation_lab.gold_dental_omop_perio
   n_people:
     description: Synthetic people to generate in the benchmark job
     default: "300"
