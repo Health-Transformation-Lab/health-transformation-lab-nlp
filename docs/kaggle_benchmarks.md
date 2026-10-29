@@ -46,6 +46,7 @@ Credentials come from `kaggle b init`, which writes short-lived `MODEL_PROXY_*` 
 ```bash
 pip install -U kaggle kaggle-benchmarks
 kaggle b init -y                                       # credentials + .env (gitignored)
+set -a; . ./.env; set +a                               # the SDK only auto-loads a .env next to its own install
 python kaggle/perio_bench_task.py                      # now a real model: validate before pushing
 ls -1 *.run.json | head                                # run files prove the task recorded results
 kaggle b t push perio-bench -f kaggle/perio_bench_task.py -d jcblearning/perio-bench-notes --wait
@@ -63,9 +64,12 @@ Rules the SDK silently depends on (all checked by `tests/test_kbench.py`):
 - repeat `-d jcblearning/perio-bench-notes` on every push, or the dataset is detached;
 - one task per notebook feeds a leaderboard (`%choose perio_bench` as the notebook's last cell).
 
-Per AGENTS.md ("Everything is started from GitHub Actions, never from a laptop") the push belongs in a
-workflow next to *Publish datasets* once the CLI flow above has been exercised by hand once; the
-`KAGGLE_API_TOKEN` secret it needs is already in `ops/secrets_register.yaml`.
+Per AGENTS.md ("Everything is started from GitHub Actions, never from a laptop") the same steps run from the
+Actions tab: **Run PerioBench on Kaggle Benchmarks** (`.github/workflows/kaggle-benchmark.yml`), with the
+`KAGGLE_USERNAME` variable and `KAGGLE_API_TOKEN` secret the publish workflow already uses. Pick `push`,
+`push-and-run` (default; model slugs as an input), `run`, `status` or `publish`; with `validate` on it first runs
+the task on 3 notes with the real default model and fails if no run file appears; with `wait` on it attaches the
+finished runs' outputs to the workflow run. The Model Proxy credentials it fetches live only in the runner.
 
 ## Getting involved: three routes
 

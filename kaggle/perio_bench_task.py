@@ -36,7 +36,8 @@ except ImportError:  # pragma: no cover - the Kaggle kernel path
 
 # %%
 # The review set: the attached Kaggle dataset when there is one, else the repo's committed copy.
-candidates = [Path("/kaggle/input/perio-bench-notes/answer_key/review_key.csv"), perio.REVIEW_KEY]
+# `kaggle/publish.py` puts review_key.csv at the dataset root; Kaggle mounts it under the slug, or owner/slug.
+candidates = [*Path("/kaggle/input").glob("**/perio-bench-notes/review_key.csv"), perio.REVIEW_KEY]
 review_key = next(p for p in candidates if p.exists())
 n = os.environ.get("PERIO_BENCH_N")
 df = perio.eval_frame(review_key, n=int(n) if n else None)
