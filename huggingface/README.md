@@ -37,7 +37,9 @@ Actions → **Publish datasets (Kaggle and Hugging Face)** → Run workflow, wit
 notebook.
 
 - **The token is checked first.** If it is missing, isn't a Hugging Face token, or can't write to the
-  organisation, the run stops before any work and names `HF_PUBLISH_TOKEN`.
+  organisation, the run stops before any work and names the secret it read (`HF_PUBLISH_TOKEN`, or `HF_TOKEN`
+  when that isn't set). Spaces, a line break, quotes or a pasted `NAME=` in front are ignored; anything else is
+  described (its length, and whether it looks like a secret's name), never printed.
 - **Each run is one commit per dataset**, named after the repository commit.
 - **Files dropped from the list are deleted** from the dataset.
 
