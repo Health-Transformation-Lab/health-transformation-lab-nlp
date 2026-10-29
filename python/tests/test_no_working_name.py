@@ -14,7 +14,8 @@ def test_no_file_calls_the_lab_a_working_name():
     hits = []
     for rel in (f for f in out.decode().split("\0") if f):
         path = REPO_ROOT / rel
-        if rel in ALLOWED or rel.startswith("pull_requests/") or not path.is_file():
+        if rel in ALLOWED or rel.startswith("pull_requests/") or rel == "data/tasks/task_manifest.csv" \
+                or not path.is_file():   # the manifest is a verbatim record of past titles (spec 028)
             continue
         data = path.read_bytes()
         if b"\0" in data[:8192]:            # binary: images, archives
