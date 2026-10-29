@@ -5,9 +5,9 @@
 > partner named here has been contacted or has agreed to anything.
 > Figures come from the public sources cited on each slide; nothing marked "to measure" has been measured.
 
-**The pitch in one line:** AI passes the dental exam and fails the real patient, and no test checks whether it
-connects the mouth to the rest of the body or helps people get care. An open lab writes those missing test
-questions, publishes an open agent built on public evidence, and measures the gain in public, for better oral
+**The pitch in one line:** AI passes the dental exam and fails the real patient: today's tests measure exam
+knowledge, and published studies find AI falling short in real-world cases such as drug interactions. An open lab
+writes the missing real-world test questions, publishes an open agent built on public evidence, and measures the gain in public, for better oral
 health for millions of Americans and better overall health through medical-dental care.
 
 | File | What it is |
@@ -26,7 +26,7 @@ The pitch asks for a fair test, and this repo is where one gets built on synthet
 - **The medical-dental seam, from the record:** the periodontal phenotyping study ([the dental record path](../edr/README.md)) reads a dental chart the
   way a doctor or an AI would have to, with harm grades borrowed from GlobalDentBench
   ([dentbench_methods.md](../dentbench_methods.md)) and the record in OMOP, the format medicine already uses.
-- **Large LLMs, from narrow to broad:** the same models, runners, harm grades and leaderboards score LLMs first on
+- **Large LLMs, from narrow to broad:** the same models, harm grades and leaderboards score LLMs first on
   periodontal charts, then on case questions written from synthetic patients whose right answers are known, then on
   broader dental and medical-dental questions.
 

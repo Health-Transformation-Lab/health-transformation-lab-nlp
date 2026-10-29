@@ -212,8 +212,8 @@ Case questions written from those patients, with the right answer already scored
 The other path
 The lab
 AI tested where medicine meets dentistry and access to care, in public.
-One harness, narrow to broad:
-the same models, runners, harm grades and leaderboards score AI first on gum charts, then on case questions, then on broader medical-dental ones.
+One way to test AI, narrow to broad:
+the same models, harm grades and leaderboards score AI first on gum charts, then on case questions, then on broader medical-dental ones.
 The lab's pitch: docs/pitch/ · Health Transformation Lab · the dental record (EDR) · 11
 
-**Speaker notes:** The landing page has two paths, and this is how they meet. This path builds synthetic patients whose right answers are known, in the same format medicine uses. That makes them a source of test questions: case questions written from those patients, with the right answer already scored. The other path, the lab, is about testing AI where medicine meets dentistry and on access to care, in public. Both use one harness: the same models, runners, harm grades and leaderboards, scoring AI first on gum charts, then on case questions from synthetic patients, then on broader medical-dental questions. The lab's pitch is in docs/pitch.
+**Speaker notes:** The landing page has two paths, and this is how they meet. This path builds synthetic patients whose right answers are known, in the same format medicine uses. That makes them a source of test questions: case questions written from those patients, with the right answer already scored. The other path, the lab, is about testing AI where medicine meets dentistry and on access to care, in public. Both test AI the same way: the same models, harm grades and leaderboards, scoring AI first on gum charts, then on case questions from synthetic patients, then on broader medical-dental questions. The lab's pitch is in docs/pitch.
