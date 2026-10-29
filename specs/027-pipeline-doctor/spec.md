@@ -85,27 +85,27 @@ group-by. They are computed from `fact_pipeline_run` by `doctor.signals`, shown 
 
 ## User stories
 
-### US1 - Every failure is classified from the tables, rules first (P1)
+### US1 - Every failure is classified from the tables, rules first (P1) #345
 Given a run row and the pipeline's recent runs, `doctor.classify` returns the failure class and the
 signals it used. Rules cover the incidents this repo has actually had (see evaluation); only `unknown`
 goes to the LLM.
 
-### US2 - Every recommendation comes from the runbook's allow-list with its impact (P1)
+### US2 - Every recommendation comes from the runbook's allow-list with its impact (P1) #346
 `doctor.recommend` returns the action code (never free text), the downstream names it affects, whether
 it is reversible, the severity, the owner, and a one-paragraph notification drafted from the row. An
 action not on the runbook's list for that class is never returned.
 
-### US3 - A failure class earns automation and can lose it (P1)
+### US3 - A failure class earns automation and can lose it (P1) #347
 `doctor.graduation` reads `fact_remediation_decision` and says `automatic` or `recommend_only` per
 class, by the rule above. A class whose runbook entry is not reversible never graduates.
 
-### US4 - The doctor is measured against the repo's own incidents (P1)
+### US4 - The doctor is measured against the repo's own incidents (P1) #348
 `data/ops/incident.csv` holds the incidents this repo has had, as run rows with the action the owner
 actually took. `doctor.evaluate` reports, per class: classification accuracy, recommendation agreement
 with the owner's decision, and the share of incidents resolved without the LLM, with 95% intervals like
 every other result here. Never presented as production numbers.
 
-### US7 - The doctor is a separate, reusable package adopted by two projects (P2)
+### US7 - The doctor is a separate, reusable package adopted by two projects (P2) #349
 `doctor.py` imports nothing from this repo but `paths` and `telemetry`, so it lifts out into its own
 package (`healthtransformationlab/pipeline-doctor`: the four tables as a contract, the ladder, the eval and the
 ablation). Two implementation projects adopt it, this repo and a second project of a different shape
@@ -114,14 +114,14 @@ config and runbook. The paper compares the same success metrics on both: classif
 action agreement, share resolved without the LLM, impact known, and the fields handed to the LLM. One
 repo is an anecdote; two with the same package is a result.
 
-### US5 - The doctor runs as a job and writes its decisions (P2)
+### US5 - The doctor runs as a job and writes its decisions (P2) #350
 A `pipeline_doctor` job runs after each pipeline job (Lakeflow Jobs `run_if` on failure, or on a
 schedule), appends to `fact_pipeline_run` and `fact_remediation_decision`, and raises a notification at
 the runbook's severity (job system notification; approval is a job parameter until an approval UI
 exists). The root-cause rung calls the judge endpoint already in the bundle (`var.judge_endpoint`) under
 the same `max_usd` budget as the scorecard.
 
-### US6 - The LLM rung is evaluated like any other model here (P2)
+### US6 - The LLM rung is evaluated like any other model here (P2) #351
 Root-cause answers on the incident set are scored with the MLflow GenAI judge pattern from spec 012
 (`make_judge`, a Guidelines scorer on the runbook's rules, a deterministic no-PHI scorer on every
 trace), and a sample of production traces is scored the same way.
