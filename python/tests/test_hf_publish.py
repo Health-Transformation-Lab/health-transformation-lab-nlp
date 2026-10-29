@@ -163,13 +163,46 @@ def test_the_publish_token_is_in_the_secrets_register_with_its_scope():
 
 
 def test_the_workflow_falls_back_to_hf_token_and_the_check_names_both():
-    # issue #249: the owner's existing HF_TOKEN secret is used when HF_PUBLISH_TOKEN isn't set
+    # issue #249: the owner's existing HF_TOKEN secret is used when HF_PUBLISH_TOKEN isn't set. #254: both reach the
+    # job separately, so the check can say which one it used
     wf = yaml.safe_load((REPO_ROOT / ".github" / "workflows" / "kaggle-publish.yml").read_text())
     for step in wf["jobs"]["huggingface"]["steps"]:
         if "HF_PUBLISH_TOKEN" in str(step.get("env", {})):
-            assert step["env"]["HF_PUBLISH_TOKEN"] == "${{ secrets.HF_PUBLISH_TOKEN || secrets.HF_TOKEN }}"
-    for token, match in (("", "HF_PUBLISH_TOKEN or HF_TOKEN"), ("abc", "HF_PUBLISH_TOKEN or HF_TOKEN")):
-        with pytest.raises(SystemExit, match=match):
-            hpub.check_token(token, whoami=lambda t: {})
+            assert step["env"]["HF_PUBLISH_TOKEN"] == "${{ secrets.HF_PUBLISH_TOKEN }}"
+            assert step["env"]["HF_TOKEN"] == "${{ secrets.HF_TOKEN }}"
+    with pytest.raises(SystemExit, match="HF_PUBLISH_TOKEN or HF_TOKEN"):
+        hpub.check_token("", whoami=lambda t: {})
+    assert hpub.token_from_env({"HF_TOKEN": "hf_b"}) == ("HF_TOKEN", "hf_b")
+    assert hpub.token_from_env({"HF_PUBLISH_TOKEN": "hf_a", "HF_TOKEN": "hf_b"}) == ("HF_PUBLISH_TOKEN", "hf_a")
+    assert hpub.token_from_env({"HF_PUBLISH_TOKEN": "  ", "HF_TOKEN": "hf_b"}) == ("HF_TOKEN", "hf_b")
+    assert hpub.token_from_env({}) == ("HF_PUBLISH_TOKEN or HF_TOKEN", "")
     reg = yaml.safe_load((REPO_ROOT / "ops" / "secrets_register.yaml").read_text())["credentials"]
     assert "HF_TOKEN" in next(c for c in reg if "HF_PUBLISH_TOKEN" in c["stored_in"])["stored_in"]
+
+
+@pytest.mark.parametrize("raw", ["hf_abc123\n", "  hf_abc123 ", '"hf_abc123"', "'hf_abc123'\r\n"])
+def test_copy_and_paste_whitespace_and_quotes_are_trimmed(raw):
+    # #254: a token pasted with a newline or quotes is still the token
+    assert hpub.clean_token(raw) == "hf_abc123"
+    assert hpub.token_from_env({"HF_PUBLISH_TOKEN": raw}) == ("HF_PUBLISH_TOKEN", "hf_abc123")
+
+
+@pytest.mark.parametrize("value, says", [
+    ("Bearer hf_abc123", "starts 7 characters in"),
+    ("perio-bench-publish", "no hf_ in it"),
+    ("0123456789abcdef0123456789abcdef", "a Kaggle API key"),
+    ("hf abc", "no hf_ in it"),
+])
+def test_a_wrong_value_says_why_and_which_secret_without_showing_it(value, says):
+    with pytest.raises(SystemExit) as e:
+        hpub.check_token(value, whoami=lambda t: {}, source="HF_PUBLISH_TOKEN")
+    msg = str(e.value)
+    assert says in msg and "HF_PUBLISH_TOKEN" in msg and f"{len(value)} characters" in msg
+    assert value not in msg and "abc123" not in msg and "perio-bench" not in msg
+
+
+def test_a_wrong_publish_token_points_at_a_good_looking_hf_token():
+    # the owner's HF_TOKEN may be fine while a stale HF_PUBLISH_TOKEN overrides it
+    with pytest.raises(SystemExit, match="HF_TOKEN is also set and starts with hf_"):
+        hpub.check_token("perio-bench-publish", whoami=lambda t: {}, source="HF_PUBLISH_TOKEN",
+                         env={"HF_PUBLISH_TOKEN": "perio-bench-publish", "HF_TOKEN": "hf_ok"})

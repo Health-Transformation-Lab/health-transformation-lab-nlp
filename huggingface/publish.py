@@ -15,6 +15,7 @@ access to the organisation's repositories); check_token() checks it before any u
 import argparse
 import importlib.util
 import os
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -102,12 +103,47 @@ def org_card() -> str:
         (HERE / "cards" / "org.md").read_text(encoding="utf-8")
 
 
-def check_token(token: str, whoami) -> str:
-    """Fail fast, naming the setting: missing, wrong shape, or unable to write to the organisation. Returns the user."""
+SOURCES = ("HF_PUBLISH_TOKEN", "HF_TOKEN")   # the workflow passes both; the first one set wins (#249, #254)
+
+
+def clean_token(raw: str | None) -> str:
+    """The token as pasted, without the whitespace, line breaks and quotes copy and paste often adds (#254)."""
+    t = (raw or "").strip()
+    while len(t) >= 2 and t[0] == t[-1] and t[0] in "\"'":
+        t = t[1:-1].strip()
+    return t
+
+
+def token_from_env(env=None) -> tuple[str, str]:
+    """(the secret it came from, the cleaned token): HF_PUBLISH_TOKEN, else HF_TOKEN."""
+    env = os.environ if env is None else env
+    for name in SOURCES:
+        if tok := clean_token(env.get(name)):
+            return name, tok
+    return " or ".join(SOURCES), ""
+
+
+def _shape(token: str) -> str:
+    """What's wrong with a value that doesn't start with hf_, without any of its characters."""
+    n = len(token)
+    if (i := token.find("hf_")) > 0:
+        return f"{n} characters; the hf_ part starts {i} characters in, so remove what's in front (e.g. 'Bearer ')"
+    looks = ", which looks like a Kaggle API key" if re.fullmatch(r"[0-9a-f]{32}", token) else ""
+    gaps = ", with spaces in it" if re.search(r"\s", token) else ""
+    return f"{n} characters, no hf_ in it{gaps}{looks}: a token's name or another service's key, not the token itself"
+
+
+def check_token(token: str, whoami, source: str = " or ".join(SOURCES), env=None) -> str:
+    """Fail fast, naming the setting: missing, wrong shape, or unable to write to the organisation. Returns the user.
+    `source` names the secret the token came from; nothing of the value is ever printed."""
     if not token:
-        raise SystemExit("HF_PUBLISH_TOKEN or HF_TOKEN is not set in the GitHub environment 'dev' (huggingface/README.md)")
+        raise SystemExit(f"{source} is not set in the GitHub environment 'dev' (huggingface/README.md)")
     if not token.startswith("hf_"):
-        raise SystemExit("HF_PUBLISH_TOKEN or HF_TOKEN doesn't look like a Hugging Face token (it should start with hf_)")
+        other = next((n for n in SOURCES if n != source and clean_token((env or {}).get(n)).startswith("hf_")), None)
+        hint = f" {other} is also set and starts with hf_: delete {source} in the 'dev' environment to use it." \
+            if other else " Copy the token's value (hf_...) from huggingface.co -> Settings -> Access tokens."
+        raise SystemExit(f"{source} doesn't look like a Hugging Face token (it should start with hf_): "
+                         f"{_shape(token)}.{hint}")
     me = whoami(token)                                # one cheap authenticated call
     role = next((o.get("roleInOrg") for o in me.get("orgs", []) if o.get("name") == ORG), None)
     fine = (me.get("auth") or {}).get("accessToken", {}).get("fineGrained")
@@ -154,9 +190,9 @@ def main() -> None:
     print(f"prepared {repo} at {a.commit[:12]}")
     if a.upload:
         from huggingface_hub import HfApi
-        token = os.environ.get("HF_PUBLISH_TOKEN", "")
+        source, token = token_from_env()
         api = HfApi(token=token or None)
-        check_token(token, whoami=lambda t: api.whoami(token=t))
+        check_token(token, whoami=lambda t: api.whoami(token=t), source=source, env=os.environ)
         upload(a.out, repo, f"{a.message} ({a.commit[:12]})", api, kind, **create)
 
 
