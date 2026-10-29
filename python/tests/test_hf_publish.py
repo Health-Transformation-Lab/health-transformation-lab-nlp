@@ -173,3 +173,28 @@ def test_the_workflow_falls_back_to_hf_token_and_the_check_names_both():
             hpub.check_token(token, whoami=lambda t: {})
     reg = yaml.safe_load((REPO_ROOT / "ops" / "secrets_register.yaml").read_text())["credentials"]
     assert "HF_TOKEN" in next(c for c in reg if "HF_PUBLISH_TOKEN" in c["stored_in"])["stored_in"]
+
+
+def test_copy_and_paste_wrapping_is_trimmed():
+    # issue #254: a space, line break or quotes around the token
+    for raw in ("  hf_abc\n", '"hf_abc"', "'hf_abc'", "\thf_abc "):
+        assert hpub.clean_token(raw) == "hf_abc", raw
+
+
+def test_a_rejected_token_says_why_and_which_secret_without_printing_it():
+    secret = "Bearer hf_SECRETVALUE"
+    with pytest.raises(SystemExit) as e:
+        hpub.check_token(secret, whoami=lambda t: {}, source="HF_TOKEN")
+    msg = str(e.value)
+    assert "HF_TOKEN" in msg and "HF_PUBLISH_TOKEN" not in msg
+    assert "before it" in msg and "SECRETVALUE" not in msg and "Bearer" not in msg
+    with pytest.raises(SystemExit, match="no hf_ anywhere") as e:
+        hpub.check_token("perio-bench-publish", whoami=lambda t: {}, source="HF_PUBLISH_TOKEN")
+    assert "perio-bench-publish" not in str(e.value)
+
+
+def test_the_workflow_names_the_secret_it_used():
+    wf = yaml.safe_load((REPO_ROOT / ".github" / "workflows" / "kaggle-publish.yml").read_text())
+    check = next(s for s in wf["jobs"]["huggingface"]["steps"] if s.get("name", "").startswith("Check the Hugging"))
+    assert check["env"]["HF_TOKEN_SOURCE"] == "${{ secrets.HF_PUBLISH_TOKEN != '' && 'HF_PUBLISH_TOKEN' || 'HF_TOKEN' }}"
+    assert "clean_token" in check["run"] and "HF_TOKEN_SOURCE" in check["run"]

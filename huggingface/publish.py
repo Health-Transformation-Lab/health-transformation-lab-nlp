@@ -102,19 +102,29 @@ def org_card() -> str:
         (HERE / "cards" / "org.md").read_text(encoding="utf-8")
 
 
-def check_token(token: str, whoami) -> str:
-    """Fail fast, naming the setting: missing, wrong shape, or unable to write to the organisation. Returns the user."""
+def clean_token(raw: str) -> str:
+    """Drop what copy and paste adds around a token: spaces, line breaks, quotes (issue #254)."""
+    return raw.strip().strip("\"'").strip()
+
+
+def check_token(token: str, whoami, source: str = "HF_PUBLISH_TOKEN or HF_TOKEN") -> str:
+    """Fail fast, naming the setting: missing, wrong shape, or unable to write to the organisation. Returns the user.
+    Never prints any part of the token."""
     if not token:
-        raise SystemExit("HF_PUBLISH_TOKEN or HF_TOKEN is not set in the GitHub environment 'dev' (huggingface/README.md)")
+        raise SystemExit(f"{source} is not set in the GitHub environment 'dev' (huggingface/README.md)")
     if not token.startswith("hf_"):
-        raise SystemExit("HF_PUBLISH_TOKEN or HF_TOKEN doesn't look like a Hugging Face token (it should start with hf_)")
+        why = ("hf_ appears later in the value: something is saved before it, such as a label or prefix"
+               if "hf_" in token else "there's no hf_ anywhere in the value: it may be the token's name, or a token "
+               "from another service")
+        raise SystemExit(f"{source} doesn't look like a Hugging Face token, which starts with hf_: {why}. "
+                         "Copy the value from huggingface.co -> Settings -> Access tokens and save only that")
     me = whoami(token)                                # one cheap authenticated call
     role = next((o.get("roleInOrg") for o in me.get("orgs", []) if o.get("name") == ORG), None)
     fine = (me.get("auth") or {}).get("accessToken", {}).get("fineGrained")
     scoped = [s for s in (fine or {}).get("scoped", []) if s.get("entity", {}).get("name") == ORG]
     if role not in ("admin", "write", "contributor") or (fine and not any(
             any("write" in p for p in s.get("permissions", [])) for s in scoped)):
-        raise SystemExit(f"HF_PUBLISH_TOKEN or HF_TOKEN can't write to the {ORG} organisation: give it write access to the "
+        raise SystemExit(f"{source} can't write to the {ORG} organisation: give it write access to the "
                          "organisation's repositories (huggingface/README.md)")
     return me["name"]
 
@@ -154,9 +164,9 @@ def main() -> None:
     print(f"prepared {repo} at {a.commit[:12]}")
     if a.upload:
         from huggingface_hub import HfApi
-        token = os.environ.get("HF_PUBLISH_TOKEN", "")
+        token = clean_token(os.environ.get("HF_PUBLISH_TOKEN", ""))
         api = HfApi(token=token or None)
-        check_token(token, whoami=lambda t: api.whoami(token=t))
+        check_token(token, whoami=lambda t: api.whoami(token=t), source=os.environ.get("HF_TOKEN_SOURCE", "HF_PUBLISH_TOKEN"))
         upload(a.out, repo, f"{a.message} ({a.commit[:12]})", api, kind, **create)
 
 
