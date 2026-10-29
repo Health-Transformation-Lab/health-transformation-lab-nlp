@@ -24,7 +24,8 @@ edit.
      **Write access to contents/settings of all repos**. Tick nothing else, and nothing for your personal
      repositories.
    - Expiry: 90 days at most.
-2. Copy it once into the GitHub environment **`dev`** as the secret **`HF_PUBLISH_TOKEN`** (repository Settings →
+2. Copy it once into the GitHub environment **`dev`** as the secret **`HF_PUBLISH_TOKEN`**. (A secret named
+   `HF_TOKEN` there is used instead when `HF_PUBLISH_TOKEN` isn't set, if it has the same write access.) (repository Settings →
    Environments → dev → Add environment secret). Never paste it anywhere else.
 3. Write its expiry date in `ops/secrets_register.yaml` ("Hugging Face publish token").
 4. Optional: upload a logo on the organisation's **Settings** page; the card can't set it.
