@@ -22,6 +22,7 @@ erDiagram
     fact_prediction ||..o| judge_queue : "sampled from"
     judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
     dim_grader_question ||--o{ fact_grader_answer : "question_id"
+    fact_visit_evidence ||--o{ fact_case_profile_item : "visit_id"
     dim_study_note }o..o{ benchmark_metric : "run_id (its test split)"
     review_key
     dim_result_file
@@ -43,6 +44,7 @@ erDiagram
     dq_source_concordance
     fact_visit_evidence
     dq_injected_error
+    fact_case_profile_item
     dim_grader_question
     fact_grader_answer
     dim_study_note
@@ -69,6 +71,7 @@ erDiagram
     fact_prediction ||..o| judge_queue : "sampled from"
     judge_queue ||--o| fact_corpus_judge_call : "method_name, visit_id"
     dim_grader_question ||--o{ fact_grader_answer : "question_id"
+    fact_visit_evidence ||--o{ fact_case_profile_item : "visit_id"
     dim_study_note }o..o{ benchmark_metric : "run_id (its test split)"
     review_key {
         bigint visit_id PK "review chart (240)"
@@ -329,6 +332,19 @@ erDiagram
         bigint injected_error_count "errors injected"
         double caught_ratio "share the temporal checks flag"
         double false_flag_ratio "visits flagged with no error injected"
+        string source_files_text "the committed CSVs the table is built from"
+        string file_sha256 "SHA-256 of those files together: the version"
+        string git_commit_sha "commit the job was deployed from"
+        timestamp loaded_ts "when Load results wrote it"
+    }
+    fact_case_profile_item {
+        bigint visit_id PK "visit"
+        string category_name "Demographics · Presentation · Visit context · Measurements · Tests and imaging · Risk factors · Treatment · Other readings · After the visit"
+        bigint category_order_num "1 = Demographics, shown first"
+        string item_name PK "what the row shows, e.g. max attachment loss (CAL)"
+        bigint item_order_num "position in the profile"
+        string item_value_name "the value as shown: a number, a status code, yes/no, or not recorded"
+        string item_unit_name "mm, %, years, teeth; empty when none"
         string source_files_text "the committed CSVs the table is built from"
         string file_sha256 "SHA-256 of those files together: the version"
         string git_commit_sha "commit the job was deployed from"
@@ -752,6 +768,24 @@ One row: charting errors injected into the synthetic data and how many the check
 |  | `injected_error_count` | bigint | errors injected |
 |  | `caught_ratio` | double | share the temporal checks flag |
 |  | `false_flag_ratio` | double | visits flagged with no error injected |
+|  | `source_files_text` | string | the committed CSVs the table is built from |
+|  | `file_sha256` | string | SHA-256 of those files together: the version |
+|  | `git_commit_sha` | string | commit the job was deployed from |
+|  | `loaded_ts` | timestamp | when Load results wrote it |
+
+### `fact_case_profile_item`
+
+One per (synthetic visit, profile category, item): the visit's structured evidence, never note text. Written by: Load results: overwrite.
+
+| Key | Column | Type | Description |
+|---|---|---|---|
+| PK | `visit_id` | bigint | visit |
+|  | `category_name` | string | Demographics · Presentation · Visit context · Measurements · Tests and imaging · Risk factors · Treatment · Other readings · After the visit |
+|  | `category_order_num` | bigint | 1 = Demographics, shown first |
+| PK | `item_name` | string | what the row shows, e.g. max attachment loss (CAL) |
+|  | `item_order_num` | bigint | position in the profile |
+|  | `item_value_name` | string | the value as shown: a number, a status code, yes/no, or not recorded |
+|  | `item_unit_name` | string | mm, %, years, teeth; empty when none |
 |  | `source_files_text` | string | the committed CSVs the table is built from |
 |  | `file_sha256` | string | SHA-256 of those files together: the version |
 |  | `git_commit_sha` | string | commit the job was deployed from |

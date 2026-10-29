@@ -223,3 +223,19 @@ def test_deploy_creates_the_spaces_last_and_only_when_their_tables_exist():
     assert "genie_tables_missing.py" in runs[genie] and "exit 0" in runs[genie]
     ci = (REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text()
     assert "cd databricks/genie && databricks bundle validate" in ci
+
+
+def test_dq_genie_space_explains_the_case_profiles():
+    """Spec 026 US1: profiles are usable from Genie before the recheck page exists."""
+    space = json.loads(dash.render_genie("dq_grader"))
+    text = " ".join(" ".join(i["content"]) for i in space["instructions"]["text_instructions"])
+    assert "fact_case_profile_item" in text and "not recorded" in text and "never note text" in text
+    questions = " ".join(q["question"][0] for q in space["config"]["sample_questions"])
+    assert "profile of visit" in questions
+
+
+def test_dq_genie_space_explains_every_value_a_profile_can_hold():
+    space = json.loads(dash.render_genie("dq_grader"))
+    text = " ".join(" ".join(i["content"]) for i in space["instructions"]["text_instructions"])
+    for value in ("'none'", "cal_drop", "rbl_drop", "teeth_regained", "perio_resolved", "stage_drop"):
+        assert value in text, value

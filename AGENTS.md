@@ -148,7 +148,7 @@ A SEV2 that fires every week for the same cause gets its cause fixed or its leve
 ## SQL and data names
 
 New tables and views, in Unity Catalog or Postgres, follow these, and the gold tables do since spec 018
-(adapted from jcbowyer/DE_Assessment; the Benchmark job's tables since spec 026). OMOP CDM tables and columns keep
+(adapted from jcbowyer/DE_Assessment; the Benchmark job's tables since spec 027). OMOP CDM tables and columns keep
 their official names. The Postgres `perio_chart` view doesn't yet, and changes when it's next touched.
 `python/tests/test_sql_conventions.py` checks the gold tables declared in `diagrams/_build/gold_model.py`.
 

@@ -2,7 +2,8 @@
 
     lab_tables  the lab grader: questions and answers, real when committed, else a seeded SIMULATED sample
     dq_tables   the EHR DQ grader: data-quality checks, completeness, prevalence, temporal plausibility,
-                transitions, concordance, per-visit evidence with its truth (statuses only, never note text)
+                transitions, concordance, per-visit evidence with its truth (statuses only, never note text),
+                and each visit's case profile (spec 026)
 
 Each dict is keyed by the gold table name; the frames keep their analysis column names, and the Load results job
 renames them with gold_names.to_gold before writing (AGENTS.md "SQL and data names").
@@ -18,6 +19,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from . import case_profile
 from .telemetry import traced
 
 STATUS_ORDER = ["healthy_gingivitis", "periodontitis_stage_1", "periodontitis_stage_2", "periodontitis_stage_3",
@@ -87,6 +89,11 @@ def dq_tables(datasets_dir: Path) -> dict[str, pd.DataFrame]:
 
     f = ["data_quality/injected_error_recall.csv"]
     out["dq_injected_error"] = _with_provenance(_read(d, f[0]), d, f)
+
+    # spec 026 US1: one KEEPER-style profile per visit, built here from the committed visits (structured values
+    # only), so the 100k-row long form isn't committed as a second copy of the same evidence
+    f = ["visits_structured.csv"]
+    out["fact_case_profile_item"] = _with_provenance(case_profile.build_profiles(_read(d, f[0])), d, f)
     return out
 
 

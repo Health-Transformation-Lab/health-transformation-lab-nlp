@@ -297,7 +297,7 @@ def test_encoder_gpu_notebook_runs_the_script_and_keeps_the_predictions():
     assert "scripts/11_ai_predict.py" in nb and "--lr" in nb
     assert "/Volumes/" in nb and "encoder_gpu" in nb          # predictions copied to the landing volume
     assert "local_disk0" not in nb                           # serverless has no local_disk0
-    assert "replace_batch(" in nb                             # and kept in fact_prediction, per run (spec 026)
+    assert "replace_batch(" in nb                             # and kept in fact_prediction, per run (spec 027)
 
 
 def test_every_model_that_can_be_scored_has_a_plain_name():

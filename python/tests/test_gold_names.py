@@ -204,7 +204,7 @@ def test_the_scorecard_waits_for_the_migration_so_it_never_pays_for_calls_it_has
     assert "gold_names.migration_plan(" in nb and "run Load results first" in nb
 
 
-# spec 026 (#233): the Benchmark job's tables and the GPU encoders' predictions under the gold names
+# spec 027 (#233): the Benchmark job's tables and the GPU encoders' predictions under the gold names
 
 def _study_frame():
     from health_transformation_lab_nlp.build import CHART_FIELDS

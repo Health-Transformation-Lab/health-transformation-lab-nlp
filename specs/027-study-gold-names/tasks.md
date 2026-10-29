@@ -1,4 +1,4 @@
-# Tasks: the study and GPU encoder tables under the gold conventions (spec 026)
+# Tasks: the study and GPU encoder tables under the gold conventions (spec 027)
 
 - [x] T001 [US1] Failing tests: gold names and model for `dim_study_note` and `benchmark_metric`, `_mm`, `prediction_rows`, notebook and job checks
 - [x] T002 [US1] AGENTS.md `_mm` suffix; `gold_names.py` tables, `RENAMED`, `MERGE_KEYS`

@@ -296,6 +296,19 @@ TABLES = {
             C("caught_ratio", "double", "share the temporal checks flag"),
             C("false_flag_ratio", "double", "visits flagged with no error injected"),
             *DQ_PROV]),
+    # spec 026: case profiles, KEEPER-style (Schuemie, Ostropolets et al. 2025)
+    "fact_case_profile_item": Table(
+        "dq", "One per (synthetic visit, profile category, item): the visit's structured evidence, never note text",
+        "Load results: overwrite", [
+            C("visit_id", "bigint", "visit", "PK"),
+            C("category_name", "string", "Demographics · Presentation · Visit context · Measurements · Tests and "
+              "imaging · Risk factors · Treatment · Other readings · After the visit"),
+            C("category_order_num", "bigint", "1 = Demographics, shown first"),
+            C("item_name", "string", "what the row shows, e.g. max attachment loss (CAL)", "PK"),
+            C("item_order_num", "bigint", "position in the profile"),
+            C("item_value_name", "string", "the value as shown: a number, a status code, yes/no, or not recorded"),
+            C("item_unit_name", "string", "mm, %, years, teeth; empty when none"),
+            *DQ_PROV]),
     # spec 019: the lab grader (a SIMULATED sample until real runs exist)
     "dim_grader_question": Table(
         "lab", "One per grader question", "Load results: overwrite", [
@@ -320,7 +333,7 @@ TABLES = {
             C("run_id", "string", "the grading run"),
             C("is_simulated", "boolean", "true for the simulated sample"),
             *DQ_PROV]),
-    # spec 026: the Benchmark job (study_benchmark, 01_run_benchmark.py); synthetic study notes and their scores
+    # spec 027: the Benchmark job (study_benchmark, 01_run_benchmark.py); synthetic study notes and their scores
     "dim_study_note": Table(
         "study", "One per synthetic study note, with its generator label and split", "Benchmark: overwrite", [
             C("note_id", "bigint", "OMOP note_id (= visit_occurrence_id)", "PK"),
@@ -376,6 +389,7 @@ RELATIONSHIPS = [
     R("judge_queue", "fact_corpus_judge_call", ("method_name", "visit_id"), ("method_name", "visit_id"),
       "method_name, visit_id", "||--o|"),
     R("dim_grader_question", "fact_grader_answer", ("question_id",), ("question_id",), "question_id"),
+    R("fact_visit_evidence", "fact_case_profile_item", ("visit_id",), ("visit_id",), "visit_id"),
     R("dim_study_note", "benchmark_metric", ("run_id",), ("run_id",), "run_id (its test split)",
       "}o..o{", derived=True),
 ]
@@ -387,6 +401,6 @@ AREAS = {   # fill, legend label
     "corpus": ("#FDE7F1", "gold · corpus judge (ai_query, notebook 02)"),
     "dq": ("#E1EEF6", "gold · EHR DQ grader (spec 019)"),
     "lab": ("#F6E7DE", "gold · lab grader, simulated sample (spec 019)"),
-    "study": ("#EDEDF7", "gold · Benchmark job, synthetic study notes (spec 026)"),
+    "study": ("#EDEDF7", "gold · Benchmark job, synthetic study notes (spec 027)"),
     "file": ("#E4E7EA", "file in git, not a table"),
 }
