@@ -437,3 +437,33 @@ if (file.exists("data/sites/parity_sites.csv") && file.exists("data/sites/derive
   stopifnot(bad == 0)
 } else cat("ACES: skipped (run 22_build_sites.py)\n")
 cat("parity OK (spec 013)\n")
+
+# Spec 026: record-mismatch rules and their scores (R 15_spec026.R vs scripts/45_case_profiles.py).
+cm <- "data/datasets/case_profiles/record_mismatch.csv"
+cs <- "data/datasets/case_profiles/mismatch_rule_score.csv"
+if (file.exists(cm) && file.exists(cs)) {
+  source("r/R/15_spec026.R")
+  v <- read.csv("data/datasets/visits_structured.csv", stringsAsFactors = FALSE)
+  truth <- read.csv("data/datasets/answer_key/visits_truth.csv", stringsAsFactors = FALSE)
+  checks <- check_rules_026(v)
+  key <- function(d) sort(paste(d$visit_id, d$rule, ifelse(is.na(d$related_visit_id), "", d$related_visit_id)))
+  r_fail <- key(checks[checks$outcome == "fail", ])
+  py_fail <- key(read.csv(cm, stringsAsFactors = FALSE))
+  same_flags <- identical(r_fail, py_fail)
+  r_s <- score_rules_026(checks, v, truth)
+  py_s <- read.csv(cs, stringsAsFactors = FALSE)
+  m <- merge(r_s, py_s, by = c("rule", "clinic"), suffixes = c(".r", ".p"))
+  num <- c("checkable_count", "not_checkable_count", "flagged_count", "code_truth_mismatch_count",
+           "true_flag_count", "precision", "recall", "only_rule_count", "injected_checkable_count",
+           "injected_caught_count")
+  diff_of <- function(k) {
+    a <- m[[paste0(k, ".r")]]; b <- m[[paste0(k, ".p")]]
+    if (any(is.na(a) != is.na(b))) return(Inf)
+    if (all(is.na(a))) 0 else max(abs(a - b), na.rm = TRUE)
+  }
+  d <- max(sapply(num, diff_of))
+  cat(sprintf("record mismatches: %d flags (same as Python: %s); %d rule x clinic scores, max |R - Python| = %.2e\n",
+              length(r_fail), same_flags, nrow(m), d))
+  stopifnot(same_flags, nrow(m) == nrow(py_s), nrow(r_s) == nrow(py_s), d < 1e-9)
+  cat("parity OK (spec 026)\n")
+} else cat("record mismatches: skipped (run 45_case_profiles.py)\n")

@@ -239,3 +239,14 @@ def test_dq_genie_space_explains_every_value_a_profile_can_hold():
     text = " ".join(" ".join(i["content"]) for i in space["instructions"]["text_instructions"])
     for value in ("'none'", "cal_drop", "rbl_drop", "teeth_regained", "perio_resolved", "stage_drop"):
         assert value in text, value
+
+
+def test_dq_genie_space_explains_the_record_mismatch_rules():
+    """Spec 026 US2: the mismatch tables are in Genie, explained in the Words rule's terms."""
+    space = json.loads(dash.render_genie("dq_grader"))
+    text = " ".join(" ".join(i["content"]) for i in space["instructions"]["text_instructions"])
+    for term in ("fact_record_mismatch", "dq_mismatch_rule", "record mismatch", "checkable_count",
+                 "coding or charting gap", "any_rule"):
+        assert term in text, term
+    questions = " ".join(q["question"][0] for q in space["config"]["sample_questions"])
+    assert "stage III code" in questions
