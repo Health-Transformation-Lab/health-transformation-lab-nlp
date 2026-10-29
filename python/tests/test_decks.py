@@ -89,3 +89,14 @@ def test_slides_name_the_benchmark_not_the_lab(deck):
         text = " ".join(build_decks.visible_text(section)) + " " + notes
         hit = re.search(r"\bthe lab\b", text, re.IGNORECASE)
         assert not hit, f"{deck}/{sid}: '{text[max(0, hit.start() - 40):hit.end() + 40]}'"
+
+
+def test_no_overstated_absolutes_about_the_world():
+    # issue #274: gum disease is hard to count consistently, not impossible; claims are scoped ("we found no ...")
+    import re
+    files = [*(REPO_ROOT / "docs").glob("*/slides/*.html"), REPO_ROOT / "README.md"]
+    for f in files:
+        text = f.read_text(encoding="utf-8")
+        for phrase in (r"nobody can (count|study)", r"nobody publishes", r"nobody has measured",
+                       r"nobody at this size", r"can't be linked to diabetes"):
+            assert not re.search(phrase, text, flags=re.I), (f.name, phrase)

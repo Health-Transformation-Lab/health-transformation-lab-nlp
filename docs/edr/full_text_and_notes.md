@@ -5,7 +5,7 @@ A personal idea, not affiliated with or endorsed by any organization. Built from
 
 PerioBench · executive pitch · the dental record (EDR) · October 2026
 Gum disease is in the dental record.
-Nobody can count it.
+It's hard to count.
 PerioBench: can finding gum disease accurately in the dental record improve care for millions of patients? Checked against gum specialists, built and tested end to end on synthetic records.
 Health Transformation Lab
 Synthetic patient records
@@ -16,7 +16,7 @@ OralHealthBench
 , AI answers on oral health and getting care, planned on top of GlobalDentBench.
 John Bowyer · personal project, not affiliated with any organization
 
-**Speaker notes:** Gum disease is one of the most common chronic diseases in adults, and it is written down at almost every dental visit. But it is written down in pieces: a checkbox here, a billing code there, measurements, and a free-text note. Nobody can count it across clinics, so nobody can study it at scale, link it to diabetes, or see whether care is working. PerioBench asks one question: can finding gum disease accurately in the dental record improve care for people with it, so it is found earlier, treated, followed over time and managed alongside diabetes? Agreement with gum specialists reviewing the same records is how we check the result; better patient care is the goal. Everything shown is on synthetic records, built so the right answer is known; it is a rehearsal of the real study, not a result on real patients. This is a personal project, not any organization's plan.
+**Speaker notes:** Gum disease is one of the most common chronic diseases in adults, and it is written down at almost every dental visit. But it is written down in pieces: a checkbox here, a billing code there, measurements, and a free-text note. That makes it hard to count the same way across clinics, and so hard to study at scale, link to diabetes, or see whether care is working. PerioBench asks one question: can finding gum disease accurately in the dental record improve care for people with it, so it is found earlier, treated, followed over time and managed alongside diabetes? Agreement with gum specialists reviewing the same records is how we check the result; better patient care is the goal. Everything shown is on synthetic records, built so the right answer is known; it is a rehearsal of the real study, not a result on real patients. This is a personal project, not any organization's plan.
 
 ## Slide 2 — problem
 
