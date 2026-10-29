@@ -413,7 +413,8 @@ def _space(tables: list[str], instructions: list[str], questions: list[str]) -> 
 
 
 DQ_TABLES = ["dq_check", "dq_column_missing", "dq_prevalence", "dq_temporal_change", "dq_stage_transition",
-             "dq_source_concordance", "fact_visit_evidence", "dq_injected_error", "fact_case_profile_item"]
+             "dq_source_concordance", "fact_visit_evidence", "dq_injected_error", "fact_case_profile_item",
+             "fact_record_mismatch", "dq_mismatch_rule"]
 
 DQ_INSTRUCTIONS = [
     ("Every table holds synthetic data from the study's generator, scored against its own truth. Start every "
@@ -448,6 +449,15 @@ DQ_INSTRUCTIONS = [
      "before, not now), stage_drop (a lower stage than before). Structured values only, never note text. To show a "
      "visit's profile, list category_name, item_name, item_value_name and item_unit_name for its visit_id in order. "
      "Recorded diagnosis codes are what the dentist recorded; we find gum disease in records, we don't diagnose."),
+    ("fact_record_mismatch has one row per visit and failed rule: a record mismatch, where the recorded code "
+     "(the completed diagnosis code) doesn't fit the rest of the record. Call it a record mismatch or a record to "
+     "recheck: it is usually a coding or charting gap, never a judgment that a dentist got it wrong. rule_name is "
+     "code_vs_chart, code_above_chart, code_below_chart, no_periodontal_care, code_vs_radiograph or stage_drop; "
+     "mismatch_evidence_text gives the values; for stage_drop, related_visit_id is the earlier visit with the "
+     "higher code; failed_rule_count is how many rules the visit fails (list visits with most first). dq_mismatch_rule scores each rule, and any_rule, against the generator's truth over the visits "
+     "it can check (checkable_count), overall (clinic_code = 'All') and per clinic: precision_ratio, recall_ratio, "
+     "only_rule_count (flags no other rule makes), injected_caught_count of injected_checkable_count. Always give "
+     "checkable_count with a rule's precision or recall. Per-clinic injected-error counts are too few to compare."),
 ]
 
 DQ_QUESTIONS = [
@@ -458,6 +468,8 @@ DQ_QUESTIONS = [
     "What share of later visits show the stage improving, by method?",
     "How well do the chart note and the exam form agree with each other?",
     "Show the case profile of visit 1234.",
+    "Which visits have a stage III code but max CAL under 3 mm?",
+    "Which record-mismatch rule adds the most flags no other rule makes?",
 ]
 
 
