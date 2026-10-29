@@ -44,7 +44,8 @@ median. Duration and cost are the OpenTelemetry metrics `pipeline.run.duration_s
 
 `data/ops/incident.csv` is the repo's own incident history as run rows (GPU not free, Python died,
 Illegal seek, a short Kaggle run, new columns, a missing secret, a failed quality check, a run that hit
-its budget). `doctor.evaluate` scores the doctor on them; `doctor.ablation` is a switch-off test: it re-runs the
+its budget); their timing and cost columns are ILLUSTRATIVE until a run table exists, and the eval does not
+score them. `doctor.evaluate` scores the doctor on them; `doctor.ablation` (the function; the docs call it the switch-off test) hides each table in turn: it re-runs the
 eval with the config table, the typed conventions, lineage, the metrics or the run history hidden, one at a
 time, and whatever drops is what that piece contributed.
 Results and reading: spec 027, "The ablation". Nine incidents is a small set and the intervals say so.

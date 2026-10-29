@@ -144,7 +144,10 @@ docs and job definitions. Each is one row with the action taken and whether the 
 
 | A judge scorecard run that reached its 5 USD budget at a sub-dollar median (`max_usd`) | `cost_anomaly` | hold downstream; page the owner | yes |
 
-The set grows with every new incident: an incident write-up adds a row.
+The set grows with every new incident: an incident write-up adds a row. The class, action and reversibility
+columns are the record; `started_ts`, `duration_seconds` and `cost_usd` on these first nine rows are
+ILLUSTRATIVE values filled in so the rows are complete (no run table existed when they happened), and the eval
+does not score them. Rows added from a real run table carry real values.
 
 ## The switch-off test (an ablation): what each piece of metadata contributes
 
