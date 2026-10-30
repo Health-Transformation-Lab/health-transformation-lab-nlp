@@ -64,6 +64,7 @@ jobs:
       # Model Proxy credentials into the runner's .env (gitignored) and proves the token works.
       - name: Model Proxy credentials and quota
         run: |
+          mkdir -p build                    # gitignored, so a fresh checkout has none (#364)
           kaggle b init -y --env-file .env --example-file build/example_task.py
           grep -q '^MODEL_PROXY_API_KEY=' .env || { echo "::error::kaggle b init wrote no MODEL_PROXY_API_KEY"; exit 1; }
           grep -E '^(LLM_DEFAULT|LLM_DEFAULT_EVAL|LLMS_AVAILABLE)=' .env | tee -a "$GITHUB_STEP_SUMMARY"
