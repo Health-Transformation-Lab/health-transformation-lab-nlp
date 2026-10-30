@@ -1,0 +1,243 @@
+# Feature Specification: was a missing tooth lost to periodontitis? A tooth-level model on an Open Dental-shaped extract
+
+**Feature Branch**: `spec/369-029-tooth-loss`
+
+**Created**: 2026-10-30
+
+**Status**: draft
+
+**Input**: "Focus on predicting tooth loss. We need a separate bronze and silver database using the Open Dental
+database format." A tooth-level binary model (logistic regression or XGBoost): did this tooth get lost because of
+periodontitis? It is trained on extractions with a periodontal diagnosis attached, then applied to teeth already
+missing with no diagnosis. No OMOP, no NLP.
+
+> Personal learning project; synthetic data; public sources only (`DISCLAIMER.md`). The extract only follows the
+> *shape* of Open Dental's published database schema (opendental.com documentation). No practice's data, extract,
+> code lists or plans come into this repo; every row is generated here and labelled synthetic.
+
+## Why
+
+Stage III and stage IV periodontitis (2017 AAP/EFP; Tonetti, Greenwell & Kornman 2018) are told apart by teeth
+lost to periodontitis: 1–4 teeth lost points to III, 5 or more to IV (`docs/staging_grading.md`). A dental
+record rarely says why a tooth is gone:
+- an extraction done in the practice may carry a diagnosis;
+- a tooth that was already missing at the first exam carries none.
+
+So the count stage IV needs is unknown for most patients. The repo's stage rules currently either count only
+recorded losses (`teeth_lost_perio`) or count every missing tooth (`all_missing_perio`). Neither is right.
+
+A model trained on extractions with a recorded diagnosis can estimate, for each tooth missing without one, the
+chance it was lost to periodontitis. On real records nobody can check that estimate. On synthetic records,
+where `sites.draw_mouth` (spec 006) already knows why each tooth is missing, it can be checked. That is what
+this benchmark adds.
+
+## User Scenarios & Testing
+
+### User Story 1 - A synthetic extract in Open Dental's table format, in its own bronze schema (Priority: P1) #369
+
+A seeded generator writes the tables a practice-management extract would hold, using Open Dental's table and
+column names, lowercased:
+- patients;
+- procedures (code, tooth, status, date, attached diagnosis);
+- the procedure-code list;
+- treatment plans;
+- perio exams and their measures;
+- teeth recorded missing at the first exam;
+- the diagnosis definitions;
+- medical problems.
+
+The extract is loaded as is into the new `bronze_tooth_loss_bench` schema.
+
+It is built from the existing synthetic people and mouths, so every missing tooth has a known reason, `perio`
+or `other`. That truth is written only to a separate answer-key table, never into the extract.
+
+**Why this priority**: everything else reads it.
+
+**Independent Test**: build with a fixed seed twice and get identical files. Every table and column has a named
+source in Open Dental's published schema. The answer key covers every missing tooth. No column in the extract
+reveals the reason a tooth is missing, except a recorded diagnosis.
+
+**Acceptance Scenarios**:
+
+1. **Given** the default seed, **When** the extract is built, **Then** each person has:
+   - a first perio exam whose missing teeth are listed as missing, with no reason;
+   - later visits, some with completed extractions.
+2. **Given** an extraction of a tooth truly lost to periodontitis, **When** its diagnosis is drawn, **Then** it
+   is periodontal at the declared rate. Otherwise it is another diagnosis (a recording mismatch) or none. Each
+   rate is a named parameter.
+3. **Given** the existing study datasets, **When** this extract is built, **Then** they are byte-identical. The
+   extract uses its own random stream and its own files.
+
+---
+
+### User Story 2 - One silver row per patient and tooth (Priority: P1) #370
+
+`silver_tooth_loss_bench` holds one row per patient and tooth (universal numbering 1–32).
+
+Each row has a status:
+- present at the last exam;
+- extracted with a periodontal diagnosis;
+- extracted with another diagnosis;
+- extracted with no diagnosis;
+- missing at the first exam.
+
+It also has the features charted **before** the tooth was lost:
+- the tooth's own last probing depth, attachment loss, bleeding, mobility and furcation, where an exam came
+  before the loss;
+- the same for its neighbours on both sides;
+- mouth-level measures from the first exam: the share of sites with CAL ≥ 5 mm, maximum PD, bleeding, and how
+  many teeth are already missing;
+- tooth type (incisor, canine, premolar, molar; upper or lower);
+- age at the first exam;
+- smoking and diabetes from the medical problems.
+
+**Why this priority**: the model, the label rules and the stage recount all read this table.
+
+**Independent Test**:
+- Hand-built extracts give the expected status for each case.
+- The R twin gives the same statuses.
+- No feature uses anything dated after the tooth's loss.
+
+**Acceptance Scenarios**:
+
+1. **Given** a tooth listed missing at the first exam with no later procedure, **Then** its status is "missing
+   at the first exam", and it has no own measures.
+2. **Given** an extraction with a periodontal diagnosis on day 400, after exams on days 0 and 200, **Then**
+   only the day-200 exam's measures are its own last measures.
+3. **Given** the parity inputs, **When** `r/tests/test_parity.R` runs, **Then** the statuses match exactly.
+
+---
+
+### User Story 3 - The tooth-level model, checked against the hidden truth (Priority: P1) #371
+
+A binary model, P(lost to periodontitis), is trained on teeth extracted with a recorded diagnosis:
+- periodontal diagnosis = 1;
+- other diagnosis = 0.
+
+It is fitted twice, as logistic regression and as XGBoost, split 70/30 by patient with a fixed seed.
+
+It is applied to teeth missing at the first exam and to teeth extracted without a diagnosis. Those teeth have no
+own measures, so the applied model uses only features both groups have: neighbours, the mouth, the tooth's type
+and the patient. A second model fitted with the tooth's own measures is reported beside it, to show what those
+measures add where they exist.
+
+Each patient's stage is then recounted with the expected number of teeth lost to periodontitis, as an
+alternative `stage4_rule`.
+
+**Why this priority**: it is the model the request asks for, and the synthetic truth is what makes it checkable.
+
+**Independent Test**: one script run with a fixed seed writes these scores, all labelled synthetic:
+- the held-out scores on extracted teeth;
+- the scores on the missing-at-entry teeth against the answer key;
+- a table of stage III vs IV under each counting rule.
+
+**Acceptance Scenarios**:
+
+1. **Given** the held-out extracted teeth, **Then** AUC, Brier score, sensitivity and specificity at the
+   chosen threshold, and a calibration table (10 bins) are reported.
+2. **Given** the missing-at-entry teeth, **Then** the same metrics are reported against the answer key, and the
+   gap between the two shows how well training on extractions carries over to teeth that were never extracted
+   in the record.
+3. **Given** each counting rule for stage IV, the counts compared are:
+   - recorded only;
+   - every missing tooth;
+   - expected from the model;
+   - the truth.
+
+   **Then** the number of patients called III and IV under each is compared with the truth.
+
+### Edge Cases
+
+- **Third molars:** they are often missing for other reasons (the synthetic mouths already treat them so), so
+  they are excluded from the label and the stage count by default. This is a parameter, and the repo's choice,
+  not a rule cited to the classification.
+- **A tooth extracted twice in the record (a data error) or extracted after being listed missing:** it is
+  counted once, at its first loss, and flagged.
+- **A patient with no exam before an extraction:** the tooth has no own measures; its neighbours' and the
+  mouth's come from the first exam after.
+- **Classes are imbalanced** (most extractions in the synthetic set may be periodontal): rates are parameters,
+  and the metrics include ones that don't depend on prevalence (AUC) and ones that do (Brier).
+- **The answer key** is never a model feature. A test fails if any feature column can be traced to it.
+
+## Requirements
+
+### Functional Requirements
+
+- **FR-001** `python/health_transformation_lab_nlp/open_dental.py` declares the extract's tables and columns once
+  (`TABLES`), each with its Open Dental source:
+  `patient`, `procedurelog`, `procedurecode`, `treatplan`, `proctp`, `perioexam`, `periomeasure`, `toothinitial`,
+  `definition`, `disease`, `diseasedef`.
+  - Only the columns this spec needs are included.
+  - Names are checked against Open Dental's published schema documentation before implementation (T001).
+  - Codes use public CDT procedure codes for extractions (D7140, D7210) and public ICD-10-CM codes for
+    diagnoses (K05.3x periodontitis, K02.x caries, others).
+- **FR-002** The generator draws a timeline per synthetic person: a first exam, then later visits, with
+  extractions dated between exams. It uses its own seeded stream (`random.Random(f"{seed}:open_dental")`), so
+  existing outputs don't change. Shares and rates are named parameters with fixed defaults:
+  - teeth missing at entry vs extracted during the record;
+  - extractions with a periodontal diagnosis, another diagnosis or none;
+  - recording mismatches.
+- **FR-003** The answer key (`tooth_loss_truth`: patient, tooth, true reason) is written apart from the extract,
+  and only the evaluation reads it.
+- **FR-004** New bench `tooth_loss_bench` in `schemas.py`, with layers bronze, silver and gold:
+  - bronze holds the extract as is, lowercased;
+  - silver holds the tooth table, following AGENTS.md naming (`tooth_status_code`, `is_perio_loss`,
+    `last_max_pd_mm`, ...);
+  - gold holds only the model's answers (`fact_tooth_loss_prediction`).
+
+  Declared in `databricks/resources/unity_catalog.yml` and `diagrams/_build/gold_model.py`. Same names in
+  every target.
+- **FR-005** The tooth-status rules and the stage recount (expected teeth lost) are label rules: they get base-R
+  twins, checked by `r/tests/test_parity.R`. Model fitting stays Python only.
+- **FR-006** Metrics (AUC, Brier, sensitivity, specificity, calibration bins) get base-R twins too. If spec
+  023's `class_metrics` has landed, the binary case reuses it.
+- **FR-007** Writes are idempotent (overwrite by run, or delete-then-append by `run_id`). Every row carries
+  `run_id`, `run_ts` and `git_commit_sha`.
+- **FR-008** No OMOP mapping, no note text, no language models anywhere in this bench.
+- **FR-009** Data-quality checks run between the bronze extract and the silver tooth table. They follow
+  Kookal et al. 2024 (references item 57; NIH Collaboratory framework), so a real extract in the same format would
+  get the same checks. Each check reports a number, and failures are flagged, never silently fixed:
+  - **completeness:** every declared column present and none extra; types and value sets as declared; one value
+    per field; the null/unknown/missing share per column and overall; duplicate rows; duplicate keys (patient,
+    tooth, procedure); rows missing any value the tooth table needs;
+  - **accuracy:** values outside known ranges (probing depth, CAL, mobility 0–3, tooth numbers 1–32, dates in
+    order); procedure codes not in the CDT list, and diagnosis codes not valid ICD-10-CM;
+  - **consistency:** the null/unknown/missing share per office (clinic), against the mean of all offices, with
+    offices beyond 2 SD flagged.
+
+  The synthetic generator plants a known number of each kind of fault, at named rates, so each check is tested
+  against what it should find. Results go to a silver `tooth_loss_dq_check` table (one row per check and run).
+
+### Key Entities
+
+- **Extract tables** (bronze): Open Dental's table and column names, lowercased.
+- **Data-quality check** (silver): check × run: domain, check number (after Kookal et al. 2024), count found,
+  share, flagged.
+- **Tooth** (silver): patient × tooth number: status, loss date, features before the loss.
+- **Truth** (silver, evaluation only): patient × tooth: true reason.
+- **Prediction** (gold): patient × tooth × model × run: probability, label at threshold.
+
+## Success Criteria
+
+- **SC-001** A rebuild with the default seed is identical, and the existing datasets are unchanged.
+- **SC-002** Every extract column names its Open Dental source table and column.
+- **SC-003** The model's scores on the held-out extractions and on the missing-at-entry teeth are both reported,
+  labelled synthetic.
+- **SC-004** The stage III/IV comparison shows each counting rule against the truth.
+- **SC-005** R parity covers the tooth statuses, the expected-count stage rule and the metrics.
+- **SC-006** Every planted fault is found by its check, and the clean rows pass every check.
+
+## Assumptions
+
+- "Open Dental format" means the shape of its published schema: table and column names, keys, how procedures
+  carry a tooth number and a diagnosis. It does not mean a runnable Open Dental database.
+- Gold is added only for the model's answers, following the repo's layer rules. Bronze and silver hold
+  everything else.
+- The synthetic mouths of spec 006 are the source of truth. Their loss process (`draw_mouth`) is reused, not
+  changed.
+
+## Out of scope
+
+- Any real extract, or any specific practice's codes, workflows or plans.
+- OMOP, notes, NLP, LLMs, agents.
+- Predicting future tooth loss. This is about why a tooth already lost was lost.

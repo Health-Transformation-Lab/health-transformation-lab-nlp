@@ -109,6 +109,24 @@ Everything this repo relies on, and what it's used for.
 36. **Kahn MG, Callahan TJ, Barnard J, et al.** *A harmonized data quality assessment terminology and framework
     for the secondary use of electronic health record data.* eGEMs 2016;4(1):1244.
     [doi:10.13063/2327-9214.1244](https://doi.org/10.13063/2327-9214.1244)
+57. **Kookal KK, Walji MF, Brandon R, Kivanc F, Mertz E, Kottek A, Mullins J, Liang S, Jenson LE, White JM.**
+    *Systematically assessing the quality of dental electronic health record data for an investigation into oral
+    health care disparities.* J Public Health Dent 2024;84(3):242–250.
+    [doi:10.1111/jphd.12618](https://doi.org/10.1111/jphd.12618), PMID 38659337, PMC11499288.
+    Data-quality checks on a dental EHR extract (children 0–18, a 30-office dental group in Oregon, records
+    2014–2022: 91,487 people, 11 tables, 75 columns). The checks follow the NIH Pragmatic Trials Collaboratory
+    framework (Zozus et al. 2014), across three domains and 12 checks (Table 1):
+    - completeness: agreed columns present, each checked against the data dictionary, data types, one value per
+      field, the share of null/unknown/missing values (NUMs) per column, duplicate rows, cohort inclusion,
+      duplicate key combinations, and rows with any missing value;
+    - accuracy: values outside known ranges, and values not in standard code sets (CDT, ZIP);
+    - consistency: NUMs per office, against the mean of all offices.
+    Its published results: 97.2% completeness, 100% extract accuracy, and 29 of 30 offices within 2 SD of the
+    mean NUM share. Its Table 2 lists anomalies and how each was resolved (corrected, or accepted as plausible),
+    e.g. invalid diagnostic codes corrected and impossible plaque scores corrected. → spec 029: the checks run
+    between the bronze extract and the silver tooth table (FR-009). Checked on PubMed and the PMC full text. The
+    abstract says benefits "between 2014–2108", a typo for 2014–2018 as the Methods give it. Published figures
+    only: the paper's data is not public and never comes in.
 
 ## Classification rules
 
