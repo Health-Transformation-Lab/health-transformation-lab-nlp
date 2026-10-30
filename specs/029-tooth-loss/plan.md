@@ -30,8 +30,9 @@
    - Own stream `random.Random(f"{seed}:open_dental")`. Output: `data/datasets/open_dental/*.csv`, plus
      `tooth_loss_truth.csv` apart from them.
 3. **Bench and bundle.**
-   - `schemas.LAYERS["tooth_loss_bench"] = ("bronze", "silver", "gold")`.
-   - `unity_catalog.yml` declares the three schemas with `prevent_destroy`.
+   - `schemas.LAYERS["opendental_perio"] = ("landing", "bronze", "silver", "gold")`: schemas
+     `<layer>_opendental_perio`.
+   - `unity_catalog.yml` declares the four schemas and the landing volume `data`, all with `prevent_destroy`.
    - A job `tooth_loss_load`: bronze from the CSVs (overwrite per run); silver and gold from the Python
      functions; rows carry `run_id`, `run_ts` and `git_commit_sha`.
 4. **Silver tooth table** (`tooth_loss.py`). `tooth_table(extract)` returns one row per patient and tooth:

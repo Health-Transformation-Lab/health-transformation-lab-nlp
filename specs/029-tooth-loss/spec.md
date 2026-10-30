@@ -46,7 +46,8 @@ column names, lowercased:
 - the diagnosis definitions;
 - medical problems.
 
-The extract is loaded as is into the new `bronze_tooth_loss_bench` schema.
+The CSV files land in the `data` volume of `landing_opendental_perio`, and are loaded as is, one table per
+Open Dental table, into `bronze_opendental_perio`.
 
 It is built from the existing synthetic people and mouths, so every missing tooth has a known reason, `perio`
 or `other`. That truth is written only to a separate answer-key table, never into the extract.
@@ -72,7 +73,8 @@ reveals the reason a tooth is missing, except a recorded diagnosis.
 
 ### User Story 2 - One silver row per patient and tooth (Priority: P1) #370
 
-`silver_tooth_loss_bench` holds one row per patient and tooth (universal numbering 1–32).
+`silver_opendental_perio` holds one row per patient and tooth (universal numbering 1–32), next to the cleaned
+Open Dental tables it is built from.
 
 Each row has a status:
 - present at the last exam;
@@ -179,10 +181,17 @@ alternative `stage4_rule`.
   - recording mismatches.
 - **FR-003** The answer key (`tooth_loss_truth`: patient, tooth, true reason) is written apart from the extract,
   and only the evaluation reads it.
-- **FR-004** New bench `tooth_loss_bench` in `schemas.py`, with layers bronze, silver and gold:
-  - bronze holds the extract as is, lowercased;
-  - silver holds the tooth table, following AGENTS.md naming (`tooth_status_code`, `is_perio_loss`,
-    `last_max_pd_mm`, ...);
+- **FR-004** New schema family `opendental_perio` in `schemas.py`, named like the old
+  `<layer>_dental_omop_perio` schemas with the format changed: `landing_opendental_perio`,
+  `bronze_opendental_perio`, `silver_opendental_perio`, `gold_opendental_perio`.
+  - landing holds the CSV files, in the managed volume `data`;
+  - bronze holds Open Dental's tables as is, one table each, with Open Dental's names (`patient`,
+    `procedurelog`, `periomeasure`, ...);
+  - silver holds the same tables cleaned, with the same names and layout: types enforced, -1 read as not
+    measured, gingival margins of 100 and up decoded as negative, CAL computed, bleeding decoded from its bit,
+    ICD codes normalised, and each row flagged by the data-quality checks (FR-009). Next to them, the tooth
+    table, following AGENTS.md naming (`tooth_status_code`, `is_perio_loss`, `last_max_pd_mm`, ...), and
+    `tooth_loss_dq_check`, one row per check and run;
   - gold holds only the model's answers (`fact_tooth_loss_prediction`).
 
   Declared in `databricks/resources/unity_catalog.yml` and `diagrams/_build/gold_model.py`. Same names in

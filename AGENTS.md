@@ -251,7 +251,8 @@ Full pipeline and dry runs: `README.md`. Study design: `docs/process.md`.
 - R: base R only, matching Python to 1e-9 (`r/tests/test_parity.R`).
 - Databricks names: identical in every target (catalog `health_transformation_lab`, schemas `<layer>_<bench>`:
   `landing_`/`bronze_`/`silver_`/`gold_perio_bench`, and `bronze_`/`silver_`/`gold_` for `oral_health_bench` and
-  `access_bench`; `health_transformation_lab_nlp.schemas`, spec 022). Never add `dev_`,
+  `access_bench`; `landing_`/`bronze_`/`silver_`/`gold_opendental_perio` for the Open Dental extract, spec 029;
+  `health_transformation_lab_nlp.schemas`, spec 022). Never add `dev_`,
   `[dev <user>]` or per-environment prefixes or suffixes, and never use
   `mode: development` (it adds them): each environment is its own workspace.
   dev is deployed by CI on every merge to `main`; don't `bundle deploy` it from a laptop.

@@ -52,7 +52,9 @@ def test_agents_md_states_the_order():
 
 
 def test_the_schemas_follow_the_order():
-    assert list(schemas.LAYERS) == ["perio_bench", "oral_health_bench", "access_bench"]
+    # the benchmarks keep their order; other schema families (spec 029's opendental_perio) come after them
+    assert [b for b in schemas.LAYERS if b.endswith("_bench")] == ["perio_bench", "oral_health_bench", "access_bench"]
+    assert list(schemas.LAYERS)[:3] == ["perio_bench", "oral_health_bench", "access_bench"]
 
 
 @pytest.mark.parametrize("text", [
