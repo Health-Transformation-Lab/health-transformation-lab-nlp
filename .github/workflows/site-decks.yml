@@ -1,0 +1,48 @@
+# Copy the built decks to the website, healthtransformationlab.org (issue #374), whenever they change on main:
+# docs/edr/deck.html -> perio-bench/, docs/pitch/deck.html -> oral-health-bench/, and the two covers -> img/.
+# .github/scripts/site_decks.py makes the copies (each deck plus the site's icon links) and commits only what changed.
+# Setting: SITE_DEPLOY_TOKEN (secret, GitHub environment dev), a fine-grained token for
+# healthtransformationlab/healthtransformationlab.github.io only, Contents read and write (ops/secrets_register.yaml).
+name: Copy the decks to the website
+on:
+  push:
+    branches: [main]
+    paths: ["docs/edr/deck.html", "docs/pitch/deck.html", "docs/img/*_deck_cover.png",
+            ".github/scripts/site_decks.py", ".github/workflows/site-decks.yml"]
+  workflow_dispatch:
+
+concurrency: site-decks
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    environment: dev
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      # Check the setting before any work (AGENTS.md "Configuration and secrets").
+      - name: Check the site token (value stays masked)
+        env:
+          SITE_DEPLOY_TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+        run: python .github/scripts/site_decks.py check
+
+      - name: Copy the decks to the site and push if anything changed
+        env:
+          SITE_DEPLOY_TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+          SHA: ${{ github.sha }}
+        run: |
+          git clone --depth 1 "https://x-access-token:${SITE_DEPLOY_TOKEN}@github.com/healthtransformationlab/healthtransformationlab.github.io" site
+          changed=$(python .github/scripts/site_decks.py copy site)
+          if [ -z "$changed" ]; then echo "The site already has these decks."; exit 0; fi
+          echo "$changed"
+          cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Copy the decks from health-transformation-lab-nlp@${SHA::12}" \
+            -m "Made by .github/workflows/site-decks.yml in healthtransformationlab/health-transformation-lab-nlp."
+          git push origin HEAD:main
+          { echo "Copied to the site:"; echo "$changed"; } >> "$GITHUB_STEP_SUMMARY"
