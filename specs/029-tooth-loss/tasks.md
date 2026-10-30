@@ -4,8 +4,8 @@ Implementation starts after this spec, plan and tasks are reviewed.
 
 ## US1 #369: synthetic extract in Open Dental's table format, own bronze schema
 
-- [ ] T001 [US1] Check each table and column in plan.md against Open Dental's published schema documentation;
-  write `TABLES` with sources
+- [x] T001 [US1] Check each table and column in plan.md against Open Dental's source schema ([research.md](research.md));
+  `TABLES` is written from it in T003
 - [ ] T002 [US1] Failing tests: `test_open_dental.py` (seed, unchanged datasets, sources, no truth in the
   extract, rates recovered)
 - [ ] T003 [US1] `open_dental.py` generator, own random stream; writes the extract and `tooth_loss_truth.csv`
