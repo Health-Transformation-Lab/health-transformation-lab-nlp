@@ -33,6 +33,16 @@ Clean.
 - Third molars are excluded by a stated parameter, marked as the repo's choice, not attributed to the
   classification.
 
+## Added in f63a378: Kookal et al. 2024 (references item 57)
+- Checked on PubMed (authors, J Public Health Dent 2024;84(3):242–250, doi, PMC) and the PMC full text:
+  Table 1's 12 checks, the cohort, and the published figures (97.2% completeness, 100% accuracy, 29 of 30
+  offices within 2 SD). The abstract's "2014–2108" is noted as a typo for the Methods' 2014–2018.
+- Spec 029 FR-009 adapts the 12 checks to the bronze-to-silver step, and SC-006 requires each planted fault to
+  be found. Plan step 6a and task T006a carry it, and `test_kookal_2024_citation.py` (written first) pins the
+  entry and FR-009.
+- The paper names the dental group it studied. The entry describes it only as the paper does (a 30-office
+  dental group in Oregon), with the citation.
+
 ## Findings
 - 🔵 The Open Dental column list in plan.md is unverified until T001. The spec requires that check before
   code, so the risk is contained.
