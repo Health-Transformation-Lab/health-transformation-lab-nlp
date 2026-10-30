@@ -9,8 +9,9 @@ Implementation starts after this spec, plan and tasks are reviewed.
 - [ ] T002 [US1] Failing tests: `test_open_dental.py` (seed, unchanged datasets, sources, no truth in the
   extract, rates recovered)
 - [ ] T003 [US1] `open_dental.py` generator, own random stream; writes the extract and `tooth_loss_truth.csv`
-- [ ] T004 [US1] `tooth_loss_bench` in `schemas.py`, `unity_catalog.yml`, `gold_model.py`; failing schema and
-  bundle tests first
+- [x] T004 [US1] `<layer>_opendental_perio` schemas and the landing volume in `schemas.py` and
+  `unity_catalog.yml`; failing schema and bundle tests first (`fact_tooth_loss_prediction` goes in `gold_model.py`
+  with the model, T010)
 
 ## US2 #370: one silver row per patient and tooth
 
