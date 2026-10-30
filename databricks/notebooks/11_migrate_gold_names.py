@@ -68,23 +68,32 @@ def rows(name: str) -> int:
     return spark.table(table(name)).count()  # noqa: F821
 
 
-def merge_missing(src, new: str) -> None:
-    """Append src's rows whose MERGE_KEYS the current table new lacks. A key column new doesn't have yet (the
-    reader's run_id, before a reader run) counts as null; mergeSchema adds it."""
+def keyed(df, key, other):
+    """df with every key column: one it lacks is null, typed as in other, or string when neither has it (the
+    reader's run_id, in a table no reader run has written yet; issue #248)."""
+    for k in key:
+        if k not in df.columns:
+            df = df.withColumn(k, F.lit(None).cast(other.schema[k].dataType if k in other.columns else "string"))
+    return df
+
+
+def missing(src, new: str):
+    """src's rows whose MERGE_KEYS the current table new lacks, with src's own columns only."""
     current = spark.table(table(new))  # noqa: F821
     key = gold_names.MERGE_KEYS[new]
-    have = current.select(*[current[k] if k in current.columns else F.lit(None).cast(src.schema[k].dataType).alias(k)
-                            for k in key]).distinct()
-    cond = [src[k].eqNullSafe(have[k]) for k in key]
-    src.join(have, cond, "left_anti").write.mode("append").option("mergeSchema", "true").saveAsTable(table(new))
+    s = keyed(src, key, current)
+    have = keyed(current, key, src).select(*key).distinct()
+    return s.join(have, [s[k].eqNullSafe(have[k]) for k in key], "left_anti").select(*src.columns)
+
+
+def merge_missing(src, new: str) -> None:
+    """Append src's rows whose MERGE_KEYS the current table new lacks; mergeSchema adds src's other columns."""
+    missing(src, new).write.mode("append").option("mergeSchema", "true").saveAsTable(table(new))
 
 
 def not_carried(src, new: str) -> int:
     """src's rows whose MERGE_KEYS are still missing from the current table new."""
-    current = spark.table(table(new))  # noqa: F821
-    key = gold_names.MERGE_KEYS[new]
-    have = current.select(*key).distinct()
-    return src.join(have, [src[k].eqNullSafe(have[k]) for k in key], "left_anti").count()
+    return missing(src, new).count()
 
 
 # Which old tables exist, with their columns; the decision is gold_names.migration_plan (tested).
