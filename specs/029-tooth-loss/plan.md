@@ -4,28 +4,27 @@
 
 ## Approach
 
-1. **Schema check (T001).**
-   - Read Open Dental's published schema documentation for the eleven tables in FR-001.
-   - Record each column used, with its type and meaning, in `TABLES` (`open_dental.py`), with a link to the doc
-     page.
-   - Columns this plan expects to use, to be confirmed:
-     - `patient`: PatNum, Birthdate, Gender
-     - `procedurelog`: ProcNum, PatNum, ProcDate, ProcStatus, CodeNum, ToothNum, Dx, DiagnosticCode
-     - `procedurecode`: CodeNum, ProcCode, Descript
-     - `treatplan` / `proctp`: plans and their planned procedures
-     - `perioexam`: PerioExamNum, PatNum, ExamDate
-     - `periomeasure`: PerioExamNum, SequenceType, IntTooth, ToothValue, and the six site values
-     - `toothinitial`: PatNum, ToothNum, InitialType (Missing)
-     - `definition`: DefNum, Category, ItemName (the diagnosis list)
-     - `disease` / `diseasedef`: medical problems (diabetes, smoking)
-   - Any expected column the docs don't have is dropped or replaced before code is written.
+1. **Schema check (T001), done.** [research.md](research.md) records every table and column used, with its meaning
+   and the Open Dental source file it came from (github.com/OpenDental/OpenDental, branch `24_3`, commit `d804c19`).
+   `TABLES` in `open_dental.py` is written from it. What the source changed in this plan:
+   - CAL is computed, not stored: probing (sequence 4) + gingival margin (sequence 2, values of 100 and up are
+     negative).
+   - Bleeding is bit 1 of sequence 6.
+   - An extraction carries the practice's own diagnosis (`Dx` → `definition`, category Diagnosis) and/or an ICD
+     code (`DiagnosticCode` with `IcdVersion`).
+   - Smoking is `patient.SmokingSnoMed`. Diabetes is a `disease` row whose `diseasedef` has an E10–E11 ICD-10 code.
+   - `ProcStatus` 4 ("Existing Other Prov") is an extraction done elsewhere: a third way a tooth is missing,
+     treated like missing at the first exam.
 2. **Generator** (`open_dental.py`, `@traced`).
    - For each synthetic person (study visits), take the mouth `sites.draw_mouth` makes at each visit. Its
      `missing_reason` is the truth.
    - Split the person's missing teeth into missing at the first exam (`toothinitial`) and extracted during the
      record (`procedurelog`, completed, D7140/D7210, dated between exams), by the share parameters.
-   - Attach `Dx` / `DiagnosticCode` to extractions by the diagnosis-rate parameters (periodontal, other, none,
-     mismatch).
+   - Attach the practice's diagnosis (`Dx` → `definition`) and/or an ICD-10 `DiagnosticCode` to extractions by the
+     diagnosis-rate parameters (periodontal, other, none, mismatch), and record some prior extractions as
+     `ProcStatus` 4 ("Existing Other Prov").
+   - Write probing and gingival margin per site (never CAL), mobility and furcation per tooth, and bleeding as bit 1
+     of sequence 6. Smoking goes in `patient.SmokingSnoMed`, diabetes in `disease` / `diseasedef`.
    - Write perio exams and measures for every visit from the site table. Medical problems come from the existing
      risk factors.
    - Own stream `random.Random(f"{seed}:open_dental")`. Output: `data/datasets/open_dental/*.csv`, plus

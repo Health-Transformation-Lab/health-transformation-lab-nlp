@@ -1,0 +1,192 @@
+# Research: Open Dental's tables for spec 029 (task T001)
+
+**Source.** Open Dental's own source code, which is public under the GPL:
+- repository: https://github.com/OpenDental/OpenDental
+- release branch `24_3`, commit `d804c19` (2025-04-01)
+- folder `OpenDentBusiness/TableTypes/`, one C# class per table
+
+Each class names its database table and documents every column. The table name comes from the class's
+`CrudTable` attribute, or is the class name lowercased when that attribute names none. Read 2026-10-30.
+
+opendental.com, which publishes the same schema as documentation, is not reachable from the build container, so
+the source was used instead.
+
+Only the names, types and meanings below are recorded here, in our own words. No source code is copied. Only
+the columns spec 029 needs are listed; each table has more.
+
+## Tables and columns
+
+### `patient`
+*(Patient.cs)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `PatNum` | bigint | primary key |
+| `Birthdate` | date | age is never stored; it is computed from this |
+| `Gender` | enum PatientGender | |
+| `PatStatus` | enum PatientStatus | |
+| `ClinicNum` | bigint | FK to `clinic`; 0 when no clinics are used |
+| `PriProv` | bigint | FK to `provider`; the primary provider |
+| `DateFirstVisit` | date | set automatically |
+| `SmokingSnoMed` | string | the most recent smoking status, as a SNOMED code |
+
+### `procedurelog`
+*(Procedure.cs; table name set by `CrudTable`)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `ProcNum` | bigint | primary key |
+| `PatNum` | bigint | FK to `patient` |
+| `ProcDate` | date | the date shown as performed; for a planned procedure, the date planned or empty |
+| `DateComplete` | date | when first set complete |
+| `DateTP` | date | when first treatment-planned |
+| `ProcStatus` | enum ProcStat | 1 TP (planned), 2 Complete, 3 Existing Cur Prov, 4 Existing Other Prov, 5 Referred, 6 Deleted, 7 Condition |
+| `CodeNum` | bigint | FK to `procedurecode` |
+| `ToothNum` | string | blank, 1–32 or A–T (primary); supernumerary +50 |
+| `Surf` | string | surfaces, or a quadrant, sextant or arch code |
+| `Dx` | bigint | FK to `definition.DefNum`: the diagnosis, from the practice's own list (category Diagnosis) |
+| `Prognosis` | bigint | FK to `definition.DefNum` (category Prognosis) |
+| `DiagnosticCode`, `DiagnosticCode2`–`4` | string | diagnosis codes sent with medical claims |
+| `IcdVersion` | byte | 9 or 10: which ICD version the diagnostic codes are |
+| `IsPrincDiag` | bool | the principal diagnosis on a medical claim |
+| `ProvNum` | bigint | FK to `provider` |
+| `ClinicNum` | bigint | FK to `clinic` |
+| `AptNum` | bigint | FK to `appointment` |
+
+### `procedurecode`
+*(ProcedureCode.cs)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `CodeNum` | bigint | primary key |
+| `ProcCode` | string | the D-code (CDT), or a medical or custom code |
+| `Descript`, `AbbrDesc` | string | description, abbreviation |
+| `TreatArea` | enum TreatmentArea | tooth, surface, quadrant, arch, mouth |
+| `DiagnosticCodes` | string | up to 4 default ICD-10 codes, comma-separated |
+
+### `treatplan`
+*(TreatPlan.cs)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `TreatPlanNum` | bigint | primary key |
+| `PatNum` | bigint | FK to `patient` |
+| `DateTP` | date | date of the plan |
+| `TPStatus` | enum TreatPlanStatus | 0 Saved, 1 Active, 2 Inactive |
+
+### `proctp`
+*(ProcTP.cs: a planned procedure, copied into a saved plan)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `ProcTPNum` | bigint | primary key |
+| `TreatPlanNum` | bigint | FK to `treatplan` |
+| `PatNum` | bigint | FK to `patient` |
+| `ProcNumOrig` | bigint | FK to `procedurelog`, to compare with the original |
+| `ToothNumTP` | string | display text of the tooth number |
+| `ProcCode` | string | display text, not a key |
+| `Dx` | string | the diagnosis *text* at the time the plan was saved (not a key) |
+| `Prognosis` | string | the prognosis text |
+
+### `perioexam`
+*(PerioExam.cs)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `PerioExamNum` | bigint | primary key |
+| `PatNum` | bigint | FK to `patient` |
+| `ExamDate` | date | |
+| `ProvNum` | bigint | FK to `provider` |
+
+### `periomeasure`
+*(PerioMeasure.cs: one row per exam, tooth and kind of measure)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `PerioMeasureNum` | bigint | primary key |
+| `PerioExamNum` | bigint | FK to `perioexam` |
+| `SequenceType` | enum PerioSequenceType | 0 Mobility, 1 Furcation, 2 GingMargin (recession), 3 MGJ, 4 Probing, 5 SkipTooth, 6 BleedSupPlaqCalc, 7 CAL |
+| `IntTooth` | int | 1–32; every measure belongs to a tooth |
+| `ToothValue` | int | for whole-tooth measures (mobility, skip tooth); -1 means not measured |
+| `MBvalue`, `Bvalue`, `DBvalue`, `MLvalue`, `Lvalue`, `DLvalue` | int | the six sites; -1 means not measured |
+
+The source says three things the plan has to follow:
+- **CAL is not stored.** Sequence type 7 (CAL) is never saved; Open Dental computes it on the fly. So
+  attachment loss must be computed from probing depth (type 4) and gingival margin (type 2): CAL = probing
+  depth + recession.
+- **Gingival margin values of 100 and up encode negative numbers** (a margin above the cementoenamel junction):
+  100 − value. So 105 means −5.
+- **Bleeding, suppuration, plaque and calculus are one bit-flag sum per site** (type 6): bleeding 1, suppuration 2,
+  plaque 4, calculus 8. Bleeding on probing is `value & 1`.
+
+### `toothinitial`
+*(ToothInitial.cs: the chart's starting state)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `ToothInitialNum` | bigint | primary key |
+| `PatNum` | bigint | FK to `patient` |
+| `ToothNum` | string | 1–32 or A–Z |
+| `InitialType` | enum ToothInitialType | 0 Missing, 1 Hidden, 2 Primary, then shifts, rotations and drawings |
+
+A tooth recorded missing with no procedure is `InitialType` 0. It carries no reason and no date.
+
+### `definition`
+*(Def.cs; table name set by `CrudTable`)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `DefNum` | bigint | primary key |
+| `Category` | enum DefCat | which list the item belongs to. `Diagnosis`, `Prognosis` and `TxPriorities` are the ones spec 029 reads |
+| `ItemName` | string | the item's text, e.g. a diagnosis name |
+| `ItemValue` | string | extra information, used differently by each category |
+
+The diagnosis on a procedure (`procedurelog.Dx`) is therefore an item in the practice's **own** list, not a
+standard code. Standard codes, when present, are in `DiagnosticCode` (ICD-9 or ICD-10, per `IcdVersion`).
+
+### `disease`
+*(Disease.cs: a patient's medical problem)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `DiseaseNum` | bigint | primary key |
+| `PatNum` | bigint | FK to `patient` |
+| `DiseaseDefNum` | bigint | FK to `diseasedef` |
+| `ProbStatus` | enum ProblemStatus | 0 Active, 1 Resolved, 2 Inactive |
+| `DateStart`, `DateStop` | date | may be empty when unknown |
+
+### `diseasedef`
+*(DiseaseDef.cs: the list of problems)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `DiseaseDefNum` | bigint | primary key |
+| `DiseaseName` | string | |
+| `Icd10Code`, `ICD9Code`, `SnomedCode` | string | standard codes for the problem, e.g. diabetes |
+
+### `clinic`
+*(Clinic.cs)*
+
+| Column | Type | Meaning |
+|---|---|---|
+| `ClinicNum` | bigint | primary key; used by patient, procedurelog and others |
+| `Description` | string | |
+
+## What this changes in spec 029
+
+1. **CAL is computed, not read**: probing + gingival margin per site, decoding the 100+ convention (plan
+   step 2 and the silver features).
+2. **Bleeding** comes from bit 1 of sequence type 6, not from a column of its own.
+3. **Two kinds of diagnosis on an extraction:**
+   - `Dx`, the practice's own diagnosis list, joined to `definition` (category Diagnosis), which is free text;
+   - `DiagnosticCode` with `IcdVersion`, where a standard ICD code was entered.
+
+   The generator writes both, at separate rates. The silver step reads the ICD code first, then maps the
+   practice's list by a declared lookup, which is a parameter, since every practice's list differs.
+4. **A third way a tooth is missing**: an extraction recorded with `ProcStatus` 4, "Existing Other Prov"
+   (done elsewhere, before this practice). It has a code and a tooth, usually no diagnosis and often no real
+   date. It joins "missing at the first exam" among the teeth the model is applied to.
+5. **Smoking** is `patient.SmokingSnoMed` (a SNOMED code). **Diabetes** is a `disease` row whose `diseasedef`
+   has an ICD-10 code in E10–E11.
+6. **Office**: `ClinicNum` on `patient` and `procedurelog` is the office for the per-office consistency check
+   (FR-009).

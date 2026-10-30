@@ -128,6 +128,12 @@ Everything this repo relies on, and what it's used for.
     abstract says benefits "between 2014–2108", a typo for 2014–2018 as the Methods give it. Published figures
     only: the paper's data is not public and never comes in.
 
+58. **Open Dental Software.** *Open Dental* source code, `OpenDentBusiness/TableTypes` (one class per database
+    table). [github.com/OpenDental/OpenDental](https://github.com/OpenDental/OpenDental), branch `24_3`, commit
+    `d804c19` (2025-04-01); GPL. → The table and column names, types and meanings of spec 029's synthetic extract
+    (`specs/029-tooth-loss/research.md`), read 2026-10-30. Names and meanings only; no code is copied. The same
+    schema is published as documentation on opendental.com.
+
 ## Classification rules
 
 26. **American Academy of Periodontology.** *Staging and Grading Periodontitis* (worksheet).
