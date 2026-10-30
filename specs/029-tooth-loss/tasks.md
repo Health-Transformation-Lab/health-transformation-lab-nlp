@@ -16,6 +16,8 @@ Implementation starts after this spec, plan and tasks are reviewed.
 
 - [ ] T005 [US2] Failing tests: statuses on hand-built extracts, nothing dated after the loss
 - [ ] T006 [US2] `tooth_loss.tooth_table`; base-R twin and parity inputs
+- [ ] T006a [US2] Failing tests, then the bronze-to-silver data-quality checks after Kookal et al. 2024
+  (completeness, accuracy, consistency; FR-009), with planted faults the generator records
 - [ ] T007 [US2] Load job: bronze as is, silver tooth table, idempotent, batch keys
 
 ## US3 #371: the model, checked against the hidden truth

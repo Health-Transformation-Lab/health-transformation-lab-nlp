@@ -194,10 +194,25 @@ alternative `stage4_rule`.
 - **FR-007** Writes are idempotent (overwrite by run, or delete-then-append by `run_id`). Every row carries
   `run_id`, `run_ts` and `git_commit_sha`.
 - **FR-008** No OMOP mapping, no note text, no language models anywhere in this bench.
+- **FR-009** Data-quality checks run between the bronze extract and the silver tooth table. They follow
+  Kookal et al. 2024 (references item 57; NIH Collaboratory framework), so a real extract in the same format would
+  get the same checks. Each check reports a number, and failures are flagged, never silently fixed:
+  - **completeness:** every declared column present and none extra; types and value sets as declared; one value
+    per field; the null/unknown/missing share per column and overall; duplicate rows; duplicate keys (patient,
+    tooth, procedure); rows missing any value the tooth table needs;
+  - **accuracy:** values outside known ranges (probing depth, CAL, mobility 0–3, tooth numbers 1–32, dates in
+    order); procedure codes not in the CDT list, and diagnosis codes not valid ICD-10-CM;
+  - **consistency:** the null/unknown/missing share per office (clinic), against the mean of all offices, with
+    offices beyond 2 SD flagged.
+
+  The synthetic generator plants a known number of each kind of fault, at named rates, so each check is tested
+  against what it should find. Results go to a silver `tooth_loss_dq_check` table (one row per check and run).
 
 ### Key Entities
 
 - **Extract tables** (bronze): Open Dental's table and column names, lowercased.
+- **Data-quality check** (silver): check × run: domain, check number (after Kookal et al. 2024), count found,
+  share, flagged.
 - **Tooth** (silver): patient × tooth number: status, loss date, features before the loss.
 - **Truth** (silver, evaluation only): patient × tooth: true reason.
 - **Prediction** (gold): patient × tooth × model × run: probability, label at threshold.
@@ -210,6 +225,7 @@ alternative `stage4_rule`.
   labelled synthetic.
 - **SC-004** The stage III/IV comparison shows each counting rule against the truth.
 - **SC-005** R parity covers the tooth statuses, the expected-count stage rule and the metrics.
+- **SC-006** Every planted fault is found by its check, and the clean rows pass every check.
 
 ## Assumptions
 

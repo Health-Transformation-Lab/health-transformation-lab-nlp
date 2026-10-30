@@ -53,6 +53,10 @@
 6. **Stage recount.** `labels.stage4_rule` gains `expected_perio_loss`: recorded periodontal losses plus the sum of
    predicted probabilities over the unlabelled missing teeth. Stage IV when that is 5 or more. Its R twin goes in
    the same file.
+6a. **Data-quality checks** (`tooth_loss_dq.py`). The 12 checks of Kookal et al. 2024 are adapted to the extract's
+   tables (FR-009). The generator plants faults at named rates (duplicate rows, out-of-range probing values, an
+   invalid diagnosis code, a missing value, one office with more missing values) and records them, so the tests
+   know what each check must find. Results go to silver `tooth_loss_dq_check`.
 7. **Docs.** `docs/tooth_loss.md` is a plain page covering:
    - the question;
    - the extract's tables, with links to Open Dental's schema docs;
