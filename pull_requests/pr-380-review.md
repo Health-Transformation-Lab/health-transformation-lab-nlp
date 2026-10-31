@@ -69,5 +69,15 @@ Checked:
 
 Full suite after merging main: 1128 passed, 16 skipped.
 
+After the owner compared it with the reference layout, two things changed:
+- **Widths:** each table's columns are sized to their content, rows are banded with vertical lines only, and
+  profiles show one fact per line.
+- **Lines:** each one is routed through the gaps with its own lane.
+
+Checked:
+- the tests cover widths that differ per table and lines that meet row sides;
+- a render filled from a throwaway sample (not committed) shows no line crossing a table, except between the two
+  side-by-side tables in Procedures.
+
 ## Verdict
 Approve with the layout nit. It can merge once CI is green.
