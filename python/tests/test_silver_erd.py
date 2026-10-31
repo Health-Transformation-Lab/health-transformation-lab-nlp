@@ -77,7 +77,7 @@ def test_the_plan_copies_quirk_is_drawn():
 
 def test_every_omop_column_names_its_open_dental_source():
     for name, t in OM.TABLES.items():
-        if t.area in ("cdm", "dental"):
+        if t.area not in ("vocab", "gap"):            # the CDM and dental-extension tables
             for c in t.columns:
                 assert "←" in c.description or "not from Open Dental" in c.description, (name, c.name)
     assert "not_mapped" in OM.TABLES                            # what the CDM can't hold
@@ -91,3 +91,38 @@ def test_the_generated_files_are_current():
                 f"run python3 diagrams/_build/silver_erd.py ({stem}.mmd is stale)"
             assert (erd.SRC / f"{stem}.drawio").exists()
     assert (erd.OUT / "data_model.md").read_text() == erd.markdown()
+
+
+# ---------- the data-dictionary format (subject areas, row counts, nulls, distinct and top values) ----------
+def test_a_column_profile_gives_nulls_distinct_and_value_counts():
+    import pandas as pd
+    prof = _load("table_profile")
+    s = pd.Series([2, 2, 1, None, 2])
+    assert prof.column_profile(s) == "null=1 (20%); n_distinct=2; 1=1 (20%); 2=3 (60%)"
+    many = pd.Series(range(100))
+    assert prof.column_profile(many) == "null=0 (0%); n_distinct=100"
+    dates = pd.Series(pd.to_datetime(["2016-03-01", "2019-07-02", None, "2024-01-05"]))
+    assert prof.column_profile(dates) == "null=1 (25%); n_distinct=3; first=2016; last=2024"
+    tables = prof.profile({"t": pd.DataFrame({"a": [1, None], "b": ["x", "y"]})})
+    assert tables["t"]["rows"] == 2 and tables["t"]["columns"]["a"].startswith("null=1 (50%)")
+
+
+@pytest.mark.parametrize("model", [OD, OM], ids=["opendental", "omop"])
+def test_every_table_is_in_one_subject_area_with_a_kind(model):
+    grouped = [t for _, _, tables in model.GROUPS for t in tables]
+    assert sorted(grouped) == sorted(model.TABLES), "each table in exactly one subject area"
+    assert set(model.KINDS) == set(model.TABLES) and set(model.KINDS.values()) <= {"fact", "dimension"}
+    for table, col in [*model.PHI, *model.QUESTIONS]:
+        assert col in {c.name for c in model.TABLES[table].columns}, (table, col)
+
+
+def test_the_dictionary_shows_counts_or_says_they_are_not_measured():
+    dic = _load("dictionary_erd")
+    xml = dic.build(OD, {"patient": {"rows": 7, "columns": {"patnum": "null=0 (0%); n_distinct=7"}}}).xml("t")
+    assert "7 rows" in xml and "n_distinct=7" in xml
+    assert "rows not measured yet" in xml                       # every table without data says so
+    for title, _, _ in OD.GROUPS:
+        assert title in xml
+    assert "Legend" in xml and "FACT" in xml and "DIMENSION" in xml
+    assert (dic.SRC / "opendental_silver_dictionary.drawio").exists()
+    assert (dic.SRC / "omop_silver_dictionary.drawio").exists()

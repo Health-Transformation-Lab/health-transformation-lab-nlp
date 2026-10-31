@@ -1,15 +1,19 @@
 """opendental_silver_model.py and omop_silver_model.py -> their ERDs, drawn by gold_erd.py's writer (spec 029, #379).
 Writes   ../silver/source/{opendental,omop}_silver_{entity,full}.{mmd,drawio}
+         ../silver/source/{opendental,omop}_silver_dictionary.drawio   the data-dictionary format (dictionary_erd.py),
+             profiled from data/datasets/open_dental/*.csv once spec 029's generator (T003) writes them
          ../silver/data_model.md   both models as Mermaid (GitHub renders them) and every column
 Run: python3 silver_erd.py   (then render: render.md)
 """
 from pathlib import Path
 
+import dictionary_erd
 import gold_erd
 import omop_silver_model
 import opendental_silver_model
 
 OUT = Path(__file__).resolve().parent.parent / "silver"
+EXTRACT = Path(__file__).resolve().parents[2] / "data" / "datasets" / "open_dental"   # spec 029 T003's output
 SRC = OUT / "source"
 MODELS = [("opendental_silver", opendental_silver_model), ("omop_silver", omop_silver_model)]
 TITLES = {
@@ -26,6 +30,25 @@ TITLES = {
 }
 
 
+def extract_stats():
+    """Profile the synthetic Open Dental extract when it exists (lowercased names, as silver); else None, and the
+    dictionary says its counts aren't measured yet."""
+    if not EXTRACT.is_dir():
+        return None
+    import pandas as pd
+
+    import table_profile
+    frames = {}
+    for f in sorted(EXTRACT.glob("*.csv")):
+        df = pd.read_csv(f)
+        df.columns = [c.lower() for c in df.columns]
+        for c in df.columns:
+            if "date" in c:
+                df[c] = pd.to_datetime(df[c], errors="coerce")
+        frames[f.stem.lower()] = df
+    return table_profile.profile(frames)
+
+
 def markdown() -> str:
     lines = ["# Silver data models (spec 029)", "",
              ("Generated from [`_build/opendental_silver_model.py`](../_build/opendental_silver_model.py) and "
@@ -35,7 +58,9 @@ def markdown() -> str:
     for prefix, m in MODELS:
         title, intro = TITLES[prefix]
         lines += [f"## {title}", "", intro, "",
-                  f"Draw.io: [entity](source/{prefix}_entity.drawio) · [full](source/{prefix}_full.drawio)", "",
+                  (f"Draw.io: [entity](source/{prefix}_entity.drawio) · [full](source/{prefix}_full.drawio) · "
+                   f"[data dictionary](source/{prefix}_dictionary.drawio) (subject areas, row counts, nulls, distinct "
+                   "and top values)"), "",
                   "```mermaid", gold_erd.mermaid(False, m).rstrip(), "```", ""]
         for name, t in m.TABLES.items():
             lines += [f"### `{name}`", "", f"{t.description}. {t.writer}.", "",
@@ -55,5 +80,7 @@ if __name__ == "__main__":
             (SRC / f"{stem}.mmd").write_text(gold_erd.mermaid(full, m))
             (SRC / f"{stem}.drawio").write_text(gold_erd.build(grid, full, m).xml(stem))
             print("wrote", f"diagrams/silver/source/{stem}.drawio, .mmd")
+    for prefix, m in MODELS:
+        print("wrote", dictionary_erd.write(prefix, m, extract_stats() if prefix == "opendental_silver" else None))
     (OUT / "data_model.md").write_text(markdown())
     print("wrote diagrams/silver/data_model.md")

@@ -197,3 +197,34 @@ AREAS = {   # fill, legend label
     "dq": ("#E3F1E4", "silver · data-quality checks"),
     "eval": ("#E4E7EA", "answer key: evaluation only, never a feature"),
 }
+
+# ---------- the data-dictionary view (dictionary_erd.py) ----------
+# subject areas: (title, column on the page, tables)
+GROUPS = [
+    ("Patient", 0, ["patient"]),
+    ("Location", 0, ["clinic"]),
+    ("Patient Health", 0, ["disease", "diseasedef"]),
+    ("Procedures", 1, ["procedurelog", "procedurecode"]),
+    ("Misc Definitions", 1, ["definition"]),
+    ("Treatment Planning", 2, ["treatplan", "proctp"]),
+    ("Perio Charting", 2, ["perioexam", "periomeasure"]),
+    ("Initial Odontogram", 2, ["toothinitial"]),
+    ("Tooth loss (spec 029)", 3, ["patient_tooth", "planned_extraction"]),
+    ("Data quality", 3, ["tooth_loss_dq_check"]),
+    ("Answer key (evaluation only)", 3, ["tooth_loss_truth"]),
+]
+KINDS = {t: "fact" for t in ("procedurelog", "treatplan", "proctp", "perioexam", "periomeasure", "toothinitial",
+                             "disease", "patient_tooth", "planned_extraction", "tooth_loss_dq_check", "tooth_loss_truth")}
+KINDS |= {t: "dimension" for t in ("patient", "clinic", "procedurecode", "definition", "diseasedef")}
+# columns that would hold PHI in a real extract (synthetic here): de-identify before anything leaves the source
+PHI = {("patient", "birthdate"), ("proctp", "descript")}
+# open questions and issues, shown in red: what to check before trusting the column
+QUESTIONS = {
+    ("procedurelog", "diagnosticcode"): "rare: only on medical claims; never the label",
+    ("proctp", "procnumorig"): "count planned procedures in procedurelog: one procedure has many copies here",
+    ("proctp", "proccode"): "editable copy: can differ from the original's procedurecode",
+    ("proctp", "dx"): "text, not a key: matched to definition.itemname by name",
+    ("definition", "itemname"): "older and newer diagnosis lists both present: map both",
+    ("periomeasure", "sequencetype"): "CAL (7) is never stored: compute probing + gingival margin",
+    ("toothinitial", "initialtype"): "missing teeth carry no date and no reason",
+}

@@ -125,3 +125,22 @@ AREAS = {   # fill, legend label
     "vocab": ("#EFE9FB", "vocabulary"),
     "gap": ("#FDE7F1", "not mapped: what the CDM loses"),
 }
+
+# ---------- the data-dictionary view (dictionary_erd.py) ----------
+GROUPS = [
+    ("Person", 0, ["person", "care_site"]),
+    ("Visits", 0, ["visit_occurrence"]),
+    ("Clinical events", 1, ["procedure_occurrence", "condition_occurrence", "measurement", "observation"]),
+    ("Teeth (dental extension)", 2, ["site", "site_event"]),
+    ("Vocabulary", 2, ["concept"]),
+    ("Not mapped", 2, ["not_mapped"]),
+]
+KINDS = {t: "fact" for t in ("visit_occurrence", "procedure_occurrence", "condition_occurrence", "measurement",
+                             "observation", "site_event")}
+KINDS |= {t: "dimension" for t in ("person", "care_site", "site", "concept", "not_mapped")}
+PHI = {("person", "birth_datetime")}
+QUESTIONS = {
+    ("procedure_occurrence", "procedure_occurrence_id"): "completed only: planned procedures are lost",
+    ("observation", "observation_date"): "assumed for missing teeth: the source has no date",
+    ("condition_occurrence", "condition_concept_id"): "practice list items need a local map; 0 when unmapped",
+}

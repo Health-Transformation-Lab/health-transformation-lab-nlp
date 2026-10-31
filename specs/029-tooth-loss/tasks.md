@@ -34,3 +34,6 @@ Implementation starts after this spec, plan and tasks are reviewed.
 - [x] T012 [US4] Failing tests (`test_silver_erd.py`), then `opendental_silver_model.py`, `omop_silver_model.py` and
   `silver_erd.py`, using `gold_erd.py`'s writer (gold output unchanged); entity and full `.drawio`, `.mmd`, PNGs and
   `diagrams/silver/data_model.md`
+- [x] T013 [US4] A third format, the data dictionary (`dictionary_erd.py`, `table_profile.py`): subject areas, fact
+  and dimension tables, row counts, each column's nulls, distinct and top values, PHI and open questions marked;
+  it fills in once T003 writes the extract

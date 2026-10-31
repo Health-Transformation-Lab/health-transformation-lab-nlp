@@ -154,6 +154,9 @@ Draw.io ERDs, generated from declarations like the gold ERDs (`diagrams/silver/`
 - **Open Dental silver:** the cleaned Open Dental tables with their own names, the derived tables and the answer
   key, with the source's quirks drawn as lines (`procedurelog.dx` a key into `definition`; `proctp` copies back to
   `procedurelog` by `procnumorig`; `proctp.dx` matched by name, not a key);
+- **Data dictionary:** the same tables grouped in subject areas, fact and dimension headers, each table's row
+  count and grain, and each column's nulls, distinct and top values from the data, with PHI columns and open
+  questions marked;
 - **OMOP silver (not built):** the same data in OMOP CDM 5.4 and the dental extension, each column naming its Open
   Dental source, and a list of what the CDM can't hold.
 
