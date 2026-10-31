@@ -1,5 +1,6 @@
-"""Profile tables for the data-dictionary ERD (dictionary_erd.py, #379): per table its row count, per column one line
-of nulls, distinct values and, when there are few, every value's count; for dates, the first and last year.
+"""Profile tables for the data-dictionary ERD (dictionary_erd.py, #379): per table its row count, per column its
+nulls, distinct values and, when there are few, every value's count (else the three most common);
+for dates, the first and last year. One fact per line, as the dictionary shows them.
 Counts are of the data given, synthetic in this repo. Nothing row-level is kept, only the counts."""
 import pandas as pd
 
@@ -21,7 +22,13 @@ def column_profile(s: pd.Series) -> str:
     elif distinct <= TOP:
         counts = present.value_counts().sort_index()
         out += [f"{_fmt(v)}={n:,} ({_pct(n, total)})" for v, n in counts.items()]
-    return "; ".join(out)
+    else:
+        counts = present.value_counts()
+        if len(counts) and counts.iloc[0] > 1:            # a value that repeats: show the three most common
+            top = sorted(counts.items(), key=lambda vn: (-vn[1], vn[0]))[:3]
+            return ";\n".join(out) + ";\ntop results:\n" + ";\n".join(
+                f"  {_fmt(v)}={n:,} ({_pct(n, total)})" for v, n in top)
+    return ";\n".join(out)
 
 
 def _fmt(v):

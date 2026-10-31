@@ -97,12 +97,14 @@ def test_the_generated_files_are_current():
 def test_a_column_profile_gives_nulls_distinct_and_value_counts():
     import pandas as pd
     prof = _load("table_profile")
-    s = pd.Series([2, 2, 1, None, 2])
-    assert prof.column_profile(s) == "null=1 (20%); n_distinct=2; 1=1 (20%); 2=3 (60%)"
-    many = pd.Series(range(100))
-    assert prof.column_profile(many) == "null=0 (0%); n_distinct=100"
+    s = pd.Series([2, 2, 1, None, 2])            # few values: each one's count, one per line
+    assert prof.column_profile(s) == "null=1 (20%);\nn_distinct=2;\n1=1 (20%);\n2=3 (60%)"
+    many = pd.Series(range(100))                 # all distinct: no top results worth showing
+    assert prof.column_profile(many) == "null=0 (0%);\nn_distinct=100"
+    skewed = pd.Series([7] * 5 + [8] * 3 + list(range(20)))
+    assert prof.column_profile(skewed).endswith("top results:\n  7=6 (21%);\n  8=4 (14%);\n  0=1 (4%)")
     dates = pd.Series(pd.to_datetime(["2016-03-01", "2019-07-02", None, "2024-01-05"]))
-    assert prof.column_profile(dates) == "null=1 (25%); n_distinct=3; first=2016; last=2024"
+    assert prof.column_profile(dates) == "null=1 (25%);\nn_distinct=3;\nfirst=2016;\nlast=2024"
     tables = prof.profile({"t": pd.DataFrame({"a": [1, None], "b": ["x", "y"]})})
     assert tables["t"]["rows"] == 2 and tables["t"]["columns"]["a"].startswith("null=1 (50%)")
 
@@ -119,10 +121,15 @@ def test_every_table_is_in_one_subject_area_with_a_kind(model):
 def test_the_dictionary_shows_counts_or_says_they_are_not_measured():
     dic = _load("dictionary_erd")
     xml = dic.build(OD, {"patient": {"rows": 7, "columns": {"patnum": "null=0 (0%); n_distinct=7"}}}).xml("t")
-    assert "7 rows" in xml and "n_distinct=7" in xml
+    assert "&lt;br&gt;7&lt;br&gt;" in xml and "n_distinct=7" in xml      # the count under the name, as a number
     assert "rows not measured yet" in xml                       # every table without data says so
     for title, _, _ in OD.GROUPS:
         assert title in xml
     assert "Legend" in xml and "FACT" in xml and "DIMENSION" in xml
+    # each table is as wide as its own content, and lines leave and enter at the side of the key row
+    widths = dic.table_widths(OD, {})
+    assert widths["procedurelog"] != widths["clinic"]
+    assert all(sum(w) <= 640 for w in widths.values())
+    assert "exitX=" in xml and "entryX=" in xml
     assert (dic.SRC / "opendental_silver_dictionary.drawio").exists()
     assert (dic.SRC / "omop_silver_dictionary.drawio").exists()
