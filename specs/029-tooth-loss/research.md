@@ -217,6 +217,31 @@ standard code. Standard codes, when present, are in `DiagnosticCode` (ICD-9 or I
 | `Phone` | string |  |
 | `Fax` | string |  |
 
+## Treatment plans: one planned procedure, many copies (added for #377)
+
+From the same classes:
+- A planned procedure is a `procedurelog` row with `ProcStatus` 1 (TP). It is the one record of the plan.
+- Saving a treatment plan (`treatplan`) copies each planned procedure into `proctp`. A patient can have several
+  plans saved on one date (alternatives offered to the patient), and new plans saved at later exams copy the same
+  planned procedure again. So one `procedurelog` row can have many `proctp` copies. `proctp.ProcNumOrig` points
+  back to it.
+- The `proctp` columns `ProcCode`, `Descript`, `ToothNumTP`, `Dx` and `Prognosis` are text saved with the plan,
+  not keys. They aren't joined to `procedurecode` or `definition`, and they can be edited, so a copy can differ
+  from the procedure it came from. `procedurelog` instead holds keys: `CodeNum` → `procedurecode`, `Dx` →
+  `definition.DefNum`.
+- When the planned procedure is done, the same `procedurelog` row is set complete (`ProcStatus` 2,
+  `DateComplete`). A plan that is never followed leaves it at 1.
+
+So: count planned procedures from `procedurelog`, use `proctp` only for when and how often each was planned, and
+check the copies against the original instead of trusting them.
+
+## Diagnosis lists change
+
+`definition` rows of category Diagnosis are whatever the practice entered. When a practice moves from an older
+periodontal classification to the 2017 AAP/EFP one, it adds new items and stops using (or hides, `IsHidden`) the
+old ones; old procedures keep pointing at the old items. A mapping from items to periodontal / other / none must
+therefore cover every list the practice has used, and the switch is a date range, not a day.
+
 ## What this changes in spec 029
 
 1. **CAL is computed, not read**: probing + gingival margin per site, decoding the 100+ convention (plan
@@ -226,8 +251,9 @@ standard code. Standard codes, when present, are in `DiagnosticCode` (ICD-9 or I
    - `Dx`, the practice's own diagnosis list, joined to `definition` (category Diagnosis), which is free text;
    - `DiagnosticCode` with `IcdVersion`, where a standard ICD code was entered.
 
-   The generator writes both, at separate rates. The silver step reads the ICD code first, then maps the
-   practice's list by a declared lookup, which is a parameter, since every practice's list differs.
+   The practice's list is the main source. ICD codes are filled only for medical claims, so the generator writes
+   them on a small share, and the silver step maps the practice's list by a declared lookup (a parameter, since
+   every practice's list differs), using the ICD code only to check it (#377).
 4. **A third way a tooth is missing**: an extraction recorded with `ProcStatus` 4, "Existing Other Prov"
    (done elsewhere, before this practice). It has a code and a tooth, usually no diagnosis and often no real
    date. It joins "missing at the first exam" among the teeth the model is applied to.

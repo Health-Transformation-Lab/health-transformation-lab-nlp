@@ -11,6 +11,18 @@ database format." A tooth-level binary model (logistic regression or XGBoost): d
 periodontitis? It is trained on extractions with a periodontal diagnosis attached, then applied to teeth already
 missing with no diagnosis. No OMOP, no NLP.
 
+**Clarified** (2026-10-31, the owner): the unit is the tooth. For each tooth: lost to periodontitis, yes or no.
+That per-tooth answer feeds the count that separates stage III from IV, and so the person-level classification.
+How Open Dental records it changes the design (#377):
+- a dental procedure's diagnosis comes from the practice's own diagnosis list (`procedurelog.Dx` → `definition`),
+  not from ICD-10, which appears only on medical claims;
+- that list changes when a practice adopts the 2017 classification, and adoption can take a while;
+- planned extractions (treatment plans) are a second source of labelled teeth, since a planned extraction may
+  never be completed in the record;
+- a planned procedure is copied into every saved plan, so its copies must be counted once and checked against
+  the original;
+- silver stays close to Open Dental; a common model (OMOP) comes later, and loses tooth detail.
+
 > Personal learning project; synthetic data; public sources only (`DISCLAIMER.md`). The extract only follows the
 > *shape* of Open Dental's published database schema (opendental.com documentation). No practice's data, extract,
 > code lists or plans come into this repo; every row is generated here and labelled synthetic.
@@ -38,9 +50,9 @@ this benchmark adds.
 A seeded generator writes the tables a practice-management extract would hold, using Open Dental's table and
 column names, lowercased:
 - patients;
-- procedures (code, tooth, status, date, attached diagnosis);
+- procedures (code, tooth, status, date, attached diagnosis), completed and planned;
 - the procedure-code list;
-- treatment plans;
+- treatment plans, and the planned procedures copied into each saved plan;
 - perio exams and their measures;
 - teeth recorded missing at the first exam;
 - the diagnosis definitions;
@@ -64,10 +76,15 @@ reveals the reason a tooth is missing, except a recorded diagnosis.
    - a first perio exam whose missing teeth are listed as missing, with no reason;
    - later visits, some with completed extractions.
 2. **Given** an extraction of a tooth truly lost to periodontitis, **When** its diagnosis is drawn, **Then** it
-   is periodontal at the declared rate. Otherwise it is another diagnosis (a recording mismatch) or none. Each
-   rate is a named parameter.
+   is a periodontal item from the practice's diagnosis list in use on that date (the older list before the
+   practice adopts the 2017 classification, the newer after, with a lag) at the declared rate. Otherwise it is
+   another item (a recording mismatch) or none. Each rate and date is a named parameter.
 3. **Given** the existing study datasets, **When** this extract is built, **Then** they are byte-identical. The
    extract uses its own random stream and its own files.
+4. **Given** an extraction a dentist plans at an exam, **When** the extract is built, **Then** it is one
+   `procedurelog` row with `ProcStatus` 1 (planned), copied into each plan saved that day (one or more) and into
+   the plans saved at later exams until it is completed or the record ends. Some planned extractions are never
+   completed in the record; the share is a named parameter.
 
 ---
 
@@ -81,7 +98,11 @@ Each row has a status:
 - extracted with a periodontal diagnosis;
 - extracted with another diagnosis;
 - extracted with no diagnosis;
-- missing at the first exam.
+- missing at the first exam;
+- planned for extraction with a periodontal diagnosis, not completed in the record;
+- planned for extraction with another diagnosis, not completed in the record.
+
+A planned extraction that is later completed counts once, as completed.
 
 It also has the features charted **before** the tooth was lost:
 - the tooth's own last probing depth, attachment loss, bleeding, mobility and furcation, where an exam came
@@ -107,6 +128,9 @@ It also has the features charted **before** the tooth was lost:
 2. **Given** an extraction with a periodontal diagnosis on day 400, after exams on days 0 and 200, **Then**
    only the day-200 exam's measures are its own last measures.
 3. **Given** the parity inputs, **When** `r/tests/test_parity.R` runs, **Then** the statuses match exactly.
+4. **Given** one planned extraction copied into three plans at one exam and two more six months later, and never
+   completed, **Then** the tooth has one row, status "planned, not completed", and the plan copies are counted
+   (five) but not repeated.
 
 ---
 
@@ -115,6 +139,9 @@ It also has the features charted **before** the tooth was lost:
 A binary model, P(lost to periodontitis), is trained on teeth extracted with a recorded diagnosis:
 - periodontal diagnosis = 1;
 - other diagnosis = 0.
+
+It is trained on two label sets (FR-010): completed extractions only, and completed plus planned extractions.
+The second has more teeth but weaker labels, since a plan states an intention, not what happened.
 
 It is fitted twice, as logistic regression and as XGBoost, split 70/30 by patient with a fixed seed.
 
@@ -147,6 +174,8 @@ alternative `stage4_rule`.
    - the truth.
 
    **Then** the number of patients called III and IV under each is compared with the truth.
+4. **Given** the two label sets, **Then** both models are scored on the same held-out teeth and the same
+   missing-at-entry teeth, so what the planned extractions add (or cost) is measured.
 
 ### User Story 4 - ERDs of the Open Dental silver tables and an OMOP alternative (Priority: P2) #379
 
@@ -177,6 +206,10 @@ relationship joins declared columns; every OMOP column names its source; the gen
   mouth's come from the first exam after.
 - **Classes are imbalanced** (most extractions in the synthetic set may be periodontal): rates are parameters,
   and the metrics include ones that don't depend on prevalence (AUC) and ones that do (Brier).
+- **A planned extraction's tooth later listed missing** with no completed extraction (done elsewhere, or lost
+  otherwise): the plan's diagnosis is its label, flagged "planned, outcome elsewhere".
+- **A diagnosis from the older list after the practice switched**, or the newer list before: both lists are
+  mapped, and the use is counted by a data-quality check, not rejected.
 - **The answer key** is never a model feature. A test fails if any feature column can be traced to it.
 
 ## Requirements
@@ -189,14 +222,22 @@ relationship joins declared columns; every OMOP column names its source; the gen
   `definition`, `disease`, `diseasedef`.
   - Only the columns this spec needs are included.
   - Names are checked against Open Dental's published schema documentation before implementation (T001).
-  - Codes use public CDT procedure codes for extractions (D7140, D7210) and public ICD-10-CM codes for
-    diagnoses (K05.3x periodontitis, K02.x caries, others).
+  - Extractions use public CDT procedure codes (D7140, D7210).
+  - Diagnoses are items in the practice's own list (`definition`, category Diagnosis), joined from
+    `procedurelog.Dx`. The generator invents two synthetic lists: one before the 2017 classification and one
+    after it, each with short codes and names for periodontal and other reasons (caries, fracture, orthodontic,
+    other). They are invented here and are not any practice's list.
+  - `DiagnosticCode` (ICD-10-CM, for medical claims) is filled on a small, named share of procedures only, so the
+    model never depends on it.
 - **FR-002** The generator draws a timeline per synthetic person: a first exam, then later visits, with
   extractions dated between exams. It uses its own seeded stream (`random.Random(f"{seed}:open_dental")`), so
   existing outputs don't change. Shares and rates are named parameters with fixed defaults:
   - teeth missing at entry vs extracted during the record;
   - extractions with a periodontal diagnosis, another diagnosis or none;
-  - recording mismatches.
+  - recording mismatches;
+  - the date the practice adopts the 2017 list, and how long both lists stay in use;
+  - planned extractions: how many plans are saved per exam, how often a planned extraction is re-planned at the
+    next exam, and the share never completed in the record.
 - **FR-003** The answer key (`tooth_loss_truth`: patient, tooth, true reason) is written apart from the extract,
   and only the evaluation reads it.
 - **FR-004** New schema family `opendental_perio` in `schemas.py`, named like the old
@@ -207,8 +248,11 @@ relationship joins declared columns; every OMOP column names its source; the gen
     `procedurelog`, `periomeasure`, ...);
   - silver holds the same tables cleaned, with the same names and layout: types enforced, -1 read as not
     measured, gingival margins of 100 and up decoded as negative, CAL computed, bleeding decoded from its bit,
-    ICD codes normalised, and each row flagged by the data-quality checks (FR-009). Next to them, the tooth
+    diagnoses mapped from either practice list to periodontal / other / none by a declared lookup (a parameter,
+    since every practice's list differs), and each row flagged by the data-quality checks (FR-009). Next to them, the tooth
     table, following AGENTS.md naming (`tooth_status_code`, `is_perio_loss`, `last_max_pd_mm`, ...), and
+    `planned_extraction`, one row per planned `procedurelog` extraction with
+    how many plan copies carry it, the first and last plan dates and whether it was completed; and
     `tooth_loss_dq_check`, one row per check and run;
   - gold holds only the model's answers (`fact_tooth_loss_prediction`).
 
@@ -221,6 +265,10 @@ relationship joins declared columns; every OMOP column names its source; the gen
 - **FR-007** Writes are idempotent (overwrite by run, or delete-then-append by `run_id`). Every row carries
   `run_id`, `run_ts` and `git_commit_sha`.
 - **FR-008** No OMOP mapping, no note text, no language models anywhere in this bench.
+- **FR-010** Two training label sets, each with its own fitted models:
+  - **completed:** extractions with `ProcStatus` 2 and a mapped diagnosis;
+  - **completed and planned:** plus planned extractions (`ProcStatus` 1) with a mapped diagnosis, one per
+    `procedurelog` row however many plan copies carry it. A tooth with both counts once, as completed.
 - **FR-009** Data-quality checks run between the bronze extract and the silver tooth table. They follow
   Kookal et al. 2024 (references item 57; NIH Collaboratory framework), so a real extract in the same format would
   get the same checks. Each check reports a number, and failures are flagged, never silently fixed:
@@ -228,7 +276,13 @@ relationship joins declared columns; every OMOP column names its source; the gen
     per field; the null/unknown/missing share per column and overall; duplicate rows; duplicate keys (patient,
     tooth, procedure); rows missing any value the tooth table needs;
   - **accuracy:** values outside known ranges (probing depth, CAL, mobility 0–3, tooth numbers 1–32, dates in
-    order); procedure codes not in the CDT list, and diagnosis codes not valid ICD-10-CM;
+    order); procedure codes not in the CDT list; diagnosis items not in either declared practice list; ICD codes,
+    where present, not valid ICD-10-CM;
+  - **plan copies against the original:** `proctp` rows whose `ProcNumOrig` has no `procedurelog` row, and copies
+    whose `ProcCode`, `ToothNumTP` or `Dx` text differs from the original procedure's code, tooth or diagnosis
+    item (the copies are text saved with the plan and can be edited);
+  - **list in use:** diagnosis items from the older list after the switch date, and from the newer list before
+    it;
   - **consistency:** the null/unknown/missing share per office (clinic), against the mean of all offices, with
     offices beyond 2 SD flagged.
 
@@ -241,6 +295,8 @@ relationship joins declared columns; every OMOP column names its source; the gen
 - **Data-quality check** (silver): check × run: domain, check number (after Kookal et al. 2024), count found,
   share, flagged.
 - **Tooth** (silver): patient × tooth number: status, loss date, features before the loss.
+- **Planned extraction** (silver): one planned `procedurelog` row: tooth, diagnosis item, plan-copy count, first
+  and last plan dates, completed or not.
 - **Truth** (silver, evaluation only): patient × tooth: true reason.
 - **Prediction** (gold): patient × tooth × model × run: probability, label at threshold.
 
@@ -253,6 +309,8 @@ relationship joins declared columns; every OMOP column names its source; the gen
 - **SC-004** The stage III/IV comparison shows each counting rule against the truth.
 - **SC-005** R parity covers the tooth statuses, the expected-count stage rule and the metrics.
 - **SC-006** Every planted fault is found by its check, and the clean rows pass every check.
+- **SC-007** Both label sets are scored on the same held-out and missing-at-entry teeth, and every planned
+  extraction counts once however many plan copies carry it.
 
 ## Assumptions
 
@@ -260,11 +318,14 @@ relationship joins declared columns; every OMOP column names its source; the gen
   carry a tooth number and a diagnosis. It does not mean a runnable Open Dental database.
 - Gold is added only for the model's answers, following the repo's layer rules. Bronze and silver hold
   everything else.
+- The diagnosis lists, the adoption date and lag, and the planning rates are invented parameters with fixed
+  defaults, not observations of any practice.
 - The synthetic mouths of spec 006 are the source of truth. Their loss process (`draw_mouth`) is reused, not
   changed.
 
 ## Out of scope
 
 - Any real extract, or any specific practice's codes, workflows or plans.
-- OMOP, notes, NLP, LLMs, agents.
+- OMOP in the pipeline, notes, NLP, LLMs, agents. Diagrams of the silver tables and of how they would map to
+  OMOP CDM 5.4 (what a common model keeps and loses) are a separate, follow-up issue.
 - Predicting future tooth loss. This is about why a tooth already lost was lost.
