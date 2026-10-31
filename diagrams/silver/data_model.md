@@ -62,6 +62,15 @@ One per patient. tooth_loss_load: overwrite per run.
 |  | `priprov` | bigint | primary provider |
 |  | `datefirstvisit` | date | set by the software |
 |  | `smokingsnomed` | string | latest smoking status, SNOMED code |
+|  | `zip` | string | postcode; a real extract keeps at most the first 3 digits |
+| FK | `guarantor` | bigint | head of household (patient.patnum) |
+|  | `medurgnote` | string | free-text medical alert |
+|  | `premed` | boolean | needs premedication before appointments |
+|  | `language` | string | primary language code |
+|  | `admitdate` | date | hospital admission date; can precede the first visit |
+|  | `sitenum` | bigint | place of care (school, nursing home); 0 when none |
+| FK | `responsparty` | bigint | responsible for finances (patient.patnum) |
+|  | `datetimedeceased` | timestamp | date of death |
 
 ### `clinic`
 
@@ -71,6 +80,14 @@ One per office. tooth_loss_load: overwrite per run.
 |---|---|---|---|
 | PK | `clinicnum` | bigint | office key |
 |  | `description` | string | office name (synthetic) |
+|  | `abbr` | string | short name |
+|  | `address` | string | street address |
+|  | `address2` | string | second address line |
+|  | `city` | string | city |
+|  | `state` | string | state |
+|  | `zip` | string | postcode |
+|  | `phone` | string | phone |
+|  | `fax` | string | fax |
 
 ### `procedurelog`
 
@@ -93,6 +110,15 @@ One per procedure, done or planned: the one record of each. tooth_loss_load: ove
 |  | `icdversion` | int | 9 or 10: which ICD diagnosticcode is |
 |  | `provnum` | bigint | provider |
 | FK | `clinicnum` | bigint | office |
+|  | `aptnum` | bigint | the appointment |
+|  | `procfee` | double | fee |
+|  | `toothrange` | string | teeth of a multi-tooth procedure, comma-separated |
+| FK | `priority` | bigint | treatment priority (definition) |
+|  | `placeservice` | int | where it was done: office, school, nursing facility, mobile unit, ... |
+|  | `prosthesis` | string | blank no · I initial · R replacement |
+|  | `medicalcode` | string | optional medical procedure code |
+|  | `unitqty` | int | units billed, 1 by default |
+|  | `sitenum` | bigint | place of care |
 
 ### `procedurecode`
 
@@ -105,6 +131,11 @@ One per procedure code: fixed meaning (CDT D-codes). tooth_loss_load: overwrite 
 |  | `descript` | string | standard description |
 |  | `abbrdesc` | string | abbreviation |
 |  | `treatarea` | int | tooth · surface · quadrant · arch · mouth |
+| FK | `proccat` | bigint | procedure category (definition) |
+|  | `isprosth` | boolean | crown, bridge, denture or partial |
+|  | `ishygiene` | boolean | a hygiene procedure |
+|  | `medicalcode` | string | a matching medical code, optional |
+|  | `isradiology` | boolean | a radiology procedure |
 
 ### `treatplan`
 
@@ -116,6 +147,7 @@ One per saved treatment plan; several can share a date (alternatives). tooth_los
 | FK | `patnum` | bigint | patient |
 |  | `datetp` | date | date of the plan |
 |  | `tpstatus` | int | 0 saved · 1 active · 2 inactive |
+|  | `signature` | string | captured when the plan is signed; empty when unsigned |
 
 ### `proctp`
 
@@ -132,6 +164,13 @@ One per planned procedure per saved plan: a copy, repeated in every plan and at 
 |  | `descript` | string | description as text: editable |
 |  | `dx` | string | diagnosis as text (the item's name when saved), not a key: matched by name |
 |  | `prognosis` | string | prognosis as text |
+|  | `itemorder` | int | order within the plan, fixed when saved |
+| FK | `priority` | bigint | treatment priority (definition) |
+|  | `surf` | string | surfaces, quadrant or arch, as text |
+|  | `procabbr` | string | code abbreviation as text; editable |
+|  | `provnum` | bigint | provider |
+|  | `datetp` | date | date planned |
+| FK | `clinicnum` | bigint | office |
 
 ### `definition`
 
@@ -143,6 +182,8 @@ One per item in the practice's own lists (diagnoses, prognoses, ...). tooth_loss
 |  | `category` | int | which list: Diagnosis, Prognosis, ... |
 |  | `itemname` | string | the item's text, e.g. a diagnosis; older and newer lists both stay |
 |  | `itemvalue` | string | extra information, used differently per list |
+|  | `itemorder` | int | place in the list, from 0 |
+|  | `ishidden` | boolean | hidden: retired items keep their keys |
 
 ### `perioexam`
 
@@ -183,6 +224,7 @@ One per tooth state at the chart's start. tooth_loss_load: overwrite per run.
 | FK | `patnum` | bigint | patient |
 |  | `toothnum` | string | tooth |
 |  | `initialtype` | int | 0 missing (no reason, no date) · 1 hidden · 2 primary · ... |
+|  | `movement` | double | shift in mm, or rotation or tipping in degrees |
 
 ### `disease`
 
@@ -196,6 +238,7 @@ One per patient medical problem. tooth_loss_load: overwrite per run.
 |  | `probstatus` | int | 0 active · 1 resolved · 2 inactive |
 |  | `datestart` | date | may be empty |
 |  | `datestop` | date | may be empty |
+|  | `patnote` | string | free-text note on the problem |
 
 ### `diseasedef`
 
@@ -207,6 +250,8 @@ One per problem in the list. tooth_loss_load: overwrite per run.
 |  | `diseasename` | string | problem name |
 |  | `icd10code` | string | ICD-10-CM; diabetes is E10–E11 |
 |  | `snomedcode` | string | SNOMED code |
+|  | `icd9code` | string | ICD-9 code |
+|  | `ishidden` | boolean | hidden from the list |
 
 ### `patient_tooth`
 

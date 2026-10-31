@@ -28,10 +28,27 @@ erDiagram
         bigint priprov "primary provider"
         date datefirstvisit "set by the software"
         string smokingsnomed "latest smoking status, SNOMED code"
+        string zip "postcode; a real extract keeps at most the first 3 digits"
+        bigint guarantor FK "head of household (patient.patnum)"
+        string medurgnote "free-text medical alert"
+        boolean premed "needs premedication before appointments"
+        string language "primary language code"
+        date admitdate "hospital admission date; can precede the first visit"
+        bigint sitenum "place of care (school, nursing home); 0 when none"
+        bigint responsparty FK "responsible for finances (patient.patnum)"
+        timestamp datetimedeceased "date of death"
     }
     clinic {
         bigint clinicnum PK "office key"
         string description "office name (synthetic)"
+        string abbr "short name"
+        string address "street address"
+        string address2 "second address line"
+        string city "city"
+        string state "state"
+        string zip "postcode"
+        string phone "phone"
+        string fax "fax"
     }
     procedurelog {
         bigint procnum PK "procedure key"
@@ -49,6 +66,15 @@ erDiagram
         int icdversion "9 or 10: which ICD diagnosticcode is"
         bigint provnum "provider"
         bigint clinicnum FK "office"
+        bigint aptnum "the appointment"
+        double procfee "fee"
+        string toothrange "teeth of a multi-tooth procedure, comma-separated"
+        bigint priority FK "treatment priority (definition)"
+        int placeservice "where it was done: office, school, nursing facility, mobile unit, ..."
+        string prosthesis "blank no · I initial · R replacement"
+        string medicalcode "optional medical procedure code"
+        int unitqty "units billed, 1 by default"
+        bigint sitenum "place of care"
     }
     procedurecode {
         bigint codenum PK "code key"
@@ -56,12 +82,18 @@ erDiagram
         string descript "standard description"
         string abbrdesc "abbreviation"
         int treatarea "tooth · surface · quadrant · arch · mouth"
+        bigint proccat FK "procedure category (definition)"
+        boolean isprosth "crown, bridge, denture or partial"
+        boolean ishygiene "a hygiene procedure"
+        string medicalcode "a matching medical code, optional"
+        boolean isradiology "a radiology procedure"
     }
     treatplan {
         bigint treatplannum PK "plan key"
         bigint patnum FK "patient"
         date datetp "date of the plan"
         int tpstatus "0 saved · 1 active · 2 inactive"
+        string signature "captured when the plan is signed; empty when unsigned"
     }
     proctp {
         bigint proctpnum PK "copy key"
@@ -73,12 +105,21 @@ erDiagram
         string descript "description as text: editable"
         string dx "diagnosis as text (the item's name when saved), not a key: matched by name"
         string prognosis "prognosis as text"
+        int itemorder "order within the plan, fixed when saved"
+        bigint priority FK "treatment priority (definition)"
+        string surf "surfaces, quadrant or arch, as text"
+        string procabbr "code abbreviation as text; editable"
+        bigint provnum "provider"
+        date datetp "date planned"
+        bigint clinicnum FK "office"
     }
     definition {
         bigint defnum PK "item key"
         int category "which list: Diagnosis, Prognosis, ..."
         string itemname "the item's text, e.g. a diagnosis; older and newer lists both stay"
         string itemvalue "extra information, used differently per list"
+        int itemorder "place in the list, from 0"
+        boolean ishidden "hidden: retired items keep their keys"
     }
     perioexam {
         bigint perioexamnum PK "exam key"
@@ -104,6 +145,7 @@ erDiagram
         bigint patnum FK "patient"
         string toothnum "tooth"
         int initialtype "0 missing (no reason, no date) · 1 hidden · 2 primary · ..."
+        double movement "shift in mm, or rotation or tipping in degrees"
     }
     disease {
         bigint diseasenum PK "key"
@@ -112,12 +154,15 @@ erDiagram
         int probstatus "0 active · 1 resolved · 2 inactive"
         date datestart "may be empty"
         date datestop "may be empty"
+        string patnote "free-text note on the problem"
     }
     diseasedef {
         bigint diseasedefnum PK "key"
         string diseasename "problem name"
         string icd10code "ICD-10-CM; diabetes is E10–E11"
         string snomedcode "SNOMED code"
+        string icd9code "ICD-9 code"
+        boolean ishidden "hidden from the list"
     }
     patient_tooth {
         bigint patient_id PK, FK "patient.patnum"

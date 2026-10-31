@@ -24,10 +24,27 @@ TABLES = {
         C("priprov", "bigint", "primary provider"),
         C("datefirstvisit", "date", "set by the software"),
         C("smokingsnomed", "string", "latest smoking status, SNOMED code"),
+        C("zip", "string", "postcode; a real extract keeps at most the first 3 digits"),
+        C("guarantor", "bigint", "head of household (patient.patnum)", "FK"),
+        C("medurgnote", "string", "free-text medical alert"),
+        C("premed", "boolean", "needs premedication before appointments"),
+        C("language", "string", "primary language code"),
+        C("admitdate", "date", "hospital admission date; can precede the first visit"),
+        C("sitenum", "bigint", "place of care (school, nursing home); 0 when none"),
+        C("responsparty", "bigint", "responsible for finances (patient.patnum)", "FK"),
+        C("datetimedeceased", "timestamp", "date of death"),
     ]),
     "clinic": Table("source", "One per office", "tooth_loss_load: overwrite per run", [
         C("clinicnum", "bigint", "office key", "PK"),
         C("description", "string", "office name (synthetic)"),
+        C("abbr", "string", "short name"),
+        C("address", "string", "street address"),
+        C("address2", "string", "second address line"),
+        C("city", "string", "city"),
+        C("state", "string", "state"),
+        C("zip", "string", "postcode"),
+        C("phone", "string", "phone"),
+        C("fax", "string", "fax"),
     ]),
     "procedurelog": Table("source", "One per procedure, done or planned: the one record of each", "tooth_loss_load: overwrite per run", [
         C("procnum", "bigint", "procedure key", "PK"),
@@ -45,6 +62,15 @@ TABLES = {
         C("icdversion", "int", "9 or 10: which ICD diagnosticcode is"),
         C("provnum", "bigint", "provider"),
         C("clinicnum", "bigint", "office", "FK"),
+        C("aptnum", "bigint", "the appointment"),
+        C("procfee", "double", "fee"),
+        C("toothrange", "string", "teeth of a multi-tooth procedure, comma-separated"),
+        C("priority", "bigint", "treatment priority (definition)", "FK"),
+        C("placeservice", "int", "where it was done: office, school, nursing facility, mobile unit, ..."),
+        C("prosthesis", "string", "blank no · I initial · R replacement"),
+        C("medicalcode", "string", "optional medical procedure code"),
+        C("unitqty", "int", "units billed, 1 by default"),
+        C("sitenum", "bigint", "place of care"),
     ]),
     "procedurecode": Table("source", "One per procedure code: fixed meaning (CDT D-codes)", "tooth_loss_load: overwrite per run", [
         C("codenum", "bigint", "code key", "PK"),
@@ -52,12 +78,18 @@ TABLES = {
         C("descript", "string", "standard description"),
         C("abbrdesc", "string", "abbreviation"),
         C("treatarea", "int", "tooth · surface · quadrant · arch · mouth"),
+        C("proccat", "bigint", "procedure category (definition)", "FK"),
+        C("isprosth", "boolean", "crown, bridge, denture or partial"),
+        C("ishygiene", "boolean", "a hygiene procedure"),
+        C("medicalcode", "string", "a matching medical code, optional"),
+        C("isradiology", "boolean", "a radiology procedure"),
     ]),
     "treatplan": Table("source", "One per saved treatment plan; several can share a date (alternatives)", "tooth_loss_load: overwrite per run", [
         C("treatplannum", "bigint", "plan key", "PK"),
         C("patnum", "bigint", "patient", "FK"),
         C("datetp", "date", "date of the plan"),
         C("tpstatus", "int", "0 saved · 1 active · 2 inactive"),
+        C("signature", "string", "captured when the plan is signed; empty when unsigned"),
     ]),
     "proctp": Table("source", "One per planned procedure per saved plan: a copy, repeated in every plan and at later exams", "tooth_loss_load: overwrite per run", [
         C("proctpnum", "bigint", "copy key", "PK"),
@@ -69,12 +101,21 @@ TABLES = {
         C("descript", "string", "description as text: editable"),
         C("dx", "string", "diagnosis as text (the item's name when saved), not a key: matched by name"),
         C("prognosis", "string", "prognosis as text"),
+        C("itemorder", "int", "order within the plan, fixed when saved"),
+        C("priority", "bigint", "treatment priority (definition)", "FK"),
+        C("surf", "string", "surfaces, quadrant or arch, as text"),
+        C("procabbr", "string", "code abbreviation as text; editable"),
+        C("provnum", "bigint", "provider"),
+        C("datetp", "date", "date planned"),
+        C("clinicnum", "bigint", "office", "FK"),
     ]),
     "definition": Table("source", "One per item in the practice's own lists (diagnoses, prognoses, ...)", "tooth_loss_load: overwrite per run", [
         C("defnum", "bigint", "item key", "PK"),
         C("category", "int", "which list: Diagnosis, Prognosis, ..."),
         C("itemname", "string", "the item's text, e.g. a diagnosis; older and newer lists both stay"),
         C("itemvalue", "string", "extra information, used differently per list"),
+        C("itemorder", "int", "place in the list, from 0"),
+        C("ishidden", "boolean", "hidden: retired items keep their keys"),
     ]),
     "perioexam": Table("source", "One per periodontal exam", "tooth_loss_load: overwrite per run", [
         C("perioexamnum", "bigint", "exam key", "PK"),
@@ -100,6 +141,7 @@ TABLES = {
         C("patnum", "bigint", "patient", "FK"),
         C("toothnum", "string", "tooth"),
         C("initialtype", "int", "0 missing (no reason, no date) · 1 hidden · 2 primary · ..."),
+        C("movement", "double", "shift in mm, or rotation or tipping in degrees"),
     ]),
     "disease": Table("source", "One per patient medical problem", "tooth_loss_load: overwrite per run", [
         C("diseasenum", "bigint", "key", "PK"),
@@ -108,12 +150,15 @@ TABLES = {
         C("probstatus", "int", "0 active · 1 resolved · 2 inactive"),
         C("datestart", "date", "may be empty"),
         C("datestop", "date", "may be empty"),
+        C("patnote", "string", "free-text note on the problem"),
     ]),
     "diseasedef": Table("source", "One per problem in the list", "tooth_loss_load: overwrite per run", [
         C("diseasedefnum", "bigint", "key", "PK"),
         C("diseasename", "string", "problem name"),
         C("icd10code", "string", "ICD-10-CM; diabetes is E10–E11"),
         C("snomedcode", "string", "SNOMED code"),
+        C("icd9code", "string", "ICD-9 code"),
+        C("ishidden", "boolean", "hidden from the list"),
     ]),
     # ---------- derived by spec 029 ----------
     "patient_tooth": Table("derived", "One per patient and tooth (1–32): how it was lost, and what was charted before", "tooth_loss.tooth_table; overwrite per run", [
@@ -219,7 +264,8 @@ KINDS = {t: "fact" for t in ("procedurelog", "treatplan", "proctp", "perioexam",
                              "disease", "patient_tooth", "planned_extraction", "tooth_loss_dq_check", "tooth_loss_truth")}
 KINDS |= {t: "dimension" for t in ("patient", "clinic", "procedurecode", "definition", "diseasedef")}
 # columns that would hold PHI in a real extract (synthetic here): de-identify before anything leaves the source
-PHI = {("patient", "birthdate"), ("proctp", "descript")}
+PHI = {("patient", "birthdate"), ("patient", "zip"), ("patient", "medurgnote"), ("patient", "datetimedeceased"),
+       ("proctp", "descript"), ("treatplan", "signature"), ("disease", "patnote")}
 # open questions and issues, shown in red: what to check before trusting the column
 QUESTIONS = {
     ("procedurelog", "diagnosticcode"): "rare: only on medical claims; never the label",
