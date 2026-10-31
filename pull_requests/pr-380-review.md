@@ -51,5 +51,23 @@ None.
 ## Test Coverage
 `cd python && python -m pytest -q tests`: 1124 passed, 16 skipped. `ruff check` on the changed Python: clean.
 
+## Added after the first review: the data-dictionary format
+A third format, `dictionary_erd.py` with `table_profile.py`, draws the same declarations as a data dictionary:
+- tables in subject areas, with fact and dimension headers;
+- each table's row count and grain;
+- each column's meaning and profile (nulls, distinct and top values);
+- names coloured for keys and PHI, and open questions in red.
+
+Checked:
+- **Profiler:** hand-worked series (counts, percentages, date years) in `test_silver_erd.py`.
+- **Grouping:** every table sits in exactly one subject area and has a kind, and every PHI or question column
+  exists.
+- **Counts:** the dictionary shows counts where given, and "not measured yet" elsewhere.
+- **Naming:** the profiler is `table_profile.py`, not `profile.py`, so it can't shadow Python's `profile` module.
+- **No data:** no counts are in the repo yet. The Open Dental dictionary fills in when spec 029's generator (T003)
+  writes the synthetic extract.
+
+Full suite after merging main: 1128 passed, 16 skipped.
+
 ## Verdict
 Approve with the layout nit. It can merge once CI is green.
