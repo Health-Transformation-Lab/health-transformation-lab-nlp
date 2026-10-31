@@ -85,6 +85,7 @@ the columns spec 029 needs are listed; each table has more.
 | `ProcNumOrig` | bigint | FK to `procedurelog`, to compare with the original |
 | `ToothNumTP` | string | display text of the tooth number |
 | `ProcCode` | string | display text, not a key |
+| `Descript` | string | the procedure's description as text saved with the plan; can be edited (#379) |
 | `Dx` | string | the diagnosis *text* at the time the plan was saved (not a key) |
 | `Prognosis` | string | the prognosis text |
 

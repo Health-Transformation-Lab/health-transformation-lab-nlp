@@ -28,3 +28,9 @@ Implementation starts after this spec, plan and tasks are reviewed.
   the stage rule
 - [ ] T010 [US3] `docs/tooth_loss.md`, results labelled synthetic; gold `fact_tooth_loss_prediction`
 - [ ] T011 Full test suite, `ruff`, R parity; review file for each implementation PR
+
+## US4 #379: ERDs of the Open Dental silver tables and an OMOP alternative
+
+- [x] T012 [US4] Failing tests (`test_silver_erd.py`), then `opendental_silver_model.py`, `omop_silver_model.py` and
+  `silver_erd.py`, using `gold_erd.py`'s writer (gold output unchanged); entity and full `.drawio`, `.mmd`, PNGs and
+  `diagrams/silver/data_model.md`
