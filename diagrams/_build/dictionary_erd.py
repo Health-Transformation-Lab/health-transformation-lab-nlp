@@ -147,6 +147,34 @@ def _legend(d, x, y):
     return h
 
 
+def _layout(tables, sizes):
+    """Two tables a row: the rows, and the subject area's width and height."""
+    rows = [tables[i:i + 2] for i in range(0, len(tables), 2)]
+    gw = max(sum(sizes[n][0] for n in row) + PAD * (len(row) + 1) for row in rows)
+    gh = 46 + sum(max(sizes[n][1] for n in row) + PAD for row in rows)
+    return rows, gw, gh
+
+
+def group_tops(m, stats, top=0):
+    """{subject area: y}: stacked down each column, the column then placed by COLUMN_ALIGN (top, middle or bottom)
+    against the tallest column."""
+    widths = table_widths(m, stats)
+    sizes = {n: _size(m, n, stats, widths[n]) for n in m.TABLES}
+    heights = {}
+    for title, c, tables in m.GROUPS:
+        heights.setdefault(c, []).append((title, _layout(tables, sizes)[2]))
+    tallest = max(sum(h for _, h in col) + GAP * (len(col) - 1) for col in heights.values())
+    tops = {}
+    for c, col in heights.items():
+        span = sum(h for _, h in col) + GAP * (len(col) - 1)
+        align = getattr(m, "COLUMN_ALIGN", {}).get(c, "top")
+        y = top + {"top": 0, "middle": (tallest - span) / 2, "bottom": tallest - span}[align]
+        for title, h in col:
+            tops[title] = y
+            y += h + GAP
+    return tops
+
+
 def build(m, stats=None):
     """m: a model with TABLES, RELATIONSHIPS, GROUPS, KINDS, PHI, QUESTIONS. stats: table_profile.profile() output;
     a table missing from it says its rows aren't measured yet."""
@@ -156,11 +184,8 @@ def build(m, stats=None):
     widths = table_widths(m, stats)
     sizes = {n: _size(m, n, stats, widths[n]) for n in m.TABLES}
 
-    def layout(tables):          # two tables a row; returns the rows and the group's size
-        rows = [tables[i:i + 2] for i in range(0, len(tables), 2)]
-        gw = max(sum(sizes[n][0] for n in row) + PAD * (len(row) + 1) for row in rows)
-        gh = 46 + sum(max(sizes[n][1] for n in row) + PAD for row in rows)
-        return rows, gw, gh
+    def layout(tables):
+        return _layout(tables, sizes)
 
     columns = sorted({c for _, c, _ in m.GROUPS})
     col_w = {c: max(layout(t)[1] for _, gc, t in m.GROUPS if gc == c) for c in columns}
@@ -169,11 +194,11 @@ def build(m, stats=None):
         col_x[c] = x
         x += col_w[c] + GAP
     top = 10 + legend_h + GAP               # the corridor above the subject areas runs just above this
-    col_y = {c: top for c in columns}
+    tops = group_tops(m, stats, top)
     anchors, place = {}, {}                 # place: table -> (column, group, row in group)
     for title, c, tables in m.GROUPS:
         rows, _, gh = layout(tables)
-        gx, gy = col_x[c], col_y[c]
+        gx, gy = col_x[c], tops[title]
         d.v(f"{_esc(title)}", gx, gy, col_w[c], gh,
             f"rounded=1;arcSize=1;absoluteArcSize=1;fillColor={AREA};strokeColor={INK};fontSize=20;fontColor={INK};verticalAlign=top;spacingTop=6;")
         ty = gy + 46
@@ -184,7 +209,6 @@ def build(m, stats=None):
                 place[n] = (c, title, i)
                 tx += w + PAD
             ty += max(sizes[n][1] for n in row) + PAD
-        col_y[c] = gy + gh + GAP
     lanes = {}
 
     def lane(key, base, step):              # the next free lane in a channel, so lines don't overlap

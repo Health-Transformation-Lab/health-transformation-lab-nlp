@@ -133,3 +133,27 @@ def test_the_dictionary_shows_counts_or_says_they_are_not_measured():
     assert "exitX=" in xml and "entryX=" in xml
     assert (dic.SRC / "opendental_silver_dictionary.drawio").exists()
     assert (dic.SRC / "omop_silver_dictionary.drawio").exists()
+
+
+def test_the_open_dental_areas_sit_in_the_reference_layout():
+    # the owner's reference data dictionary for an Open Dental extract (its layout only; nothing else is used):
+    # left Patient Health; centre-left Patient over Initial Odontogram; centre-right Misc Definitions over Location;
+    # right Perio Charting over Treatment Planning over Procedures; spec 029's own areas in a fifth column
+    cols = {}
+    for title, c, tables in OD.GROUPS:
+        cols.setdefault(c, []).append(title)
+    assert cols[0] == ["Patient Health"]
+    assert cols[1] == ["Patient", "Initial Odontogram"]
+    assert cols[2] == ["Misc Definitions", "Location"]
+    assert cols[3] == ["Perio Charting", "Treatment Planning", "Procedures"]
+    assert cols[4] == ["Tooth loss (spec 029)", "Data quality", "Answer key (evaluation only)"]
+    tables = {title: t for title, _, t in OD.GROUPS}
+    assert tables["Treatment Planning"] == ["proctp", "treatplan"]
+    assert tables["Patient Health"] == ["diseasedef", "disease"]
+    assert tables["Procedures"] == ["procedurelog", "procedurecode"]
+    assert tables["Perio Charting"] == ["perioexam", "periomeasure"]
+    # and vertically: Patient Health at the bottom, the centre columns in the middle, Procedures' column full height
+    assert OD.COLUMN_ALIGN == {0: "bottom", 1: "middle", 2: "middle"}
+    dic = _load("dictionary_erd")
+    tops = dic.group_tops(OD, {})
+    assert tops["Patient Health"] > tops["Perio Charting"] and tops["Patient"] > tops["Perio Charting"]

@@ -199,20 +199,22 @@ AREAS = {   # fill, legend label
 }
 
 # ---------- the data-dictionary view (dictionary_erd.py) ----------
-# subject areas: (title, column on the page, tables)
+# subject areas: (title, column on the page, tables), top to bottom in each column and tables left to right, laid
+# out like the owner's reference data dictionary for an Open Dental extract; spec 029's own areas get a fifth column
 GROUPS = [
-    ("Patient", 0, ["patient"]),
-    ("Location", 0, ["clinic"]),
-    ("Patient Health", 0, ["disease", "diseasedef"]),
-    ("Procedures", 1, ["procedurelog", "procedurecode"]),
-    ("Misc Definitions", 1, ["definition"]),
-    ("Treatment Planning", 2, ["treatplan", "proctp"]),
-    ("Perio Charting", 2, ["perioexam", "periomeasure"]),
-    ("Initial Odontogram", 2, ["toothinitial"]),
-    ("Tooth loss (spec 029)", 3, ["patient_tooth", "planned_extraction"]),
-    ("Data quality", 3, ["tooth_loss_dq_check"]),
-    ("Answer key (evaluation only)", 3, ["tooth_loss_truth"]),
+    ("Patient Health", 0, ["diseasedef", "disease"]),
+    ("Patient", 1, ["patient"]),
+    ("Initial Odontogram", 1, ["toothinitial"]),
+    ("Misc Definitions", 2, ["definition"]),
+    ("Location", 2, ["clinic"]),
+    ("Perio Charting", 3, ["perioexam", "periomeasure"]),
+    ("Treatment Planning", 3, ["proctp", "treatplan"]),
+    ("Procedures", 3, ["procedurelog", "procedurecode"]),
+    ("Tooth loss (spec 029)", 4, ["patient_tooth", "planned_extraction"]),
+    ("Data quality", 4, ["tooth_loss_dq_check"]),
+    ("Answer key (evaluation only)", 4, ["tooth_loss_truth"]),
 ]
+COLUMN_ALIGN = {0: "bottom", 1: "middle", 2: "middle"}    # columns not listed start at the top
 KINDS = {t: "fact" for t in ("procedurelog", "treatplan", "proctp", "perioexam", "periomeasure", "toothinitial",
                              "disease", "patient_tooth", "planned_extraction", "tooth_loss_dq_check", "tooth_loss_truth")}
 KINDS |= {t: "dimension" for t in ("patient", "clinic", "procedurecode", "definition", "diseasedef")}
